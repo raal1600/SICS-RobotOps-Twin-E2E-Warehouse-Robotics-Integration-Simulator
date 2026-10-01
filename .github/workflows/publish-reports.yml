@@ -1,0 +1,96 @@
+name: Build and publish research reports
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'reports/**'
+      - 'publication/**'
+      - 'tools/build_publication.py'
+      - 'requirements-docs.txt'
+      - 'CITATION.cff'
+      - '.github/workflows/publish-reports.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: robotops-publication
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+      - name: Install PDF rendering system libraries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 fonts-dejavu-core
+      - name: Install pinned publication toolchain
+        run: python -m pip install -r requirements-docs.txt
+      - name: Build HTML, diagrams, references and PDFs
+        run: python tools/build_publication.py
+      - name: Archive complete publication for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: robotops-publication
+          path: _site/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain generated publication and PDF downloads in gh-pages branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="$RUNNER_TEMP/robotops-published"
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages:refs/remotes/origin/gh-pages
+            git worktree add -B gh-pages "$target" origin/gh-pages
+          else
+            git worktree add --detach "$target" HEAD
+            (cd "$target" && git switch --orphan gh-pages)
+          fi
+          rsync -a --delete --exclude='.git' _site/ "$target/"
+          cd "$target"
+          git add --all
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "Publish documentation from ${GITHUB_SHA}"
+            git push origin HEAD:gh-pages
+          fi
+      - name: Package GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Publication summary
+        run: |
+          echo '## RobotOps Twin publication' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Three reports, combined PDF, seven vector diagrams, editable sources and source register built.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Generated files are retained in the gh-pages branch even if Pages requires initial activation.' >> "$GITHUB_STEP_SUMMARY"
+          cat _site/build.json >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check Pages configuration
+        uses: actions/configure-pages@v5
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

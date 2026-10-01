@@ -8,7 +8,7 @@
 
 Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till AI-assisterad robotexekvering, verifiering och återhämtning. Blender är den **planerade simulatorvärlden**, inte en validerad kopia av en verklig anläggning.
 
-**Aktuell status:** rapporter, diagram och publiceringskedja finns. Den fullständiga ERP/robot-simulatorn är specificerad men ännu inte implementerad eller empiriskt validerad i detta repository. Projektet är inte beställt eller godkänt av SICS AI.
+**Aktuell status:** rapporter, diagram och publiceringskedja finns. Den fullständiga ERP/robot-simulatorn är nu specificerad i ett normativt implementation contract och success-criteria contract, men är ännu inte implementerad eller empiriskt validerad i detta repository. Projektet är inte beställt eller godkänt av SICS AI.
 
 ## Läs och ladda ned
 
@@ -21,6 +21,17 @@ Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till A
 **[Alla tre rapporterna i en PDF](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/downloads/robotops-twin-samlat.pdf)** · [Diagramgalleri](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/diagram.html) · [Källregister](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/kallor.html)
 
 PDF-filer och färdig webbplats finns också i den genererade [gh-pages-grenen](https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tree/gh-pages). Publiceringshistorik och HTTP-kontroller finns i Actions.
+
+## Implementation contract and Codex handoff
+
+The implementation is governed by four English documents intended for an autonomous Codex `/goal` loop:
+
+- [PROJECT_PLAN.md](PROJECT_PLAN.md) — normative architecture, contracts, state/recovery semantics, implementation phases and knowledge-base synchronization protocol.
+- [SUCCESS_CRITERIA.md](SUCCESS_CRITERIA.md) — normative machine-checkable acceptance contract. **DONE requires every MUST criterion to pass with inspectable evidence.**
+- [HANDOFF.md](HANDOFF.md) — exact `/goal` prompt, mandatory read order, iteration algorithm, anti-shortcut rules, escalation conditions, milestone discipline and final release checklist.
+- [CODEX_GOAL_CHECKLIST.md](CODEX_GOAL_CHECKLIST.md) — operational checklist derived from the normative plan and criteria; it does not weaken them.
+
+During implementation, `GOAL_PROGRESS.md` and `ACCEPTANCE_REPORT.md` will be generated/maintained as operational evidence. Any architecture, API, schema, state-machine, source, command or project-status change that makes existing documentation stale must update all affected knowledge-base source documents and diagrams in the same coherent change. Generated Pages/PDFs are rebuilt through the publication workflow rather than edited manually.
 
 ## Konceptet
 
@@ -65,6 +76,10 @@ publication/             Källregister, diagramlayout och CSS
 .github/workflows/       Bygge, publicering och HTTP-kontroll
 CITATION.cff             Citeringsmetadata
 PUBLICATION.md           Underhålls- och publiceringsguide
+PROJECT_PLAN.md           Normativ implementation plan
+SUCCESS_CRITERIA.md       Normativ acceptance contract
+HANDOFF.md                Codex /goal operating contract
+CODEX_GOAL_CHECKLIST.md   Operational implementation checklist
 ```
 
 Rami Halabi · Version 1.0 · 1 oktober 2026. Befintlig [MIT-licens](LICENSE) behålls. Länkade källor och varumärken tillhör respektive rättighetsinnehavare.

@@ -75,8 +75,6 @@ jobs:
       - name: Publication summary
         run: |
           echo '## RobotOps Twin publication' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Three reports, combined PDF, seven vector diagrams, editable sources and source register built.' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Generated files are retained in the gh-pages branch even if Pages requires initial activation.' >> "$GITHUB_STEP_SUMMARY"
           cat _site/build.json >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
@@ -94,3 +92,56 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify public HTML, diagram and PDF responses
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, time, urllib.request
+          from pathlib import Path
+          from datetime import datetime, timezone
+          base=os.environ['PAGE_URL'].rstrip('/')+'/'
+          commit=os.environ['GITHUB_SHA']
+          def get(path):
+              request=urllib.request.Request(base+path+'?verify='+commit, headers={'User-Agent':'RobotOps-Publication-Smoke-Test','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(request,timeout=30) as response:
+                  return response.status,response.headers.get_content_type(),response.read()
+          for attempt in range(12):
+              try:
+                  status,ctype,raw=get('build.json')
+                  manifest=json.loads(raw)
+                  if manifest['source_commit']==commit:
+                      break
+              except Exception:
+                  if attempt==11:
+                      raise
+              time.sleep(10)
+          else:
+              raise RuntimeError('Pages did not expose the current publication commit')
+          checks=[]
+          for name in ['index','design','avgransning','diskussion','kallor','diagram']:
+              path=name+'.html'; status,ctype,data=get(path)
+              assert status==200 and ctype=='text/html' and b'RobotOps Twin' in data, path
+              checks.append({'path':path,'status':status,'content_type':ctype,'bytes':len(data)})
+          for report in manifest['reports']:
+              path='downloads/'+report['report']+'.pdf'; status,ctype,data=get(path)
+              digest=hashlib.sha256(data).hexdigest()
+              assert status==200 and data.startswith(b'%PDF-') and digest==report['pdf_sha256'], path
+              checks.append({'path':path,'status':status,'content_type':ctype,'sha256':digest,'bytes':len(data)})
+          path='downloads/robotops-twin-samlat.pdf';status,ctype,data=get(path)
+          assert status==200 and data.startswith(b'%PDF-') and len(data)>10000,path
+          checks.append({'path':path,'status':status,'content_type':ctype,'bytes':len(data)})
+          for name in ['context','architecture','state','ack-loss','worlds','trust','boundary']:
+              path='assets/'+name+'.svg';status,ctype,data=get(path)
+              assert status==200 and b'<svg' in data,path
+              checks.append({'path':path,'status':status,'content_type':ctype,'bytes':len(data)})
+          evidence={'page_url':base,'source_commit':commit,'verified_at':datetime.now(timezone.utc).isoformat(),'checks':checks,'scope':'Public documentation only; no robot runtime tested'}
+          Path('publication-http-checks.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2))
+          print(json.dumps(evidence,ensure_ascii=False,indent=2))
+          PY
+      - name: Archive public HTTP verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-http-checks
+          path: publication-http-checks.json
+          if-no-files-found: error

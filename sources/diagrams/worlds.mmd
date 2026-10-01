@@ -1,0 +1,12 @@
+flowchart TD
+  goal["Önskat tillstånd g<br/>ERP anger vilket resultat som behövs"]
+  truth["Simulatortillstånd x<br/>Objekt • robot • effektjournal"]
+  brain["Modell / planering b<br/>Förslag utifrån mål och observation"]
+  obs["Observerat tillstånd y<br/>Sensor • brus • skymning • tid"]
+  action["Validerad handling<br/>Endast typade operationer"]
+  oracle["Test-orakel<br/>Facit jämförs med verifierarens dom"]
+  goal --> brain
+  truth --> obs
+  obs --> brain
+  brain --> action
+  truth -.-> oracle

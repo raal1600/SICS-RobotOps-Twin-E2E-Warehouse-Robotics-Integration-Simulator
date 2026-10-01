@@ -1,0 +1,297 @@
+<!doctype html><html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Simulatorn och den verkliga robotcellen | RobotOps Twin</title><meta name="author" content="Rami Halabi"><meta name="description" content="Vad demonstratorn kan representera, vad den inte kan bevisa och vad som krävs före fysisk integration."><link rel="stylesheet" href="style.css"></head><body><a class="skip" href="#main">Hoppa till innehållet</a><header class="site-header"><a class="brand" href="index.html">ROBOTOPS TWIN<span>FORSKNING · SYSTEMDESIGN · DIALOG</span></a><nav class="top-nav" aria-label="Huvudmeny"><a href="index.html">Översikt</a><a href="design.html">Designstudie</a><a href="avgransning.html" aria-current="page">Avgränsning</a><a href="diskussion.html">Diskussion</a><a href="kallor.html">Källor</a><a href="diagram.html">Diagram</a></nav></header><div class="shell"><aside class="sidebar"><details open><summary>Innehåll</summary><ol><li><a href="#section-1">Sammanfattning</a></li><li><a href="#section-2">1. Jämförelsens tre nivåer</a></li><li><a href="#section-3">2. Vad vi vet, vad vi förenklar och vad vi inte vet</a></li><li><a href="#section-7">3. Vilken typ av realism är viktig?</a></li><li><a href="#section-12">4. ”Digital twin” är ett projektnamn, inte en valideringsstämpel</a></li><li><a href="#section-13">5. Den viktigaste gränsen: kontroll av kommando kontra kontroll av effekt</a></li><li><a href="#section-17">6. Vad ett byte till verklig hårdvara skulle kräva</a></li><li><a href="#section-18">7. Påståenden som är rimliga respektive missvisande</a></li><li><a href="#section-19">8. Vad som avsiktligt ligger utanför projektet</a></li><li><a href="#section-20">9. Risker, motåtgärder och kvarvarande osäkerhet</a></li><li><a href="#section-21">10. Slutsats och kontrollista för presentation</a></li><li><a href="#referenser">Referenser och källbegränsningar</a></li></ol></details><div class="side-meta">Rapport 02 / 03<br>Version 1.0 · Svenska<br>Designstadium — inga driftresultat<br><a href="downloads/02-avgransning.pdf">Ladda ned PDF</a></div></aside><main id="main" class="document"><section class="cover"><div class="eyebrow">Rapport 02 / 03 · RobotOps Twin</div><h1>Simulatorn och den verkliga robotcellen</h1><p class="subtitle">Avgränsning, realism och överförbarhet</p><div class="metadata">Rami Halabi<br>Version 1.0 · 1 oktober 2026<br>Oberoende tekniskt rapportpaket · Svenska</div><div class="status"><strong>Status: design och forskningsunderlag.</strong> Simulatorn beskrivs som ett planerat system. Inga empiriska robotresultat eller säkerhetsgarantier hävdas.</div><div class="buttons"><a class="button" href="downloads/02-avgransning.pdf" download>Ladda ned PDF</a><a class="button secondary" href="sources/02-avgransning.md" download>Markdown-källa</a></div><p class="print-label">AI-assisterad text- och publiceringsframställning.<br>Ej sakkunniggranskad. Inte framtagen av eller godkänd av SICS AI.<br>Rapporternas källor, diagram och byggskript finns i projektets repository.</p></section><nav class="print-toc" aria-label="Innehållsförteckning"><h2>Innehåll</h2><ol><li><a href="#section-1">Sammanfattning</a></li><li><a href="#section-2">1. Jämförelsens tre nivåer</a></li><li><a href="#section-3">2. Vad vi vet, vad vi förenklar och vad vi inte vet</a></li><li><a href="#section-7">3. Vilken typ av realism är viktig?</a></li><li><a href="#section-12">4. ”Digital twin” är ett projektnamn, inte en valideringsstämpel</a></li><li><a href="#section-13">5. Den viktigaste gränsen: kontroll av kommando kontra kontroll av effekt</a></li><li><a href="#section-17">6. Vad ett byte till verklig hårdvara skulle kräva</a></li><li><a href="#section-18">7. Påståenden som är rimliga respektive missvisande</a></li><li><a href="#section-19">8. Vad som avsiktligt ligger utanför projektet</a></li><li><a href="#section-20">9. Risker, motåtgärder och kvarvarande osäkerhet</a></li><li><a href="#section-21">10. Slutsats och kontrollista för presentation</a></li><li><a href="#referenser">Referenser och källbegränsningar</a></li></ol></nav><h2 id="section-1">Sammanfattning</h2>
+<p>Den här rapporten skiljer <strong>RobotOps Twins planerade simulator</strong> från dels en generell industriell robotcell, dels den begränsade bild av SICS AI:s miljö som finns i offentliga källor. Dessa två jämförelseobjekt är inte samma sak. Offentlig information räcker inte för att beskriva företagets fullständiga interna system.</p>
+<p>Simulatorn ska efterlikna informationsflödet från kundorder till verifierat plock och återkoppling. Den ska bevara vissa integrationsproblem: dubbletter, osäkra utfall, återhämtning, separata systemägare och motstridiga observationer. Den ska däremot förenkla robotmekanik, sensorsystem, säkerhet, produktvariation, nätverk och driftorganisation.</p>
+<p><strong>Det som senare kan demonstreras är programvarans beteende under definierade simuleringsantaganden.</strong> Det är inte ett bevis för fysisk säkerhet, kommersiell driftsäkerhet, ett fungerande SICS-gränssnitt eller generell intelligens. Projektet befinner sig i denna version på designstadiet.</p>
+<h2 id="section-2">1. Jämförelsens tre nivåer</h2>
+<p>Vi använder tre nivåer för att undvika att generella branschbegrepp tillskrivs ett enskilt bolag.</p>
+<p><strong>Nivå A: dokumenterad offentlig uppgift.</strong> Exempelvis anger SICS rollannons kundintegration, medan Cognibotics beskriver en konkret Nowaste-cell. Uppgifterna citeras och attribueras. <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a><a class="cite" href="#ref-S07" aria-label="Källa S07">[S07]</a></p>
+<p><strong>Nivå B: generell integrationsfråga.</strong> Exempelvis måste ett system skilja mellan förlorad kommunikation och en känd utebliven sidoeffekt. Det är en fråga om distribuerad systemdesign, inte ett fynd om hur SICS har implementerat sin lösning. <a class="cite" href="#ref-S17" aria-label="Källa S17">[S17]</a></p>
+<p><strong>Nivå C: vårt föreslagna val.</strong> SQLite, en Blender-arm, en deterministisk Brain-adapter och ett visst tillståndsdiagram är egna beslut. De ska kunna ändras utan att källorna ändras.</p>
+<p>Jämförelsen är alltså inte en omvänd konstruktion av SICS AI:s produkt. Den identifierar vilka aspekter en liten demonstrator kan representera och var motsvarigheten upphör.</p>
+<figure id="fig-boundary"><img src="assets/boundary.svg" alt="Gemensam fråga — olika beviskrav. Figur 7. Egen jämförelse. Kontrakt, identiteter, felhantering och observerbarhet kan studeras i båda miljöerna. Fysik, sensorer, säkerhet och driftsvillkor kräver ny validering vid övergång till verklig utrustning. Figuren beskriver ingen intern SICS-arkitektur." width="900" height="760"><figcaption>Figur 7. Egen jämförelse. Kontrakt, identiteter, felhantering och observerbarhet kan studeras i båda miljöerna. Fysik, sensorer, säkerhet och driftsvillkor kräver ny validering vid övergång till verklig utrustning. Figuren beskriver ingen intern SICS-arkitektur.</figcaption><div class="figure-tools"><a href="assets/boundary.svg">Öppna stor SVG</a><a href="sources/diagrams/boundary.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<h2 id="section-3">2. Vad vi vet, vad vi förenklar och vad vi inte vet</h2>
+<h3 id="section-4">2.1 Affärssystem och integration</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Aspekt</th>
+<th>Offentlig eller generell verklighetsbild</th>
+<th>RobotOps Twins mål</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kundflöde</td>
+<td>Rollen omfattar kundens API/WMS/ERP. <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a></td>
+<td>Syntetiska order, tre SKU:er och ett plock per orderrad.</td>
+</tr>
+<tr>
+<td>Affärsregler</td>
+<td>Exakta kundregler är inte offentliga.</td>
+<td>En enkel regel: rätt exemplar till rätt orderlåda.</td>
+</tr>
+<tr>
+<td>Integration</td>
+<td>Leverantörsmaterial beskriver lagerstyrning runt robotcellen. <a class="cite" href="#ref-S07" aria-label="Källa S07">[S07]</a></td>
+<td>Separat kundadapter och kvittenskontrakt.</td>
+</tr>
+<tr>
+<td>Inventering</td>
+<td>Verklig redovisning, reservation och korrigering är inte kartlagda.</td>
+<td>Förenklad reservations- och saldomodell utan bokföring.</td>
+</tr>
+<tr>
+<td>Kommunikation</td>
+<td>Det faktiska protokollet och garantierna är okända.</td>
+<td>Lokala API:er med injicerad fördröjning och kvittensförlust.</td>
+</tr>
+</tbody>
+</table></div>
+<p>En mock kan visa hur kontrakt hanteras. Den kan inte visa att alla verkliga affärsregler är förstådda. Returer, substitution, batcher, förpackningshierarkier, lagersaldokonflikter och flera samtidiga kunder ligger utanför den första versionen.</p>
+<p>Ett lyckat plock kan också vara olika saker i olika affärsprocesser: flyttat objekt, scannad artikel, klar orderrad eller skickklar försändelse. Simulatorn ska därför uttryckligen definiera sin sluttillståndsregel. Den bör inte använda ordet ”levererad” för en artikel som bara har flyttats mellan två lådor.</p>
+<h3 id="section-5">2.2 AI, robot och rörelse</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Aspekt</th>
+<th>Offentlig uppgift eller kunskapslucka</th>
+<th>Simulatorns avgränsning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Robotbrain</td>
+<td>HYPER beskriver en proprietär modell. <a class="cite" href="#ref-S03" aria-label="Källa S03">[S03]</a></td>
+<td>Ett gränssnitt, inte en återimplementation.</td>
+</tr>
+<tr>
+<td>Modellstyrning</td>
+<td>Offentliga texter beskriver olika kontrollnivåer. <a class="cite" href="#ref-S03" aria-label="Källa S03">[S03]</a><a class="cite" href="#ref-S07" aria-label="Källa S07">[S07]</a></td>
+<td>Uppgiftsnivå i MVP; lednivå endast ett framtida adapterkontrakt.</td>
+</tr>
+<tr>
+<td>Robotmekanik</td>
+<td>HKM1800 har hybridkinematik enligt tillverkaren. <a class="cite" href="#ref-S08" aria-label="Källa S08">[S08]</a></td>
+<td>Generisk arm; inga HKM-prestandapåståenden.</td>
+</tr>
+<tr>
+<td>Gripning</td>
+<td>Verkliga objekt och verktyg påverkar resultatet.</td>
+<td>Regelstyrd fästning/lossning av syntetiska objekt.</td>
+</tr>
+<tr>
+<td>Perception</td>
+<td>Den exakta sensorkedjan är inte offentlig.</td>
+<td>Syntetisk observation, med valfri rendering och bildmodell.</td>
+</tr>
+<tr>
+<td>Inlärning</td>
+<td>Algoritm, data och vikter är inte tillgängliga för denna studie.</td>
+<td>Ingen träning i baslinjen; versionshanterad planeringslogik.</td>
+</tr>
+</tbody>
+</table></div>
+<p>En animation kan vara begriplig utan att dess moment, kontaktkrafter eller ledhastigheter motsvarar en verklig robot. Det är tillåtet i en integrationsdemo om det är tydligt deklarerat. Problemet uppstår när visuellt övertygande rörelse används som underlag för påståenden om dynamisk noggrannhet.</p>
+<h3 id="section-6">2.3 PLC, beräkning och drift</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Aspekt</th>
+<th>Verklighetsanknytning</th>
+<th>Vad demonstratorn inte styrker</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLC</td>
+<td>Finns i rollens integrationsområde. <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a></td>
+<td>Att ett logiskt signalobjekt är ett testat PLC-program.</td>
+</tr>
+<tr>
+<td>OPC UA</td>
+<td>Har informationsmodell och kommunikationstjänster. <a class="cite" href="#ref-S18" aria-label="Källa S18">[S18]</a></td>
+<td>Att ett JSON-API innebär OPC UA-stöd.</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>LUMI-arbete och DGX-leverans är offentliggjorda. <a class="cite" href="#ref-S10" aria-label="Källa S10">[S10]</a><a class="cite" href="#ref-S11" aria-label="Källa S11">[S11]</a></td>
+<td>Att simulatorn motsvarar träning på B200.</td>
+</tr>
+<tr>
+<td>Drift</td>
+<td>Rollen omfattar system i kundmiljö. <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a></td>
+<td>Tillgänglighet över månader, jourförmåga eller verkligt serviceansvar.</td>
+</tr>
+<tr>
+<td>Säkerhet</td>
+<td>Verklig utrustning har egna säkerhetskrav och risker.</td>
+<td>Funktionell säkerhet, validerat nödstopp eller CE-underlag.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-7">3. Vilken typ av realism är viktig?</h2>
+<h3 id="section-8">3.1 Semantisk realism</h3>
+<p>Projektets viktigaste mål är att betydelsen i meddelandena ska vara konsekvent. Kundens begäran, integrationens avsikt och robotens exekveringsförsök ska inte ha samma otydliga ”klart”-flagga. Begrepp som accepterat, utfört, verifierat och kundkvitterat måste kunna skiljas åt.</p>
+<p>Detta går att demonstrera med enkla objekt och låg grafisk detaljnivå. En grå låda som hamnar i fel destination är ett bättre testfall än en fotorealistisk kartong vars position aldrig kontrolleras.</p>
+<h3 id="section-9">3.2 Beteendemässig realism</h3>
+<p>Systemet ska kunna visa plausibla felreaktioner: en tjänst förlorar svaret, ett objekt är skymt, en kvittens återlevereras och en gammal plan når en återställd scen. Reaktionerna måste följa definierade regler, inte en demonstration som är skriptad för att alltid lyckas.</p>
+<p>Vi modellerar dock inte hela felpopulationen i en riktig anläggning. Inga slutsatser om sannolikheten för driftstopp kan dras från att ett antal utvalda fel har hanterats.</p>
+<h3 id="section-10">3.3 Fysikalisk och perceptuell realism</h3>
+<p>Fysikalisk realism är låg i första versionen. Simulatorn kan kontrollera geometriska villkor men saknar exempelvis verklig kontaktfysik, deformation och materialvariation. Perceptuell realism är också begränsad om objektens identiteter kommer från metadata.</p>
+<p>En valfri bildmodell höjer inte automatiskt realismen till produktionsnivå. Bilder från Blender kan avvika systematiskt från verkliga kamerabilder. Dessutom kan modellens klassificering vara korrekt samtidigt som koordinater eller tidpunkter är fel.</p>
+<h3 id="section-11">3.4 Operationell realism</h3>
+<p>Loggning, idempotens och återhämtning kan vara ganska realistiska trots en enkel värld. Däremot saknas människor som flyttar gods, underhållspersonal, skiftbyten, leverantörsgränser, nätverkssegment och verkliga incidentprocesser. Dessa ska inte döljas bakom ett dashboard-uttryck som ”production ready”.</p>
+<h2 id="section-12">4. ”Digital twin” är ett projektnamn, inte en valideringsstämpel</h2>
+<p>RobotOps Twin ska i första hand beskrivas som en <strong>simulerad cell med digital-tvilling-inspirerad systemdesign</strong>. Vi saknar en verklig referenscell, en mätkedja som synkroniserar den och en utvärdering av modellens avvikelse från verkligheten.</p>
+<p>Axels examensarbetstitel ger en relevant tematisk koppling, men denna rapport har inte verifierat hela examensarbetets metod eller resultat. Det vore därför fel att säga att vår efterhandsverifiering i Blender är samma metod eller att en KTH-studie har validerat vår design. <a class="cite" href="#ref-S04" aria-label="Källa S04">[S04]</a></p>
+<p>Ett framtida digitalt tvillingarbete behöver definiera vilken tillgång som avbildas, vilka tillstånd som uppdateras, hur ofta uppdatering sker och vilka avvikelser som accepteras för den avsedda användningen. Det räcker inte att två skärmar visar samma robotform.</p>
+<h2 id="section-13">5. Den viktigaste gränsen: kontroll av kommando kontra kontroll av effekt</h2>
+<h3 id="section-14">5.1 Vad som faktiskt kan testas</h3>
+<p>Inom vår modell kan test-oraklet räkna hur många gånger ett objekt har flyttats och om affärsstatus motsvarar slutläget. Därmed går det att upptäcka logiska fel: samma order skapar två effekter, gamla kommandon körs efter scenreset eller en kundkvittens orsakar ett nytt robotplock.</p>
+<p>Den ordinarie verifieraren ska däremot arbeta med begränsad observation. Att test-oraklet vet exakt var objektet finns betyder inte att driftlogiken har samma kunskap.</p>
+<h3 id="section-15">5.2 Vad som inte kan bevisas</h3>
+<p>Ett lyckat test visar inte att en fysisk robot aldrig dubbelplockar. Ett plock kan misslyckas på sätt som vår modell inte innehåller. Två funktioner kan dela samma felaktiga antagande och ändå vara överens.</p>
+<p>Exempel: simulatorn flyttar ett objekt genom att ändra dess parent och verifieraren läser samma parent-fält. Då kan båda rapportera framgång utan att vi har testat en oberoende sensorväg. Därför ska test-orakel, observerad värld och beslut särskiljas, och kvarvarande gemensamma beroenden redovisas.</p>
+<h3 id="section-16">5.3 Oavgjort är ett legitimt resultat</h3>
+<p>Vid kvittensförlust kan journal och ny observation stödja ett slutförande. Men om journalen är borta och objektet skymt bör systemet inte gissa. En tydlig <code>MANUAL_REVIEW</code> är i det fallet mer korrekt än att forcera flödet till grönt.</p>
+<p>Demonstrationen ska visa både ett återhämtningsbart fel och ett ärligt oavgjort fall. Då blir det tydligt att reconciliation inte är en magisk funktion som alltid vet vad som hände.</p>
+<h2 id="section-17">6. Vad ett byte till verklig hårdvara skulle kräva</h2>
+<p>En adaptergräns är värdefull men ett hårdvarubyte är ett integrationsprojekt. Tabellen nedan beskriver ett föreslaget införandeförfarande, inte SICS AI:s process.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Steg</th>
+<th>Nödvändigt underlag</th>
+<th>Föreslagen beslutsgrind</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Kontraktsgranskning</td>
+<td>Leverantörens API, felkoder, enheter och kvittenser.</td>
+<td>Alla kommandomappningar och okända fall dokumenterade.</td>
+</tr>
+<tr>
+<td>2. Risk- och ansvarsfördelning</td>
+<td>Ansvariga för cell, robot, arbetsmiljö och säkerhetsfunktioner.</td>
+<td>Ingen rörelse med oklart säkerhetsansvar.</td>
+</tr>
+<tr>
+<td>3. Geometri och kalibrering</td>
+<td>Verkliga koordinatsystem, verktyg och tillåtna områden.</td>
+<td>Mätningar och verifiering mot avsedd uppgift.</td>
+</tr>
+<tr>
+<td>4. Kontrollerat hårdvaruprov</td>
+<td>Avgränsad testmiljö och godkända rutiner.</td>
+<td>Rörelse, stopp och felrespons granskade av ansvariga.</td>
+</tr>
+<tr>
+<td>5. Affärssystemtest</td>
+<td>Riktiga kundregler och representativa data.</td>
+<td>Order- och inventeringssemantik accepterad av kund.</td>
+</tr>
+<tr>
+<td>6. Driftprov</td>
+<td>Övervakning, återställning, versionsbyte och support.</td>
+<td>Mätbara acceptanskriterier och kända begränsningar.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Varken rapportpaketet eller simulatorns planerade logik ska användas som säkerhetsinstruktion för fysisk utrustning. Funktionell säkerhet måste hanteras av personer med rätt ansvar och kompetens i den aktuella anläggningen.</p>
+<h2 id="section-18">7. Påståenden som är rimliga respektive missvisande</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Rimlig formulering</th>
+<th>Missvisande formulering</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>”Jag har specificerat en simulerad order–robot-kedja.”</td>
+<td>”Jag har byggt SICS system.”</td>
+</tr>
+<tr>
+<td>”Det här är ett test av idempotens inom en definierad felmodell.”</td>
+<td>”Det här garanterar exactly-once i den fysiska världen.”</td>
+</tr>
+<tr>
+<td>”Blender ersätter den fysiska cellen i demonstrationen.”</td>
+<td>”Modellen är en validerad tvilling av Nowastes cell.”</td>
+</tr>
+<tr>
+<td>”En deterministisk adapter föreslår handlingar.”</td>
+<td>”Jag har återskapat deras inlärda robotbrain.”</td>
+</tr>
+<tr>
+<td>”Stoppet är en logisk simulering.”</td>
+<td>”Systemet har ett certifierat nödstopp.”</td>
+</tr>
+<tr>
+<td>”Bildmodellen lämnar ett förslag som valideras.”</td>
+<td>”Schemakorrekt AI-utdata är säkert att exekvera.”</td>
+</tr>
+<tr>
+<td>”OPC UA är ett planerat tillägg.”</td>
+<td>”PLC/OPC UA är klart eftersom jag har en signalvy.”</td>
+</tr>
+<tr>
+<td>”Det här behöver testas på verklig hårdvara.”</td>
+<td>”Byt adapter så är allt produktionsklart.”</td>
+</tr>
+</tbody>
+</table></div>
+<p>När simulatorn senare är byggd ska formuleringarna uppdateras till dåtid endast för de delar som faktiskt går att visa. Testresultat ska länka till en körning och en commit, inte bara till en skärmbild.</p>
+<h2 id="section-19">8. Vad som avsiktligt ligger utanför projektet</h2>
+<p>Den första versionen omfattar inte AGI-forskning, egen foundationmodell, full HKM1800-kinematik, säkerhets-PLC, komplex kontaktfysik, storskalig GPU-träning, flerrobotsamordning, verklig AutoStore-integration eller ett komplett ERP. Den omfattar inte heller säkerhetscertifiering, juridisk bedömning eller revision av SICS AI.</p>
+<p>Detta är inte ett argument för att dessa områden är oviktiga. Avgränsningen gör i stället att de delar som faktiskt byggs kan förstås, testas och diskuteras. En liten design med uttryckliga begränsningar är lättare att granska än en bred demo som använder många tekniska namn utan motsvarande implementation.</p>
+<p>GitHub Pages-publiceringen är en dokumentationsleverans. Den ska inte förväxlas med en molndriftsatt simulator. Python, lokal databas, Blender och eventuella modellnycklar hör till en separat körmiljö. <a class="cite" href="#ref-S19" aria-label="Källa S19">[S19]</a></p>
+<h2 id="section-20">9. Risker, motåtgärder och kvarvarande osäkerhet</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Föreslagen motåtgärd</th>
+<th>Kvarvarande begränsning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visuell realism övertygar mer än tester.</td>
+<td>Visa status och effektjournal tillsammans med grafiken.</td>
+<td>Grafiken kan ändå ge ett starkare intryck än modellen motiverar.</td>
+</tr>
+<tr>
+<td>Verifieraren läser facit.</td>
+<td>Separera sensorväg och test-orakel.</td>
+<td>Båda delar simulatorns grundantaganden.</td>
+</tr>
+<tr>
+<td>För många verktyg försämrar leveransen.</td>
+<td>En lokal cell och ett aktivt uppdrag.</td>
+<td>Ingen skalbarhetsvalidering.</td>
+</tr>
+<tr>
+<td>LLM gör demonstrationen instabil.</td>
+<td>Deterministisk baslinje och tydlig felpolicy.</td>
+<td>Baslinjen visar inte modellens intelligens.</td>
+</tr>
+<tr>
+<td>Återställning raderar bevis.</td>
+<td>Epoker, beständig historik och export av körning.</td>
+<td>En inkonsistent fysiskliknande värld kan kräva granskning.</td>
+</tr>
+<tr>
+<td>Agentverktyg får för stor behörighet.</td>
+<td>Isolerat scenförfattande; inget MCP i runtime.</td>
+<td>Utvecklingsmiljön behöver fortfarande skyddas.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Blender Labs egen varning om exekvering av modellgenererad kod är motiv för separationen mellan författande och drift. Det är inte ett påstående om att ett visst MCP-paket har använts eller säkerhetsgranskats i denna version. <a class="cite" href="#ref-S12" aria-label="Källa S12">[S12]</a></p>
+<h2 id="section-21">10. Slutsats och kontrollista för presentation</h2>
+<p>Den rimliga ambitionen är <strong>hög tydlighet i integrationssemantik och låg, öppet deklarerad fysisk realism</strong>. Projektet ska göra det möjligt att diskutera var beslut tas, vem som äger tillstånd och vad som händer när observation och journal inte stämmer överens.</p>
+<p>Före varje demonstration ska projektägaren kunna besvara följande i vanliga ord: vad är implementerat, vad är simulerat, vilka källor inspirerade valet, vilka tester har körts och vad kräver fortfarande verklig utrustning? När dessa svar är tydliga blir begränsningarna en del av det tekniska resonemanget, inte något som behöver döljas.</p>
+<p><strong>Rapportens slutsats är inte att simulatorn motsvarar den verkliga miljön. Slutsatsen är att den kan bevara utvalda, betydelsefulla integrationsproblem samtidigt som den gör deras gränser synliga.</strong></p>
+<section class="references" aria-label="Referenser"><h2 id="referenser">Referenser och källbegränsningar</h2><p>Referenserna avser avgränsade sakuppgifter. Diagram, kontrakt och testplan är egna förslag. Gemensamt kontrolldatum: 1 oktober 2026.</p><section class="reference" id="ref-S01"><h3>[S01] Systemingenjör — annons 4464336388</h3><span class="ref-kind">Arbetsgivarens rollbeskrivning</span><p>Superintelligence Computing Systems. Utan säkert publiceringsdatum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4464336388">https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4464336388</a></p><p>Offentligt sökindexerad annons kontrollerad. Används som kravunderlag; inte som bevis för intern teknikstack. Direktsidan kunde inte återläsas konsekvent.</p></section><section class="reference" id="ref-S03"><h3>[S03] Foundation AGI model for Industrial Robots — HYPER: reporting</h3><span class="ref-kind">Självrapporterat projektarbete</span><p>SICS AI, deltagarrapport hos Europeiska kommissionen/CORDIS. Uppdaterad 1 juni 2026. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://cordis.europa.eu/project/id/101218436/reporting">https://cordis.europa.eu/project/id/101218436/reporting</a></p><p>Projekt-ID 101218436. Beskrivningen av modell och robotkontroll är deltagarens redovisning, inte oberoende reproduktion. DOI för projektet: 10.3030/101218436.</p></section><section class="reference" id="ref-S04"><h3>[S04] Simulation In The Loop: Real-Time Robot Action Success Verification with a Digital Twin</h3><span class="ref-kind">Examensarbete — bibliografisk uppgift</span><p>Axel Kaliff, KTH. 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A1988006">https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A1988006</a></p><p>Titel och författarsamband stöds av examinatorns offentligt indexerade KTH-sida. DiVA-fulltexten kunde inte hämtas vid denna kontroll. Inga detaljerade metod- eller resultatpåståenden återges.</p><p class="ref-url">Kompletterande primärkälla: <a href="https://www.csc.kth.se/~fpokorny/">https://www.csc.kth.se/~fpokorny/</a></p></section><section class="reference" id="ref-S07"><h3>[S07] Nowaste Logistics Advances Automation with Cognibotics Robot Picking Cell</h3><span class="ref-kind">Leverantörens installationsbeskrivning</span><p>Cognibotics. 5 januari 2026. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/articles/nowaste-logistics-advances-automation-with-cognibotics-robot-picking-cell">https://www.cognibotics.com/en/articles/nowaste-logistics-advances-automation-with-cognibotics-robot-picking-cell</a></p><p>Beskriver andra cellen, AutoStore, SICS AI-vision och Juliet &amp; Romeo. Leverantörsuppgifter, inte publicerad intern API-specifikation eller oberoende driftsrevision.</p></section><section class="reference" id="ref-S08"><h3>[S08] HKM1800 — robot for intralogistics and warehouse automation</h3><span class="ref-kind">Tillverkardokumentation</span><p>Cognibotics. Utan datum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/products/hkm">https://www.cognibotics.com/en/products/hkm</a></p><p>Används för att skilja verklig hybridkinematik från projektets generiska arm. Tillverkarens kapacitetsuppgifter är inte simulatorresultat.</p></section><section class="reference" id="ref-S10"><h3>[S10] SICS AI: HPC Access to LUMI Supercomputer for AI and Robotics</h3><span class="ref-kind">Teknisk samarbetsbeskrivning</span><p>ENCCS. 12 september 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://enccs.se/2025/09/news/sics-hpc-access-lumi-supercomputer-ai-robotics-3/">https://enccs.se/2025/09/news/sics-hpc-access-lumi-supercomputer-ai-robotics-3/</a></p><p>Dokumenterar arbete med beräkningsmiljö och GPU-träning. Fastställer inte kundernas aktuella inferensarkitektur.</p></section><section class="reference" id="ref-S11"><h3>[S11] SICS AI investerar i NVIDIA DGX B200 från Aixia</h3><span class="ref-kind">Leverantörens pressmeddelande</span><p>Aixia Group AB. 17 juni 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://news.cision.com/se/aixia-group-ab--publ-/r/sics-ai-investerar-i-nvidia-dgx-b200-fran-aixia---accelererar-utvecklingen-av-ai-hjarna-for-nasta-ge%2Cc4165473">https://news.cision.com/se/aixia-group-ab--publ-/r/sics-ai-investerar-i-nvidia-dgx-b200-fran-aixia---accelererar-utvecklingen-av-ai-hjarna-for-nasta-ge%2Cc4165473</a></p><p>Bekräftar offentliggjord DGX B200-affär med drifttjänster. Inte ett test av modeller eller belägg för var dagens maskin är placerad.</p></section><section class="reference" id="ref-S12"><h3>[S12] MCP Server</h3><span class="ref-kind">Officiell verktygsdokumentation</span><p>Blender Lab / Blender Foundation. Löpande dokumentation. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://www.blender.org/lab/mcp-server/">https://www.blender.org/lab/mcp-server/</a></p><p>Dokumenterar separat MCP-integration och varnar för exekvering av modellgenererad kod. Sidan anger Blender 5.1 eller senare för integrationen. Faktisk projektkompatibilitet återstår att testa.</p></section><section class="reference" id="ref-S17"><h3>[S17] Making retries safe with idempotent APIs</h3><span class="ref-kind">Primär teknisk designbeskrivning</span><p>Amazon Web Services, Builders&#x27; Library. Utan datum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/">https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/</a></p><p>Stabila begärandeidentiteter och idempotent semantik. Projektets slutsatser om fysiska effekter är egen designanalys, inte en utlovad AWS-garanti för robotar.</p></section><section class="reference" id="ref-S18"><h3>[S18] OPC Unified Architecture</h3><span class="ref-kind">Protokollägarens dokumentation</span><p>OPC Foundation. Löpande dokumentation. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://opcfoundation.org/about/opc-technologies/opc-ua/">https://opcfoundation.org/about/opc-technologies/opc-ua/</a></p><p>Informationsmodell och kommunikationstjänster. En lokal signalmodell eller REST-route innebär inte implementerat OPC UA-stöd.</p></section><section class="reference" id="ref-S19"><h3>[S19] Creating a GitHub Pages site; configuring a publishing source</h3><span class="ref-kind">Officiell publiceringsdokumentation</span><p>GitHub Docs. Löpande dokumentation. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site">https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site</a></p><p>Pages används för statiska rapporter och nedladdningar, inte för Python eller Blender-runtime.</p><p class="ref-url">Kompletterande primärkälla: <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site</a></p></section></section></main></div><footer class="site-footer">Rami Halabi · Version 1.0 · 1 oktober 2026.<br>Oberoende, AI-assisterad designstudie. Inte SICS AI:s dokumentation eller en verifierad robotimplementation. <a href="https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator">Källfiler på GitHub</a> · <a href="downloads/robotops-twin-samlat.pdf">Samtliga rapporter som PDF</a></footer></body></html>

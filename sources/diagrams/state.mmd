@@ -1,0 +1,19 @@
+flowchart TD
+  created["MOTTAGET → PLANERAT<br/>Validering och beständig avsikt"]
+  executing["SKICKAS / UTFÖRS<br/>Ett identifierat kommando"]
+  unknown["UNKNOWN_OUTCOME<br/>Timeout • saknad evidens"]
+  verifying["VERIFYING<br/>Ny observation och journal"]
+  reconcile["RECONCILING<br/>Avstämning • inget nytt plock"]
+  verified["VERIFIED<br/>Effekt belagd i modellen"]
+  review["MANUAL_REVIEW<br/>Konflikt eller otillräckligt stöd"]
+  sync["ERP_SYNC_PENDING<br/>Endast kundkvittens återstår"]
+  completed["COMPLETED<br/>Verifierat och kundkvitterat"]
+  created --> executing
+  executing --> verifying
+  executing --> unknown
+  unknown --> reconcile
+  reconcile --> verifying
+  reconcile --> review
+  verifying --> verified
+  verified --> sync
+  sync --> completed

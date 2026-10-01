@@ -1,0 +1,16 @@
+flowchart TD
+  erp["Kundens ERP / WMS<br/>Order • SKU • destination"]
+  job["Integrationslager<br/>Validera • lagra • samordna"]
+  plan["Plan och validering<br/>Observation → tillåtet förslag"]
+  robot["Cell + RobotGateway<br/>Kontrollera läge • exekvera"]
+  blender["Blender-världen<br/>Objektet flyttas i simulatorn"]
+  verify["Observation + verifiering<br/>Lyckat • misslyckat • oavgjort"]
+  sync["Kundkvittens<br/>Rapportera verifierad orderrad"]
+  done["Spårbart slutresultat<br/>Order • evidens • händelselogg"]
+  erp --> job
+  job --> plan
+  plan --> robot
+  robot --> blender
+  blender --> verify
+  verify --> sync
+  sync --> done

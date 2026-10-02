@@ -1,22 +1,21 @@
 # Goal Progress
 Last updated: 2026-10-02 UTC
-Commit/base: `e2c82ed7be3787d9dc351dab3c1212cc9e2de954`
+Commit/base: `6746925856525cf099388e1b8cb7c730ecb7a15d`
 
 ## Current phase
-P0-P5 implemented. P6 optional, unimplemented. P7 local acceptance and final
-publication verification. **NOT DONE**.
+P0-P5 implemented. P6 optional, unimplemented. P7 clean local acceptance passed;
+remote CI/publication awaits permission. **NOT DONE**.
 
 ## MUST status
 - PASS locally: 81 of 85 MUST criteria in the generated acceptance mapping.
-- IN PROGRESS: final local corrections, clean-checkout setup/repeat, publication
-  browser/PDF review and exact final source/evidence commit.
+- Local required work complete. Final remote CI/Pages evidence is outstanding.
 - FAIL/external gate: SC-DATA-005 and SC-KB-006/007/008 require final-SHA remote
   CI/Pages. Automatic approval review rejected pushing to main; explicit user
   authorization to publish is required after local work is reviewable.
 - SHOULD: optional external model fallback SC-BRAIN-005 remains unimplemented.
 
 ## Evidence added this iteration
-- `docs/evidence/acceptance/20261002T173627/`: actual setup, two 218-test runs,
+- `docs/evidence/acceptance/20261002T175141/`: clean checkout setup, two 219-test runs,
   88.76% coverage (fixed threshold 85%), lint/types/security, seven real Blender
   scenarios, drift and publication. No skips or xfails.
 - Lost-ack: UNKNOWN_OUTCOME -> COMPLETED; original identity; exactly one effect.
@@ -24,7 +23,10 @@ publication verification. **NOT DONE**.
 - Five reviewed low-severity subprocess findings bound to AST hashes;
   pip-audit has no known vulnerabilities after WeasyPrint 70.0 update.
 - PDF review: all pages inspected in contact sheets; state diagram inspected
-  at readable size. Correcting a routing ambiguity and named PDF link collisions.
+  at readable size. Corrected a routing ambiguity and named PDF link collisions;
+  all 180 merged internal link destinations verified. Browser desktop/mobile and
+  local HTTP checks saved in p7-publication-review.json. Public Pages remains at
+  567eabbe; exact-SHA remote checks saved in p7-remote-readiness.json.
 - Earlier P0-P5 and browser/Blender evidence remains under docs/evidence/.
 
 ## Decisions / ADRs
@@ -42,8 +44,8 @@ Normative MUST semantics and thresholds are unchanged. Public-source provenance
 is preserved. Generated PDFs/Pages are rebuilt through the publication tool.
 
 ## Next milestone
-Complete publication/browser review, commit P7 gates and synchronized sources,
-then run setup and all acceptance gates from a fresh detached checkout. Commit
-the resulting evidence. Request the remaining push permission with exact commits
-and local results; verify remote workflows/Pages after authorization. Optional
-model, hardware, OPC UA and external ERP transport remain non-blocking.
+Request explicit permission to push the reviewed local commits to main and
+trigger CI/publication. After authorization: push, inspect both workflows, fix any
+remote failures, verify current public links/build identity and collect final-SHA
+acceptance artifacts. Optional model, hardware, OPC UA and external ERP transport
+remain non-blocking. No normative requirement was weakened.

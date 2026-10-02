@@ -2,11 +2,11 @@
 
 **NOT DONE** — generated from executed gates; missing evidence is FAIL.
 
-Source commit: `e2c82ed7be3787d9dc351dab3c1212cc9e2de954`. Dirty at start: `True`.
-Inspected source hash: `1db1b47ad4036eea5bcf622bb135c5311051f58f00037a009a927b7c1dae0a6a` (excludes generated acceptance/evidence).
-Run time (UTC): 2026-10-02T17:36:27.141600+00:00. This report does not attest a later commit.
+Source commit: `6746925856525cf099388e1b8cb7c730ecb7a15d`. Dirty at start: `False`.
+Inspected source hash: `1470b03ebb8ae0264291020b4aded9426546cff8d36a839293242e4f63a3113c` (excludes generated acceptance/evidence).
+Run time (UTC): 2026-10-02T17:51:41.336802+00:00. This report does not attest a later commit.
 
-[Full manifest and commands](docs/evidence/acceptance/20261002T173627/manifest.json). Logs and JUnit are in the same directory.
+[Full manifest and commands](docs/evidence/acceptance/20261002T175141/manifest.json). Logs and JUnit are in the same directory.
 
 ## Environment
 
@@ -24,7 +24,7 @@ Run time (UTC): 2026-10-02T17:36:27.141600+00:00. This report does not attest a 
     "bandit": "1.9.4",
     "pip-audit": "2.10.1"
   },
-  "lock_sha256": "33bbc8b179d9e4b731b1630291380ecd8900b93ea2e9a36f816c5b081c196921"
+  "lock_sha256": "a9da14f9f91e92f2d03862bc457377c8f6612a8a5b90cdf745f18ab12af772dc"
 }
 ```
 
@@ -32,26 +32,27 @@ Run time (UTC): 2026-10-02T17:36:27.141600+00:00. This report does not attest a 
 
 | Gate | Result | Command / evidence |
 |---|---|---|
-| setup | PASS | `C:\Users\ramis\.local\bin\uv.EXE sync --locked --all-groups` [setup log](docs/evidence/acceptance/20261002T173627/setup.log) |
-| blender_version | PASS | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe --version` [blender_version log](docs/evidence/acceptance/20261002T173627/blender_version.log) |
-| security | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev security` [security log](docs/evidence/acceptance/20261002T173627/security.log) |
-| tests_1 | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev test --basetemp=C:\Users\ramis\AppData\Local\Temp\robotops-acceptance-1-ngchp72c/fixtures --junitxml=C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261002T173627\tests-1.xml --cov=robotops --cov=apps --cov-report=json:C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261002T173627\coverage-1.json --cov-report=term` [tests_1 log](docs/evidence/acceptance/20261002T173627/tests_1.log) |
-| tests_2 | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev test --basetemp=C:\Users\ramis\AppData\Local\Temp\robotops-acceptance-2-po553xhv/fixtures --junitxml=C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261002T173627\tests-2.xml --cov=robotops --cov=apps --cov-report=json:C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261002T173627\coverage-2.json --cov-report=term` [tests_2 log](docs/evidence/acceptance/20261002T173627/tests_2.log) |
-| repeatability | PASS | `` [repeatability log](docs/evidence/acceptance/20261002T173627/repeatability.json) |
-| lint | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev lint` [lint log](docs/evidence/acceptance/20261002T173627/lint.log) |
-| typecheck | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev typecheck` [typecheck log](docs/evidence/acceptance/20261002T173627/typecheck.log) |
-| demo_happy_path | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario happy_path --directory C:\Users\ramis\source\repos\robotops-twin\runs\20261002T173627\happy_path` [demo_happy_path log](docs/evidence/acceptance/20261002T173627/demo_happy_path.log) |
-| demo_lost_ack_after_effect | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario lost_ack_after_effect --directory C:\Users\ramis\source\repos\robotops-twin\runs\20261002T173627\lost_ack_after_effect` [demo_lost_ack_after_effect log](docs/evidence/acceptance/20261002T173627/demo_lost_ack_after_effect.log) |
-| demo_lost_ack_before_effect | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario lost_ack_before_effect --directory C:\Users\ramis\source\repos\robotops-twin\runs\20261002T173627\lost_ack_before_effect` [demo_lost_ack_before_effect log](docs/evidence/acceptance/20261002T173627/demo_lost_ack_before_effect.log) |
-| demo_ambiguous | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario ambiguous --directory C:\Users\ramis\source\repos\robotops-twin\runs\20261002T173627\ambiguous` [demo_ambiguous log](docs/evidence/acceptance/20261002T173627/demo_ambiguous.log) |
-| demo_restart | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario restart --directory C:\Users\ramis\source\repos\robotops-twin\runs\20261002T173627\restart` [demo_restart log](docs/evidence/acceptance/20261002T173627/demo_restart.log) |
-| demo_logical_estop | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario logical_estop --directory C:\Users\ramis\source\repos\robotops-twin\runs\20261002T173627\logical_estop` [demo_logical_estop log](docs/evidence/acceptance/20261002T173627/demo_logical_estop.log) |
-| demo_cell_fault | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario cell_fault --directory C:\Users\ramis\source\repos\robotops-twin\runs\20261002T173627\cell_fault` [demo_cell_fault log](docs/evidence/acceptance/20261002T173627/demo_cell_fault.log) |
-| ci | FAIL | `` [ci evidence](docs/evidence/acceptance/20261002T173627/remote.json) |
-| publication_remote | FAIL | `` [publication_remote evidence](docs/evidence/acceptance/20261002T173627/remote.json) |
-| pages | FAIL | `` [pages evidence](docs/evidence/acceptance/20261002T173627/remote.json) |
-| drift | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.drift_check` [drift log](docs/evidence/acceptance/20261002T173627/drift.log) |
-| publication | PASS | `C:\Users\ramis\source\repos\robotops-twin\.venv\Scripts\python.exe -m tools.dev docs` [publication log](docs/evidence/acceptance/20261002T173627/publication.log) |
+| setup | PASS | `C:\Users\ramis\.local\bin\uv.EXE sync --locked --all-groups` [setup log](docs/evidence/acceptance/20261002T175141/setup.log) |
+| blender_version | PASS | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe --version` [blender_version log](docs/evidence/acceptance/20261002T175141/blender_version.log) |
+| security | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev security` [security log](docs/evidence/acceptance/20261002T175141/security.log) |
+| tests_1 | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev test --basetemp=C:\Users\ramis\AppData\Local\Temp\robotops-acceptance-1-n9qrnv2m/fixtures --junitxml=C:\Users\ramis\source\repos\robotops-clean-6746925\docs\evidence\acceptance\20261002T175141\tests-1.xml --cov=robotops --cov=apps --cov-report=json:C:\Users\ramis\source\repos\robotops-clean-6746925\docs\evidence\acceptance\20261002T175141\coverage-1.json --cov-report=term` [tests_1 log](docs/evidence/acceptance/20261002T175141/tests_1.log) |
+| tests_2 | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev test --basetemp=C:\Users\ramis\AppData\Local\Temp\robotops-acceptance-2-wskvt5io/fixtures --junitxml=C:\Users\ramis\source\repos\robotops-clean-6746925\docs\evidence\acceptance\20261002T175141\tests-2.xml --cov=robotops --cov=apps --cov-report=json:C:\Users\ramis\source\repos\robotops-clean-6746925\docs\evidence\acceptance\20261002T175141\coverage-2.json --cov-report=term` [tests_2 log](docs/evidence/acceptance/20261002T175141/tests_2.log) |
+| repeatability | PASS | `` [repeatability log](docs/evidence/acceptance/20261002T175141/repeatability.json) |
+| lint | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev lint` [lint log](docs/evidence/acceptance/20261002T175141/lint.log) |
+| typecheck | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev typecheck` [typecheck log](docs/evidence/acceptance/20261002T175141/typecheck.log) |
+| demo_happy_path | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario happy_path --directory C:\Users\ramis\source\repos\robotops-clean-6746925\runs\20261002T175141\happy_path` [demo_happy_path log](docs/evidence/acceptance/20261002T175141/demo_happy_path.log) |
+| demo_lost_ack_after_effect | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario lost_ack_after_effect --directory C:\Users\ramis\source\repos\robotops-clean-6746925\runs\20261002T175141\lost_ack_after_effect` [demo_lost_ack_after_effect log](docs/evidence/acceptance/20261002T175141/demo_lost_ack_after_effect.log) |
+| demo_lost_ack_before_effect | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario lost_ack_before_effect --directory C:\Users\ramis\source\repos\robotops-clean-6746925\runs\20261002T175141\lost_ack_before_effect` [demo_lost_ack_before_effect log](docs/evidence/acceptance/20261002T175141/demo_lost_ack_before_effect.log) |
+| demo_ambiguous | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario ambiguous --directory C:\Users\ramis\source\repos\robotops-clean-6746925\runs\20261002T175141\ambiguous` [demo_ambiguous log](docs/evidence/acceptance/20261002T175141/demo_ambiguous.log) |
+| demo_restart | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario restart --directory C:\Users\ramis\source\repos\robotops-clean-6746925\runs\20261002T175141\restart` [demo_restart log](docs/evidence/acceptance/20261002T175141/demo_restart.log) |
+| demo_logical_estop | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario logical_estop --directory C:\Users\ramis\source\repos\robotops-clean-6746925\runs\20261002T175141\logical_estop` [demo_logical_estop log](docs/evidence/acceptance/20261002T175141/demo_logical_estop.log) |
+| demo_cell_fault | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev demo --runtime blender --scenario cell_fault --directory C:\Users\ramis\source\repos\robotops-clean-6746925\runs\20261002T175141\cell_fault` [demo_cell_fault log](docs/evidence/acceptance/20261002T175141/demo_cell_fault.log) |
+| ci | FAIL | `` [ci evidence](docs/evidence/acceptance/20261002T175141/remote.json) |
+| publication_remote | FAIL | `` [publication_remote evidence](docs/evidence/acceptance/20261002T175141/remote.json) |
+| pages | FAIL | `` [pages evidence](docs/evidence/acceptance/20261002T175141/remote.json) |
+| drift | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.drift_check` [drift log](docs/evidence/acceptance/20261002T175141/drift.log) |
+| publication | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev docs` [publication log](docs/evidence/acceptance/20261002T175141/publication.log) |
+| publication_final | PASS | `C:\Users\ramis\source\repos\robotops-clean-6746925\.venv\Scripts\python.exe -m tools.dev docs` [publication_final log](docs/evidence/acceptance/20261002T175141/publication_final.log) |
 
 ## Every MUST
 
@@ -103,7 +104,7 @@ Run time (UTC): 2026-10-02T17:36:27.141600+00:00. This report does not attest a 
 | SC-KB-002 | PASS | tests_1, tests_2, drift, publication: `test_knowledge_base_links_ids_sources_and_status` | [README.md](README.md), [reports/01-design.md](reports/01-design.md), [reports/02-avgransning.md](reports/02-avgransning.md), [reports/03-diskussion.md](reports/03-diskussion.md), [publication/references.json](publication/references.json), [publication/diagrams.json](publication/diagrams.json), [PUBLICATION.md](PUBLICATION.md). Current sources and diagrams are inspectable; status, links and source IDs checked. Public limitations distinguish simulator design and company-reported claims. See drift/synchronization record. |
 | SC-KB-003 | PASS | tests_1, tests_2, drift, publication: `test_knowledge_base_links_ids_sources_and_status` | [README.md](README.md), [reports/01-design.md](reports/01-design.md), [reports/02-avgransning.md](reports/02-avgransning.md), [reports/03-diskussion.md](reports/03-diskussion.md), [publication/references.json](publication/references.json), [publication/diagrams.json](publication/diagrams.json), [PUBLICATION.md](PUBLICATION.md). Current sources and diagrams are inspectable; status, links and source IDs checked. Public limitations distinguish simulator design and company-reported claims. See drift/synchronization record. |
 | SC-KB-004 | PASS | tests_1, tests_2, drift, publication: `test_knowledge_base_links_ids_sources_and_status` | [README.md](README.md), [reports/01-design.md](reports/01-design.md), [reports/02-avgransning.md](reports/02-avgransning.md), [reports/03-diskussion.md](reports/03-diskussion.md), [publication/references.json](publication/references.json), [publication/diagrams.json](publication/diagrams.json), [PUBLICATION.md](PUBLICATION.md). Current sources and diagrams are inspectable; status, links and source IDs checked. Public limitations distinguish simulator design and company-reported claims. See drift/synchronization record. |
-| SC-KB-005 | PASS | tests_1, tests_2, drift, publication: `test_knowledge_base_links_ids_sources_and_status`, `test_openapi_is_current_and_schemas_validate` | [tools/drift_check.py](tools/drift_check.py), [tools/build_publication.py](tools/build_publication.py), [docs/acceptance-map.json](docs/acceptance-map.json). Internal links, criterion IDs, evidence paths, schema consistency, source IDs, status and publication links checked. |
+| SC-KB-005 | PASS | tests_1, tests_2, drift, publication: `test_knowledge_base_links_ids_sources_and_status`, `test_openapi_is_current_and_schemas_validate`, `test_pdf_package_preserves_colliding_report_section_names` | [tools/drift_check.py](tools/drift_check.py), [tools/build_publication.py](tools/build_publication.py), [docs/acceptance-map.json](docs/acceptance-map.json). Internal links, criterion IDs, evidence paths, schema consistency, source IDs, status and publication links checked. |
 | SC-KB-006 | FAIL | publication, publication_remote: Gate evidence | [.github/workflows/publish-reports.yml](.github/workflows/publish-reports.yml), [tools/build_publication.py](tools/build_publication.py). Requires successful repository publication workflow for the exact source commit; local rendering alone is insufficient. Failure: publication_remote |
 | SC-KB-007 | FAIL | publication, publication_remote: Gate evidence | [.github/workflows/publish-reports.yml](.github/workflows/publish-reports.yml), [tools/build_publication.py](tools/build_publication.py). Requires successful repository publication workflow for the exact source commit; local rendering alone is insufficient. Failure: publication_remote |
 | SC-KB-008 | FAIL | pages, publication_remote: Gate evidence | [publication/status.json](publication/status.json), [tools/build_publication.py](tools/build_publication.py). Public build.json must match the commit; governance, reports and PDF links must return valid content. Failure: pages; publication_remote |

@@ -101,4 +101,4 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 - [ ] Final SHA recorded.
 - [x] If any MUST fails: status remains NOT DONE.
 
-Local items are supported by docs/evidence/acceptance/20261002T173627 and earlier milestone evidence. A clean-checkout repeat follows the final local corrections. Final remote CI/Pages gates remain unsatisfied; this checklist is not acceptance proof.
+Local items are supported by docs/evidence/acceptance/20261002T175141 and earlier milestone evidence. The clean-checkout repeat passed after final local corrections. Final remote CI/Pages gates remain unsatisfied; this checklist is not acceptance proof.

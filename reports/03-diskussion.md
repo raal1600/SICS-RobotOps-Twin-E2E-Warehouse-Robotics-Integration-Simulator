@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** The deterministic E2E simulator, CPU Blender adapter, dashboard and persisted observability are implemented. Two full local suite runs, seven Blender scenarios, security and publication builds pass. Clean-checkout verification and final-SHA remote CI/Pages gates remain to be completed. Status: NOT DONE.
+> **Implementation status, 2026-10-02:** Clean-checkout acceptance passes: the deterministic E2E simulator, CPU Blender runtime, dashboard and observability are implemented and verified. Two complete test runs, seven Blender demos, quality/security gates and local publication checks pass. Final-commit CI and public Pages verification require publishing the local commits; the project remains NOT DONE. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

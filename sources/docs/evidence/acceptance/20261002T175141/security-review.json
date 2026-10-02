@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "lock_sha256": "a9da14f9f91e92f2d03862bc457377c8f6612a8a5b90cdf745f18ab12af772dc",
+  "bandit_exit": 1,
+  "pip_audit_exit": 0,
+  "findings": [
+    {
+      "path": "robotops/blender/adapter.py",
+      "scope": "import subprocess",
+      "test_id": "B404",
+      "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+      "reviewed": true,
+      "rationale": "Only fixed Blender executable invocations below; shell is never enabled. Configuration is trusted local operator input."
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "scope": "_invoke",
+      "test_id": "B603",
+      "ast_sha256": "6db8182d837c593cb2a99215577d6722100d378748c74fc921ee9f524ef01138",
+      "reviewed": true,
+      "rationale": "Arguments invoke the committed runtime script with factory startup and disabled autoexec. Only a generated exchange-directory path is passed; validated commands are JSON data, never code. Bounded timeout; shell=False by default."
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "scope": "manifest",
+      "test_id": "B603",
+      "ast_sha256": "92619db757ed965d9ff8c99447df6b07d613f691c84780ade6fcae2f84b350a1",
+      "reviewed": true,
+      "rationale": "Only the configured local Blender executable and literal --version; no remote/model argument or shell."
+    },
+    {
+      "path": "robotops/demo.py",
+      "scope": "import subprocess",
+      "test_id": "B404",
+      "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+      "reviewed": true,
+      "rationale": "Demo restart invokes the current Python interpreter with the fixed committed module; no shell."
+    },
+    {
+      "path": "robotops/demo.py",
+      "scope": "run_demo",
+      "test_id": "B603",
+      "ast_sha256": "8305221fd65572f995ab0d67a2d57cd12ee19c62834c45d689e4e26cd7f42f51",
+      "reviewed": true,
+      "rationale": "Demo launches only sys.executable -m robotops.demo with argparse-controlled runtime and local directory arguments. No shell or generated code; outside runtime command execution."
+    }
+  ]
+}

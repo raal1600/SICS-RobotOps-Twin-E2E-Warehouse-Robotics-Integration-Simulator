@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "destination_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Destination Id",
+      "type": "string"
+    },
+    "order_line_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Order Line Id",
+      "type": "string"
+    },
+    "product_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Product Id",
+      "type": "string"
+    },
+    "quantity": {
+      "const": 1,
+      "default": 1,
+      "title": "Quantity",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Source Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "order_line_id",
+    "product_id",
+    "source_id",
+    "destination_id"
+  ],
+  "title": "OrderLine",
+  "type": "object"
+}

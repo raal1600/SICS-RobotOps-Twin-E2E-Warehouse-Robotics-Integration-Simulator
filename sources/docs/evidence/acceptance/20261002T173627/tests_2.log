@@ -1,0 +1,77 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\ramis\source\repos\robotops-twin
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.2, cov-7.1.0
+collected 218 items
+
+tests\blender\test_blender_runtime.py .....                              [  2%]
+tests\contract\test_api.py ..                                            [  3%]
+tests\contract\test_governance.py ....                                   [  5%]
+tests\contract\test_schemas.py .........................                 [ 16%]
+tests\e2e\test_observability.py .                                        [ 16%]
+tests\e2e\test_workflow.py ......................                        [ 27%]
+tests\integration\test_process_restart.py .                              [ 27%]
+tests\integration\test_runtime.py .............                          [ 33%]
+tests\integration\test_store.py .....                                    [ 35%]
+tests\unit\test_action_validation.py ................                    [ 43%]
+tests\unit\test_observation_verifier.py ...                              [ 44%]
+tests\unit\test_states.py .............................................. [ 65%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path C:\Users\ramis\source\repos\robotops-twin\.pytest_cache\v\cache\nodeids: [WinError 5] Access is denied: 'C:\\Users\\ramis\\source\\repos\\robotops-twin\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261002T173627\tests-2.xml -
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.13.15-final-0 _______________
+
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+apps\__init__.py                         0      0   100%
+apps\api\__init__.py                     0      0   100%
+apps\api\__main__.py                    24     24     0%   1-34
+apps\api\app.py                         79      3    96%   56, 86, 121
+robotops\__init__.py                     0      0   100%
+robotops\blender\__init__.py             0      0   100%
+robotops\blender\adapter.py            141     22    84%   29, 33, 80-82, 85, 90, 101, 107, 110, 113, 240, 260-263, 271-278
+robotops\brain\__init__.py               0      0   100%
+robotops\brain\deterministic.py          7      0   100%
+robotops\brain\validation.py            32      4    88%   54, 70, 77, 87
+robotops\cell\__init__.py                0      0   100%
+robotops\cell\controller.py             12      0   100%
+robotops\cell\runtime.py               130      7    95%   89, 187, 189, 191, 289-293
+robotops\config.py                      19      0   100%
+robotops\demo.py                        55     55     0%   3-148
+robotops\domain\__init__.py              0      0   100%
+robotops\domain\models.py              220      1    99%   101
+robotops\domain\ports.py                 6      0   100%
+robotops\faults\__init__.py              0      0   100%
+robotops\faults\injection.py             3      0   100%
+robotops\observability\__init__.py       0      0   100%
+robotops\observability\metrics.py       24      0   100%
+robotops\observation\__init__.py         0      0   100%
+robotops\observation\model.py           28      0   100%
+robotops\observation\quality.py         22      2    91%   16, 31
+robotops\robot_gateway\__init__.py       0      0   100%
+robotops\robot_gateway\gateway.py       32      1    97%   16
+robotops\verification\__init__.py        0      0   100%
+robotops\verification\verifier.py       35      3    91%   39, 43, 54
+robotops\workflow\__init__.py            0      0   100%
+robotops\workflow\engine.py            133      5    96%   147, 176, 190, 207, 257
+robotops\workflow\states.py             24      2    92%   42, 46
+robotops\workflow\store.py             220     11    95%   129, 144, 151, 215, 222, 238-241, 380, 410, 459, 461
+------------------------------------------------------------------
+TOTAL                                 1246    140    89%
+Coverage JSON written to file C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261002T173627\coverage-2.json
+Required test coverage of 85.0% reached. Total coverage: 88.76%
+====================== 218 passed, 2 warnings in 52.33s =======================

@@ -5,9 +5,12 @@ flowchart TD
   obs["Observerat tillstånd y<br/>Sensor • brus • skymning • tid"]
   action["Validerad handling<br/>Endast typade operationer"]
   oracle["Test-orakel<br/>Facit jämförs med verifierarens dom"]
+  verify["Verifier<br/>WorldObservation only"]
   goal --> brain
   truth --> obs
   obs --> brain
   brain --> action
   action --> truth
   truth -.-> oracle
+  obs --> verify
+  verify -.-> oracle

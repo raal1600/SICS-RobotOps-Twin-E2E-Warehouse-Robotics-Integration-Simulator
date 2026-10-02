@@ -1,0 +1,82 @@
+{
+  "$defs": {
+    "CellMode": {
+      "enum": [
+        "READY",
+        "BUSY",
+        "FAULTED",
+        "ESTOP_LOGICAL",
+        "RESETTING",
+        "OFFLINE"
+      ],
+      "title": "CellMode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "causation_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Causation Id",
+      "type": "string"
+    },
+    "cell_id": {
+      "default": "cell-1",
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Cell Id",
+      "type": "string"
+    },
+    "correlation_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "generation": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Generation",
+      "type": "integer"
+    },
+    "mode": {
+      "$ref": "#/$defs/CellMode",
+      "default": "READY"
+    },
+    "reason": {
+      "default": "INITIALIZED",
+      "title": "Reason",
+      "type": "string"
+    },
+    "run_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "correlation_id",
+    "causation_id",
+    "timestamp"
+  ],
+  "title": "CellState",
+  "type": "object"
+}

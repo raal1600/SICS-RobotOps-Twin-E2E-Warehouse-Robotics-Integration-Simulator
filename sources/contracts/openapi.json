@@ -1,0 +1,1829 @@
+{
+  "components": {
+    "schemas": {
+      "AuditEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "command_id": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "pattern": "^[\\w.:-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Command Id"
+          },
+          "component": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Component",
+            "type": "string"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "duration_ms": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Duration Ms",
+            "type": "number"
+          },
+          "event_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "event_type": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Event Type",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "default": [],
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "pattern": "^[\\w.:-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "order_id": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "pattern": "^[\\w.:-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "state_after": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State After"
+          },
+          "state_before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Before"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "event_id",
+          "component",
+          "event_type",
+          "reason"
+        ],
+        "title": "AuditEvent",
+        "type": "object"
+      },
+      "CellMode": {
+        "enum": [
+          "READY",
+          "BUSY",
+          "FAULTED",
+          "ESTOP_LOGICAL",
+          "RESETTING",
+          "OFFLINE"
+        ],
+        "title": "CellMode",
+        "type": "string"
+      },
+      "CellState": {
+        "additionalProperties": false,
+        "properties": {
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "cell_id": {
+            "default": "cell-1",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Cell Id",
+            "type": "string"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "generation": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Generation",
+            "type": "integer"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/CellMode",
+            "default": "READY"
+          },
+          "reason": {
+            "default": "INITIALIZED",
+            "title": "Reason",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp"
+        ],
+        "title": "CellState",
+        "type": "object"
+      },
+      "CommandReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "command_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Command Id",
+            "type": "string"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "effect_count": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Effect Count",
+            "type": "integer"
+          },
+          "job_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "journal_durable": {
+            "default": true,
+            "title": "Journal Durable",
+            "type": "boolean"
+          },
+          "payload_hash": {
+            "title": "Payload Hash",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "scene_epoch": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Scene Epoch",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CommandStatus"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "command_id",
+          "job_id",
+          "scene_epoch",
+          "status",
+          "reason",
+          "effect_count",
+          "payload_hash"
+        ],
+        "title": "CommandReceipt",
+        "type": "object"
+      },
+      "CommandStatus": {
+        "enum": [
+          "CREATED",
+          "DISPATCHED",
+          "ACCEPTED",
+          "RUNNING",
+          "SUCCEEDED",
+          "FAILED",
+          "REJECTED",
+          "STATUS_UNKNOWN"
+        ],
+        "title": "CommandStatus",
+        "type": "string"
+      },
+      "ExecutionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "fault": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fault"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "title": "ExecutionRequest",
+        "type": "object"
+      },
+      "Fault": {
+        "enum": [
+          "DROP_ACK_AFTER_EFFECT",
+          "DROP_ACK_BEFORE_EFFECT",
+          "ROBOT_COMMAND_FAILURE",
+          "CELL_FAULT",
+          "LOGICAL_ESTOP",
+          "LOW_CONFIDENCE_OBSERVATION",
+          "CONTRADICTORY_OBSERVATION",
+          "STALE_OBSERVATION",
+          "MISSING_OBSERVATION",
+          "POSE_UNCERTAINTY",
+          "BRAIN_TIMEOUT",
+          "BRAIN_INVALID_OUTPUT"
+        ],
+        "title": "Fault",
+        "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "JobEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RobotCommand"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "job": {
+            "$ref": "#/components/schemas/PickJob"
+          },
+          "journal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommandReceipt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/WorldObservation"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "reconciliations": {
+            "items": {
+              "$ref": "#/components/schemas/ReconciliationEvidence"
+            },
+            "title": "Reconciliations",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "verifications": {
+            "items": {
+              "$ref": "#/components/schemas/VerificationResult"
+            },
+            "title": "Verifications",
+            "type": "array"
+          }
+        },
+        "required": [
+          "job",
+          "command",
+          "journal",
+          "observations",
+          "verifications",
+          "reconciliations"
+        ],
+        "title": "JobEvidence",
+        "type": "object"
+      },
+      "JobState": {
+        "enum": [
+          "RECEIVED",
+          "VALIDATED",
+          "PLANNING",
+          "READY_TO_EXECUTE",
+          "EXECUTING",
+          "VERIFYING",
+          "UNKNOWN_OUTCOME",
+          "RECONCILING",
+          "COMPLETED",
+          "FAILED",
+          "REQUIRES_INTERVENTION"
+        ],
+        "title": "JobState",
+        "type": "string"
+      },
+      "ObservedObject": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "location_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "pose": {
+            "$ref": "#/components/schemas/Pose"
+          },
+          "product_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "uncertainty_m": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Uncertainty M",
+            "type": "number"
+          }
+        },
+        "required": [
+          "product_id",
+          "location_id",
+          "pose",
+          "confidence"
+        ],
+        "title": "ObservedObject",
+        "type": "object"
+      },
+      "Order": {
+        "additionalProperties": false,
+        "properties": {
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "job_ids": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            "title": "Job Ids",
+            "type": "array"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/OrderLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "order_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobState",
+            "default": "RECEIVED"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "order_id",
+          "lines",
+          "job_ids"
+        ],
+        "title": "Order",
+        "type": "object"
+      },
+      "OrderLine": {
+        "additionalProperties": false,
+        "properties": {
+          "destination_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Destination Id",
+            "type": "string"
+          },
+          "order_line_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Order Line Id",
+            "type": "string"
+          },
+          "product_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "quantity": {
+            "const": 1,
+            "default": 1,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_line_id",
+          "product_id",
+          "source_id",
+          "destination_id"
+        ],
+        "title": "OrderLine",
+        "type": "object"
+      },
+      "OrderRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/OrderLine"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Lines",
+            "type": "array"
+          },
+          "order_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "lines"
+        ],
+        "title": "OrderRequest",
+        "type": "object"
+      },
+      "PickJob": {
+        "additionalProperties": false,
+        "properties": {
+          "action_plan_id": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "pattern": "^[\\w.:-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Plan Id"
+          },
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "command_id": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "pattern": "^[\\w.:-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Command Id"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "job_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "line": {
+            "$ref": "#/components/schemas/OrderLine"
+          },
+          "order_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "revision": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/JobState",
+            "default": "RECEIVED"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "job_id",
+          "order_id",
+          "line"
+        ],
+        "title": "PickJob",
+        "type": "object"
+      },
+      "Pose": {
+        "additionalProperties": false,
+        "properties": {
+          "calibration_version": {
+            "default": "cal-1",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Calibration Version",
+            "type": "string"
+          },
+          "frame_id": {
+            "default": "cell_world",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Frame Id",
+            "type": "string"
+          },
+          "position": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Position",
+            "type": "array"
+          },
+          "quaternion_xyzw": {
+            "default": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Quaternion Xyzw",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "unit": {
+            "const": "m",
+            "default": "m",
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "position"
+        ],
+        "title": "Pose",
+        "type": "object"
+      },
+      "ReconciliationEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "command": {
+            "$ref": "#/components/schemas/RobotCommand"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "evidence_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "job_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/WorldObservation"
+          },
+          "receipt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommandReceipt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          },
+          "verification": {
+            "$ref": "#/components/schemas/VerificationResult"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "evidence_id",
+          "job_id",
+          "command",
+          "receipt",
+          "observation",
+          "verification"
+        ],
+        "title": "ReconciliationEvidence",
+        "type": "object"
+      },
+      "RobotCommand": {
+        "additionalProperties": false,
+        "properties": {
+          "action_plan_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Action Plan Id",
+            "type": "string"
+          },
+          "brain_version": {
+            "default": "deterministic-1",
+            "enum": [
+              "deterministic-1",
+              "structured-1"
+            ],
+            "title": "Brain Version",
+            "type": "string"
+          },
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "cell_generation": {
+            "minimum": 0.0,
+            "title": "Cell Generation",
+            "type": "integer"
+          },
+          "command_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Command Id",
+            "type": "string"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "destination_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Destination Id",
+            "type": "string"
+          },
+          "job_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "PICK_AND_PLACE",
+            "default": "PICK_AND_PLACE",
+            "title": "Kind",
+            "type": "string"
+          },
+          "observation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "order_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "order_line_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Order Line Id",
+            "type": "string"
+          },
+          "product_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "scene_epoch": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Scene Epoch",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "target_pose": {
+            "$ref": "#/components/schemas/Pose"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "action_plan_id",
+          "job_id",
+          "order_id",
+          "order_line_id",
+          "product_id",
+          "source_id",
+          "destination_id",
+          "target_pose",
+          "scene_epoch",
+          "observation_id",
+          "cell_generation",
+          "command_id"
+        ],
+        "title": "RobotCommand",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "Verdict": {
+        "enum": [
+          "VERIFIED_SUCCESS",
+          "VERIFIED_FAILURE",
+          "INCONCLUSIVE"
+        ],
+        "title": "Verdict",
+        "type": "string"
+      },
+      "VerificationResult": {
+        "additionalProperties": false,
+        "properties": {
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "command_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Command Id",
+            "type": "string"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "job_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "observation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/Verdict"
+          },
+          "verification_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Verification Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "verification_id",
+          "job_id",
+          "command_id",
+          "observation_id",
+          "verdict",
+          "reason"
+        ],
+        "title": "VerificationResult",
+        "type": "object"
+      },
+      "WorldObservation": {
+        "additionalProperties": false,
+        "properties": {
+          "calibration_version": {
+            "default": "cal-1",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Calibration Version",
+            "type": "string"
+          },
+          "captured_at": {
+            "format": "date-time",
+            "title": "Captured At",
+            "type": "string"
+          },
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "cell_generation": {
+            "minimum": 0.0,
+            "title": "Cell Generation",
+            "type": "integer"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "covered_locations": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            "title": "Covered Locations",
+            "type": "array"
+          },
+          "model_version": {
+            "default": "synthetic-observer-1",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Model Version",
+            "type": "string"
+          },
+          "objects": {
+            "items": {
+              "$ref": "#/components/schemas/ObservedObject"
+            },
+            "title": "Objects",
+            "type": "array"
+          },
+          "observation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "scene_epoch": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Scene Epoch",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "step": {
+            "minimum": 0.0,
+            "title": "Step",
+            "type": "integer"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp",
+          "observation_id",
+          "scene_epoch",
+          "step",
+          "captured_at",
+          "objects",
+          "covered_locations",
+          "cell_generation"
+        ],
+        "title": "WorldObservation",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Local independent synthetic simulator. Completion means verified business outcome. No physical safety guarantees; bind to loopback only.",
+    "title": "RobotOps Twin",
+    "version": "1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "dashboard__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Dashboard"
+      }
+    },
+    "/artifacts/latest.png": {
+      "get": {
+        "operationId": "artifact_artifacts_latest_png_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Artifact"
+      }
+    },
+    "/cell": {
+      "get": {
+        "operationId": "cell_cell_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CellState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Cell"
+      }
+    },
+    "/cell/reset": {
+      "post": {
+        "operationId": "reset_cell_cell_reset_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CellState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Reset Cell"
+      }
+    },
+    "/fixtures": {
+      "get": {
+        "operationId": "fixtures_fixtures_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Fixtures Fixtures Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Fixtures"
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/jobs/{job_id}": {
+      "get": {
+        "operationId": "job_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Job"
+      }
+    },
+    "/jobs/{job_id}/evidence": {
+      "get": {
+        "operationId": "evidence_jobs__job_id__evidence_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobEvidence"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Evidence"
+      }
+    },
+    "/jobs/{job_id}/reconcile": {
+      "post": {
+        "operationId": "reconcile_jobs__job_id__reconcile_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reconcile"
+      }
+    },
+    "/jobs/{job_id}/run": {
+      "post": {
+        "operationId": "run_jobs__job_id__run_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run"
+      }
+    },
+    "/metrics": {
+      "get": {
+        "operationId": "metrics_metrics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Metrics"
+      }
+    },
+    "/orders": {
+      "get": {
+        "operationId": "orders_orders_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  },
+                  "title": "Response Orders Orders Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Orders"
+      },
+      "post": {
+        "operationId": "create_order_orders_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true,
+            "schema": {
+              "maxLength": 160,
+              "minLength": 1,
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Order"
+      }
+    },
+    "/orders/{order_id}": {
+      "get": {
+        "operationId": "order_orders__order_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Order"
+      }
+    },
+    "/orders/{order_id}/timeline": {
+      "get": {
+        "operationId": "timeline_orders__order_id__timeline_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEvent"
+                  },
+                  "title": "Response Timeline Orders  Order Id  Timeline Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Timeline"
+      }
+    },
+    "/ui/app.js": {
+      "get": {
+        "operationId": "javascript_ui_app_js_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Javascript"
+      }
+    }
+  }
+}

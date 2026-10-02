@@ -1,0 +1,31 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "product_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Product Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sku": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Sku",
+      "type": "string"
+    }
+  },
+  "required": [
+    "product_id",
+    "sku"
+  ],
+  "title": "Product",
+  "type": "object"
+}

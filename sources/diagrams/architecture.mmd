@@ -3,18 +3,20 @@ flowchart TD
   core["Integrationskärna<br/>Uppdrag och samordning"]
   gateway["RobotGateway<br/>Typade kommandon och status"]
   brain["Brain-adapter<br/>Planförslag • ingen exekvering"]
-  db["Beständig lagring<br/>Avsikt • event • outbox"]
-  world["Blender-runtime<br/>Värld • effektjournal • sensor"]
+  db["Beständig lagring<br/>Order • plan • command • audit"]
+  world["Blender-runtime<br/>World • separate controller journal"]
   monitor["Operationsvy<br/>Order- och feltidslinje"]
   verify["Verifierare<br/>Observation → bedömning"]
-  cell["CellController<br/>READY • STOP • FAULT"]
+  cell["CellController<br/>READY • ESTOP_LOGICAL • FAULTED"]
+  observation["ObservationModel<br/>WorldState → WorldObservation"]
   erp <--> core
   core <--> gateway
   core <--> db
   gateway <--> world
   world <--> cell
-  world --> verify
   verify --> db
   verify --> monitor
   brain <--> core
   cell -.-> gateway
+  world --> observation
+  observation --> verify

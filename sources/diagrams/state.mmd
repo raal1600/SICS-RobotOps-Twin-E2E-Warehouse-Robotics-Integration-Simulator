@@ -1,19 +1,17 @@
 flowchart TD
-  created["MOTTAGET → PLANERAT<br/>Validering och beständig avsikt"]
-  executing["SKICKAS / UTFÖRS<br/>Ett identifierat kommando"]
-  unknown["UNKNOWN_OUTCOME<br/>Timeout • saknad evidens"]
-  verifying["VERIFYING<br/>Ny observation och journal"]
-  reconcile["RECONCILING<br/>Avstämning • inget nytt plock"]
-  verified["VERIFIED<br/>Effekt belagd i modellen"]
-  review["MANUAL_REVIEW<br/>Konflikt eller otillräckligt stöd"]
-  sync["ERP_SYNC_PENDING<br/>Endast kundkvittens återstår"]
-  completed["COMPLETED<br/>Verifierat och kundkvitterat"]
-  created --> executing
-  executing --> verifying
+  received["RECEIVED → VALIDATED<br/>Durable order and job identity"]
+  planning["PLANNING → READY_TO_EXECUTE<br/>Typed plan and action validation"]
+  executing["EXECUTING → VERIFYING<br/>One original command identity"]
+  unknown["UNKNOWN_OUTCOME<br/>Communication loss / uncertain effect"]
+  reconciling["RECONCILING<br/>Original journal + fresh observation"]
+  completed["COMPLETED<br/>Verified business outcome"]
+  intervention["REQUIRES_INTERVENTION<br/>Insufficient / contradictory evidence"]
+  failed["FAILED<br/>Proven failure; never timeout alone"]
+  received --> planning
+  planning --> executing
+  executing --> completed
   executing --> unknown
-  unknown --> reconcile
-  reconcile --> verifying
-  reconcile --> review
-  verifying --> verified
-  verified --> sync
-  sync --> completed
+  unknown --> reconciling
+  reconciling --> completed
+  reconciling --> intervention
+  reconciling --> failed

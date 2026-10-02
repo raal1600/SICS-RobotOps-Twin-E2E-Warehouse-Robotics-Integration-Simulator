@@ -7,20 +7,24 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.domain.models import Fault, JobState, OrderLine, OrderRequest, new_id
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Store
 
 
-def make_engine(directory: Path) -> Engine:
-    return Engine(Store(directory / "workflow.db"), SyntheticRuntime(directory / "runtime.db"))
+def make_engine(directory: Path, runtime_mode: str = "headless") -> Engine:
+    runtime = (BlenderRuntime if runtime_mode == "blender" else SyntheticRuntime)(
+        directory / "runtime.db"
+    )
+    return Engine(Store(directory / "workflow.db"), runtime)
 
 
-def run_demo(directory: Path, scenario: str) -> dict[str, Any]:
+def run_demo(directory: Path, scenario: str, runtime_mode: str = "headless") -> dict[str, Any]:
     if (directory / "workflow.db").exists():
         raise ValueError("Demo needs a new directory; existing evidence is never overwritten.")
-    engine = make_engine(directory)
+    engine = make_engine(directory, runtime_mode)
     order = engine.store.intake(
         OrderRequest(
             order_id="demo-order",
@@ -48,10 +52,19 @@ def run_demo(directory: Path, scenario: str) -> dict[str, Any]:
     initial = job.state
     if scenario == "restart":
         subprocess.run(
-            [sys.executable, "-m", "robotops.demo", "--resume", "--directory", str(directory)],
+            [
+                sys.executable,
+                "-m",
+                "robotops.demo",
+                "--resume",
+                "--directory",
+                str(directory),
+                "--runtime",
+                runtime_mode,
+            ],
             check=True,
         )
-        engine = make_engine(directory)
+        engine = make_engine(directory, runtime_mode)
         job = engine.store.job(job.job_id)
     elif job.state == JobState.UNKNOWN_OUTCOME:
         job = engine.reconcile(
@@ -71,6 +84,7 @@ def run_demo(directory: Path, scenario: str) -> dict[str, Any]:
     timeline = engine.store.timeline(order.order_id)
     result = dict(
         scenario=scenario,
+        runtime=runtime_mode,
         initial_state=initial,
         final_state=job.state,
         command_id=job.command_id,
@@ -102,14 +116,15 @@ def main() -> None:
         ],
     )
     parser.add_argument("--directory", type=Path, default=None)
+    parser.add_argument("--runtime", choices=["headless", "blender"], default="headless")
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     directory = args.directory or Path("runs") / new_id()
     if args.resume:
-        recovered = make_engine(directory).recover()
+        recovered = make_engine(directory, args.runtime).recover()
         print(json.dumps({"recovered": [job.state for job in recovered]}))
         return
-    result = run_demo(directory, args.scenario)
+    result = run_demo(directory, args.scenario, args.runtime)
     print(
         json.dumps(
             {

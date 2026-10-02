@@ -48,7 +48,9 @@ class RobotGateway:
             "ORIGINAL_COMMAND_IDENTITY",
             evidence_ids=(command.command_id,),
         )
-        return self.runtime.journal(command.command_id)
+        receipt = self.runtime.journal(command.command_id)
+        self.sync_events(command.command_id)
+        return receipt
 
     def sync_events(self, command_id: str | None = None) -> None:
         for event in self.runtime.events(command_id):

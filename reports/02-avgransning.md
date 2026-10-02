@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** The deterministic headless E2E workflow is implemented and tested: local Brain, semantic validation, durable journals, degraded observations, conservative reconciliation, process-crash recovery and deterministic demos. Blender runtime and dashboard/publication acceptance remain in progress. Status: NOT DONE.
+> **Implementation status, 2026-10-02:** The deterministic E2E workflow and bounded Blender runtime are implemented and tested, including lost acknowledgement, exactly one effect, ambiguous observations, process restart, corrupt checkpoints and cell interlocks. Dashboard, final acceptance mapping and publication verification remain in progress. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

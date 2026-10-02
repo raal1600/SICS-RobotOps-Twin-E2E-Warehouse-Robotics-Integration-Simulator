@@ -62,8 +62,21 @@ class SyntheticRuntime:
             cell=cell,
             locations=self.settings.locations,
             objects=tuple(
-                WorldObject(product=p, location_id=source.location_id, pose=source.pose)
-                for p in self.settings.products
+                WorldObject(
+                    product=p,
+                    location_id=source.location_id,
+                    pose=source.pose.model_copy(
+                        update={
+                            "position": (
+                                source.pose.position[0],
+                                source.pose.position[1]
+                                + (index - (len(self.settings.products) - 1) / 2) * 0.18,
+                                source.pose.position[2],
+                            )
+                        }
+                    ),
+                )
+                for index, p in enumerate(self.settings.products)
             ),
         )
         self._write_world(db, world)
@@ -158,6 +171,30 @@ class SyntheticRuntime:
                 )
             ]
 
+    @staticmethod
+    def rejection_reason(
+        world: WorldState, command: RobotCommand, fault: Fault | None
+    ) -> str | None:
+        objects = {obj.product.product_id: obj for obj in world.objects}
+        locations = {loc.location_id: loc for loc in world.locations}
+        if command.scene_epoch != world.scene_epoch:
+            return "SCENE_EPOCH_MISMATCH"
+        elif world.cell.mode != CellMode.READY:
+            return "CELL_NOT_READY"
+        elif command.cell_generation != world.cell.generation:
+            return "CELL_GENERATION_MISMATCH"
+        elif command.product_id not in objects or command.destination_id not in locations:
+            return "UNKNOWN_PRODUCT_OR_DESTINATION"
+        elif objects[command.product_id].location_id != command.source_id:
+            return "SOURCE_PRECONDITION_FAILED"
+        elif command.target_pose != locations[command.destination_id].pose:
+            return "TARGET_POSE_MISMATCH"
+        elif fault == Fault.DROP_ACK_BEFORE_EFFECT:
+            return "PROVEN_NOT_STARTED"
+        elif fault == Fault.ROBOT_COMMAND_FAILURE:
+            return "SIMULATED_COMMAND_FAILURE"
+        return None
+
     def _execute(
         self, db: sqlite3.Connection, command: RobotCommand, fault: Fault | None
     ) -> CommandReceipt:
@@ -176,7 +213,6 @@ class SyntheticRuntime:
         if fault is not None:
             self._event(db, command, world, "FAULT_INJECTED", fault.value)
         objects = {obj.product.product_id: obj for obj in world.objects}
-        locations = {loc.location_id: loc for loc in world.locations}
         reason = "PICK_APPLIED"
         status = CommandStatus.SUCCEEDED
         count = 0
@@ -193,22 +229,8 @@ class SyntheticRuntime:
                     )
                 }
             )
-        if command.scene_epoch != world.scene_epoch:
-            reason = "SCENE_EPOCH_MISMATCH"
-        elif world.cell.mode != CellMode.READY:
-            reason = "CELL_NOT_READY"
-        elif command.cell_generation != world.cell.generation:
-            reason = "CELL_GENERATION_MISMATCH"
-        elif command.product_id not in objects or command.destination_id not in locations:
-            reason = "UNKNOWN_PRODUCT_OR_DESTINATION"
-        elif objects[command.product_id].location_id != command.source_id:
-            reason = "SOURCE_PRECONDITION_FAILED"
-        elif command.target_pose != locations[command.destination_id].pose:
-            reason = "TARGET_POSE_MISMATCH"
-        elif fault == Fault.DROP_ACK_BEFORE_EFFECT:
-            reason = "PROVEN_NOT_STARTED"
-        elif fault == Fault.ROBOT_COMMAND_FAILURE:
-            reason = "SIMULATED_COMMAND_FAILURE"
+        reason = self.rejection_reason(world, command, fault) or "PICK_APPLIED"
+        if reason == "SIMULATED_COMMAND_FAILURE":
             status = CommandStatus.FAILED
         if reason != "PICK_APPLIED":
             if status != CommandStatus.FAILED:

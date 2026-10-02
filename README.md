@@ -8,7 +8,7 @@
 
 Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till AI-assisterad robotexekvering, verifiering och återhämtning. Blender är den **planerade simulatorvärlden**, inte en validerad kopia av en verklig anläggning.
 
-**Aktuell status:** The deterministic headless E2E workflow is implemented and tested: local Brain, semantic validation, durable journals, degraded observations, conservative reconciliation, process-crash recovery and deterministic demos. Blender runtime and dashboard/publication acceptance remain in progress. **NOT DONE** until all MUST criteria and remote workflows pass.
+**Aktuell status:** The deterministic E2E workflow and bounded Blender runtime are implemented and tested, including lost acknowledgement, exactly one effect, ambiguous observations, process restart, corrupt checkpoints and cell interlocks. Dashboard, final acceptance mapping and publication verification remain in progress. **NOT DONE** until all MUST criteria and remote workflows pass.
 
 ## Läs och ladda ned
 
@@ -99,3 +99,13 @@ Persistence details: [durable state and claims](docs/implementation/persistence.
 [Runtime journal and fault semantics](docs/implementation/runtime.md).
 
 [Observation and reconciliation decision table](docs/implementation/reconciliation.md).
+
+
+## Real Blender runtime
+
+Install Blender 5.2.1 LTS and set `BLENDER_EXECUTABLE` if it is not on PATH.
+On Windows the standard Blender 5.2 install directory is also detected.
+`uv run --locked python -m tools.dev demo --runtime blender --scenario lost_ack_after_effect`
+executes a real synthetic scene move and saves scene, PNG, journal and timeline.
+`make test` includes the required Blender lane and fails if Blender is unavailable.
+[Bounded protocol, restart behavior and limits](docs/implementation/blender.md).

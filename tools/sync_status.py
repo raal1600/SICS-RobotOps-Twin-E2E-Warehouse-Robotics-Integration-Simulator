@@ -5,9 +5,29 @@ import re
 import sys
 from pathlib import Path
 
+from tools.drift_check import criterion_ids
 
-def update(phase: str, summary: str) -> None:
-    status = {"phase": phase, "status": "NOT DONE", "summary": summary}
+
+def completion_status(manifest: dict | None) -> str:
+    if manifest is None:
+        return "NOT DONE"
+    if not all(
+        manifest.get("criteria", {}).get(ident, {}).get("passed", False)
+        for ident in criterion_ids()
+    ):
+        raise ValueError("Every MUST needs PASS evidence before completion")
+    if not all(
+        manifest.get("gates", {}).get(gate, {}).get("passed", False)
+        for gate in ("ci", "publication_remote", "pages")
+    ):
+        raise ValueError("Remote CI and Pages evidence required before completion")
+    return "DONE"
+
+
+def update(phase: str, summary: str, completion_manifest: Path | None = None) -> None:
+    manifest = json.loads(completion_manifest.read_text()) if completion_manifest else None
+    state = completion_status(manifest)
+    status = {"phase": phase, "status": state, "summary": summary}
     Path("publication/status.json").write_text(
         json.dumps(status, indent=2) + "\n", encoding="utf-8"
     )
@@ -15,7 +35,7 @@ def update(phase: str, summary: str) -> None:
         text = path.read_text(encoding="utf-8")
         replacement = (
             "<!-- implementation-status:start -->\n"
-            "> **Implementation status, 2026-10-02:** " + summary + " Status: NOT DONE.\n"
+            "> **Implementation status, 2026-10-02:** " + summary + f" Status: {state}.\n"
             "> Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.\n"
             "> The research below records design rationale, not real-world robot validation.\n"
             "<!-- implementation-status:end -->"
@@ -31,11 +51,7 @@ def update(phase: str, summary: str) -> None:
     text = path.read_text(encoding="utf-8")
     text = re.sub(
         r"\*\*Aktuell status:\*\*.*?(?=\n\n)",
-        lambda _: (
-            "**Aktuell status:** "
-            + summary
-            + " **NOT DONE** until all MUST criteria and remote workflows pass."
-        ),
+        lambda _: "**Aktuell status:** " + summary + f" **{state}**.",
         text,
         flags=re.DOTALL,
     )
@@ -43,4 +59,4 @@ def update(phase: str, summary: str) -> None:
 
 
 if __name__ == "__main__":
-    update(sys.argv[1], sys.argv[2])
+    update(sys.argv[1], sys.argv[2], Path(sys.argv[3]) if len(sys.argv) > 3 else None)

@@ -157,6 +157,43 @@ def remote_checks(commit: str) -> dict:
     return result
 
 
+def refresh_remote(manifest_path: Path, mapping: dict) -> dict:
+    """Add live remote attestation to an existing run without changing its local evidence."""
+    out = manifest_path.resolve().parent
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    original = out / "local-manifest.json"
+    if not original.exists():
+        shutil.copyfile(manifest_path, original)
+    remote = remote_checks(manifest["source"]["commit"])
+    (out / "remote.json").write_text(json.dumps(remote, indent=2) + "\n", encoding="utf-8")
+    command = [
+        "uv",
+        "run",
+        "--locked",
+        "python",
+        "-m",
+        "tools.dev",
+        "acceptance",
+        "--refresh-remote",
+        manifest_path.relative_to(ROOT).as_posix(),
+    ]
+    for name, workflow in (("ci", "ci.yml"), ("publication_remote", "publish-reports.yml")):
+        manifest["gates"][name] = {
+            "passed": remote.get("workflows", {}).get(workflow, {}).get("passed", False),
+            "command": command,
+        }
+    manifest["gates"]["pages"] = {
+        "passed": bool(remote.get("links"))
+        and all(item["passed"] for item in remote.get("links", {}).values()),
+        "command": command,
+    }
+    manifest["remote_verified_at"] = datetime.now(UTC).isoformat()
+    suites = [read_junit(out / f"tests-{i}.xml") for i in (1, 2)]
+    manifest["criteria"] = render_report(manifest, mapping, suites, out)
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    return manifest
+
+
 def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) -> dict:
     gates = manifest["gates"]
     results = {ident: evaluate(item, gates, suites) for ident, item in mapping.items()}
@@ -171,6 +208,11 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
         f"Source commit: `{manifest['source']['commit']}`. Dirty at start: `{manifest['source']['dirty']}`.",
         f"Inspected source hash: `{manifest['source']['source_sha256']}` (excludes generated acceptance/evidence).",
         f"Run time (UTC): {manifest['started_at']}. This report does not attest a later commit.",
+        "Evidence/status successors run the full workflows again. Their exact-SHA reports are retained in [CI artifacts](https://github.com/"
+        + REPO
+        + "/actions/workflows/ci.yml), and the deployed SHA is in [public build.json]("
+        + PAGES
+        + "build.json). See [ADR 0002](docs/adr/0002-acceptance-attestations.md).",
         "",
         f"[Full manifest and commands]({evidence}/manifest.json). Logs and JUnit are in the same directory.",
         "",
@@ -247,8 +289,18 @@ def main() -> None:
         type=Path,
         help="Re-render an existing manifest; does not rerun or refresh evidence.",
     )
+    parser.add_argument(
+        "--refresh-remote",
+        type=Path,
+        help="Verify live CI/Pages for an existing run's exact SHA, then regenerate its report.",
+    )
     args = parser.parse_args()
     mapping = json.loads((ROOT / "docs/acceptance-map.json").read_text())
+    if args.refresh_remote:
+        manifest = refresh_remote(args.refresh_remote.resolve(), mapping)
+        passed = all(manifest["criteria"][ident]["passed"] for ident in criterion_ids())
+        print("All MUST criteria PASS" if passed else "NOT DONE: inspect ACCEPTANCE_REPORT.md")
+        raise SystemExit(0 if passed else 1)
     if args.report_only:
         out = args.report_only.resolve().parent
         manifest = json.loads(args.report_only.read_text())

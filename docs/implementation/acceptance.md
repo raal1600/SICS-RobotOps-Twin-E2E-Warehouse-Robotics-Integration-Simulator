@@ -31,6 +31,14 @@ misrepresented as a run on a later commit. Final remote checks record workflow
 URLs and the deployed `build.json` commit. Generated Pages/PDFs are only built by
 the repository publication tool/workflow.
 
+After downloading the CI evidence for a completed source commit, use
+`uv run --locked python -m tools.dev acceptance --refresh-remote <manifest-path>`.
+This preserves `local-manifest.json`, checks live workflows and Pages for the
+same SHA, saves `remote.json` and regenerates the criterion table. It does not
+rerun tests or change their outcomes. A failed local gate stays failed.
+[ADR 0002](../adr/0002-acceptance-attestations.md) explains source snapshots and
+the final-SHA attestation carried by CI artifacts and public `build.json`.
+
 The optional external model provider, real ERP delivery, OPC UA and hardware
 integration are not completion gates. Missing optional model fallback is recorded
 against SHOULD SC-BRAIN-005. Reviewed subprocess exceptions are exact AST hashes;

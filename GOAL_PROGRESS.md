@@ -1,51 +1,50 @@
-# Goal Progress
+﻿# Goal Progress
 Last updated: 2026-10-02 UTC
-Commit/base: `6746925856525cf099388e1b8cb7c730ecb7a15d`
+Audited source: `17e45315f003ae84f384fc07caa89b33234d8264`
 
 ## Current phase
-P0-P5 implemented. P6 optional, unimplemented. P7 clean local acceptance passed;
-remote CI/publication awaits permission. **NOT DONE**.
+P0-P5 implemented; P7 acceptance evidence covers every MUST. P6 is optional and
+unimplemented. Both remote workflows pass for the audited source. The final
+attestation/status commit is rechecked by CI and publication before release closes.
 
 ## MUST status
-- PASS locally: 81 of 85 MUST criteria in the generated acceptance mapping.
-- Local required work complete. Final remote CI/Pages evidence is outstanding.
-- FAIL/external gate: SC-DATA-005 and SC-KB-006/007/008 require final-SHA remote
-  CI/Pages. Automatic approval review rejected pushing to main; explicit user
-  authorization to publish is required after local work is reviewable.
-- SHOULD: optional external model fallback SC-BRAIN-005 remains unimplemented.
+- PASS: all 85 MUST criteria, individually mapped in ACCEPTANCE_REPORT.md.
+- No remaining implementation failures or permission blockers. User explicitly
+  authorized pushing and publishing on 2026-10-02.
+- SHOULD SC-BRAIN-005: optional external model fallback is unimplemented; non-blocking.
 
-## Evidence added this iteration
-- `docs/evidence/acceptance/20261002T175141/`: clean checkout setup, two 219-test runs,
-  88.76% coverage (fixed threshold 85%), lint/types/security, seven real Blender
-  scenarios, drift and publication. No skips or xfails.
-- Lost-ack: UNKNOWN_OUTCOME -> COMPLETED; original identity; exactly one effect.
-- Ambiguous: REQUIRES_INTERVENTION. Restart and interlocks pass.
-- Five reviewed low-severity subprocess findings bound to AST hashes;
-  pip-audit has no known vulnerabilities after WeasyPrint 70.0 update.
-- PDF review: all pages inspected in contact sheets; state diagram inspected
-  at readable size. Corrected a routing ambiguity and named PDF link collisions;
-  all 180 merged internal link destinations verified. Browser desktop/mobile and
-  local HTTP checks saved in p7-publication-review.json. Public Pages remains at
-  567eabbe; exact-SHA remote checks saved in p7-remote-readiness.json.
-- Earlier P0-P5 and browser/Blender evidence remains under docs/evidence/.
+## Evidence
+- Windows clean checkout: `docs/evidence/acceptance/20261002T175141/`, 219 tests
+  twice, 88.76% coverage against the unchanged 85% threshold.
+- Ubuntu CI: `docs/evidence/acceptance/20261002T190747/`, 219 tests twice, 88.60%
+  coverage, all quality/security gates and seven actual CPU Blender demos.
+- CI 37051979620 and publication 37051979852 pass. Artifact digest and URLs are
+  recorded in p7-ci-provenance.json. Exact-SHA public checks are in remote.json.
+- Lost-ack: UNKNOWN_OUTCOME -> RECONCILING -> COMPLETED; original command; one
+  effect and zero duplicates. Ambiguous: REQUIRES_INTERVENTION. Process restart,
+  before-effect lost ack, logical E-stop and cell fault preserve their semantics.
+- PDF/browser review: all 50 PDF pages, desktop/mobile, local HTTP responses and
+  180 merged internal link destinations. Public workflow verifies HTML/PDF/SVG.
+- New completion guards reject missing MUST or remote PASS evidence. Remote
+  refresh preserves the original local manifest and never upgrades failed tests.
 
 ## Decisions / ADRs
-ADR 0001 records the two durable stores, batch Blender boundary and local ERP
-contract. Acceptance compares named tests in both JUnit runs and fails missing,
-failed or skipped evidence. Reports distinguish audited source SHA from later
-evidence commits; CI artifacts attest the exact CI commit.
+ADR 0001: durable stores, bounded batch Blender adapter and local ERP contract.
+ADR 0002: immutable inspected source identity, timestamped remote attestation,
+original local evidence preservation and exact final-SHA CI/publication evidence.
+A report does not invent its own commit hash or relabel earlier tests.
 
 ## Knowledge-base synchronization
-Drift detected: yes. Updated README commands/status; all report status boxes;
-obsolete report command example, bridge proposal and optional experiment scope;
-PUBLICATION, citation revision, public status, publication covers/footers, state
-diagram layout, checklist, acceptance mapping and dependency/security docs.
-Normative MUST semantics and thresholds are unchanged. Public-source provenance
-is preserved. Generated PDFs/Pages are rebuilt through the publication tool.
+Drift detected and resolved: design-only status, obsolete report command/bridge,
+optional research experiments, publication covers/footers, source/diagram/API
+boundaries, developer commands, checklist and acceptance status. README, all
+reports, PUBLICATION, progress, acceptance, status, diagrams, dependency/security
+and acceptance documentation were synchronized. Company claims retain provenance.
+No normative MUST, state semantics or threshold was weakened.
 
-## Next milestone
-Request explicit permission to push the reviewed local commits to main and
-trigger CI/publication. After authorization: push, inspect both workflows, fix any
-remote failures, verify current public links/build identity and collect final-SHA
-acceptance artifacts. Optional model, hardware, OPC UA and external ERP transport
-remain non-blocking. No normative requirement was weakened.
+## Final release verification
+Push the coherent attestation/status commit, verify its full CI and publication
+runs, and verify its SHA in public build.json. The immutable CI artifact records
+that exact successor SHA; the repository report retains its honestly identified
+source snapshot (ADR 0002). Optional model, OPC UA, external ERP transport and real
+hardware remain non-blocking. No further feature implementation is required.

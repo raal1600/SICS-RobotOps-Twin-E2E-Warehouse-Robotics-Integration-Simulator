@@ -19,21 +19,20 @@ foreach ($name in @('Microsoft.Web.WebView2.Core.dll','Microsoft.Web.WebView2.Wi
 }
 Copy-Item -LiteralPath (Join-Path $sdk 'runtimes\win-x64\native\WebView2Loader.dll') -Destination $output -Force
 Copy-Item -LiteralPath (Join-Path $sdk 'LICENSE.txt') -Destination (Join-Path $output 'WEBVIEW2-LICENSE.txt') -Force
-$notice = Join-Path $sdk 'ThirdPartyNotices.txt'
-if (Test-Path -LiteralPath $notice) { Copy-Item -LiteralPath $notice -Destination $output -Force }
+Copy-Item -LiteralPath (Join-Path $sdk 'NOTICE.txt') -Destination (Join-Path $output 'WEBVIEW2-NOTICE.txt') -Force
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 $source = Join-Path $repository 'apps\desktop'
-& $compiler /nologo /target:winexe /platform:x64 /optimize+ /warnaserror+ /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll ('/reference:'+(Join-Path $output 'Microsoft.Web.WebView2.Core.dll')) ('/reference:'+(Join-Path $output 'Microsoft.Web.WebView2.WinForms.dll')) ('/out:'+(Join-Path $output 'RobotOps Twin.exe')) (Join-Path $source 'OwnedProcess.cs') (Join-Path $source 'RobotOpsLauncher.cs')
+& $compiler /nologo /target:winexe /platform:x64 /optimize+ /warnaserror+ /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll ('/reference:'+(Join-Path $output 'Microsoft.Web.WebView2.Core.dll')) ('/reference:'+(Join-Path $output 'Microsoft.Web.WebView2.WinForms.dll')) ('/win32manifest:'+(Join-Path $source 'app.manifest')) ('/out:'+(Join-Path $output 'RobotOps Twin.exe')) (Join-Path $source 'OwnedProcess.cs') (Join-Path $source 'RobotOpsLauncher.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Desktop compilation failed.' }
 @{ repository=$repository; python=$python } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'launcher.json') -Encoding UTF8
 @'
 <?xml version="1.0" encoding="utf-8"?>
-<configuration><startup><supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" /></startup></configuration>
+<configuration><startup><supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" /></startup><runtime><AppContextSwitchOverrides value="Switch.System.IO.UseLegacyPathHandling=false;Switch.System.IO.BlockLongPaths=false" /></runtime></configuration>
 '@ | Set-Content -LiteralPath (Join-Path $output 'RobotOps Twin.exe.config') -Encoding UTF8
 $hashes = @{}
 Get-ChildItem -LiteralPath $output -File | Where-Object Name -NE 'windows-build.json' | ForEach-Object { $hashes[$_.Name]=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
 $sources = @{}
-foreach ($name in @('apps/desktop/OwnedProcess.cs','apps/desktop/RobotOpsLauncher.cs','apps/desktop/backend.py','tools/build-desktop.ps1')) {
+foreach ($name in @('apps/desktop/OwnedProcess.cs','apps/desktop/RobotOpsLauncher.cs','apps/desktop/app.manifest','apps/desktop/backend.py','tools/build-desktop.ps1')) {
     $sources[$name]=(Get-FileHash -LiteralPath (Join-Path $repository $name) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 @{ source_commit=(git -C $repository rev-parse HEAD); source_dirty=[bool](git -C $repository status --porcelain); source_sha256=$sources; sdk_version='1.0.3800.47'; sdk_sha256=$expectedHash.ToLowerInvariant(); files=$hashes } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output 'windows-build.json') -Encoding UTF8

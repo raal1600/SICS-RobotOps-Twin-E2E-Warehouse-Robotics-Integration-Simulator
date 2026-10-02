@@ -3,6 +3,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -74,7 +75,9 @@ internal sealed class OwnedProcess : IDisposable {
             limits.Basic.Flags = 0x2000; // JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
             if (!SetInformationJobObject(job, 9, ref limits, (uint)Marshal.SizeOf(limits))) throw new Win32Exception();
             var security = new Security { Length=Marshal.SizeOf(typeof(Security)), Inherit=true };
-            output = CreateFile(log, 0x40000000, 3, ref security, 2, 0x80, IntPtr.Zero);
+            string fullLog=Path.GetFullPath(log);
+            string nativeLog=fullLog.StartsWith("\\\\") ? "\\\\?\\UNC\\"+fullLog.Substring(2) : "\\\\?\\"+fullLog;
+            output = CreateFile(nativeLog, 0x40000000, 3, ref security, 2, 0x80, IntPtr.Zero);
             input = CreateFile("NUL", 0x80000000, 3, ref security, 3, 0x80, IntPtr.Zero);
             if (output == new IntPtr(-1) || input == new IntPtr(-1)) throw new Win32Exception();
             var startup = new Startup { Size=Marshal.SizeOf(typeof(Startup)), Flags=0x100, Input=input, Output=output, Error=output };

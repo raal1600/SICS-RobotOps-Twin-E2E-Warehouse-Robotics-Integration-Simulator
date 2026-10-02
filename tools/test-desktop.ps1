@@ -1,8 +1,9 @@
-param([ValidateSet('headless','blender')][string]$Runtime='headless')
+param([ValidateSet('headless','blender')][string]$Runtime='headless',[string]$DataRoot)
 $ErrorActionPreference='Stop'
 $repository=Split-Path -Parent $PSScriptRoot
 $executable=Join-Path $repository 'artifacts\desktop\RobotOps Twin\RobotOps Twin.exe'
 $root=Join-Path $repository ('artifacts\desktop-smoke\'+[guid]::NewGuid().ToString('N')+' test data')
+if ($DataRoot) { $root=[IO.Path]::GetFullPath($DataRoot) }
 New-Item -ItemType Directory -Path $root -Force | Out-Null
 Add-Type -TypeDefinition @'
 using System; using System.Text; using System.Runtime.InteropServices;
@@ -24,6 +25,7 @@ function Wait-Condition([scriptblock]$Condition,[string]$Message,[int]$Seconds=4
 }
 function Start-OwnedApp {
     $process=Start-Process -FilePath $executable -ArgumentList ('--runtime '+$Runtime+' --data-root "'+$root+'"') -WindowStyle Hidden -PassThru
+    try {
     Wait-Condition { (Get-ChildItem -Path (Join-Path $root 'sessions\*\launcher.json') -ErrorAction SilentlyContinue | Where-Object { (Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json).pid -eq $process.Id }).Count -eq 1 } 'No launcher identity'
     $identity=Get-ChildItem -Path (Join-Path $root 'sessions\*\launcher.json') | Where-Object { (Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json).pid -eq $process.Id }
     $session=$identity.DirectoryName
@@ -32,6 +34,12 @@ function Start-OwnedApp {
     $backend=Get-Process -Id $ready.pid
     $held=$backend.Handle
     return @{ process=$process; backend=$backend; session=$session; origin=$ready.origin }
+    } catch {
+        $diagnostic=Join-Path $env:LOCALAPPDATA 'RobotOpsTwin\launcher-error.log'
+        if (Test-Path -LiteralPath $diagnostic) { Write-Host (Get-Content -LiteralPath $diagnostic -Raw) }
+        if (-not $process.HasExited) { $process.Kill(); $null=$process.WaitForExit(5000) }
+        throw
+    }
 }
 function Assert-Exited($App) {
     if (-not $App.process.WaitForExit(25000)) { throw 'Desktop did not stop' }

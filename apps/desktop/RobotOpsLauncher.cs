@@ -15,6 +15,7 @@ using Microsoft.Web.WebView2.WinForms;
 
 [assembly: AssemblyTitle("RobotOps Twin")]
 [assembly: AssemblyVersion("1.0.0.0")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.8")]
 internal static class Launcher {
     [STAThread] static int Main(string[] args) {
         Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
@@ -36,10 +37,16 @@ internal static class Launcher {
             using (var mutex = new Mutex(true, "Local\\RobotOpsTwin-" + key, out first))
             using (var activate = new EventWaitHandle(false, EventResetMode.AutoReset, "Local\\RobotOpsTwinActivate-" + key)) {
                 if (!first) { activate.Set(); return 0; }
-                Application.Run(new Desktop(config, data, runtime, activate));
+                string profile=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"RobotOpsTwin","WebView2",key.Substring(0,32));
+                Application.Run(new Desktop(config, data, runtime, activate, profile));
             }
             return 0;
         } catch (Exception error) {
+            try {
+                string logs=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"RobotOpsTwin");
+                Directory.CreateDirectory(logs);
+                File.WriteAllText(Path.Combine(logs,"launcher-error.log"),error.ToString());
+            } catch { }
             MessageBox.Show(error.Message, "RobotOps Twin could not start", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return 1;
         }
@@ -48,7 +55,7 @@ internal static class Launcher {
 
 internal sealed class Desktop : Form {
     readonly Dictionary<string,string> config;
-    readonly string data, runtime, sessionId, session;
+    readonly string data, runtime, sessionId, session, profile;
     readonly WebView2 view = new WebView2();
     readonly Label status = new Label();
     readonly System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
@@ -59,8 +66,8 @@ internal sealed class Desktop : Form {
     string origin;
     bool closing, allowClose;
 
-    public Desktop(Dictionary<string,string> configuration, string dataRoot, string mode, EventWaitHandle signal) {
-        config=configuration; data=dataRoot; runtime=mode; activate=signal;
+    public Desktop(Dictionary<string,string> configuration, string dataRoot, string mode, EventWaitHandle signal, string browserProfile) {
+        config=configuration; data=dataRoot; runtime=mode; activate=signal; profile=browserProfile;
         sessionId=Guid.NewGuid().ToString("N");
         session=Path.Combine(data, "sessions", DateTime.UtcNow.ToString("yyyyMMddTHHmmss") + "-" + sessionId);
         Directory.CreateDirectory(session);
@@ -107,7 +114,8 @@ internal sealed class Desktop : Form {
             origin=Convert.ToString(ready["origin"]);
             if (!Uri.TryCreate(origin,UriKind.Absolute,out address) || address.Scheme != "http" || address.Host != "127.0.0.1" || address.Port <= 0)
                 throw new InvalidDataException("Backend must bind an owned loopback port.");
-            var environment=await CoreWebView2Environment.CreateAsync(null,Path.Combine(data,"WebView2"));
+            // Chromium profile paths stay short even for long checkout/data roots.
+            var environment=await CoreWebView2Environment.CreateAsync(null,profile);
             cancellation.Token.ThrowIfCancellationRequested();
             await view.EnsureCoreWebView2Async(environment);
             cancellation.Token.ThrowIfCancellationRequested();

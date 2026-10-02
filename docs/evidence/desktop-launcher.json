@@ -54,5 +54,71 @@
     "security": "PASS: no dependency vulnerabilities; unchanged five reviewed subprocess findings; desktop Python Bandit zero findings",
     "publication": "PASS: regenerated HTML/SVG/PDF with updated architecture",
     "drift": "PASS: links, criterion IDs, source registry and shared status"
+  },
+  "long_path_regression": {
+    "prior_failure": "Windows CI failed before session identity in its long checkout; a local >260-character data-root regression reproduced native path and Chromium-profile startup limits.",
+    "resolution": "Explicit Windows/.NET long-path support and short LocalAppData browser profiles keyed by data root. Startup exceptions are logged.",
+    "evidence": {
+      "data": "C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\desktop-smoke\\long-path-0bc031599f214adfa5d445d66662bc6b\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb test data",
+      "passed": true,
+      "checks": [
+        "native window rendered with owned loopback API",
+        "duplicate launch reuses window without new backend",
+        "window close drains backend and releases port",
+        "reopen reconciles original command with exactly one pick",
+        "abrupt desktop termination also stops owned backend",
+        "reopen after forced close preserves completed work"
+      ],
+      "source_dirty": true,
+      "source_commit": "2380bd72b2dbba01467cf90bee82a7f4ea18fede",
+      "test_script_sha256": "2b72c191c464e67f5af3bc3a1f79ea684ccd294a0322cfe2a9eb534d475b691a",
+      "runtime": "headless"
+    },
+    "source_sha256": {
+      "apps/desktop/OwnedProcess.cs": "3bc774b0977aa50f687a29572c10ca4f96004e4def4ccc761aa2f5e8d37b1f03",
+      "apps/desktop/RobotOpsLauncher.cs": "2c1fe14d47b99cdecac7f8d8a3908b381363bd3ab6eb3fd87c78bba08e773200",
+      "apps/desktop/app.manifest": "fda29859f91bd211b4f8928a4aacfe66baf8767695085e0710048ac937739235",
+      "tools/build-desktop.ps1": "39762d61316ae4b2041458059d44c53c7da733bb14ea0e36845346fb91393732",
+      "tools/test-desktop.ps1": "2b72c191c464e67f5af3bc3a1f79ea684ccd294a0322cfe2a9eb534d475b691a"
+    },
+    "real_blender_recheck": {
+      "data": "C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\desktop-smoke\\4490e7b2a7c2423d87668e2e507a78f0 test data",
+      "passed": true,
+      "checks": [
+        "native window rendered with owned loopback API",
+        "duplicate launch reuses window without new backend",
+        "window close drains backend and releases port",
+        "reopen reconciles original command with exactly one pick",
+        "abrupt desktop termination also stops owned backend",
+        "reopen after forced close preserves completed work",
+        "normal window close during a real Blender pick drains it to completion",
+        "abrupt close during a real Blender pick terminates its owned process tree"
+      ],
+      "source_dirty": true,
+      "source_commit": "2380bd72b2dbba01467cf90bee82a7f4ea18fede",
+      "test_script_sha256": "2b72c191c464e67f5af3bc3a1f79ea684ccd294a0322cfe2a9eb534d475b691a",
+      "runtime": "blender"
+    }
+  },
+  "installed_copy_check": {
+    "source_commit": "2380bd72b2dbba01467cf90bee82a7f4ea18fede",
+    "target": "C:\\Users\\ramis\\AppData\\Local\\RobotOpsTwin\\App\\RobotOps Twin.exe",
+    "exe_sha256": "2a259f94442ffdeaaaf8e836beb41c2f50dce1d1294f63950caf8733b14a54a2",
+    "checks": [
+      "Installed EXE resolves copied DLLs",
+      "Embedded window renders without debug flags",
+      "Default runtime is Blender",
+      "Owned backend exits with installed app"
+    ],
+    "passed": true
+  },
+  "core_ci": {
+    "source_commit": "2380bd72b2dbba01467cf90bee82a7f4ea18fede",
+    "run_id": 37057003498,
+    "artifact_id": 11250025001,
+    "artifact_sha256": "ccedb4857b6c41b62b60b55e49cb0965dffc01885519818a45c04312e86d6945",
+    "digest_verified": true,
+    "tests_each_run": 223,
+    "evidence": "docs/evidence/acceptance/20261002T195545/manifest.json"
   }
 }

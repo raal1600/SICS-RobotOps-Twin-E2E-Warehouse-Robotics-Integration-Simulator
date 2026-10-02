@@ -1,44 +1,48 @@
 # Goal Progress
 Last updated: 2026-10-02 UTC
-Base: `13528bebf6eccce588bc8d8d905d2bad87167904` (completed core acceptance).
+Audited source: `2380bd72b2dbba01467cf90bee82a7f4ea18fede`.
 
 ## Current phase
-User-requested Windows desktop launcher extension. Native EXE and WebView2 window
-implemented; starts its owned API and actual Blender runtime, stops them on close.
+User-requested Windows desktop extension implemented, tested and installed.
+The native EXE starts its own API and embedded dashboard, uses real Blender by
+default, and stops its owned process tree when its window closes. Persistent
+orders, journals and uncertainty retain the existing conservative recovery rules.
 
 ## MUST status
-The base has all 85 MUST PASS with exact-SHA CI/publication evidence. Rechecking
-all affected criteria for this extension: SC-DEMO-001/003, SC-PERSIST-002/003/004,
-SC-IDEM-001, SC-REC-004, SC-TEST-001/003/004/005/006 and SC-KB/DOC/ACC groups.
-No normative criterion or threshold changed. Core external-model fallback SHOULD
-SC-BRAIN-005 remains a documented non-blocking gap.
+All 85 core MUST criteria pass against the audited source, with clean CI evidence
+in ACCEPTANCE_REPORT.md. Both mandatory suite runs contain 223 passing tests.
+The native Windows workflow exposed a long-path startup issue; the correction is
+covered by a real local window test with a data path over 260 characters. Its
+successor commit reruns all three workflows before final delivery.
+SHOULD SC-BRAIN-005 (optional external model fallback) remains non-blocking.
 
-## Evidence added this iteration
-- Cross-platform desktop backend process tests: close/reopen, original-command
-  reconciliation with exactly one pick, separate ports and independent stop files.
-- Actual native EXE with Blender: rendered WebView, duplicate launch, graceful
-  window close, stopped port, persisted unknown-outcome recovery, crash cleanup,
-  closing during a real pick, terminating the owned Blender tree after a crash.
-- Full regression: 223 passed, 85.21% Windows coverage (threshold unchanged).
-- Lint/format, strict typing, dependency audit/security, drift and generated
-  publication all PASS. Evidence: docs/evidence/desktop-launcher.json.
-- App installed under LocalAppData/RobotOpsTwin/App with desktop shortcut.
+## Evidence
+- docs/evidence/acceptance/20261002T195545: clean Ubuntu acceptance, repeated tests,
+  quality/security checks, seven actual Blender demos and publication.
+- docs/evidence/desktop-launcher.json: native WebView rendering, duplicate launch,
+  normal window close, stopped port, unknown-outcome recovery with one pick,
+  abrupt desktop termination and closing during a real Blender operation.
+- Long-path regression: native long-path support plus a short per-data-root browser
+  profile correct the Windows runner startup failure; same lifecycle assertions.
+- Installed copy verified in LocalAppData/RobotOpsTwin/App; desktop shortcut exists.
 
 ## Decisions
-Native .NET Framework/WebView2 host follows the installed Asset Director pattern.
-Checksum-pinned SDK; no standalone Python/Blender bundle. OS-selected loopback
-port and session-specific filesystem lifecycle avoid changing the API contract.
-A private Windows Job Object receives the backend before its suspended process
-is resumed. Close drains work for up to 20 seconds, then terminates only owned
-children. Persistent journals retain existing conservative recovery semantics.
+Native .NET Framework/WebView2 host follows the Asset Director desktop pattern.
+Checksum-pinned SDK; existing local Python/Blender installation. OS-selected
+loopback port and session-specific files do not change the public API contract.
+A private Windows Job Object owns the backend before its suspended process resumes.
+Close drains work for up to 20 seconds, then terminates only owned descendants.
+No blind replay or fabricated success is introduced by shutdown/reopening.
 
 ## Knowledge-base synchronization
-Updated README, operations, desktop/dependency docs and architecture diagram for
-window ownership, installation, data locations, closing, recovery and tests.
-Generated publication will be rebuilt through its existing workflow. The core
-architecture, command/observation contracts and research claims are unchanged.
+README, desktop/operations/dependency docs, acceptance mapping/report, architecture
+diagram and this progress record reflect the extension and its evidence. Generated
+HTML/SVG/PDF were rebuilt and the affected architecture figure visually checked.
+No normative criterion, coverage threshold, runtime schema, or provenance class
+changed. The observed CI failure and its corrective evidence are retained.
 
-## Next milestone
-Commit the verified implementation/tests/docs, run the new Windows desktop CI
-lane and full deterministic acceptance, then retain exact-SHA remote/publication
-attestations per ADR 0002. The installed app is ready to use.
+## Release evidence
+The report retains its exact audited source identity. Per ADR 0002, later native
+path/evidence changes receive fresh exact-SHA CI artifacts and a public build.json;
+final verification checks all three workflows and deployed source identity. The
+installer records source hashes and clean/dirty state in windows-build.json.

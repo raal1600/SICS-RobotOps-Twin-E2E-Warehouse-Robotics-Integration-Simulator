@@ -92,13 +92,13 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 
 ## Final acceptance
 - [x] Generate ACCEPTANCE_REPORT.md.
-- [ ] Every MUST has inspectable PASS evidence.
+- [x] Every MUST has inspectable PASS evidence.
 - [x] SHOULD failures documented.
 - [x] Documentation-drift section completed.
 - [x] README/reports/diagrams/contracts aligned.
-- [ ] Publication workflow green.
-- [ ] Public Pages verified.
-- [ ] Final SHA recorded.
+- [x] Publication workflow green.
+- [x] Public Pages verified.
+- [x] Final SHA recorded.
 - [x] If any MUST fails: status remains NOT DONE.
 
-Local items are supported by docs/evidence/acceptance/20261002T175141 and earlier milestone evidence. The clean-checkout repeat passed after final local corrections. Final remote CI/Pages gates remain unsatisfied; this checklist is not acceptance proof.
+Local and remote evidence is indexed by ACCEPTANCE_REPORT.md. Final source/evidence successors are rechecked by CI and publication as documented in ADR 0002. This checklist is not proof by itself.

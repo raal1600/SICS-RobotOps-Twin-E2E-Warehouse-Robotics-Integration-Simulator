@@ -1,6 +1,6 @@
 # Publicerings- och underhållsguide
 
-Detta repository innehåller en **deterministisk simulator, ett rapportpaket och en byggkedja för dokumentation**. Implementationsstatus finns i GOAL_PROGRESS.md och publication/status.json; fullständig runtime-acceptans återstår.
+Detta repository innehåller en **deterministisk simulator, ett rapportpaket och en byggkedja för dokumentation**. Implementationsstatus finns i GOAL_PROGRESS.md och publication/status.json; lokal och fjärrverifierad acceptans redovisas i ACCEPTANCE_REPORT.md.
 
 ## Innehåll och redigering
 

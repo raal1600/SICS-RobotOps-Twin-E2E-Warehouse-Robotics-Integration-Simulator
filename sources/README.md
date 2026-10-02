@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** Clean-checkout acceptance passes: the deterministic E2E simulator, CPU Blender runtime, dashboard and observability are implemented and verified. Two complete test runs, seven Blender demos, quality/security gates and local publication checks pass. Final-commit CI and public Pages verification require publishing the local commits; the project remains NOT DONE. **NOT DONE** until all MUST criteria and remote workflows pass.
+**Aktuell status:** All 85 MUST criteria have inspectable PASS evidence. Deterministic CI and the publication workflow pass; the public site exposes the current governance documents. Lost-ack recovery applies exactly one simulated pick, ambiguous evidence requires intervention, and restart recovery is verified. Optional model and hardware integrations remain unimplemented and non-blocking. **DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·

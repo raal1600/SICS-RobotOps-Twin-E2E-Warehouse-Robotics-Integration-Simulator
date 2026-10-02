@@ -108,3 +108,7 @@ See GOAL_PROGRESS.md. No generated publication files were manually edited.
 
 P0 evidence: `docs/evidence/p0-checks.json` records 24 passing contract tests, lint/format and mypy.
 Synchronized: README, PUBLICATION, reports 01/02, diagrams, publication builder/status/workflow, contracts, ADR/dependency docs.
+
+P1: 152 tests, lint/format, mypy passed; commands and output in `docs/evidence/p1-checks.json`.
+OpenAPI, README, publication/status, contract/persistence docs and progress synchronized.
+Remote CI/publication remain unverified: push rejected by automatic approval review.

@@ -1,40 +1,37 @@
 # Goal Progress
-
 Last updated: 2026-10-02 UTC
-Commit/base: `567eabbe29b7e2d42c2137963942b78c2c82f839`
+Commit/base: `39ea4b5084e6b2443772eb9e5ccbb1d9c0edcbd4`
 
 ## Current phase
-P0 â€” baseline and versioned contracts. Status: **NOT DONE**.
-The repository was cloned cleanly and read in the requested order. It contains
-research/publication sources only; no runtime, contracts, tests or ADRs exist.
+P1 complete locally; P2 deterministic runtime next. **NOT DONE**.
 
 ## MUST status
-- Targeted PASS: SC-DATA-001, SC-DATA-003 (schema checks); full acceptance remains pending.
-- IN PROGRESS: SC-DATA-001, SC-DATA-002, SC-DATA-003, SC-DATA-005,
-  SC-ARCH-001, SC-ARCH-002, SC-DOC-003.
-- FAIL/unverified: all remaining MUST criteria. The initial per-criterion
-  baseline is in ACCEPTANCE_REPORT.md; documentation assertions are not proof.
+- Targeted PASS: SC-DATA-001/003/004/005; SC-STATE-001/002/003/004;
+  SC-IDEM-003; schema/state/intake evidence is in docs/evidence/p1-checks.json.
+- In progress: durable restart across actual external effects, full E2E,
+  runtime journal, Brain/validation, observations, Blender and observability.
+- All remaining MUST criteria lack full acceptance evidence.
+- Remote CI/Pages blocked by push approval, not by local implementation.
 
-## Evidence added this iteration
-- Clean base inventory: `git ls-files`, `git status --porcelain`.
-- Reviewed normative documents, all three reports, source registry, seven
-  diagram definitions, publication builder and workflow.
-- P0: 24 contract tests passed; Ruff lint/format and strict mypy passed.
-- Inspectable commands/output: docs/evidence/p0-checks.json.
-- Publication source and workflow updated; remote build pending milestone push.
+## Evidence this milestone
+152 tests pass (contract, unit transition matrix, HTTP intake, persistence,
+claim and intake races); lint/format and strict mypy pass. Logs:
+`docs/evidence/p1-checks.json`. No skip or xfail is used.
 
 ## Decisions / ADRs
-- Follow PROJECT_PLAN's normative states/API names; older explanatory report
-  names are documentation drift, not a change to acceptance intent.
-- The user requested PUBLICATION before reports; this read-order difference
-  from HANDOFF has no behavioral effect and needs no human escalation.
-- Preserve independent simulator scope and source provenance.
+ADR 0001 applies. SQLite atomically commits state/audit. Leases use fencing.
+A different unknown/intervention job quarantines the cell even after expiry.
+API exposes durable intake/status only until execution components are ready.
 
 ## Knowledge-base synchronization
-- Drift detected: yes. Reports/diagrams predate the normative API/state names.
-- P0 will synchronize these sources, document runtime/dependency boundaries,
-  and add executable schema evidence. Generated output is never hand-edited.
-- Publication currently lacks a rendered current governance/status section.
+Drift detected: implementation status changed. Updated README, publication/status,
+contract docs, persistence docs, OpenAPI, progress and acceptance evidence.
+P0 already aligned reports and diagrams with the normative states and boundaries.
+Generated publication will be rebuilt by the workflow after authorized push.
+Automatic review rejected direct-main push because explicit authorization was
+absent. No alternate remote write was attempted. Local work continues.
 
 ## Next milestone
-P1: durable intake, transition guards, causal audit, atomic worker claims.
+P2: deterministic cell runtime, atomic world/journal updates, deduplication,
+cell interlocks and deterministic fault injection. P3 then connects Brain,
+observations, verification and conservative reconciliation.

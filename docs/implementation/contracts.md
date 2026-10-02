@@ -14,5 +14,5 @@ Only ObservationModel receives WorldState on the normal decision path; Verifier
 receives WorldObservation. Observation coverage is explicit: a missing detection
 alone never proves that a product left its source.
 
-P0 establishes these contracts; behavior and OpenAPI are implemented in following
-milestones. Current evidence and remaining work are in GOAL_PROGRESS.md.
+P1 implements durable intake and status APIs; contracts/openapi.json is generated
+and tested. Execution and reconciliation follow in P2/P3. Current evidence and remaining work are in GOAL_PROGRESS.md.

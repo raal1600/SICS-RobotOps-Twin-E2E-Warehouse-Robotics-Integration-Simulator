@@ -1,22 +1,27 @@
 # Goal Progress
 Last updated: 2026-10-02 UTC
-Extension base: `62628444448a0440af7e47f586efef6ce8c75f4f`.
+Audited extension source: `899678f0e11044b4104d5c93467de776dce916c6`.
 
 ## Current phase
 P5/P7 user-requested extension: live Blender motion illustration and per-order
-replay implemented. Final clean acceptance and exact-SHA remote checks are next.
+replay implemented and accepted. All 85 MUST criteria pass with clean local and
+remote evidence. Native Windows and publication workflows are also green.
 The installed desktop launcher uses this checkout; reopening loads the new UI/API.
 Existing saved orders can import their original keyed animation without a pick.
 
 ## MUST status
-All 85 core MUSTs have audited base evidence in ACCEPTANCE_REPORT.md. Extension
-verification: 239 tests pass, 86.57% coverage (unchanged 85% threshold), lint,
+ACCEPTANCE_REPORT.md attests all 85 MUSTs for the audited extension source.
+Both clean suite runs pass all 239 tests, with 86.57% coverage (unchanged 85%
+threshold). Setup, seven real Blender demos, lint,
 strict types and security checks pass. Native desktop tests with real Blender
 pass, including close during motion and recovery with exactly one pick.
-The final extension revision is not yet attested by remote CI/publication.
+Exact-SHA CI, publication and public Pages are verified in the report manifest.
 SHOULD SC-BRAIN-005 (optional model failure/fallback) remains non-blocking.
 
 ## Evidence added
+- docs/evidence/acceptance/20261002T211230: clean source, two suites, all gates
+  and live remote attestation. CI runs 37065407198 (core), 37065407209 (Windows),
+  and 37065407211 (publication) all succeeded for the audited SHA.
 - docs/evidence/replay-extension.json and replay-desktop.png: browser playback,
   uncertainty/intervention and exactly one effect; native process lifecycle.
 - tests/blender/test_playback.py: live frame progression, actual evaluated poses,
@@ -44,6 +49,9 @@ four presentation schemas, acceptance map/generator, reviewed subprocess scope
 and this progress record. Generated publication is rebuilt, never hand-edited.
 No external source claim or provenance class changed.
 
-## Next milestone
-Commit coherent extension, run clean acceptance twice plus demos, refresh exact-SHA
-CI/publication evidence and current acceptance report, verify deployed sources.
+## Release evidence
+The committed report identifies its audited source rather than claiming its own
+future commit hash (ADR 0002). The evidence successor receives fresh exact-SHA
+CI artifacts and public build.json; final delivery verifies all three workflows.
+Optional model/hardware work remains non-blocking. Reopen the existing desktop
+app to load this checkout; no data reset or reinstallation is needed.

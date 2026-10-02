@@ -1,0 +1,78 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.12.2, cov-7.1.0, anyio-4.15.1
+collected 223 items
+
+tests/blender/test_blender_runtime.py .....                              [  2%]
+tests/contract/test_api.py ..                                            [  3%]
+tests/contract/test_completion.py ..                                     [  4%]
+tests/contract/test_governance.py ....                                   [  5%]
+tests/contract/test_pdf_package.py .                                     [  6%]
+tests/contract/test_schemas.py .........................                 [ 17%]
+tests/e2e/test_observability.py .                                        [ 17%]
+tests/e2e/test_workflow.py ......................                        [ 27%]
+tests/integration/test_desktop_backend.py ..                             [ 28%]
+tests/integration/test_process_restart.py .                              [ 29%]
+tests/integration/test_runtime.py .............                          [ 34%]
+tests/integration/test_store.py .....                                    [ 37%]
+tests/unit/test_action_validation.py ................                    [ 44%]
+tests/unit/test_observation_verifier.py ...                              [ 45%]
+tests/unit/test_states.py .............................................. [ 66%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261002T195545/tests-2.xml -
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.13.15-final-0 _______________
+
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+apps/__init__.py                         0      0   100%
+apps/api/__init__.py                     0      0   100%
+apps/api/__main__.py                    24     24     0%   1-34
+apps/api/app.py                         79      3    96%   56, 86, 121
+apps/desktop/__init__.py                 0      0   100%
+apps/desktop/backend.py                 52     52     0%   3-80
+robotops/__init__.py                     0      0   100%
+robotops/blender/__init__.py             0      0   100%
+robotops/blender/adapter.py            141     24    83%   30-33, 80-82, 85, 90, 101, 107, 110, 113, 240, 260-263, 271-278
+robotops/brain/__init__.py               0      0   100%
+robotops/brain/deterministic.py          7      0   100%
+robotops/brain/validation.py            32      4    88%   54, 70, 77, 87
+robotops/cell/__init__.py                0      0   100%
+robotops/cell/controller.py             12      0   100%
+robotops/cell/runtime.py               130      7    95%   89, 187, 189, 191, 289-293
+robotops/config.py                      19      0   100%
+robotops/demo.py                        55     55     0%   3-148
+robotops/domain/__init__.py              0      0   100%
+robotops/domain/models.py              220      1    99%   101
+robotops/domain/ports.py                 6      0   100%
+robotops/faults/__init__.py              0      0   100%
+robotops/faults/injection.py             3      0   100%
+robotops/observability/__init__.py       0      0   100%
+robotops/observability/metrics.py       24      0   100%
+robotops/observation/__init__.py         0      0   100%
+robotops/observation/model.py           28      0   100%
+robotops/observation/quality.py         22      2    91%   16, 31
+robotops/robot_gateway/__init__.py       0      0   100%
+robotops/robot_gateway/gateway.py       32      1    97%   16
+robotops/verification/__init__.py        0      0   100%
+robotops/verification/verifier.py       35      3    91%   39, 43, 54
+robotops/workflow/__init__.py            0      0   100%
+robotops/workflow/engine.py            133      5    96%   147, 176, 190, 207, 257
+robotops/workflow/states.py             24      2    92%   42, 46
+robotops/workflow/store.py             220     11    95%   129, 144, 151, 215, 222, 238-241, 380, 410, 459, 461
+------------------------------------------------------------------
+TOTAL                                 1298    194    85%
+Coverage JSON written to file /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261002T195545/coverage-2.json
+Required test coverage of 85.0% reached. Total coverage: 85.05%
+======================= 223 passed, 1 warning in 47.33s ========================

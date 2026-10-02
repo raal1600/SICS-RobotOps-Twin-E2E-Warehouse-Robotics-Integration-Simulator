@@ -29,7 +29,12 @@ Data survives closing and reopening:
 
 - `%LOCALAPPDATA%\RobotOpsTwin\data`: orders, world, journals and Blender artifacts.
 - `%LOCALAPPDATA%\RobotOpsTwin\sessions`: startup, server and shutdown evidence.
-- `%LOCALAPPDATA%\RobotOpsTwin\WebView2`: this app's isolated browser profile.
+- `%LOCALAPPDATA%\RobotOpsTwin\WebView2`: isolated profiles keyed by data root.
+
+The native host opts into .NET/Windows long-path handling. Browser profiles stay
+under a short LocalAppData path even when a checkout or custom data root is long;
+this avoids Chromium profile-path limits. Top-level startup failures are also
+recorded in `%LOCALAPPDATA%\RobotOpsTwin\launcher-error.log`.
 
 Two launches for the same data root activate the same window. The backend binds
 an OS-selected loopback port and publishes a session-specific ready file only

@@ -40,6 +40,8 @@ SYNC_FILES = [
     "docs/implementation/acceptance.md",
     "docs/implementation/dependencies.md",
     "docs/security-exceptions.json",
+    "docs/implementation/desktop.md",
+    "docs/evidence/desktop-launcher.json",
 ]
 
 
@@ -258,6 +260,12 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
     lines += [
         "",
         "Optional model provider/fallback, external ERP outbox, OPC UA, contact physics and real hardware remain non-blocking and unimplemented.",
+        "",
+        "## Windows desktop extension",
+        "",
+        "The native EXE starts an owned API in an embedded WebView2 window and closes its process tree on exit. Persistent state uses the same recovery rules. [Desktop lifecycle and build](docs/implementation/desktop.md), [actual Windows/Blender evidence](docs/evidence/desktop-launcher.json), and [Windows workflow](https://github.com/"
+        + REPO
+        + "/actions/workflows/desktop.yml) record its separate native build/window checks. Cross-platform close/reopen and independent-port tests are included in both mandatory suite runs above.",
         "",
         "## Documentation drift and synchronization",
         "",

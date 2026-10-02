@@ -646,14 +646,18 @@
     ],
     "tests": [
       "test_restart_unknown_outcome",
-      "test_process_dies_after_effect_before_orchestrator_receipt"
+      "test_process_dies_after_effect_before_orchestrator_receipt",
+      "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick"
     ],
     "files": [
       "robotops/workflow/engine.py",
       "robotops/workflow/store.py",
-      "tests/integration/test_process_restart.py"
+      "tests/integration/test_process_restart.py",
+      "apps/desktop/backend.py",
+      "tests/integration/test_desktop_backend.py",
+      "docs/implementation/desktop.md"
     ],
-    "explanation": "Abrupt process death after runtime commit recovers original command and persisted causal evidence without replay."
+    "explanation": "Abrupt process death after runtime commit recovers original command and persisted causal evidence without replay. Desktop close/reopen preserves the original command and reconciles with exactly one pick."
   },
   "SC-BRAIN-001": {
     "gates": [
@@ -1108,16 +1112,22 @@
     ],
     "tests": [
       "test_metrics_timeline_and_dashboard_survive_restart",
-      "test_happy_path"
+      "test_happy_path",
+      "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick"
     ],
     "files": [
       "robotops/observability/metrics.py",
       "apps/erp_ui/index.html",
       "apps/erp_ui/app.js",
       "docs/evidence/p5-browser-evidence.json",
-      "docs/evidence/ui-p5-completed.png"
+      "docs/evidence/ui-p5-completed.png",
+      "apps/desktop/backend.py",
+      "tests/integration/test_desktop_backend.py",
+      "docs/implementation/desktop.md",
+      "docs/evidence/desktop-launcher.json",
+      "docs/evidence/desktop-window-lost-ack.png"
     ],
-    "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained."
+    "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained. Desktop close/reopen preserves the original command and reconciles with exactly one pick."
   },
   "SC-DEMO-004": {
     "gates": [

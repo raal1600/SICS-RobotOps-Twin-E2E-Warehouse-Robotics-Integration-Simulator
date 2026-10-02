@@ -1,0 +1,58 @@
+{
+  "base": "13528bebf6eccce588bc8d8d905d2bad87167904",
+  "dirty_at_verification": true,
+  "scope": "User-requested Windows launcher extension; actual local native window and Blender, not a mock",
+  "runs": [
+    {
+      "runtime": "headless",
+      "source_commit": "13528bebf6eccce588bc8d8d905d2bad87167904",
+      "data": "C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\desktop-smoke\\2f4cf12f7cf74061881f18f725d07ddf test data",
+      "checks": [
+        "native window rendered with owned loopback API",
+        "duplicate launch reuses window without new backend",
+        "window close drains backend and releases port",
+        "reopen reconciles original command with exactly one pick",
+        "abrupt desktop termination also stops owned backend",
+        "reopen after forced close preserves completed work"
+      ],
+      "passed": true,
+      "source_dirty": true
+    },
+    {
+      "runtime": "blender",
+      "source_commit": "13528bebf6eccce588bc8d8d905d2bad87167904",
+      "data": "C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\desktop-smoke\\9899439357d8429b96622bc0c08ffbbd test data",
+      "checks": [
+        "native window rendered with owned loopback API",
+        "duplicate launch reuses window without new backend",
+        "window close drains backend and releases port",
+        "reopen reconciles original command with exactly one pick",
+        "abrupt desktop termination also stops owned backend",
+        "reopen after forced close preserves completed work",
+        "normal window close during a real Blender pick drains it to completion",
+        "abrupt close during a real Blender pick terminates its owned process tree"
+      ],
+      "passed": true,
+      "source_dirty": true
+    }
+  ],
+  "source_sha256": {
+    "apps/desktop/OwnedProcess.cs": "a3ed3de76528a80d2fd0344334495d0c55b2c8ffcc03ee2abdf3b018692bd247",
+    "apps/desktop/RobotOpsLauncher.cs": "5cbfe4e0af13619137f516475b7e26bef4492bf9747dd3236475fd0f5f201cdb",
+    "apps/desktop/backend.py": "74297e9cf8e84d40e813c3c5eaee8a5b6328bd3c4e19cf714998040afdea522f"
+  },
+  "python_suite": {
+    "tests": 223,
+    "passed": 223,
+    "coverage_percent": 85.20801232665639
+  },
+  "visual_review": "Embedded dashboard renders status, timeline and Blender artifact. Screenshot: desktop-window-lost-ack.png.",
+  "manual_ownership_review": "Backend starts suspended; assigned to kill-on-close job before resume; no process-name kill or shared server reuse; launcher PID and backend handles held; WebView restricted to own origin; shutdown control is a private session file; all command/observation schemas unchanged.",
+  "quality": {
+    "lint": "PASS: 84 Python files formatted",
+    "typecheck": "PASS: 35 source files",
+    "security": "PASS: no dependency vulnerabilities; unchanged five reviewed subprocess findings; desktop Python Bandit zero findings",
+    "publication": "PASS: regenerated HTML/SVG/PDF with updated architecture",
+    "drift": "PASS: links, criterion IDs, source registry and shared status"
+  }
+}

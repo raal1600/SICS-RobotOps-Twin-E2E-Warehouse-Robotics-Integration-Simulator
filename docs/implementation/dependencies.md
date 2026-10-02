@@ -25,3 +25,10 @@ separately from deterministic runtime tests.
 Blender 5.2.1 LTS is the selected real-runtime acceptance executable. Mandatory
 headless logic tests always run. The Blender acceptance lane must fail explicitly
 when the executable is missing, never skip or silently fall back to a fake runtime.
+
+The optional Windows desktop host builds with the Windows .NET Framework x64 C#
+compiler and checksum-pinned Microsoft.Web.WebView2 1.0.3800.47. The installed
+WebView2 Runtime receives Microsoft's normal security updates. Its separate
+Windows CI lane compiles and tests the real window lifecycle. See [desktop build
+and ownership details](desktop.md); no Python dependency or mandatory Blender
+test is replaced by desktop packaging.

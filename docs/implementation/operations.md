@@ -1,5 +1,10 @@
 # Local operations and observability
 
+On Windows, the [desktop app](desktop.md) starts this same dashboard in its own
+window and stops its owned backend/Blender processes when closed. Desktop data is
+persistent under `%LOCALAPPDATA%\RobotOpsTwin\data`; it uses an OS-selected port.
+The following command remains the independently managed browser/server mode.
+
 Start the loopback-only dashboard:
 
 ```

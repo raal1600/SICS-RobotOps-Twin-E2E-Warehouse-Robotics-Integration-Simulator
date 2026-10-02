@@ -8,7 +8,7 @@
 
 Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till AI-assisterad robotexekvering, verifiering och återhämtning. Blender är den **planerade simulatorvärlden**, inte en validerad kopia av en verklig anläggning.
 
-**Aktuell status:** The deterministic E2E workflow and bounded Blender runtime are implemented and tested, including lost acknowledgement, exactly one effect, ambiguous observations, process restart, corrupt checkpoints and cell interlocks. Dashboard, final acceptance mapping and publication verification remain in progress. **NOT DONE** until all MUST criteria and remote workflows pass.
+**Aktuell status:** The deterministic E2E simulator, bounded CPU Blender runtime, local ERP dashboard and persisted metrics are implemented. Lost-ack, ambiguous evidence, restart and interlocks are tested; the real dashboard flow is browser-verified. Final clean acceptance and publication verification remain in progress. **NOT DONE** until all MUST criteria and remote workflows pass.
 
 ## Läs och ladda ned
 
@@ -109,3 +109,12 @@ On Windows the standard Blender 5.2 install directory is also detected.
 executes a real synthetic scene move and saves scene, PNG, journal and timeline.
 `make test` includes the required Blender lane and fails if Blender is unavailable.
 [Bounded protocol, restart behavior and limits](docs/implementation/blender.md).
+
+
+## Local ERP dashboard
+
+`uv run --locked python -m apps.api --runtime blender --data-dir runs/my-demo --port 8000`
+starts the dashboard at http://127.0.0.1:8000. Select a product and fault scenario,
+create/run an order, inspect the original command and timeline, and reconcile an
+unknown outcome. Reuse a data directory to retain evidence; choose a fresh one
+for a fresh fixture. [Operations and metrics](docs/implementation/operations.md).

@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** The deterministic E2E workflow and bounded Blender runtime are implemented and tested, including lost acknowledgement, exactly one effect, ambiguous observations, process restart, corrupt checkpoints and cell interlocks. Dashboard, final acceptance mapping and publication verification remain in progress. Status: NOT DONE.
+> **Implementation status, 2026-10-02:** The deterministic E2E simulator, bounded CPU Blender runtime, local ERP dashboard and persisted metrics are implemented. Lost-ack, ambiguous evidence, restart and interlocks are tested; the real dashboard flow is browser-verified. Final clean acceptance and publication verification remain in progress. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

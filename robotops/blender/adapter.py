@@ -266,3 +266,13 @@ class BlenderRuntime(SyntheticRuntime):
             "script_sha256": hashlib.sha256(SCRIPT.read_bytes()).hexdigest(),
             "gpu_required": False,
         }
+
+    def latest_artifact(self) -> Path | None:
+        with self.db.connect() as db:
+            row = db.execute("SELECT value FROM meta WHERE key='latest_artifact'").fetchone()
+        if row is None:
+            return None
+        path = Path(row[0]).resolve()
+        if not path.is_relative_to(self.artifacts.resolve()):
+            raise ValueError("ARTIFACT_OUTSIDE_RUNTIME")
+        return path if path.is_file() else None

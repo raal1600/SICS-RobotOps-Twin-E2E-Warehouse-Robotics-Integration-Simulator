@@ -489,3 +489,11 @@ class Store:
         with self.connect() as db:
             jobs = [PickJob.model_validate_json(r[0]) for r in db.execute("SELECT body FROM jobs")]
             return [job for job in jobs if job.state not in TERMINAL]
+
+    def records_for_job[T: Contract](self, model: type[T], job_id: str) -> tuple[T, ...]:
+        with self.connect() as db:
+            rows = db.execute(
+                "SELECT body FROM records WHERE kind=? AND json_extract(body,'$.job_id')=?",
+                (model.__name__, job_id),
+            ).fetchall()
+            return tuple(model.model_validate_json(row[0]) for row in rows)

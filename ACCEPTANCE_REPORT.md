@@ -119,3 +119,5 @@ Synchronized README, reports 01/02/03 status, publication/status, runtime and co
 P3: `docs/evidence/p3-checks.json` and `docs/evidence/p3-lost-ack-demo.json` record deterministic E2E evidence. Process-crash test confirms no blind redispatch. Coverage run: 207 passed, 90.92% (threshold 85%). Full acceptance mapping, Blender, UI and publication remain pending.
 
 P4: actual Blender evidence in docs/evidence/p4-blender-lost-ack.json/png; five Blender tests pass, including complete-response recovery and corrupt-checkpoint intervention. CPU-only adapter used. README, all report status, source registry S21, trust/recovery diagrams, Blender docs and CI synchronized. Final full report remains pending.
+
+P5: browser evidence in docs/evidence/p5-browser-evidence.json and ui-p5-*.png; actual Blender lost-ack reconciled via UI. Persisted metrics and typed evidence endpoint tested. All affected status/API/operations documents synchronized.

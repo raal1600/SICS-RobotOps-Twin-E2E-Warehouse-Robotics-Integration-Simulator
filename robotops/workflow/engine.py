@@ -12,11 +12,13 @@ from robotops.domain.models import (
     ActionPlan,
     FailureInjection,
     Fault,
+    JobEvidence,
     JobState,
     PickJob,
     ReconciliationEvidence,
     RobotCommand,
     Verdict,
+    VerificationResult,
     WorldObservation,
     new_id,
     stable_id,
@@ -254,3 +256,28 @@ class Engine:
             else:
                 recovered.append(self.run(job.job_id))
         return recovered
+
+    def evidence(self, job_id: str) -> JobEvidence:
+        job = self.store.job(job_id)
+        observations = tuple(
+            self.store.load(WorldObservation, event.evidence_ids[0])
+            for event in self.store.timeline(job.order_id)
+            if event.job_id == job_id and event.event_type == "OBSERVATION_CAPTURED"
+        )
+        reconciliations = self.store.records_for_job(ReconciliationEvidence, job_id)
+        results = {
+            item.verification_id: item
+            for item in self.store.records_for_job(VerificationResult, job_id)
+        }
+        results.update(
+            {item.verification.verification_id: item.verification for item in reconciliations}
+        )
+        command = self.store.load(RobotCommand, job.command_id) if job.command_id else None
+        return JobEvidence(
+            job=job,
+            command=command,
+            journal=self.runtime.journal(job.command_id) if job.command_id else None,
+            observations=observations,
+            verifications=tuple(results.values()),
+            reconciliations=reconciliations,
+        )

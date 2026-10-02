@@ -33,7 +33,9 @@ def stable_id(namespace: str, value: str) -> str:
 
 
 class Contract(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, validate_default=True)
+    model_config = ConfigDict(
+        extra="forbid", frozen=True, validate_default=True, allow_inf_nan=False
+    )
     schema_version: Literal["1.0"] = "1.0"
 
 
@@ -290,7 +292,17 @@ class ReconciliationEvidence(Record):
     verification: VerificationResult
 
 
+class JobEvidence(Contract):
+    job: PickJob
+    command: RobotCommand | None
+    journal: CommandReceipt | None
+    observations: tuple[WorldObservation, ...]
+    verifications: tuple[VerificationResult, ...]
+    reconciliations: tuple[ReconciliationEvidence, ...]
+
+
 SCHEMAS: tuple[type[Contract], ...] = (
+    JobEvidence,
     Product,
     InventoryLocation,
     OrderRequest,

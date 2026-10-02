@@ -1,8 +1,10 @@
+from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, Header, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 
+from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.controller import CellController
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.domain.models import (
@@ -10,10 +12,12 @@ from robotops.domain.models import (
     CellState,
     Contract,
     Fault,
+    JobEvidence,
     Order,
     OrderRequest,
     PickJob,
 )
+from robotops.observability.metrics import prometheus
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Conflict, NotFound, Store
 
@@ -86,5 +90,46 @@ def create_app(store: Store, engine: Engine | None = None) -> FastAPI:
         cell = CellController(workflow.runtime).reset()
         workflow.gateway.sync_events()
         return cell
+
+    @app.get("/jobs/{job_id}/evidence", response_model=JobEvidence)
+    def evidence(job_id: str) -> JobEvidence:
+        return workflow.evidence(job_id)
+
+    @app.get("/metrics", response_class=PlainTextResponse)
+    def metrics() -> PlainTextResponse:
+        workflow.gateway.sync_events()
+        return PlainTextResponse(prometheus(store), media_type="text/plain; version=0.0.4")
+
+    @app.get("/fixtures")
+    def fixtures() -> dict[str, object]:
+        return {
+            "runtime": "blender" if isinstance(workflow.runtime, BlenderRuntime) else "headless",
+            "products": [product.model_dump(mode="json") for product in workflow.settings.products],
+            "source_id": workflow.settings.locations[0].location_id,
+            "destination_id": workflow.settings.locations[1].location_id,
+        }
+
+    @app.get("/artifacts/latest.png", response_class=FileResponse)
+    def artifact() -> FileResponse:
+        path = (
+            workflow.runtime.latest_artifact()
+            if isinstance(workflow.runtime, BlenderRuntime)
+            else None
+        )
+        if path is None:
+            raise HTTPException(404, "No Blender artifact yet")
+        return FileResponse(path, media_type="image/png")
+
+    @app.get("/", response_class=FileResponse)
+    def dashboard() -> FileResponse:
+        return FileResponse(
+            Path(__file__).parents[1] / "erp_ui" / "index.html", media_type="text/html"
+        )
+
+    @app.get("/ui/app.js", response_class=FileResponse)
+    def javascript() -> FileResponse:
+        return FileResponse(
+            Path(__file__).parents[1] / "erp_ui" / "app.js", media_type="text/javascript"
+        )
 
     return app

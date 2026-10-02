@@ -3,7 +3,7 @@ Last updated: 2026-10-02 UTC
 Commit/base: `817144e6b78061b309e3622e7f70d41afe545a9e`
 
 ## Current phase
-P4 implemented; P5 dashboard and final acceptance tooling next. **NOT DONE**.
+P5 implemented; P7 final acceptance/publication next. **NOT DONE**.
 
 ## MUST status
 - Local contracts, intake, state guards, idempotency, claim races, Brain validation,
@@ -36,3 +36,5 @@ provenance is not robot-performance validation. Generated publication is not edi
 P5: local ERP dashboard, metrics and causal evidence explorer. P7: acceptance
 mapping, drift/security gates, two clean runs, publication/PDF rendering and remote
 CI/Pages after authorized push. OPTIONAL model/hardware backlog remains non-blocking.
+
+P5: actual browser desktop/mobile verification passed using agent-browser 0.27.0. Lost-ack UNKNOWN -> reconciliation COMPLETED observed through UI; browser errors empty. Evidence in docs/evidence/p5-browser-evidence.json and ui-p5-*.png. Metrics restart test passed. Added JobEvidence schema, /metrics, /fixtures, artifact and dashboard routes. Synchronized operations docs, README, all report status, public status, OpenAPI and progress.

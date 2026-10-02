@@ -1,10 +1,16 @@
+<!-- implementation-status:start -->
+> **Implementation status, 2026-10-02:** P2: durable intake, typed contracts, fenced claims and the deterministic headless runtime are implemented. Tests cover lost acknowledgement before/after effect, duplicate suppression, restart and logical cell interlocks. Brain/reconciliation E2E, Blender and UI remain in progress. NOT DONE.
+> Current evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the repository/governance section.
+> The research below records design rationale, not real-world robot validation.
+<!-- implementation-status:end -->
+
 ## Sammanfattning
 
 Den här rapporten skiljer **RobotOps Twins planerade simulator** från dels en generell industriell robotcell, dels den begränsade bild av SICS AI:s miljö som finns i offentliga källor. Dessa två jämförelseobjekt är inte samma sak. Offentlig information räcker inte för att beskriva företagets fullständiga interna system.
 
 Simulatorn ska efterlikna informationsflödet från kundorder till verifierat plock och återkoppling. Den ska bevara vissa integrationsproblem: dubbletter, osäkra utfall, återhämtning, separata systemägare och motstridiga observationer. Den ska däremot förenkla robotmekanik, sensorsystem, säkerhet, produktvariation, nätverk och driftorganisation.
 
-**Det som senare kan demonstreras är programvarans beteende under definierade simuleringsantaganden.** Det är inte ett bevis för fysisk säkerhet, kommersiell driftsäkerhet, ett fungerande SICS-gränssnitt eller generell intelligens. Projektet befinner sig i denna version på designstadiet.
+**Det som senare kan demonstreras är programvarans beteende under definierade simuleringsantaganden.** Det är inte ett bevis för fysisk säkerhet, kommersiell driftsäkerhet, ett fungerande SICS-gränssnitt eller generell intelligens. Aktuell implementationsstatus och kvarvarande arbete redovisas i statusrutan ovan.
 
 ## 1. Jämförelsens tre nivåer
 

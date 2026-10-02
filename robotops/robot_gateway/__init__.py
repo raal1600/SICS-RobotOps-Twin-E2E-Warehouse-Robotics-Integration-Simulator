@@ -1,0 +1,1 @@
+"""Typed robot boundary."""

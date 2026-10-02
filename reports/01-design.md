@@ -1,10 +1,16 @@
+<!-- implementation-status:start -->
+> **Implementation status, 2026-10-02:** P2: durable intake, typed contracts, fenced claims and the deterministic headless runtime are implemented. Tests cover lost acknowledgement before/after effect, duplicate suppression, restart and logical cell interlocks. Brain/reconciliation E2E, Blender and UI remain in progress. NOT DONE.
+> Current evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the repository/governance section.
+> The research below records design rationale, not real-world robot validation.
+<!-- implementation-status:end -->
+
 ## Sammanfattning
 
 RobotOps Twin är en föreslagen, lokal integrationssimulator för lagerrobotik. Ett förenklat ERP/WMS skapar plockuppdrag. Ett Pythonbaserat integrationslager validerar och lagrar uppdragen, hämtar observationer, begär ett handlingsförslag och skickar typade kommandon till en simulerad robotcell i Blender. En separat verifierare bedömer utfallet innan kundsystemet uppdateras. Den centrala frågan är inte hur en robotarm animeras, utan hur mjukvaran hanterar skillnaden mellan en begärd handling, en kvitterad operation och ett observerat resultat.
 
 Studien kombinerar en riktad genomgång av offentliga primärkällor med ett eget arkitekturförslag och en förhandsdefinierad utvärderingsplan. Underlaget omfattar SICS AI:s rollbeskrivning och HYPER-redovisning, Cognibotics produktionsbeskrivning, CloudGripper/AutoGrasper, R900 samt officiell dokumentation för Blender, OpenAI och integrationsprotokoll. Källorna har olika bevisvärde och hålls därför isär.
 
-**Resultatet i denna version är en dokumenterad design, inte en implementerad eller experimentellt validerad robotlösning.** Inga prestandasiffror för projektet, säkerhetsgarantier eller resultat om generell intelligens hävdas. Det planerade bidraget är ett litet, reproducerbart testsystem där fel efter en fysiskliknande sidoeffekt kan studeras utan verklig robotutrustning.
+**Forskningsdelen redovisar designunderlaget. Aktuell implementationsstatus finns ovan; simulatorresultat är inte fysisk robotvalidering.** Inga prestandasiffror för projektet, säkerhetsgarantier eller resultat om generell intelligens hävdas. Det planerade bidraget är ett litet, reproducerbart testsystem där fel efter en fysiskliknande sidoeffekt kan studeras utan verklig robotutrustning.
 
 **Nyckelord:** systemintegration, lagerrobotik, Blender, verifiering, idempotens, återhämtning, observerbarhet, digital-tvilling-inspirerad simulering.
 

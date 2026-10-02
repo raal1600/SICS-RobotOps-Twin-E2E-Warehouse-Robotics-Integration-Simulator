@@ -8,7 +8,7 @@
 
 Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till AI-assisterad robotexekvering, verifiering och återhämtning. Blender är den **planerade simulatorvärlden**, inte en validerad kopia av en verklig anläggning.
 
-**Aktuell status:** P1: domänkontrakt, beständig order/API, tillståndsvakter, revisionslogg och worker-claims är implementerade och testade. Rörelse och reconciliation återstår. Den fullständiga ERP/robot-simulatorn är nu specificerad i ett normativt implementation contract och success-criteria contract, men är ännu inte implementerad eller empiriskt validerad i detta repository. Projektet är inte beställt eller godkänt av SICS AI.
+**Aktuell status:** P2: durable intake, typed contracts, fenced claims and the deterministic headless runtime are implemented. Tests cover lost acknowledgement before/after effect, duplicate suppression, restart and logical cell interlocks. Brain/reconciliation E2E, Blender and UI remain in progress. NOT DONE. Projektet är oberoende och inte godkänt av SICS AI.
 
 ## Läs och ladda ned
 
@@ -95,3 +95,5 @@ See [dependency policy](docs/implementation/dependencies.md),
 [contracts](docs/implementation/contracts.md) and [ADR 0001](docs/adr/0001-durable-synthetic-boundaries.md).
 
 Persistence details: [durable state and claims](docs/implementation/persistence.md).
+
+[Runtime journal and fault semantics](docs/implementation/runtime.md).

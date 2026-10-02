@@ -24,6 +24,7 @@ from robotops.domain.models import (
     ReconciliationEvidence,
     Record,
     RobotCommand,
+    RobotEvent,
     VerificationResult,
     new_id,
     stable_id,
@@ -200,6 +201,21 @@ class Store:
             )
             self._event(db, event)
             return event
+
+    def ingest_robot_event(self, event: RobotEvent) -> None:
+        """Import immutable controller events without granting access to world state."""
+        body = event.model_dump(exclude={"scene_epoch", "step"})
+        audit = AuditEvent.model_validate(body)
+        with self.transaction() as db:
+            existing = db.execute(
+                "SELECT body FROM events WHERE id=?", (event.event_id,)
+            ).fetchone()
+            if existing:
+                if existing[0] != audit.model_dump_json():
+                    raise Conflict("EXTERNAL_EVENT_CONFLICT")
+                return
+            self._record(db, event.event_id, event)
+            self._event(db, audit)
 
     def intake(self, request: OrderRequest, key: str) -> Order:
         if not key or len(key) > 160:
@@ -453,6 +469,20 @@ class Store:
                 }
             )
             self._write_job(db, updated)
+            self._event(
+                db,
+                AuditEvent(
+                    **metadata(job, self._last_cause(db, job)),
+                    event_id=command.command_id,
+                    component="validator",
+                    event_type="COMMAND_INTENT",
+                    order_id=job.order_id,
+                    job_id=job.job_id,
+                    command_id=command.command_id,
+                    reason="VALIDATED_DURABLE_COMMAND",
+                    evidence_ids=(plan.action_plan_id,),
+                ),
+            )
             return updated
 
     def recoverable(self) -> list[PickJob]:

@@ -112,3 +112,6 @@ Synchronized: README, PUBLICATION, reports 01/02, diagrams, publication builder/
 P1: 152 tests, lint/format, mypy passed; commands and output in `docs/evidence/p1-checks.json`.
 OpenAPI, README, publication/status, contract/persistence docs and progress synchronized.
 Remote CI/publication remain unverified: push rejected by automatic approval review.
+
+P2 evidence: `docs/evidence/p2-checks.json`; runtime tests prove one/zero effects for after/before lost acknowledgement, duplicate and concurrent delivery, restart, cell interlocks and stale-epoch rejection.
+Synchronized README, reports 01/02/03 status, publication/status, runtime and contract docs. No external claims changed.

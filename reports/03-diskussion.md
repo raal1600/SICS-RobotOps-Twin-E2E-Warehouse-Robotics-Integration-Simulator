@@ -1,8 +1,14 @@
+<!-- implementation-status:start -->
+> **Implementation status, 2026-10-02:** P2: durable intake, typed contracts, fenced claims and the deterministic headless runtime are implemented. Tests cover lost acknowledgement before/after effect, duplicate suppression, restart and logical cell interlocks. Brain/reconciliation E2E, Blender and UI remain in progress. NOT DONE.
+> Current evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the repository/governance section.
+> The research below records design rationale, not real-world robot validation.
+<!-- implementation-status:end -->
+
 ## Så använder du underlaget
 
 Det här dokumentet är ett **arbetsunderlag för teknisk dialog**, inte ett manus som ska läsas upp ord för ord. Det hjälper projektägaren att presentera RobotOps Twin, förklara sina beslut och pröva antaganden tillsammans med Axel Kaliff och Per-Eric Olsson.
 
-Version 1.0 gäller en specificerad men ännu inte verifierad simulator. Formuleringar som ”jag har byggt”, ”testerna visar” eller ”det fungerar” får användas först när de motsvarar körbar kod och sparade resultat. Fram till dess är ”jag har specificerat”, ”jag föreslår” och ”jag vill testa” rätt ord.
+Det ursprungliga designunderlaget kompletteras av aktuell implementationsevidens i statusrutan ovan. Formuleringar som ”jag har byggt”, ”testerna visar” eller ”det fungerar” får användas först när de motsvarar körbar kod och sparade resultat. Fram till dess är ”jag har specificerat”, ”jag föreslår” och ”jag vill testa” rätt ord.
 
 Samtalet ska visa förståelse, inte bara att många källor har lästs. En bra diskussion kan sluta med att ett eget designval behöver ändras. Det är ett användbart resultat.
 

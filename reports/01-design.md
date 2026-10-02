@@ -201,32 +201,33 @@ Nedanstående JSON är ett designexempel, inte SICS AI:s API:
 
 Valideringen kontrollerar bland annat tillåten kommandotyp, ändliga tal, rätt koordinatsystem, korrekt objekt, rimliga gränser, kompatibel kalibrering och tillräckligt aktuell observation. Kvaternionen kontrolleras mot en dokumenterad normtolerans. Toleranserna är egna simulatorparametrar och får inte kallas industriellt säkra.
 
-### 6.3 Föreslagna API-gränser
+### 6.3 Normativa API-gränser
 
-| Gräns | Exempel | Semantik |
-|---|---|---|
-| Kund till integration | `POST /v1/pick-jobs` | Skapa eller återfå samma uppdrag via idempotensnyckel. |
-| Uppföljning | `GET /v1/jobs/{job_id}` | Affärsstatus och länkar till försök/evidens. |
-| Modell | `POST /v1/plans` | Förslag, inte exekvering. |
-| Robot | `POST /v1/commands` | Accepterad betyder inte utförd. |
-| Robotstatus | `GET /v1/commands/{command_id}` | Journalens status inom angiven scene_epoch. |
-| Observation | `GET /v1/cells/{cell_id}/observation` | Tidsatt observation med sensorursprung. |
-| Kundkvittens | `POST /v1/order-events` | Dubblettskyddad uppdatering av orderrad. |
-| Felscenarier | `POST /test/faults` | Endast lokal testmiljö; inte produktionsgränssnitt. |
+PROJECT_PLAN.md och contracts/ är implementationens kontrakt. Integrations-API:t
+omfattar POST /orders, GET /orders/{order_id}, GET /orders/{order_id}/timeline,
+GET /jobs/{job_id}, POST /jobs/{job_id}/reconcile, GET /health och GET /metrics.
+Brain, RobotGateway, ObservationModel och runtime har separata typade Python-
+eller processgränser; de äldre föreslagna /v1-endpointsen är inte publik API.
 
-API-kontrakten ska dokumentera timeout, felkod, tidsstämpel, behörighet och vilka fält som ingår i innehållshashen. Felkod 404 från robotjournalen bevisar inte i sig att kommandot aldrig kördes: journalens beständighet, epok och retention måste också vara kända.
+Samma idempotensnyckel och payload återger samma order. Ändrat innehåll ger
+konflikt. Journalens frånvaro bevisar inte i sig utebliven effekt.
 
 ### 6.4 Uppdragstillstånd och celltillstånd
 
-Uppdraget beskriver vad affärsflödet vet. Celltillståndet beskriver om simulatorn kan fortsätta köra. Dessa är separata tillståndsmaskiner. En robot kan ha avslutat en rörelse medan uppdraget fortfarande har okänt utfall.
-
 {{figure:state}}
 
-Normalvägen är mottaget, validerat, kölagt, planerat, skickas, utförs, verifieras, verifierat och kundsynk väntar. `COMPLETED` tillåts först när kundsystemets kvittens är hanterad. Om endast kundsynk misslyckas ska roboten inte plocka igen.
+Den normativa normalvägen är RECEIVED → VALIDATED → PLANNING →
+READY_TO_EXECUTE → EXECUTING → VERIFYING → COMPLETED. ERP-status är den
+verifierade affärsstatus som API:t exponerar. En separat fjärr-ERP med outbox är
+ett framtida integrationsarbete, inte en implementerad kundkvittenskanal.
 
-`UNKNOWN_OUTCOME` betyder att underlaget inte räcker. Reconciliation är avstämning, inte ännu ett robotkommando. Om bevisen fortfarande är otillräckliga går ärendet till `MANUAL_REVIEW` eller kvarstår som oavgjort. Det får inte automatiskt bli `FAILED` enbart för att en tidsgräns passerat.
+UNKNOWN_OUTCOME kan endast lösas via RECONCILING och lagrad evidens.
+Otillräckligt eller motstridigt underlag ger REQUIRES_INTERVENTION, aldrig
+påhittad framgång. Timeout är inte bevis för FAILED.
 
-Cellen kan vara `BOOTING`, `READY`, `RUNNING`, `FAULTED`, `STOPPED` eller `RESETTING`. Ett återställt stopp återställer inte automatiskt planens giltighet. En ny observation och ny tillåtelse behövs innan en avbruten uppgift återupptas.
+Cellen har READY, BUSY, FAULTED, ESTOP_LOGICAL, RESETTING och OFFLINE.
+Reset bevisar inte oförändrad värld. Osäkra uppdrag behöver ny observation och
+avstämning. Stoppet är logiskt, aldrig en säkerhetsklassad funktion.
 
 ## 7. Kärnfallet: utfört plock, förlorad kvittens
 
@@ -387,30 +388,14 @@ Ett misslyckat experiment sparas lika noggrant som ett lyckat. Presentationen f�
 
 **Etapp D: tillägg.** Lägg till valfri bildmodell eller ett verkligt lokalt OPC UA-gränssnitt först när baslinjen är stabil. Fotorealism, komplex fysik och flera robotar prioriteras sist.
 
-### 11.2 Föreslagen struktur för senare simulatorimplementation
+### 11.2 Implementationens struktur
 
-```text
-src/
-  customer/       # ERP/WMS-mock och kundkvittens
-  integration/    # uppdrag, outbox, återhämtning
-  contracts/      # typade API- och händelsemodeller
-  brain/          # deterministisk och valfri modelladapter
-  cell/           # operationella signaler och ägarskap
-  robot/          # gateway, kapabiliteter och journal
-  verification/   # observerad effekt och avstämning
-blender/
-  scene_setup.py
-  runtime_adapter.py
-tests/
-  unit/
-  contract/
-  integration/
-  scenarios/
-runs/             # lokala kördata; inte hemligheter i Git
-reports/          # detta rapportpaket
-```
-
-Detta är en målstruktur, inte en lista över redan implementerade simulatorfiler. Dokumentationsbygget hålls separat från runtime.
+Den aktuella målstrukturen finns i PROJECT_PLAN.md: apps/, robotops/domain/,
+robotops/workflow/, robotops/brain/, robotops/robot_gateway/, robotops/cell/,
+robotops/blender/, robotops/observation/, robotops/verification/, contracts/ och
+tests/{unit,contract,integration,e2e}/. GOAL_PROGRESS.md redovisar vad som finns
+nu och ACCEPTANCE_REPORT.md redovisar verifierad evidens. Dokumentationsbygget
+hålls separat från runtime. Se ADR 0001 för den begränsade processadaptern.
 
 ### 11.3 Definition av färdig demonstration
 

@@ -8,7 +8,7 @@
 
 Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till AI-assisterad robotexekvering, verifiering och återhämtning. Blender är den **planerade simulatorvärlden**, inte en validerad kopia av en verklig anläggning.
 
-**Aktuell status:** rapporter, diagram och publiceringskedja finns. Den fullständiga ERP/robot-simulatorn är nu specificerad i ett normativt implementation contract och success-criteria contract, men är ännu inte implementerad eller empiriskt validerad i detta repository. Projektet är inte beställt eller godkänt av SICS AI.
+**Aktuell status:** P0 pågår: rapporter, diagram, typade domänkontrakt och kontraktstester finns. Den fullständiga ERP/robot-simulatorn är nu specificerad i ett normativt implementation contract och success-criteria contract, men är ännu inte implementerad eller empiriskt validerad i detta repository. Projektet är inte beställt eller godkänt av SICS AI.
 
 ## Läs och ladda ned
 
@@ -31,7 +31,7 @@ The implementation is governed by four English documents intended for an autonom
 - [HANDOFF.md](HANDOFF.md) — exact `/goal` prompt, mandatory read order, iteration algorithm, anti-shortcut rules, escalation conditions, milestone discipline and final release checklist.
 - [CODEX_GOAL_CHECKLIST.md](CODEX_GOAL_CHECKLIST.md) — operational checklist derived from the normative plan and criteria; it does not weaken them.
 
-During implementation, `GOAL_PROGRESS.md` and `ACCEPTANCE_REPORT.md` will be generated/maintained as operational evidence. Any architecture, API, schema, state-machine, source, command or project-status change that makes existing documentation stale must update all affected knowledge-base source documents and diagrams in the same coherent change. Generated Pages/PDFs are rebuilt through the publication workflow rather than edited manually.
+[GOAL_PROGRESS.md](GOAL_PROGRESS.md) and [ACCEPTANCE_REPORT.md](ACCEPTANCE_REPORT.md) track progress and evidence. Status remains NOT DONE until every MUST passes. Any architecture, API, schema, state-machine, source, command or project-status change that makes existing documentation stale must update all affected knowledge-base source documents and diagrams in the same coherent change. Generated Pages/PDFs are rebuilt through the publication workflow rather than edited manually.
 
 ## Konceptet
 
@@ -83,3 +83,13 @@ CODEX_GOAL_CHECKLIST.md   Operational implementation checklist
 ```
 
 Rami Halabi · Version 1.0 · 1 oktober 2026. Befintlig [MIT-licens](LICENSE) behålls. Länkade källor och varumärken tillhör respektive rättighetsinnehavare.
+
+## Development toolchain (P0)
+
+Install uv, then run `uv sync --locked --all-groups` (equivalent to `make setup`).
+Run `uv run --locked python -m tools.dev test`, `lint`, or `typecheck`.
+JSON schemas: `uv run --locked python -m tools.dev contracts`.
+Publication: `uv run --locked python -m tools.dev docs`; Pango is required.
+The demo and acceptance commands are reserved for their implementation milestones.
+See [dependency policy](docs/implementation/dependencies.md),
+[contracts](docs/implementation/contracts.md) and [ADR 0001](docs/adr/0001-durable-synthetic-boundaries.md).

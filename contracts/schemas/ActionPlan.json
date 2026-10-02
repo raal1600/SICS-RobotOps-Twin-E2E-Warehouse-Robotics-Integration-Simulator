@@ -1,0 +1,225 @@
+{
+  "$defs": {
+    "Pose": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "default": "cal-1",
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "default": "cell_world",
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "quaternion_xyzw": {
+          "default": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Quaternion Xyzw",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "position"
+      ],
+      "title": "Pose",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "action_plan_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Action Plan Id",
+      "type": "string"
+    },
+    "brain_version": {
+      "default": "deterministic-1",
+      "enum": [
+        "deterministic-1",
+        "structured-1"
+      ],
+      "title": "Brain Version",
+      "type": "string"
+    },
+    "causation_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Causation Id",
+      "type": "string"
+    },
+    "cell_generation": {
+      "minimum": 0,
+      "title": "Cell Generation",
+      "type": "integer"
+    },
+    "correlation_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "destination_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Destination Id",
+      "type": "string"
+    },
+    "job_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Job Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "PICK_AND_PLACE",
+      "default": "PICK_AND_PLACE",
+      "title": "Kind",
+      "type": "string"
+    },
+    "observation_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Observation Id",
+      "type": "string"
+    },
+    "order_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Order Id",
+      "type": "string"
+    },
+    "order_line_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Order Line Id",
+      "type": "string"
+    },
+    "product_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Product Id",
+      "type": "string"
+    },
+    "run_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "scene_epoch": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Scene Epoch",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "target_pose": {
+      "$ref": "#/$defs/Pose"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "correlation_id",
+    "causation_id",
+    "timestamp",
+    "action_plan_id",
+    "job_id",
+    "order_id",
+    "order_line_id",
+    "product_id",
+    "source_id",
+    "destination_id",
+    "target_pose",
+    "scene_epoch",
+    "observation_id",
+    "cell_generation"
+  ],
+  "title": "ActionPlan",
+  "type": "object"
+}

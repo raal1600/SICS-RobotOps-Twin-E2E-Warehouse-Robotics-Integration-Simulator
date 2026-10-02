@@ -1,9 +1,812 @@
 {
-"context":{"number":1,"title":"Från kundorder till verifierad effekt","subtitle":"Föreslaget flöde • en cell • ett aktivt plock","width":900,"height":670,"caption":"Figur 1. Egen konceptmodell. Ett plock passerar flera ansvar; kundstatus ändras först efter observerad effekt och hanterad kvittens. Pilarna visar informations- och exekveringsflöde, inte verkliga SICS-gränssnitt.","nodes":[["erp",40,90,350,92,"Kundens ERP / WMS","Order • SKU • destination","business"],["job",510,90,350,92,"Integrationslager","Validera • lagra • samordna","core"],["plan",510,230,350,92,"Plan och validering","Observation → tillåtet förslag","core"],["robot",40,230,350,92,"Cell + RobotGateway","Kontrollera läge • exekvera","core"],["blender",40,370,350,92,"Blender-världen","Objektet flyttas i simulatorn","world"],["verify",510,370,350,92,"Observation + verifiering","Lyckat • misslyckat • oavgjort","core"],["sync",510,510,350,92,"Kundkvittens","Rapportera verifierad orderrad","business"],["done",40,510,350,92,"Spårbart slutresultat","Order • evidens • händelselogg","business"]],"edges":[["erp","job"],["job","plan"],["plan","robot"],["robot","blender"],["blender","verify"],["verify","sync"],["sync","done"]]},
-"architecture":{"number":2,"title":"Systemgränser och ägarskap","subtitle":"Moduler är inte automatiskt separata mikrotjänster","width":900,"height":665,"caption":"Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering.","nodes":[["erp",30,90,240,108,"ERP / WMS","Kundens order och kvittens","business"],["core",330,90,240,108,"Integrationskärna","Uppdrag och samordning","core"],["gateway",630,90,240,108,"RobotGateway","Typade kommandon och status","core"],["brain",30,275,240,108,"Brain-adapter","Planförslag • ingen exekvering","core"],["db",330,275,240,108,"Beständig lagring","Avsikt • event • outbox","business"],["world",630,275,240,108,"Blender-runtime","Värld • effektjournal • sensor","world"],["monitor",30,460,240,108,"Operationsvy","Order- och feltidslinje","business"],["verify",330,460,240,108,"Verifierare","Observation → bedömning","core"],["cell",630,460,240,108,"CellController","READY • STOP • FAULT","world"]],"edges":[["erp","core","both"],["core","gateway","both"],["core","db","both"],["gateway","world","both"],["world","cell","both"],["world","verify"],["verify","db"],["verify","monitor"],["brain","core","both"],["cell","gateway","dashed"]]},
-"state":{"number":3,"title":"Uppdragets tillstånd och osäkra utfall","subtitle":"Förenklad vy • cellens tillståndsmaskin är separat","width":900,"height":900,"caption":"Figur 3. Egen tillståndsmodell. Mottagning och planering sammanfattas för läsbarhet. UNKNOWN_OUTCOME är kunskapsbrist, inte bevis för ett misslyckat plock. Reconciliation kan gå vidare till verifiering eller kräva granskning. ERP-fel återförsöker bara synkroniseringen.","nodes":[["created",45,90,340,94,"MOTTAGET → PLANERAT","Validering och beständig avsikt","business"],["executing",45,240,340,94,"SKICKAS / UTFÖRS","Ett identifierat kommando","core"],["unknown",510,240,340,94,"UNKNOWN_OUTCOME","Timeout • saknad evidens","warn"],["verifying",45,390,340,94,"VERIFYING","Ny observation och journal","core"],["reconcile",510,390,340,94,"RECONCILING","Avstämning • inget nytt plock","warn"],["verified",45,540,340,94,"VERIFIED","Effekt belagd i modellen","business"],["review",510,540,340,94,"MANUAL_REVIEW","Konflikt eller otillräckligt stöd","warn"],["sync",45,690,340,94,"ERP_SYNC_PENDING","Endast kundkvittens återstår","business"],["completed",510,690,340,94,"COMPLETED","Verifierat och kundkvitterat","business"]],"edges":[["created","executing"],["executing","verifying"],["executing","unknown"],["unknown","reconcile"],["reconcile","verifying"],["reconcile","review"],["verifying","verified"],["verified","sync"],["sync","completed"]]},
-"ack-loss":{"number":4,"type":"sequence","title":"Utfört plock — förlorad kvittens","subtitle":"Planerat felscenario T04 • inget empiriskt testresultat","width":900,"height":795,"caption":"Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning.","participants":[["integration","Integration",110],["gateway","RobotGateway",340],["blender","Blender",570],["verifier","Verifierare",790]],"messages":[["integration","gateway",175,"1. Skicka CMD-17","normal"],["gateway","blender",235,"2. Utför samma kommando","normal"],["blender","blender",295,"3. Objekt flyttas; effekt sparas","note"],["gateway","integration",355,"4. Kvittens försvinner","lost"],["integration","integration",415,"5. UNKNOWN_OUTCOME","note"],["integration","gateway",475,"6. Läs status för CMD-17","normal"],["blender","verifier",535,"7. Ny observation","normal"],["gateway","verifier",595,"8. Journal + samma epok","normal"],["verifier","integration",655,"9. Tillräcklig evidens → verifierat; annars granskning","normal"]]},
-"worlds":{"number":5,"title":"Verklighet, observation, mål och förslag","subtitle":"Simulatorns facit är inte driftlogikens kunskap","width":900,"height":730,"caption":"Figur 5. Egen informationsmodell. Handling ändrar världen; nästa observation återkopplas till planeringen. Driftvägen får inte obegränsat facit. Test-oraklet jämför verifierarens slutsats med simulatortillståndet. Separationen undanröjer inte gemensamma modellfel.","nodes":[["goal",40,480,340,105,"Önskat tillstånd g","ERP anger vilket resultat som behövs","business"],["truth",515,90,340,105,"Simulatortillstånd x","Objekt • robot • effektjournal","world"],["brain",40,285,340,105,"Modell / planering b","Förslag utifrån mål och observation","core"],["obs",515,285,340,105,"Observerat tillstånd y","Sensor • brus • skymning • tid","core"],["action",40,90,340,105,"Validerad handling","Endast typade operationer","core"],["oracle",515,480,340,105,"Test-orakel","Facit jämförs med verifierarens dom","warn"]],"edges":[["goal","brain"],["truth","obs"],["obs","brain"],["brain","action"],["action","truth"],["truth","oracle","dashed"]],"footer":"Streckad pil: facit används av testet, inte som obegränsad tillgång för modellen."},
-"trust":{"number":6,"title":"Skilj scenförfattande från robotkörning","subtitle":"Två behörighetsnivåer • inga fria kodkommandon i runtime","width":900,"height":755,"caption":"Figur 6. Egen behörighetsmodell. Codex och MCP kan hjälpa till med scenförfattande i en isolerad utvecklingsmiljö. Granskade och versionshanterade artefakter förs sedan till körmiljön. RobotGateway accepterar enbart det avgränsade runtime-kontraktet.","nodes":[["agent",40,90,340,98,"UTVECKLING: Codex","Kodförslag och granskade ändringar","business"],["mcp",515,90,340,98,"Blender MCP","Kraftfullt scenförfattande","warn"],["review",515,260,340,98,"Granskning + versionslås","Scen • adapter • tester • manifest","business"],["request",40,445,340,98,"RUNTIME: uppdrag","Brain föreslår; validator granskar","core"],["gateway",515,445,340,98,"RobotGateway","Tillåtna typade kommandon","core"],["blender",515,610,340,98,"Blender-runtime","Huvudtråd • kända funktioner","world"]],"edges":[["agent","mcp"],["mcp","review"],["review","gateway","dashed"],["request","gateway"],["gateway","blender"]],"footer":"Utvecklingsverktygens behörighet är inte tillgänglig för körningens modellförslag."},
-"boundary":{"number":7,"title":"Gemensam fråga — olika beviskrav","subtitle":"Simulatorn är inte en validerad kopia av en fysisk cell","width":900,"height":760,"caption":"Figur 7. Egen jämförelse. Kontrakt, identiteter, felhantering och observerbarhet kan studeras i båda miljöerna. Fysik, sensorer, säkerhet och driftsvillkor kräver ny validering vid övergång till verklig utrustning. Figuren beskriver ingen intern SICS-arkitektur.","nodes":[["question",180,85,540,96,"Gemensamt integrationsproblem","Från kundavsikt till belagd effekt","business"],["sim",35,255,350,105,"ROBOTOPS TWIN","Syntetiska objekt och Blender","world"],["real",515,255,350,105,"FYSISK ROBOTCELL","Verkliga objekt, sensorer och styrning","core"],["simproof",35,425,350,105,"Avgränsad evidens","Testlogik inom definierad felmodell","world"],["realproof",515,425,350,105,"Nya bevis behövs","Kalibrering • risker • hårdvaruprov","warn"],["limit",180,615,540,100,"Ingen automatisk överföring","Ett adapterbyte räcker inte för produktionsgodkännande","warn"]],"edges":[["question","sim"],["question","real"],["sim","simproof"],["real","realproof"],["simproof","limit"],["realproof","limit"]]}
+  "context": {
+    "number": 1,
+    "title": "Från kundorder till verifierad effekt",
+    "subtitle": "Föreslaget flöde • en cell • ett aktivt plock",
+    "width": 900,
+    "height": 670,
+    "caption": "Figur 1. Egen konceptmodell. Ett plock passerar flera ansvar; kundstatus ändras först efter observerad effekt och hanterad kvittens. Pilarna visar informations- och exekveringsflöde, inte verkliga SICS-gränssnitt.",
+    "nodes": [
+      [
+        "erp",
+        40,
+        90,
+        350,
+        92,
+        "Kundens ERP / WMS",
+        "Order • SKU • destination",
+        "business"
+      ],
+      [
+        "job",
+        510,
+        90,
+        350,
+        92,
+        "Integrationslager",
+        "Validera • lagra • samordna",
+        "core"
+      ],
+      [
+        "plan",
+        510,
+        230,
+        350,
+        92,
+        "Plan och validering",
+        "Observation → tillåtet förslag",
+        "core"
+      ],
+      [
+        "robot",
+        40,
+        230,
+        350,
+        92,
+        "Cell + RobotGateway",
+        "Kontrollera läge • exekvera",
+        "core"
+      ],
+      [
+        "blender",
+        40,
+        370,
+        350,
+        92,
+        "Blender-världen",
+        "Objektet flyttas i simulatorn",
+        "world"
+      ],
+      [
+        "verify",
+        510,
+        370,
+        350,
+        92,
+        "Observation + verifiering",
+        "Lyckat • misslyckat • oavgjort",
+        "core"
+      ],
+      [
+        "sync",
+        510,
+        510,
+        350,
+        92,
+        "Kundkvittens",
+        "Rapportera verifierad orderrad",
+        "business"
+      ],
+      [
+        "done",
+        40,
+        510,
+        350,
+        92,
+        "Spårbart slutresultat",
+        "Order • evidens • händelselogg",
+        "business"
+      ]
+    ],
+    "edges": [
+      [
+        "erp",
+        "job"
+      ],
+      [
+        "job",
+        "plan"
+      ],
+      [
+        "plan",
+        "robot"
+      ],
+      [
+        "robot",
+        "blender"
+      ],
+      [
+        "blender",
+        "verify"
+      ],
+      [
+        "verify",
+        "sync"
+      ],
+      [
+        "sync",
+        "done"
+      ]
+    ]
+  },
+  "architecture": {
+    "number": 2,
+    "title": "Systemgränser och ägarskap",
+    "subtitle": "Moduler är inte automatiskt separata mikrotjänster",
+    "width": 900,
+    "height": 850,
+    "caption": "Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering.",
+    "nodes": [
+      [
+        "erp",
+        30,
+        90,
+        240,
+        108,
+        "ERP / WMS",
+        "Kundens order och kvittens",
+        "business"
+      ],
+      [
+        "core",
+        330,
+        90,
+        240,
+        108,
+        "Integrationskärna",
+        "Uppdrag och samordning",
+        "core"
+      ],
+      [
+        "gateway",
+        630,
+        90,
+        240,
+        108,
+        "RobotGateway",
+        "Typade kommandon och status",
+        "core"
+      ],
+      [
+        "brain",
+        30,
+        275,
+        240,
+        108,
+        "Brain-adapter",
+        "Planförslag • ingen exekvering",
+        "core"
+      ],
+      [
+        "db",
+        330,
+        275,
+        240,
+        108,
+        "Beständig lagring",
+        "Order • plan • command • audit",
+        "business"
+      ],
+      [
+        "world",
+        630,
+        275,
+        240,
+        108,
+        "Blender-runtime",
+        "World • separate controller journal",
+        "world"
+      ],
+      [
+        "monitor",
+        30,
+        460,
+        240,
+        108,
+        "Operationsvy",
+        "Order- och feltidslinje",
+        "business"
+      ],
+      [
+        "verify",
+        330,
+        460,
+        240,
+        108,
+        "Verifierare",
+        "Observation → bedömning",
+        "core"
+      ],
+      [
+        "cell",
+        630,
+        460,
+        240,
+        108,
+        "CellController",
+        "READY • ESTOP_LOGICAL • FAULTED",
+        "world"
+      ],
+      [
+        "observation",
+        630,
+        660,
+        240,
+        110,
+        "ObservationModel",
+        "WorldState → WorldObservation",
+        "core"
+      ]
+    ],
+    "edges": [
+      [
+        "erp",
+        "core",
+        "both"
+      ],
+      [
+        "core",
+        "gateway",
+        "both"
+      ],
+      [
+        "core",
+        "db",
+        "both"
+      ],
+      [
+        "gateway",
+        "world",
+        "both"
+      ],
+      [
+        "world",
+        "cell",
+        "both"
+      ],
+      [
+        "verify",
+        "db"
+      ],
+      [
+        "verify",
+        "monitor"
+      ],
+      [
+        "brain",
+        "core",
+        "both"
+      ],
+      [
+        "cell",
+        "gateway",
+        "dashed"
+      ],
+      [
+        "world",
+        "observation"
+      ],
+      [
+        "observation",
+        "verify"
+      ]
+    ]
+  },
+  "state": {
+    "number": 3,
+    "title": "Uppdragets tillstånd och osäkra utfall",
+    "subtitle": "Normative PROJECT_PLAN state machine",
+    "width": 900,
+    "height": 900,
+    "caption": "Figure 3. SIMULATOR_DESIGN. Only reconciliation evidence resolves an unknown effect. Timeout alone never proves failure. ERP exposes the verified business outcome.",
+    "nodes": [
+      [
+        "received",
+        30,
+        90,
+        380,
+        105,
+        "RECEIVED → VALIDATED",
+        "Durable order and job identity",
+        "business"
+      ],
+      [
+        "planning",
+        30,
+        250,
+        380,
+        105,
+        "PLANNING → READY_TO_EXECUTE",
+        "Typed plan and action validation",
+        "core"
+      ],
+      [
+        "executing",
+        30,
+        410,
+        380,
+        105,
+        "EXECUTING → VERIFYING",
+        "One original command identity",
+        "core"
+      ],
+      [
+        "unknown",
+        490,
+        250,
+        380,
+        105,
+        "UNKNOWN_OUTCOME",
+        "Communication loss / uncertain effect",
+        "warn"
+      ],
+      [
+        "reconciling",
+        490,
+        410,
+        380,
+        105,
+        "RECONCILING",
+        "Original journal + fresh observation",
+        "warn"
+      ],
+      [
+        "completed",
+        30,
+        590,
+        380,
+        105,
+        "COMPLETED",
+        "Verified business outcome",
+        "business"
+      ],
+      [
+        "intervention",
+        490,
+        590,
+        380,
+        105,
+        "REQUIRES_INTERVENTION",
+        "Insufficient / contradictory evidence",
+        "warn"
+      ],
+      [
+        "failed",
+        260,
+        755,
+        380,
+        100,
+        "FAILED",
+        "Proven failure; never timeout alone",
+        "warn"
+      ]
+    ],
+    "edges": [
+      [
+        "received",
+        "planning"
+      ],
+      [
+        "planning",
+        "executing"
+      ],
+      [
+        "executing",
+        "completed"
+      ],
+      [
+        "executing",
+        "unknown"
+      ],
+      [
+        "unknown",
+        "reconciling"
+      ],
+      [
+        "reconciling",
+        "completed"
+      ],
+      [
+        "reconciling",
+        "intervention"
+      ],
+      [
+        "reconciling",
+        "failed"
+      ]
+    ]
+  },
+  "ack-loss": {
+    "number": 4,
+    "type": "sequence",
+    "title": "Utfört plock — förlorad kvittens",
+    "subtitle": "Normative scenario SC-REC-001–007",
+    "width": 900,
+    "height": 795,
+    "caption": "Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning.",
+    "participants": [
+      [
+        "integration",
+        "Integration",
+        110
+      ],
+      [
+        "gateway",
+        "RobotGateway",
+        340
+      ],
+      [
+        "blender",
+        "Blender",
+        570
+      ],
+      [
+        "verifier",
+        "Verifierare",
+        790
+      ]
+    ],
+    "messages": [
+      [
+        "integration",
+        "gateway",
+        175,
+        "1. Skicka CMD-17",
+        "normal"
+      ],
+      [
+        "gateway",
+        "blender",
+        235,
+        "2. Utför samma kommando",
+        "normal"
+      ],
+      [
+        "blender",
+        "blender",
+        295,
+        "3. Objekt flyttas; effekt sparas",
+        "note"
+      ],
+      [
+        "gateway",
+        "integration",
+        355,
+        "4. Kvittens försvinner",
+        "lost"
+      ],
+      [
+        "integration",
+        "integration",
+        415,
+        "5. UNKNOWN_OUTCOME",
+        "note"
+      ],
+      [
+        "integration",
+        "gateway",
+        475,
+        "6. Läs status för CMD-17",
+        "normal"
+      ],
+      [
+        "blender",
+        "verifier",
+        535,
+        "7. Ny observation",
+        "normal"
+      ],
+      [
+        "gateway",
+        "verifier",
+        595,
+        "8. Journal + samma epok",
+        "normal"
+      ],
+      [
+        "verifier",
+        "integration",
+        655,
+        "9. Tillräcklig evidens → verifierat; annars granskning",
+        "normal"
+      ]
+    ]
+  },
+  "worlds": {
+    "number": 5,
+    "title": "Verklighet, observation, mål och förslag",
+    "subtitle": "Simulatorns facit är inte driftlogikens kunskap",
+    "width": 900,
+    "height": 790,
+    "caption": "Figur 5. Egen informationsmodell. Handling ändrar världen; nästa observation återkopplas till planeringen. Driftvägen får inte obegränsat facit. Test-oraklet jämför verifierarens slutsats med simulatortillståndet. Separationen undanröjer inte gemensamma modellfel.",
+    "nodes": [
+      [
+        "goal",
+        40,
+        480,
+        340,
+        105,
+        "Önskat tillstånd g",
+        "ERP anger vilket resultat som behövs",
+        "business"
+      ],
+      [
+        "truth",
+        515,
+        90,
+        340,
+        105,
+        "Simulatortillstånd x",
+        "Objekt • robot • effektjournal",
+        "world"
+      ],
+      [
+        "brain",
+        40,
+        285,
+        340,
+        105,
+        "Modell / planering b",
+        "Förslag utifrån mål och observation",
+        "core"
+      ],
+      [
+        "obs",
+        515,
+        285,
+        340,
+        105,
+        "Observerat tillstånd y",
+        "Sensor • brus • skymning • tid",
+        "core"
+      ],
+      [
+        "action",
+        40,
+        90,
+        340,
+        105,
+        "Validerad handling",
+        "Endast typade operationer",
+        "core"
+      ],
+      [
+        "oracle",
+        515,
+        480,
+        340,
+        105,
+        "Test-orakel",
+        "Facit jämförs med verifierarens dom",
+        "warn"
+      ],
+      [
+        "verify",
+        40,
+        610,
+        340,
+        100,
+        "Verifier",
+        "WorldObservation only",
+        "core"
+      ]
+    ],
+    "edges": [
+      [
+        "goal",
+        "brain"
+      ],
+      [
+        "truth",
+        "obs"
+      ],
+      [
+        "obs",
+        "brain"
+      ],
+      [
+        "brain",
+        "action"
+      ],
+      [
+        "action",
+        "truth"
+      ],
+      [
+        "truth",
+        "oracle",
+        "dashed"
+      ],
+      [
+        "obs",
+        "verify"
+      ],
+      [
+        "verify",
+        "oracle",
+        "dashed"
+      ]
+    ],
+    "footer": "Streckad pil: facit används av testet, inte som obegränsad tillgång för modellen."
+  },
+  "trust": {
+    "number": 6,
+    "title": "Skilj scenförfattande från robotkörning",
+    "subtitle": "Två behörighetsnivåer • inga fria kodkommandon i runtime",
+    "width": 900,
+    "height": 755,
+    "caption": "Figur 6. Egen behörighetsmodell. Codex och MCP kan hjälpa till med scenförfattande i en isolerad utvecklingsmiljö. Granskade och versionshanterade artefakter förs sedan till körmiljön. RobotGateway accepterar enbart det avgränsade runtime-kontraktet.",
+    "nodes": [
+      [
+        "agent",
+        40,
+        90,
+        340,
+        98,
+        "UTVECKLING: Codex",
+        "Kodförslag och granskade ändringar",
+        "business"
+      ],
+      [
+        "mcp",
+        515,
+        90,
+        340,
+        98,
+        "Blender MCP",
+        "Kraftfullt scenförfattande",
+        "warn"
+      ],
+      [
+        "review",
+        515,
+        260,
+        340,
+        98,
+        "Granskning + versionslås",
+        "Scen • adapter • tester • manifest",
+        "business"
+      ],
+      [
+        "request",
+        40,
+        445,
+        340,
+        98,
+        "RUNTIME: uppdrag",
+        "Brain föreslår; validator granskar",
+        "core"
+      ],
+      [
+        "gateway",
+        515,
+        445,
+        340,
+        98,
+        "RobotGateway",
+        "Tillåtna typade kommandon",
+        "core"
+      ],
+      [
+        "blender",
+        515,
+        610,
+        340,
+        98,
+        "Blender-runtime",
+        "Huvudtråd • kända funktioner",
+        "world"
+      ]
+    ],
+    "edges": [
+      [
+        "agent",
+        "mcp"
+      ],
+      [
+        "mcp",
+        "review"
+      ],
+      [
+        "review",
+        "gateway",
+        "dashed"
+      ],
+      [
+        "request",
+        "gateway"
+      ],
+      [
+        "gateway",
+        "blender"
+      ]
+    ],
+    "footer": "Utvecklingsverktygens behörighet är inte tillgänglig för körningens modellförslag."
+  },
+  "boundary": {
+    "number": 7,
+    "title": "Gemensam fråga — olika beviskrav",
+    "subtitle": "Simulatorn är inte en validerad kopia av en fysisk cell",
+    "width": 900,
+    "height": 760,
+    "caption": "Figur 7. Egen jämförelse. Kontrakt, identiteter, felhantering och observerbarhet kan studeras i båda miljöerna. Fysik, sensorer, säkerhet och driftsvillkor kräver ny validering vid övergång till verklig utrustning. Figuren beskriver ingen intern SICS-arkitektur.",
+    "nodes": [
+      [
+        "question",
+        180,
+        85,
+        540,
+        96,
+        "Gemensamt integrationsproblem",
+        "Från kundavsikt till belagd effekt",
+        "business"
+      ],
+      [
+        "sim",
+        35,
+        255,
+        350,
+        105,
+        "ROBOTOPS TWIN",
+        "Syntetiska objekt och Blender",
+        "world"
+      ],
+      [
+        "real",
+        515,
+        255,
+        350,
+        105,
+        "FYSISK ROBOTCELL",
+        "Verkliga objekt, sensorer och styrning",
+        "core"
+      ],
+      [
+        "simproof",
+        35,
+        425,
+        350,
+        105,
+        "Avgränsad evidens",
+        "Testlogik inom definierad felmodell",
+        "world"
+      ],
+      [
+        "realproof",
+        515,
+        425,
+        350,
+        105,
+        "Nya bevis behövs",
+        "Kalibrering • risker • hårdvaruprov",
+        "warn"
+      ],
+      [
+        "limit",
+        180,
+        615,
+        540,
+        100,
+        "Ingen automatisk överföring",
+        "Ett adapterbyte räcker inte för produktionsgodkännande",
+        "warn"
+      ]
+    ],
+    "edges": [
+      [
+        "question",
+        "sim"
+      ],
+      [
+        "question",
+        "real"
+      ],
+      [
+        "sim",
+        "simproof"
+      ],
+      [
+        "real",
+        "realproof"
+      ],
+      [
+        "simproof",
+        "limit"
+      ],
+      [
+        "realproof",
+        "limit"
+      ]
+    ]
+  }
 }

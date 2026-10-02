@@ -1,0 +1,111 @@
+{
+  "$defs": {
+    "CommandStatus": {
+      "enum": [
+        "CREATED",
+        "DISPATCHED",
+        "ACCEPTED",
+        "RUNNING",
+        "SUCCEEDED",
+        "FAILED",
+        "REJECTED",
+        "STATUS_UNKNOWN"
+      ],
+      "title": "CommandStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "causation_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Causation Id",
+      "type": "string"
+    },
+    "command_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Command Id",
+      "type": "string"
+    },
+    "correlation_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "effect_count": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Effect Count",
+      "type": "integer"
+    },
+    "job_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Job Id",
+      "type": "string"
+    },
+    "journal_durable": {
+      "default": true,
+      "title": "Journal Durable",
+      "type": "boolean"
+    },
+    "payload_hash": {
+      "title": "Payload Hash",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    },
+    "run_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "scene_epoch": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Scene Epoch",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/CommandStatus"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "correlation_id",
+    "causation_id",
+    "timestamp",
+    "command_id",
+    "job_id",
+    "scene_epoch",
+    "status",
+    "reason",
+    "effect_count",
+    "payload_hash"
+  ],
+  "title": "CommandReceipt",
+  "type": "object"
+}

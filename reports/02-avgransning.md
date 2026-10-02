@@ -107,7 +107,7 @@ Exempel: simulatorn flyttar ett objekt genom att ändra dess parent och verifier
 
 ### 5.3 Oavgjort är ett legitimt resultat
 
-Vid kvittensförlust kan journal och ny observation stödja ett slutförande. Men om journalen är borta och objektet skymt bör systemet inte gissa. En tydlig `MANUAL_REVIEW` är i det fallet mer korrekt än att forcera flödet till grönt.
+Vid kvittensförlust kan journal och ny observation stödja ett slutförande. Men om journalen är borta och objektet skymt bör systemet inte gissa. En tydlig `REQUIRES_INTERVENTION` är i det fallet mer korrekt än att forcera flödet till grönt.
 
 Demonstrationen ska visa både ett återhämtningsbart fel och ett ärligt oavgjort fall. Då blir det tydligt att reconciliation inte är en magisk funktion som alltid vet vad som hände.
 

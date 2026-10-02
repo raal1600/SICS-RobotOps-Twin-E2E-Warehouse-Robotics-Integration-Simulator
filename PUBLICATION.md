@@ -1,6 +1,6 @@
 # Publicerings- och underhållsguide
 
-Detta repository innehåller ett **rapportpaket och en byggkedja för dokumentation**. Det innehåller ännu inte den simulerade ERP/robot-runtime som rapporterna specificerar.
+Detta repository innehåller ett **rapportpaket och en byggkedja för dokumentation**. Implementationsstatus finns i GOAL_PROGRESS.md och publication/status.json; fullständig runtime-acceptans återstår.
 
 ## Innehåll och redigering
 
@@ -16,8 +16,9 @@ Använd Python 3.13 och en miljö med Pango, Fontconfig och DejaVu installerade.
 sudo apt-get install libpango-1.0-0 libpangoft2-1.0-0 fonts-dejavu-core
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements-docs.txt
-python tools/build_publication.py
+python -m pip install uv==0.12.13
+uv sync --locked --all-groups
+uv run --locked python -m tools.dev docs
 python -m http.server 8000 --directory _site
 ```
 
@@ -25,7 +26,7 @@ python -m http.server 8000 --directory _site
 
 ## Utdata
 
-Bygget skapar sex HTML-sidor, sju SVG-diagram, motsvarande Mermaid-definitioner, tre separata PDF-rapporter, ett samlat PDF-paket, Markdown-källor, BibTeX och JSON-register. `build.json` innehåller källcommit, sidantal och PDF-hashar.
+Bygget skapar sju HTML-sidor, inklusive aktuell governance/status, sju SVG-diagram, motsvarande Mermaid-definitioner, tre separata PDF-rapporter, ett samlat PDF-paket, Markdown-källor, BibTeX och JSON-register. `build.json` innehåller källcommit, sidantal och PDF-hashar.
 
 Automatiska kontroller fångar okända käll-ID:n, kvarvarande figurplatshållare, ogiltig SVG-XML, bristande PDF-textutvinning samt trasiga interna länkar/ankare. Dessa kontroller ersätter inte visuell PDF- och webbläsargranskning.
 

@@ -8,6 +8,12 @@ on:
       - 'publication/**'
       - 'tools/build_publication.py'
       - 'requirements-docs.txt'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
+      - 'PUBLICATION.md'
+      - 'docs/**'
+      - 'contracts/**'
       - 'CITATION.cff'
       - 'README.md'
       - 'PROJECT_PLAN.md'
@@ -37,7 +43,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version-file: '.python-version'
           cache: pip
           cache-dependency-path: requirements-docs.txt
       - name: Install PDF rendering system libraries
@@ -45,9 +51,11 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 fonts-dejavu-core
       - name: Install pinned publication toolchain
-        run: python -m pip install -r requirements-docs.txt
+        run: |
+          python -m pip install uv==0.12.13
+          uv sync --locked --only-group docs
       - name: Build HTML, diagrams, references and PDFs
-        run: python tools/build_publication.py
+        run: uv run --locked --only-group docs python tools/build_publication.py
       - name: Archive complete publication for inspection
         uses: actions/upload-artifact@v4
         with:
@@ -126,7 +134,7 @@ jobs:
           else:
               raise RuntimeError('Pages did not expose the current publication commit')
           checks=[]
-          for name in ['index','design','avgransning','diskussion','kallor','diagram']:
+          for name in ['index','design','avgransning','diskussion','kallor','diagram','governance']:
               path=name+'.html'; status,ctype,data=get(path)
               assert status==200 and ctype=='text/html' and b'RobotOps Twin' in data, path
               checks.append({'path':path,'status':status,'content_type':ctype,'bytes':len(data)})

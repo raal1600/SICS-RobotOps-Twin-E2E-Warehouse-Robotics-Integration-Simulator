@@ -1,0 +1,36 @@
+[project]
+name = "robotops-twin"
+version = "0.1.0"
+description = "Deterministic warehouse integration and uncertain-outcome simulator"
+requires-python = ">=3.13,<3.14"
+dependencies = ["fastapi", "pydantic", "uvicorn"]
+
+[dependency-groups]
+dev = ["pytest", "pytest-cov", "httpx", "ruff", "mypy", "jsonschema", "types-jsonschema", "bandit", "pip-audit"]
+docs = ["markdown-it-py==4.2.0", "weasyprint==68.0", "pypdf>=6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["blender: exercises the real Blender executable (mandatory acceptance lane)"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+extend-exclude = ["tools/build_publication.py"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+files = ["robotops", "apps"]
+plugins = ["pydantic.mypy"]
+
+[tool.coverage.run]
+source = ["robotops", "apps"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

@@ -17,24 +17,24 @@ jobs:
       - name: Install locked dependencies
         run: |
           python -m pip install uv==0.12.13
-          uv sync --locked
+          uv sync --locked --all-groups
       - name: Install pinned CPU Blender runtime
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0 libgl1
+          sudo apt-get install -y libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0 libgl1 libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core
           curl --fail --location --retry 3 https://download.blender.org/release/Blender5.2/blender-5.2.1-linux-x64.tar.xz -o "$RUNNER_TEMP/blender.tar.xz"
           echo 'a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9  '"$RUNNER_TEMP/blender.tar.xz" | sha256sum --check
           tar -xf "$RUNNER_TEMP/blender.tar.xz" -C "$RUNNER_TEMP"
           echo "BLENDER_EXECUTABLE=$RUNNER_TEMP/blender-5.2.1-linux-x64/blender" >> "$GITHUB_ENV"
-      - name: Deterministic suite
-        run: uv run --locked python -m tools.dev test --junitxml=artifacts/tests.xml
-      - name: Lint and format
-        run: uv run --locked python -m tools.dev lint
-      - name: Strict types
-        run: uv run --locked python -m tools.dev typecheck
+      - name: Local acceptance (two clean fixture runs, quality, demos, publication)
+        run: uv run --locked python -m tools.dev acceptance --local
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: deterministic-evidence
-          path: artifacts/
+          path: |
+            artifacts/
+            docs/evidence/acceptance/
+            ACCEPTANCE_REPORT.md
+            _site/build.json
           if-no-files-found: error

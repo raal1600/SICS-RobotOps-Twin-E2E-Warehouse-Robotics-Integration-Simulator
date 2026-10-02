@@ -1,16 +1,16 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** The deterministic E2E simulator, bounded CPU Blender runtime, local ERP dashboard and persisted metrics are implemented. Lost-ack, ambiguous evidence, restart and interlocks are tested; the real dashboard flow is browser-verified. Final clean acceptance and publication verification remain in progress. Status: NOT DONE.
+> **Implementation status, 2026-10-02:** The deterministic E2E simulator, CPU Blender adapter, dashboard and persisted observability are implemented. Two full local suite runs, seven Blender scenarios, security and publication builds pass. Clean-checkout verification and final-SHA remote CI/Pages gates remain to be completed. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
 
 ## Sammanfattning
 
-RobotOps Twin är en föreslagen, lokal integrationssimulator för lagerrobotik. Ett förenklat ERP/WMS skapar plockuppdrag. Ett Pythonbaserat integrationslager validerar och lagrar uppdragen, hämtar observationer, begär ett handlingsförslag och skickar typade kommandon till en simulerad robotcell i Blender. En separat verifierare bedömer utfallet innan kundsystemet uppdateras. Den centrala frågan är inte hur en robotarm animeras, utan hur mjukvaran hanterar skillnaden mellan en begärd handling, en kvitterad operation och ett observerat resultat.
+RobotOps Twin är en implementerad, lokal integrationssimulator för lagerrobotik. Ett förenklat ERP/WMS skapar plockuppdrag. Ett Pythonbaserat integrationslager validerar och lagrar uppdragen, hämtar observationer, begär ett handlingsförslag och skickar typade kommandon till en simulerad robotcell i Blender. En separat verifierare bedömer utfallet innan kundsystemet uppdateras. Den centrala frågan är inte hur en robotarm animeras, utan hur mjukvaran hanterar skillnaden mellan en begärd handling, en kvitterad operation och ett observerat resultat.
 
 Studien kombinerar en riktad genomgång av offentliga primärkällor med ett eget arkitekturförslag och en förhandsdefinierad utvärderingsplan. Underlaget omfattar SICS AI:s rollbeskrivning och HYPER-redovisning, Cognibotics produktionsbeskrivning, CloudGripper/AutoGrasper, R900 samt officiell dokumentation för Blender, OpenAI och integrationsprotokoll. Källorna har olika bevisvärde och hålls därför isär.
 
-**Forskningsdelen redovisar designunderlaget. Aktuell implementationsstatus finns ovan; simulatorresultat är inte fysisk robotvalidering.** Inga prestandasiffror för projektet, säkerhetsgarantier eller resultat om generell intelligens hävdas. Det planerade bidraget är ett litet, reproducerbart testsystem där fel efter en fysiskliknande sidoeffekt kan studeras utan verklig robotutrustning.
+**Forskningsdelen redovisar designunderlaget. Aktuell implementationsstatus finns ovan; simulatorresultat är inte fysisk robotvalidering.** Inga prestandasiffror för projektet, säkerhetsgarantier eller resultat om generell intelligens hävdas. Bidraget är ett litet, reproducerbart testsystem där fel efter en fysiskliknande sidoeffekt kan studeras utan verklig robotutrustning.
 
 **Nyckelord:** systemintegration, lagerrobotik, Blender, verifiering, idempotens, återhämtning, observerbarhet, digital-tvilling-inspirerad simulering.
 
@@ -138,7 +138,7 @@ Systemet ska kunna köras utan externa modellkonton. Blender visar förändringe
 | K11 | Industriella protokoll | OPC UA-adapter som tillägg med kontraktstest. | Protokollintegration först när den är implementerad. |
 | K12 | AI-stödd utveckling | Versionshanterade ändringar och granskade tester. | Eget ansvar för agentgenererad kod. |
 
-K01–K10 är förberedelsemål, inte genomförda leveranser i denna rapportversion. K11 får inte markeras färdigt för att booleska signaler finns i JSON. Annonsens kärnuppgifter och meriterande områden är utgångspunkt för kartläggningen. [S01][S02]
+K01–K10 är en forskningsbaserad kravkartläggning. Vilka simulatorfunktioner som har körts och godkänts framgår av ACCEPTANCE_REPORT.md, inte av denna tabell. K11 får inte markeras färdigt för att booleska signaler finns i JSON. Annonsens kärnuppgifter och meriterande områden är utgångspunkt för kartläggningen. [S01][S02]
 
 ## 5. Föreslagen systemarkitektur
 
@@ -168,7 +168,7 @@ Senare kan en lednivåadapter införas med lednamn, tidsatta waypoints och expli
 
 ### 5.3 Driftmiljö
 
-Den avsedda körningen är lokal: webbläsare, Pythonprocesser, SQLite och Blender. Kundmocken bör ha en separat databas eller åtminstone ett separat lagringskontrakt så att kundkvittens inte blir en dold lokal transaktion. Ett processövervakningsskript kan starta komponenterna. Containerisering av backend är valfri; Blender kan köras direkt på värddatorn.
+Körningen är lokal: webbläsare, Pythonprocesser, SQLite och Blender. Kundmocken använder integrations-API:t och dess beständiga orderkontrakt. Runtime-journal och värld har en separat SQLite-databas. En extern ERP-transport med egen outbox är ett valfritt tillägg, inte en implementerad leveransgaranti; se ADR 0001.
 
 GitHub Pages används endast för rapporter, diagram och nedladdningar. Pages kör inte Pythonbackend eller Blender. En framtida inspelad demo ska märkas inspelad och inte presenteras som levande robottelemetri. [S19]
 
@@ -180,30 +180,9 @@ GitHub Pages används endast för rapporter, diagram och nedladdningar. Pages k�
 
 Återleverans av samma orderbegäran använder samma idempotensnyckel. Samma nyckel med annat innehåll avvisas som konflikt. Ett nytt försök efter ett verkligt misslyckande får egen försöksidentitet men behåller kopplingen till samma uppdrag. Skillnaden mellan begäran och avsikt är central i designen. [S17]
 
-### 6.2 Föreslaget kommando
+### 6.2 Implementerat kommando
 
-Nedanstående JSON är ett designexempel, inte SICS AI:s API:
-
-```json
-{
-  "schema_version": "1.0",
-  "command_id": "CMD-017-A1",
-  "job_id": "JOB-017",
-  "scene_epoch": "SCENE-004",
-  "kind": "PICK_AND_PLACE",
-  "object_id": "OBJ-RED-01",
-  "source_id": "SOURCE-A",
-  "destination_id": "ORDER-TOTE-17",
-  "observation_id": "OBS-104",
-  "calibration_version": "CAL-001",
-  "frame_id": "cell_world",
-  "target_pose": {
-    "position_m": [0.42, -0.18, 0.12],
-    "quaternion_xyzw": [0.0, 0.0, 0.0, 1.0]
-  },
-  "planner_version": "deterministic-1"
-}
-```
+Det fullständiga, versionshanterade kontraktet finns i `contracts/schemas/RobotCommand.json`. Det innehåller stabil order-, jobb-, plan-, kommando- och observationsidentitet, scenepok, cellgeneration samt `product_id`, källa, destination och en typad `target_pose` med meter, koordinatram och kalibrering. JSON är strikt data; okända fält och godtycklig kod avvisas. Det är vårt simulator-API, inte SICS AI:s API.
 
 Valideringen kontrollerar bland annat tillåten kommandotyp, ändliga tal, rätt koordinatsystem, korrekt objekt, rimliga gränser, kompatibel kalibrering och tillräckligt aktuell observation. Kvaternionen kontrolleras mot en dokumenterad normtolerans. Toleranserna är egna simulatorparametrar och får inte kallas industriellt säkra.
 
@@ -243,7 +222,7 @@ Anta att robotadaptern flyttar ett objekt, men att nätverket bryts innan integr
 
 {{figure:ack-loss}}
 
-Den föreslagna lösningen kombinerar beständig avsikt, kommandoregister och observation efter handling. Den utlovar inte en universell exactly-once-egenskap. Ett databaslås och en robotrörelse är inte en gemensam atomär transaktion.
+Lösningen kombinerar beständig avsikt, kommandoregister och observation efter handling. Den utlovar inte en universell exactly-once-egenskap. Ett databaslås och en robotrörelse är inte en gemensam atomär transaktion.
 
 ### 7.2 Föreslaget återhämtningsförlopp
 
@@ -295,7 +274,7 @@ Varje observation har fångsttid, mottagningstid och scensteg. Väggklocka anvä
 
 Baslinjen gör ett reproducerbart val bland tillåtna objekt och rörelsesegment. Den tränar ingen modell. En valfri LLM/VLM-adapter kan ge ett strukturerat förslag, men schemakorrekthet garanterar inte semantisk korrekthet. OpenAI dokumenterar strukturerade utdata och särskild hantering av exempelvis avvisade svar. [S16]
 
-Föreslagna felvägar är timeout, okänd objektidentitet, felaktig destination, otillräcklig observation eller avvisat modellsvar. Dessa ger ett synligt avbrott eller en dokumenterad alternativ policy. Ett självrapporterat confidence-värde ska inte behandlas som kalibrerad sannolikhet för ett lyckat grepp.
+Implementerade felvägar är timeout, okänd objektidentitet, felaktig destination och otillräcklig observation. Avvisat externt modellsvar hör till den valfria modelladaptern som inte är implementerad. Dessa ger ett synligt avbrott eller en dokumenterad alternativ policy. Ett självrapporterat confidence-värde ska inte behandlas som kalibrerad sannolikhet för ett lyckat grepp.
 
 ## 9. Blender, MCP och operationella gränser
 
@@ -309,13 +288,13 @@ Rörelsen följer definierade delsteg: närma sig, kontrollera greppvillkor, fä
 
 Blenders dokumentation varnar för osäker användning av Pythontrådar. Scenändringar ska inte göras godtyckligt från en långlivad bakgrundstråd. Timers ger ett API för schemalagda anrop. [S13][S14]
 
-Vårt förslag är en separat bryggprocess för nätverks-I/O och en begränsad, icke-blockerande mottagning i Blender. Validerade kommandon behandlas på huvudtråden vid definierade simulatorsteg. Varje steg har en tidsbudget så att UI och händelsehantering inte blockeras av en lång operation. Vald Blender-version, tilläggsversion och scene_hash registreras i körningens manifest.
+Den implementerade adaptern använder i stället en tidsbegränsad Blender-batchprocess med ett fast Python-skript och typade JSON-filer. Scenändringar sker på Blenders huvudtråd. RUNNING journalförs före start; scenfilens hash och svarets identitet kontrolleras innan checkpointen godkänns. Saknat eller korrupt svar leder till osäkerhet utan omkörning. Blender-version och skripthash finns i runtime-manifestet. ADR 0001 dokumenterar valet; ingen långlivad nätverksbrygga krävs. CPU-versionen är Blender 5.2.1 LTS. [S21]
 
 ### 9.3 MCP hör till utvecklingsmiljön
 
 Blender Lab beskriver en MCP-server med ett separat tillägg och varnar för att LLM-genererad kod kan köras utan dataskyddsräcken. Den kontrollerade sidan anger Blender 5.1 eller senare för just denna integration. [S12]
 
-Codex kan ansluta till MCP-servrar. I projektförslaget används det för kodarbete, scenförfattande och granskning, inte som en säkerhetsklassad regulator. [S15]
+Codex kan ansluta till MCP-servrar. Det kan användas för kodarbete, scenförfattande och granskning; den aktuella runtime-adaptern använder det inte, inte som en säkerhetsklassad regulator. [S15]
 
 {{figure:trust}}
 
@@ -323,13 +302,15 @@ Under utveckling kan en agent föreslå Blenderkod i en isolerad miljö. Under k
 
 ### 9.4 PLC och stopp
 
-CellController simulerar exempelvis `ready`, `source_present`, `destination_present`, `robot_ready`, `faulted` och `stop_requested`. Före start måste definierade förvillkor vara uppfyllda. Signalerna behöver aktualitetskontroll; ett gammalt READY räcker inte.
+Cellmodellen har READY, BUSY, FAULTED, ESTOP_LOGICAL, RESETTING och OFFLINE samt generationsnummer. Runtime kontrollerar källobjekt och destination mot det typade kommandot. Före start måste definierade förvillkor vara uppfyllda. Signalerna behöver aktualitetskontroll; ett gammalt READY räcker inte.
 
 En eventuell OPC UA-utökning ska implementera ett riktigt protokollgränssnitt med dokumenterad informationsmodell och testad klient/server-kommunikation. OPC Foundation beskriver dessa som separata delar av OPC UA. En REST-route som heter `/plc` är inte samma sak. [S18]
 
 Stoppknappen i demonstrationen är **en simulerad operationell spärr**, inte ett nödstopp med verifierad säkerhetsfunktion. Projektet ska inte anslutas till fysisk robotutrustning med denna logik som skyddssystem.
 
-## 10. Utvärderingsplan: hur vi avser att testa designen
+## 10. Utvärderingsprotokoll och genomförd acceptans
+
+Den ursprungliga forskningsplanen nedan innehåller även framtida experiment. Den normativa obligatoriska sviten definieras av SUCCESS_CRITERIA.md. ACCEPTANCE_REPORT.md kopplar varje MUST till aktuella kommandon, tester och artefakter. T07 (extern ERP-outbox), kontinuerligt stopp mitt i rörelse i T10, partiellt grepp i T12 och jämförande fröexperiment är uttryckligen tillägg; de har inte körts som sådana. Batch-runtime simulerar ingen säker realtidsavbrytning.
 
 ### 10.1 Hypoteser och jämförelse
 
@@ -362,7 +343,7 @@ Hypoteserna är prövbara inom simulatorns felmodell. De är inte testresultat. 
 | T15 | Blender omstart med inkonsistent snapshot | Ny epok och granskning; inget tyst återspel. |
 | T16 | Observation med fel koordinatenhet | Kontraktsfel upptäcks före exekvering. |
 
-Första testomgången föreslås använda tio namngivna scenfrön per scenario, med dokumenterade objektplaceringar och felpunkter. Antalet är en praktisk startpunkt, inte en statistisk styrkeberäkning. Deterministiska fall ska också testas vid flera gränser i tillståndsövergången, inte bara med flera slumpfrön.
+Ett valfritt framtida experiment föreslås använda tio namngivna scenfrön per scenario, med dokumenterade objektplaceringar och felpunkter. Antalet är en praktisk startpunkt, inte en statistisk styrkeberäkning. Deterministiska fall ska också testas vid flera gränser i tillståndsövergången, inte bara med flera slumpfrön.
 
 ### 10.3 Mått och invarianta villkor
 
@@ -384,7 +365,9 @@ Ett misslyckat experiment sparas lika noggrant som ett lyckat. Presentationen f�
 
 ## 11. Genomförande, dokumentation och underhåll
 
-### 11.1 Byggordning
+### 11.1 Ursprunglig byggordning och aktuell status
+
+Etapperna nedan beskriver den ursprungliga forskningsplanen. P0–P5 i PROJECT_PLAN.md är implementerade; P6 är valfri och ej implementerad. P7 omfattar slutlig acceptans och publicering. Fullständig aktuell status står i rapportens statusruta. Utökade experiment i avsnitt 10 är inte automatiskt genomförda genom att kärnan finns.
 
 **Etapp A: kontrakt och testbar kärna.** Skapa modeller, beständig uppdragslogg, kundmock och en robotstub utan grafik. Godkänn T01–T07 innan scenarbete blir huvudfokus.
 
@@ -415,4 +398,4 @@ Det finns risk för gemensamma modellfel mellan simulator och verifierare. Scena
 
 **Slutsatsen är att projektet är motiverat som ett avgränsat integrations- och återhämtningstest, inte som en kopia av SICS AI:s robotbrain.** En liten demo med ärlig osäkerhet, spårbara beslut och reproducerbara fel är vetenskapligt mer användbar än en större animation som ger sken av verifierad fysisk förmåga.
 
-Den fortsatta diskussionen bör pröva designens antaganden: var den verkliga plattformens gränser går, vilka fel som är vanligast och vilken evidens som krävs för att ett plock ska räknas som lyckat. Inga experimentella resultat för RobotOps Twin redovisas i version 1.0.
+Den fortsatta diskussionen bör pröva designens antaganden: var den verkliga plattformens gränser går, vilka fel som är vanligast och vilken evidens som krävs för att ett plock ska räknas som lyckat. Version 1.1 länkar lokal simulator-evidens via ACCEPTANCE_REPORT.md. Den redovisar inga experimentella resultat för fysisk robotprestanda eller generell intelligens.

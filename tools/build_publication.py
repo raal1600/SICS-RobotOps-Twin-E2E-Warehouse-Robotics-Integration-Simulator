@@ -20,13 +20,14 @@ from typing import Any
 from xml.etree import ElementTree
 
 from markdown_it import MarkdownIt
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfReader
+from pdf_package import merge_reports
 from weasyprint import HTML
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / '_site'
 DATE = '2026-10-01'
-VERSION = '1.0.0'
+VERSION = '1.1.0'
 REPO = 'raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator'
 REPO_URL = 'https://github.com/' + REPO
 REPORTS = [
@@ -132,18 +133,19 @@ def render_diagram(name: str, d: dict[str,Any]) -> tuple[str,str]:
             mode=edge[2] if len(edge)>2 else 'normal'
             dash=' stroke-dasharray="7 5"' if mode=='dashed' else ''
             both=' marker-start="url(#arrow)"' if mode=='both' else ''
-            parts.append(f'<path d="{edge_path(a,b,d["nodes"])}" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"{both}{dash}/>')
+            parts.append(f'<path d="{(edge[3] if len(edge)>3 else edge_path(a,b,d["nodes"]))}" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"{both}{dash}/>')
         for n in d['nodes']:
             key,x,y,nw,nh,title,description,kind=n
             bg,stroke=PALETTE[kind]
             parts += [f'<rect x="{x}" y="{y}" width="{nw}" height="{nh}" rx="7" fill="{bg}" stroke="{stroke}" stroke-width="1.3"/>',
                       f'<rect x="{x}" y="{y+10}" width="4" height="{nh-20}" rx="2" fill="{stroke}"/>']
+            title_size=min(19, (nw-24) / max(len(word) for word in title.split()) / 0.67)
             titlelines=textwrap.wrap(title,width=max(17,int((nw-32)/11.0)),break_long_words=False)
             desclines=textwrap.wrap(description,width=max(21,int((nw-32)/8.7)),break_long_words=False)
             total=len(titlelines)*23+len(desclines)*21+6
             yy=y+(nh-total)/2+19
             for line in titlelines:
-                parts.append(svg_text(x+nw/2,yy,line,19,'middle',weight='700')); yy+=23
+                parts.append(svg_text(x+nw/2,yy,line,title_size,'middle',weight='700')); yy+=23
             yy+=3
             for line in desclines:
                 parts.append(svg_text(x+nw/2,yy,line,16,'middle',color='#526473')); yy+=21
@@ -199,8 +201,8 @@ def page(title: str, content: str, current: str, description: str='') -> str:
             f'<title>{E(title)} | RobotOps Twin</title><meta name="author" content="Rami Halabi">'
             f'<meta name="description" content="{E(description or title)}">'
             '<link rel="stylesheet" href="style.css"></head><body>' + header(current)+content+
-            '<footer class="site-footer">Rami Halabi · Version 1.0 · 1 oktober 2026.<br>'
-            'Oberoende, AI-assisterad designstudie. Inte SICS AI:s dokumentation eller en verifierad robotimplementation. '
+            '<footer class="site-footer">Rami Halabi · Version 1.1 · 2 oktober 2026.<br>'
+            'Oberoende, AI-assisterad simulator och forskningsunderlag. Inte SICS AI:s dokumentation eller validerad fysisk robotprestanda. '
             f'<a href="{REPO_URL}">Källfiler på GitHub</a> · '
             '<a href="downloads/robotops-twin-samlat.pdf">Samtliga rapporter som PDF</a></footer></body></html>')
 
@@ -230,15 +232,15 @@ def build_report(meta: dict[str,str], refs: dict[str,Any], diagrams: dict[str,An
     if '{{figure:' in body:
         raise ValueError('Unresolved figure placeholder')
     refs_html='<section class="references" aria-label="Referenser"><h2 id="referenser">Referenser och källbegränsningar</h2>'
-    refs_html+='<p>Referenserna avser avgränsade sakuppgifter. Diagram, kontrakt och testplan är egna förslag. Gemensamt kontrolldatum: 1 oktober 2026.</p>'
+    refs_html+='<p>Referenserna avser avgränsade sakuppgifter. Diagram, kontrakt och testfall är simulatorns egna designval. Gemensamt kontrolldatum: 1 oktober 2026.</p>'
     refs_html+=''.join(reference_html(refs[k]) for k in used)+'</section>'
     toc.append(('referenser','Referenser och källbegränsningar'))
     toc_list='<ol>'+''.join(f'<li><a href="#{i}">{E(t)}</a></li>' for i,t in toc)+'</ol>'
     sidebar='<aside class="sidebar"><details open><summary>Innehåll</summary>'+toc_list+'</details><div class="side-meta">'
-    sidebar+=f'Rapport {meta["number"]} / 03<br>Version 1.0 · Svenska<br>Designstadium — inga driftresultat<br><a href="downloads/{meta["slug"]}.pdf">Ladda ned PDF</a></div></aside>'
+    sidebar+=f'Rapport {meta["number"]} / 03<br>Version 1.1 · Svenska<br>Simulator implementerad; acceptans spåras separat<br><a href="downloads/{meta["slug"]}.pdf">Ladda ned PDF</a></div></aside>'
     cover=f'<section class="cover"><div class="eyebrow">Rapport {meta["number"]} / 03 · RobotOps Twin</div><h1>{E(meta["title"])}</h1>'
-    cover+=f'<p class="subtitle">{E(meta["subtitle"])}</p><div class="metadata">Rami Halabi<br>Version 1.0 · 1 oktober 2026<br>Oberoende tekniskt rapportpaket · Svenska</div>'
-    cover+='<div class="status"><strong>Status: design och forskningsunderlag.</strong> Simulatorn beskrivs som ett planerat system. Inga empiriska robotresultat eller säkerhetsgarantier hävdas.</div>'
+    cover+=f'<p class="subtitle">{E(meta["subtitle"])}</p><div class="metadata">Rami Halabi<br>Version 1.1 · 2 oktober 2026<br>Oberoende tekniskt rapportpaket · Svenska</div>'
+    cover+='<div class="status"><strong>Status: simulator och forskningsunderlag.</strong> Den deterministiska simulatorn är implementerad. Aktuell acceptansstatus och evidens anges i rapportens statusruta och governance-sidan. Inga fysiska robotresultat eller säkerhetsgarantier hävdas.</div>'
     cover+=f'<div class="buttons"><a class="button" href="downloads/{meta["slug"]}.pdf" download>Ladda ned PDF</a><a class="button secondary" href="sources/{meta["slug"]}.md" download>Markdown-källa</a></div>'
     cover+='<p class="print-label">AI-assisterad text- och publiceringsframställning.<br>Ej sakkunniggranskad. Inte framtagen av eller godkänd av SICS AI.<br>Rapporternas källor, diagram och byggskript finns i projektets repository.</p></section>'
     content='<div class="shell">'+sidebar+'<main id="main" class="document">'+cover+'<nav class="print-toc" aria-label="Innehållsförteckning"><h2>Innehåll</h2>'+toc_list+'</nav>'+body+refs_html+'</main></div>'
@@ -263,12 +265,15 @@ def validate_links() -> None:
 
 
 def main() -> None:
+    if OUT.resolve() != ROOT.resolve() / '_site':
+        raise ValueError('Unsafe publication output directory')
     if OUT.exists():
         shutil.rmtree(OUT)
     (OUT/'assets').mkdir(parents=True)
     (OUT/'downloads').mkdir()
     (OUT/'sources'/'diagrams').mkdir(parents=True)
     shutil.copy2(ROOT/'publication/style.css',OUT/'style.css')
+    shutil.copy2(ROOT/'LICENSE',OUT/'sources/LICENSE')
     references=read_json('publication/references.json'); refs={s['id']:s for s in references}
     diagrams=read_json('publication/diagrams.json')
     for name,d in diagrams.items():
@@ -297,27 +302,24 @@ def main() -> None:
             raise ValueError(f'Invalid PDF content: {pdf}')
         stats.append({'report':meta['slug'],'title':meta['title'],'pages':len(reader.pages),'words_approx':words,'references':used,'pdf_sha256':hashlib.sha256(pdf.read_bytes()).hexdigest()})
         print(f'Built {pdf.name}: {len(reader.pages)} pages, ~{words} words',flush=True)
-    writer=PdfWriter()
-    for meta in REPORTS:
-        writer.append(str(OUT/'downloads'/f'{meta["slug"]}.pdf'),outline_item=meta['title'])
-    writer.add_metadata({'/Title':'RobotOps Twin — samlat rapportpaket','/Author':'Rami Halabi','/Subject':'Designstudie, avgränsning och diskussionsunderlag; inga empiriska robotresultat.'})
-    with (OUT/'downloads/robotops-twin-samlat.pdf').open('wb') as f:
-        writer.write(f)
+    package_checks=merge_reports([(OUT/'downloads'/f'{meta["slug"]}.pdf',meta['title']) for meta in REPORTS],OUT/'downloads/robotops-twin-samlat.pdf')
     cards=''
     for m,s in zip(REPORTS,stats):
         cards+=f'<article class="card"><div class="number">RAPPORT {m["number"]} · {s["pages"]} SIDOR</div><h2>{E(m["title"])}</h2><p>{E(m["description"])}</p><div class="buttons"><a class="button" href="{m["page"]}.html">Läs rapporten</a><a class="button secondary" href="downloads/{m["slug"]}.pdf" download>PDF</a></div></article>'
-    home='<main id="main" class="home"><section class="home-hero"><div class="eyebrow">Oberoende designstudie · version 1.0 · 1 oktober 2026</div><h1>Från order.<br>Till belagd effekt.</h1><p class="lead">Ett forskningsbaserat rapportpaket om systemet mellan kundens lagerorder, AI-förslaget och robotens verkliga resultat — med Blender som planerad simulatorvärld.</p><div class="buttons"><a class="button" href="design.html">Börja med designstudien</a><a class="button secondary" href="downloads/robotops-twin-samlat.pdf" download>Hela paketet som PDF</a></div><div class="status"><strong>Det här är dokumentation, inte en levande robotsimulator.</strong> Rapportpaketet skiljer källbelagda uppgifter från egna designval. Ingen intern SICS-arkitektur, AGI-förmåga eller fysisk säkerhet påstås vara återskapad.</div></section><section aria-label="Rapporter" class="cards">'+cards+'</section><h2>En sammanhängande kedja — flera olika ansvar</h2><p class="section-intro">Alla sju diagram är egna, redigerbara illustrationer. De finns både som vektorgrafik och Mermaid-källor.</p>'+figure('context',diagrams)+'<div class="buttons"><a class="button secondary" href="diagram.html">Utforska alla diagram</a><a class="button secondary" href="kallor.html">Källor och metod</a></div><h2>Läs med rätt förväntningar</h2><p>Designrapporten specificerar vad som ska byggas och testas. Avgränsningsrapporten förklarar vad som inte överförs till en fysisk robotcell. Diskussionsunderlaget hjälper till att pröva antaganden med tekniska sakkunniga.</p><p>Forskningsinspirationen kommer från bland annat CloudGripper/AutoGrasper och R900. Företags- och leverantörsuppgifter redovisas som sådana. Källornas begränsningar följer med in i varje rapport.</p></main>'
+    home='<main id="main" class="home"><section class="home-hero"><div class="eyebrow">Oberoende simulator · version 1.1 · 2 oktober 2026</div><h1>Från order.<br>Till belagd effekt.</h1><p class="lead">Ett forskningsbaserat rapportpaket om systemet mellan kundens lagerorder, AI-förslaget och robotens verkliga resultat — med Blender som syntetisk simulatorvärld.</p><div class="buttons"><a class="button" href="design.html">Börja med designstudien</a><a class="button secondary" href="downloads/robotops-twin-samlat.pdf" download>Hela paketet som PDF</a></div><div class="status"><strong>Det här är dokumentation, inte en levande robotsimulator.</strong> Rapportpaketet skiljer källbelagda uppgifter från egna designval. Ingen intern SICS-arkitektur, AGI-förmåga eller fysisk säkerhet påstås vara återskapad.</div></section><section aria-label="Rapporter" class="cards">'+cards+'</section><h2>En sammanhängande kedja — flera olika ansvar</h2><p class="section-intro">Alla sju diagram är egna, redigerbara illustrationer. De finns både som vektorgrafik och Mermaid-källor.</p>'+figure('context',diagrams)+'<div class="buttons"><a class="button secondary" href="diagram.html">Utforska alla diagram</a><a class="button secondary" href="kallor.html">Källor och metod</a></div><h2>Läs med rätt förväntningar</h2><p>Designrapporten beskriver arkitektur, forskningsunderlag och avgränsade experiment; den aktuella acceptansrapporten länkar körningar och evidens. Avgränsningsrapporten förklarar vad som inte överförs till en fysisk robotcell. Diskussionsunderlaget hjälper till att pröva antaganden med tekniska sakkunniga.</p><p>Forskningsinspirationen kommer från bland annat CloudGripper/AutoGrasper och R900. Företags- och leverantörsuppgifter redovisas som sådana. Källornas begränsningar följer med in i varje rapport.</p></main>'
     status=read_json('publication/status.json')
     governance_files=['PROJECT_PLAN.md','SUCCESS_CRITERIA.md','HANDOFF.md','CODEX_GOAL_CHECKLIST.md','GOAL_PROGRESS.md','ACCEPTANCE_REPORT.md','README.md','PUBLICATION.md']
     links=''
     for name in governance_files:
         shutil.copy2(ROOT/name,OUT/'sources'/name)
         links+=f'<li><a href="sources/{name}">{name}</a></li>'
+    for directory in ['docs', 'contracts', 'reports']:
+        shutil.copytree(ROOT/directory,OUT/'sources'/directory,dirs_exist_ok=True)
     governance='<main id="main" class="catalog"><h1>Implementation and acceptance</h1><div class="status"><strong>'+E(status['status'])+' — '+E(status['phase'])+'</strong><p>'+E(status['summary'])+'</p></div><p>These are current source documents. Historical research is not runtime acceptance evidence. Pages hosts documentation only.</p><ul>'+links+'</ul></main>'
     write(OUT/'governance.html',page('Implementation and acceptance',governance,'governance'))
     home=home.replace('</main>','<h2>Current implementation status</h2><p>'+E(status['status'])+' — '+E(status['summary'])+'</p><p><a href="governance.html">Normative contracts, progress and acceptance evidence</a></p></main>')
     write(OUT/'index.html',page('Forskningsunderlag och systemdesign',home,'index'))
-    sources='<main id="main" class="catalog"><div class="eyebrow">Spårbarhet och källkritik</div><h1>Källor, inte antaganden</h1><p>Gemensamt kontrolldatum: 1 oktober 2026. Registret innehåller 20 källor, inklusive kompletterande läsning. Uppgifter från företag och leverantörer är inte likställda med oberoende experiment. Varje rapport visar de källor som faktiskt används där.</p><div class="status">Källorna motiverar avgränsade fynd. Diagrammen, arkitekturen och experimentplanen är egna förslag. Fulltexten till Axels examensarbete kunde inte återhämtas; endast den bibliografiska kopplingen används.</div><div class="buttons"><a class="button secondary" href="sources/references.bib" download>BibTeX</a><a class="button secondary" href="sources/references.json" download>Källregister JSON</a></div><section class="references">'+''.join(reference_html(s) for s in references)+'</section></main>'
+    sources='<main id="main" class="catalog"><div class="eyebrow">Spårbarhet och källkritik</div><h1>Källor, inte antaganden</h1><p>Gemensamt kontrolldatum: 1 oktober 2026. Registret innehåller 20 källor, inklusive kompletterande läsning. Uppgifter från företag och leverantörer är inte likställda med oberoende experiment. Varje rapport visar de källor som faktiskt används där.</p><div class="status">Källorna motiverar avgränsade fynd. Diagrammen, arkitekturen och experimentplanen är egna simulatorval. Fulltexten till Axels examensarbete kunde inte återhämtas; endast den bibliografiska kopplingen används.</div><div class="buttons"><a class="button secondary" href="sources/references.bib" download>BibTeX</a><a class="button secondary" href="sources/references.json" download>Källregister JSON</a></div><section class="references">'+''.join(reference_html(s) for s in references)+'</section></main>'
     sources=sources.replace('20 källor',str(len(references))+' källor')
     write(OUT/'kallor.html',page('Källregister',sources,'kallor'))
     gallery='<main id="main" class="catalog"><div class="eyebrow">Sju egna illustrationer</div><h1>Systemet, gränserna och felvägen</h1><p>Öppna en figur i storlek som passar skärmen, eller ladda ned dess redigerbara källa. SVG-filerna är också inbäddade som vektorgrafik i PDF-rapporterna.</p><div class="gallery">'+''.join(figure(name,diagrams) for name in diagrams)+'</div></main>'
@@ -329,7 +331,7 @@ def main() -> None:
             commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
         except (OSError,subprocess.SubprocessError):
             commit='local-unversioned-build'
-    manifest={'title':'RobotOps Twin publication','version':VERSION,'date':DATE,'source_commit':commit,'reports':stats,'diagrams':len(diagrams),'references':len(references),'combined_pdf_pages':sum(s['pages'] for s in stats),'simulator_status':status,'checks':['reference IDs resolved','figure placeholders resolved','SVG XML parsed','PDF text extractable','relative links and fragments validated']}
+    manifest={'title':'RobotOps Twin publication','version':VERSION,'date':'2026-10-02','source_checked_at':DATE,'source_commit':commit,'reports':stats,'diagrams':len(diagrams),'references':len(references),'combined_pdf_pages':sum(s['pages'] for s in stats),'pdf_package_checks':package_checks,'simulator_status':status,'checks':['reference IDs resolved','figure placeholders resolved','SVG XML parsed','PDF text extractable','relative links and fragments validated']}
     write(OUT/'build.json',json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     validate_links()
     print(json.dumps(manifest,ensure_ascii=False,indent=2),flush=True)

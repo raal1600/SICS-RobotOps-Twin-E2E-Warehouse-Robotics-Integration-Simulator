@@ -1,40 +1,49 @@
 # Goal Progress
 Last updated: 2026-10-02 UTC
-Commit/base: `817144e6b78061b309e3622e7f70d41afe545a9e`
+Commit/base: `e2c82ed7be3787d9dc351dab3c1212cc9e2de954`
 
 ## Current phase
-P5 implemented; P7 final acceptance/publication next. **NOT DONE**.
+P0-P5 implemented. P6 optional, unimplemented. P7 local acceptance and final
+publication verification. **NOT DONE**.
 
 ## MUST status
-- Local contracts, intake, state guards, idempotency, claim races, Brain validation,
-  headless/Blender lost-ack, conservative observations/reconciliation and restart
-  evidence pass in their targeted suites. Full MUST mapping remains in progress.
-- In progress: metrics/dashboard, final drift/security/clean-run acceptance.
-- Blocked external gates: remote CI and Pages need explicit push authorization.
+- PASS locally: 81 of 85 MUST criteria in the generated acceptance mapping.
+- IN PROGRESS: final local corrections, clean-checkout setup/repeat, publication
+  browser/PDF review and exact final source/evidence commit.
+- FAIL/external gate: SC-DATA-005 and SC-KB-006/007/008 require final-SHA remote
+  CI/Pages. Automatic approval review rejected pushing to main; explicit user
+  authorization to publish is required after local work is reviewable.
+- SHOULD: optional external model fallback SC-BRAIN-005 remains unimplemented.
 
-## Evidence
-- P0/P1/P2/P3 gate logs under docs/evidence/.
-- P3: 207 tests, 90.92% coverage (fixed threshold 85%).
-- P4 real Blender: five tests pass, including corrupt-checkpoint intervention.
-- p4-blender-lost-ack.json/png: actual scene effect, UNKNOWN_OUTCOME -> COMPLETED,
-  original command identity, one pick effect and zero duplicates. PNG inspected.
-- Blender 5.2.1 LTS, CPU. No user Blender session or MCP was used.
+## Evidence added this iteration
+- `docs/evidence/acceptance/20261002T173627/`: actual setup, two 218-test runs,
+  88.76% coverage (fixed threshold 85%), lint/types/security, seven real Blender
+  scenarios, drift and publication. No skips or xfails.
+- Lost-ack: UNKNOWN_OUTCOME -> COMPLETED; original identity; exactly one effect.
+- Ambiguous: REQUIRES_INTERVENTION. Restart and interlocks pass.
+- Five reviewed low-severity subprocess findings bound to AST hashes;
+  pip-audit has no known vulnerabilities after WeasyPrint 70.0 update.
+- PDF review: all pages inspected in contact sheets; state diagram inspected
+  at readable size. Correcting a routing ambiguity and named PDF link collisions.
+- Earlier P0-P5 and browser/Blender evidence remains under docs/evidence/.
 
 ## Decisions / ADRs
-ADR 0001: fixed batch script + typed JSON, durable RUNNING before external effect,
-checkpoint recovery and quarantine for unresolved runtime commands. Scene hashes
-are validated before committing the returned world. Final verifier uses observation.
+ADR 0001 records the two durable stores, batch Blender boundary and local ERP
+contract. Acceptance compares named tests in both JUnit runs and fails missing,
+failed or skipped evidence. Reports distinguish audited source SHA from later
+evidence commits; CI artifacts attest the exact CI commit.
 
 ## Knowledge-base synchronization
-Drift detected: implementation status, real Blender boundary and new release source.
-Updated README, all reports/status, public status, trust/recovery diagrams, source
-registry S21, Blender/runtime docs, generated schemas/OpenAPI and CI installer.
-External company claims unchanged. Official checksum checked directly; release
-provenance is not robot-performance validation. Generated publication is not edited.
+Drift detected: yes. Updated README commands/status; all report status boxes;
+obsolete report command example, bridge proposal and optional experiment scope;
+PUBLICATION, citation revision, public status, publication covers/footers, state
+diagram layout, checklist, acceptance mapping and dependency/security docs.
+Normative MUST semantics and thresholds are unchanged. Public-source provenance
+is preserved. Generated PDFs/Pages are rebuilt through the publication tool.
 
 ## Next milestone
-P5: local ERP dashboard, metrics and causal evidence explorer. P7: acceptance
-mapping, drift/security gates, two clean runs, publication/PDF rendering and remote
-CI/Pages after authorized push. OPTIONAL model/hardware backlog remains non-blocking.
-
-P5: actual browser desktop/mobile verification passed using agent-browser 0.27.0. Lost-ack UNKNOWN -> reconciliation COMPLETED observed through UI; browser errors empty. Evidence in docs/evidence/p5-browser-evidence.json and ui-p5-*.png. Metrics restart test passed. Added JobEvidence schema, /metrics, /fixtures, artifact and dashboard routes. Synchronized operations docs, README, all report status, public status, OpenAPI and progress.
+Complete publication/browser review, commit P7 gates and synchronized sources,
+then run setup and all acceptance gates from a fresh detached checkout. Commit
+the resulting evidence. Request the remaining push permission with exact commits
+and local results; verify remote workflows/Pages after authorization. Optional
+model, hardware, OPC UA and external ERP transport remain non-blocking.

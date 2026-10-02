@@ -1,16 +1,16 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** The deterministic E2E simulator, bounded CPU Blender runtime, local ERP dashboard and persisted metrics are implemented. Lost-ack, ambiguous evidence, restart and interlocks are tested; the real dashboard flow is browser-verified. Final clean acceptance and publication verification remain in progress. Status: NOT DONE.
+> **Implementation status, 2026-10-02:** The deterministic E2E simulator, CPU Blender adapter, dashboard and persisted observability are implemented. Two full local suite runs, seven Blender scenarios, security and publication builds pass. Clean-checkout verification and final-SHA remote CI/Pages gates remain to be completed. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
 
 ## Sammanfattning
 
-Den här rapporten skiljer **RobotOps Twins planerade simulator** från dels en generell industriell robotcell, dels den begränsade bild av SICS AI:s miljö som finns i offentliga källor. Dessa två jämförelseobjekt är inte samma sak. Offentlig information räcker inte för att beskriva företagets fullständiga interna system.
+Den här rapporten skiljer **RobotOps Twins implementerade simulator** från dels en generell industriell robotcell, dels den begränsade bild av SICS AI:s miljö som finns i offentliga källor. Dessa två jämförelseobjekt är inte samma sak. Offentlig information räcker inte för att beskriva företagets fullständiga interna system.
 
 Simulatorn ska efterlikna informationsflödet från kundorder till verifierat plock och återkoppling. Den ska bevara vissa integrationsproblem: dubbletter, osäkra utfall, återhämtning, separata systemägare och motstridiga observationer. Den ska däremot förenkla robotmekanik, sensorsystem, säkerhet, produktvariation, nätverk och driftorganisation.
 
-**Det som senare kan demonstreras är programvarans beteende under definierade simuleringsantaganden.** Det är inte ett bevis för fysisk säkerhet, kommersiell driftsäkerhet, ett fungerande SICS-gränssnitt eller generell intelligens. Aktuell implementationsstatus och kvarvarande arbete redovisas i statusrutan ovan.
+**Det som demonstreras är programvarans beteende under definierade simuleringsantaganden.** Det är inte ett bevis för fysisk säkerhet, kommersiell driftsäkerhet, ett fungerande SICS-gränssnitt eller generell intelligens. Aktuell implementationsstatus och kvarvarande arbete redovisas i statusrutan ovan.
 
 ## 1. Jämförelsens tre nivåer
 
@@ -20,7 +20,7 @@ Vi använder tre nivåer för att undvika att generella branschbegrepp tillskriv
 
 **Nivå B: generell integrationsfråga.** Exempelvis måste ett system skilja mellan förlorad kommunikation och en känd utebliven sidoeffekt. Det är en fråga om distribuerad systemdesign, inte ett fynd om hur SICS har implementerat sin lösning. [S17]
 
-**Nivå C: vårt föreslagna val.** SQLite, en Blender-arm, en deterministisk Brain-adapter och ett visst tillståndsdiagram är egna beslut. De ska kunna ändras utan att källorna ändras.
+**Nivå C: vårt simulatorval.** SQLite, en Blender-arm, en deterministisk Brain-adapter och ett visst tillståndsdiagram är egna beslut. De ska kunna ändras utan att källorna ändras.
 
 Jämförelsen är alltså inte en omvänd konstruktion av SICS AI:s produkt. Den identifierar vilka aspekter en liten demonstrator kan representera och var motsvarigheten upphör.
 
@@ -130,7 +130,7 @@ En adaptergräns är värdefull men ett hårdvarubyte är ett integrationsprojek
 | 5. Affärssystemtest | Riktiga kundregler och representativa data. | Order- och inventeringssemantik accepterad av kund. |
 | 6. Driftprov | Övervakning, återställning, versionsbyte och support. | Mätbara acceptanskriterier och kända begränsningar. |
 
-Varken rapportpaketet eller simulatorns planerade logik ska användas som säkerhetsinstruktion för fysisk utrustning. Funktionell säkerhet måste hanteras av personer med rätt ansvar och kompetens i den aktuella anläggningen.
+Varken rapportpaketet eller simulatorns logik ska användas som säkerhetsinstruktion för fysisk utrustning. Funktionell säkerhet måste hanteras av personer med rätt ansvar och kompetens i den aktuella anläggningen.
 
 ## 7. Påståenden som är rimliga respektive missvisande
 
@@ -145,7 +145,7 @@ Varken rapportpaketet eller simulatorns planerade logik ska användas som säker
 | ”OPC UA är ett planerat tillägg.” | ”PLC/OPC UA är klart eftersom jag har en signalvy.” |
 | ”Det här behöver testas på verklig hårdvara.” | ”Byt adapter så är allt produktionsklart.” |
 
-När simulatorn senare är byggd ska formuleringarna uppdateras till dåtid endast för de delar som faktiskt går att visa. Testresultat ska länka till en körning och en commit, inte bara till en skärmbild.
+Implementerade delar beskrivs som genomförda endast när de kan kopplas till sparad evidens. Valfria tillägg ska fortsatt märkas som framtida. Testresultat ska länka till en körning och en commit, inte bara till en skärmbild.
 
 ## 8. Vad som avsiktligt ligger utanför projektet
 

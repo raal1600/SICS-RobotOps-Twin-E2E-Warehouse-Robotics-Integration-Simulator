@@ -1,120 +1,138 @@
-# RobotOps Twin
+﻿# RobotOps Twin
 
-### End-to-End Warehouse Robotics Integration Simulator — forsknings- och designunderlag
+A deterministic warehouse robotics integration simulator with a durable workflow,
+a synthetic Blender world, observations, verification and conservative recovery.
 
-**[Öppna rapportpaketet på GitHub Pages](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/)**
+**Aktuell status:** The deterministic E2E simulator, CPU Blender adapter, dashboard and persisted observability are implemented. Two full local suite runs, seven Blender scenarios, security and publication builds pass. Clean-checkout verification and final-SHA remote CI/Pages gates remain to be completed. **NOT DONE** until all MUST criteria and remote workflows pass.
 
-[![Build and publish research reports](https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/actions/workflows/publish-reports.yml/badge.svg)](https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/actions/workflows/publish-reports.yml)
+[Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
+[Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
+[Agent handoff](HANDOFF.md) · [Checklist](CODEX_GOAL_CHECKLIST.md)
 
-Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till AI-assisterad robotexekvering, verifiering och återhämtning. Blender är den **planerade simulatorvärlden**, inte en validerad kopia av en verklig anläggning.
+This is an independent simulator inspired by public sources and general practice.
+It does not reproduce SICS AI proprietary architecture or AGI. Blender supplies
+synthetic visualization and test state, not validated robot dynamics, an exact
+HKM1800 simulation or evidence of real-world robot performance. Logical E-stop is
+an application interlock, not safety certification. No API key, model service,
+GPU, real PLC or industrial hardware is required.
 
-**Aktuell status:** The deterministic E2E simulator, bounded CPU Blender runtime, local ERP dashboard and persisted metrics are implemented. Lost-ack, ambiguous evidence, restart and interlocks are tested; the real dashboard flow is browser-verified. Final clean acceptance and publication verification remain in progress. **NOT DONE** until all MUST criteria and remote workflows pass.
+## Setup
 
-## Läs och ladda ned
+Install [uv 0.12.13](https://docs.astral.sh/uv/getting-started/installation/) and
+[Blender 5.2.1 LTS](https://download.blender.org/release/Blender5.2/).
+Python 3.13.15 is selected by `.python-version`; uv can install it automatically.
+Set `BLENDER_EXECUTABLE` to the Blender executable when it is not on PATH.
+The standard Windows Blender 5.2 installation is also detected.
 
-| Rapport | Webb | PDF |
-|---|---|---|
-| 01. Från kundorder till verifierad roboteffekt | [Designstudie](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/design.html) | [Ladda ned](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/downloads/01-design.pdf) |
-| 02. Simulatorn och den verkliga robotcellen | [Avgränsning](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/avgransning.html) | [Ladda ned](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/downloads/02-avgransning.pdf) |
-| 03. Teknisk dialog om RobotOps Twin | [Diskussionsunderlag](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/diskussion.html) | [Ladda ned](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/downloads/03-diskussion.pdf) |
+```sh
+git clone https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator.git
+cd SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator
+uv sync --locked --all-groups
+uv run --locked python -m tools.dev demo
+```
 
-**[Alla tre rapporterna i en PDF](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/downloads/robotops-twin-samlat.pdf)** · [Diagramgalleri](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/diagram.html) · [Källregister](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/kallor.html)
+The last command initializes empty SQLite state and runs the deterministic
+headless happy path. Every demo creates a fresh directory under `runs/` and prints
+its evidence path. Existing evidence is never overwritten. Full tests require
+actual Blender and fail explicitly if it is absent. PDF publication additionally
+needs the system libraries documented in [PUBLICATION.md](PUBLICATION.md).
 
-PDF-filer och färdig webbplats finns också i den genererade [gh-pages-grenen](https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tree/gh-pages). Publiceringshistorik och HTTP-kontroller finns i Actions.
+| Make command | Portable equivalent (including PowerShell) |
+|---|---|
+| `make setup` | `uv sync --locked --all-groups` |
+| `make test` | `uv run --locked python -m tools.dev test` |
+| `make lint` | `uv run --locked python -m tools.dev lint` |
+| `make typecheck` | `uv run --locked python -m tools.dev typecheck` |
+| `make security` | `uv run --locked python -m tools.dev security` |
+| `make demo` | `uv run --locked python -m tools.dev demo` |
+| `make acceptance` | `uv run --locked python -m tools.dev acceptance` |
+| `make docs` | `uv run --locked python -m tools.dev docs` |
 
-## Implementation contract and Codex handoff
+Dependencies are pinned by `uv.lock`. Security auditing queries public advisory
+databases during preflight; the mandatory runtime tests require no network after
+installation. [Toolchain and reviewed exceptions](docs/implementation/dependencies.md).
 
-The implementation is governed by four English documents intended for an autonomous Codex `/goal` loop:
+## Demonstrations
 
-- [PROJECT_PLAN.md](PROJECT_PLAN.md) — normative architecture, contracts, state/recovery semantics, implementation phases and knowledge-base synchronization protocol.
-- [SUCCESS_CRITERIA.md](SUCCESS_CRITERIA.md) — normative machine-checkable acceptance contract. **DONE requires every MUST criterion to pass with inspectable evidence.**
-- [HANDOFF.md](HANDOFF.md) — exact `/goal` prompt, mandatory read order, iteration algorithm, anti-shortcut rules, escalation conditions, milestone discipline and final release checklist.
-- [CODEX_GOAL_CHECKLIST.md](CODEX_GOAL_CHECKLIST.md) — operational checklist derived from the normative plan and criteria; it does not weaken them.
+```sh
+uv run --locked python -m tools.dev demo --runtime blender --scenario happy_path
+uv run --locked python -m tools.dev demo --runtime blender --scenario lost_ack_after_effect
+uv run --locked python -m tools.dev demo --runtime blender --scenario ambiguous
+uv run --locked python -m tools.dev demo --runtime blender --scenario restart
+```
 
-[GOAL_PROGRESS.md](GOAL_PROGRESS.md) and [ACCEPTANCE_REPORT.md](ACCEPTANCE_REPORT.md) track progress and evidence. Status remains NOT DONE until every MUST passes. Any architecture, API, schema, state-machine, source, command or project-status change that makes existing documentation stale must update all affected knowledge-base source documents and diagrams in the same coherent change. Generated Pages/PDFs are rebuilt through the publication workflow rather than edited manually.
+The lost-ack demo moves the product, loses the reply and persists UNKNOWN_OUTCOME.
+Reconciliation queries the original command journal and obtains a fresh observation.
+It completes only with sufficient evidence and proves one pick effect. Ambiguous
+evidence produces REQUIRES_INTERVENTION. Further fixtures include
+`lost_ack_before_effect`, `logical_estop` and `cell_fault`. `--runtime headless`
+uses the same contracts with an atomic synthetic world for fast logic experiments.
 
-## Konceptet
+```sh
+uv run --locked python -m apps.api --runtime blender --data-dir runs/my-demo --port 8000
+```
+
+Open http://127.0.0.1:8000 for the local ERP dashboard. Select a product and fault,
+run the order, inspect job/cell status, observation, verifier and timeline, then
+reconcile uncertain work. Reusing the data directory preserves state across restart.
+`/metrics` exposes persisted counts and pipeline latency; `/docs` exposes OpenAPI.
+This local demo API has no production authentication and binds to loopback.
+
+## Architecture
 
 ```mermaid
 flowchart LR
-    ERP[ERP / WMS] --> INT[Pythonintegration]
-    INT --> PLAN[Observation och planförslag]
-    PLAN --> VALID[Validering och celltillåtelse]
-    VALID --> ROBOT[RobotGateway]
-    ROBOT --> BLENDER[Blender-värld]
-    BLENDER --> VERIFY[Observation och verifiering]
-    VERIFY --> SYNC[Kundkvittens]
-    SYNC --> ERP
+    ERP[ERP/WMS UI] --> API[Integration API]
+    API --> WF[Durable workflow]
+    WF --> B[DeterministicBrain]
+    B --> V[Action validation]
+    V --> G[RobotGateway]
+    G --> C[Cell and command journal]
+    C --> W[Blender WorldState]
+    W --> O[ObservationModel]
+    O --> WO[WorldObservation]
+    WO --> VERIFY[Verifier]
+    VERIFY --> R[Reconciliation]
+    R --> WF
+    WF --> ERP
 ```
 
-Huvudfallet är ett plock som genomförs medan kvittensen försvinner. Systemet ska då inte anta att handlingen uteblev. Det ska markera okänt utfall och stämma av journal och observation utan ett omotiverat nytt plock. Otillräcklig evidens ska kunna leda till granskning i stället för ett falskt grönt resultat.
+The verifier accepts observations, never simulator ground truth. Duplicate command
+delivery preserves identity and cannot repeat the effect. Fenced durable claims
+serialize the cell; lease expiry does not prove that motion failed. A fixed Blender
+script and typed JSON form the runtime boundary. Missing/corrupt checkpoints remain
+uncertain. No natural-language MCP execution or generated code controls the runtime.
 
-## Underlag och avgränsning
+| Code / contract | Documentation |
+|---|---|
+| `apps/api/`, `apps/erp_ui/` | [Operations, API and metrics](docs/implementation/operations.md) |
+| `robotops/domain/`, `contracts/` | [Versioned contracts](docs/implementation/contracts.md) |
+| `robotops/workflow/` | [Persistence and fenced claims](docs/implementation/persistence.md) |
+| `robotops/brain/`, `robotops/verification/`, `robotops/observation/` | [Validation and reconciliation](docs/implementation/reconciliation.md) |
+| `robotops/cell/`, `robotops/robot_gateway/` | [Journal and fault semantics](docs/implementation/runtime.md) |
+| `robotops/blender/`, `blender/scripts/` | [Bounded Blender runtime](docs/implementation/blender.md) |
+| `tests/`, `tools/`, `.github/workflows/` | [Acceptance process](docs/implementation/acceptance.md) |
 
-Rapporterna skiljer offentliga uppgifter, självrapporterade företagsresultat, egna designbeslut och kunskapsluckor. Inspirationen kommer bland annat från CloudGripper/AutoGrasper, R900, SICS AI:s offentliga roll- och HYPER-material samt Cognibotics installationsbeskrivning. Källorna är spårbara; ingen proprietär robotbrain eller AGI-implementation påstås vara återskapad.
+Material design decisions are recorded in [ADR 0001](docs/adr/0001-durable-synthetic-boundaries.md).
+Optional model assistance, OPC UA, external ERP delivery, realistic physics and real
+hardware remain a non-blocking backlog. They are not implemented or validated.
 
-Sju originaldiagram kan redigeras som Mermaid eller via JSON-layouten. Källkod och text är AI-assisterade. Rapportpaketet är inte sakkunniggranskat. Inga privata rekryteringsmeddelanden eller interna företagsdokument publiceras.
+## Research and publication
 
-## Bygg dokumentationen lokalt
+[GitHub Pages](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/)
+hosts documentation only. Current deployment identity appears in `build.json`.
+Local implementation does not imply the public site has been deployed.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements-docs.txt
-python tools/build_publication.py
-python -m http.server 8000 --directory _site
-```
+| Editable source | Published report |
+|---|---|
+| [Design and research](reports/01-design.md) | [Design study](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/design.html) |
+| [Scope and transfer limits](reports/02-avgransning.md) | [Scope](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/avgransning.html) |
+| [Technical discussion](reports/03-diskussion.md) | [Discussion](https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/diskussion.html) |
 
-Python 3.13 och Pango/DejaVu behövs. Se [PUBLICATION.md](PUBLICATION.md) för systemberoenden, publicering och visuell kvalitetskontroll. GitHub Pages kör enbart dokumentationen, inte Blender eller Pythonbackend.
+[Source registry](publication/references.json) and [diagram definitions](publication/diagrams.json)
+distinguish independently verified public facts, company-reported claims, general
+practice and our simulator design. Research is not acceptance evidence. All generated
+HTML, SVG and PDFs are rebuilt from sources via [PUBLICATION.md](PUBLICATION.md).
+No private recruitment messages, credentials or proprietary code are part of this project.
 
-## Struktur
-
-```text
-reports/                 Tre redigerbara Markdown-rapporter
-publication/             Källregister, diagramlayout och CSS
- tools/build_publication.py   HTML-, SVG-, Mermaid- och PDF-bygge
-.github/workflows/       Bygge, publicering och HTTP-kontroll
-CITATION.cff             Citeringsmetadata
-PUBLICATION.md           Underhålls- och publiceringsguide
-PROJECT_PLAN.md           Normativ implementation plan
-SUCCESS_CRITERIA.md       Normativ acceptance contract
-HANDOFF.md                Codex /goal operating contract
-CODEX_GOAL_CHECKLIST.md   Operational implementation checklist
-```
-
-Rami Halabi · Version 1.0 · 1 oktober 2026. Befintlig [MIT-licens](LICENSE) behålls. Länkade källor och varumärken tillhör respektive rättighetsinnehavare.
-
-## Development toolchain
-
-Install uv, then run `uv sync --locked --all-groups` (equivalent to `make setup`).
-Run `uv run --locked python -m tools.dev test`, `lint`, or `typecheck`.
-JSON schemas and OpenAPI: `uv run --locked python -m tools.dev contracts`.
-Publication: `uv run --locked python -m tools.dev docs`; Pango is required.
-Run `uv run --locked python -m tools.dev demo` for happy path. Add `--scenario lost_ack_after_effect`, `--scenario ambiguous`, or `--scenario restart`. Each run saves inspectable evidence under runs/. The acceptance command is still in progress.
-See [dependency policy](docs/implementation/dependencies.md),
-[contracts](docs/implementation/contracts.md) and [ADR 0001](docs/adr/0001-durable-synthetic-boundaries.md).
-
-Persistence details: [durable state and claims](docs/implementation/persistence.md).
-
-[Runtime journal and fault semantics](docs/implementation/runtime.md).
-
-[Observation and reconciliation decision table](docs/implementation/reconciliation.md).
-
-
-## Real Blender runtime
-
-Install Blender 5.2.1 LTS and set `BLENDER_EXECUTABLE` if it is not on PATH.
-On Windows the standard Blender 5.2 install directory is also detected.
-`uv run --locked python -m tools.dev demo --runtime blender --scenario lost_ack_after_effect`
-executes a real synthetic scene move and saves scene, PNG, journal and timeline.
-`make test` includes the required Blender lane and fails if Blender is unavailable.
-[Bounded protocol, restart behavior and limits](docs/implementation/blender.md).
-
-
-## Local ERP dashboard
-
-`uv run --locked python -m apps.api --runtime blender --data-dir runs/my-demo --port 8000`
-starts the dashboard at http://127.0.0.1:8000. Select a product and fault scenario,
-create/run an order, inspect the original command and timeline, and reconcile an
-unknown outcome. Reuse a data directory to retain evidence; choose a fresh one
-for a fresh fixture. [Operations and metrics](docs/implementation/operations.md).
+Rami Halabi · AI-assisted code, research text and publication · [MIT license](LICENSE).

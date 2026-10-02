@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** The deterministic E2E simulator, bounded CPU Blender runtime, local ERP dashboard and persisted metrics are implemented. Lost-ack, ambiguous evidence, restart and interlocks are tested; the real dashboard flow is browser-verified. Final clean acceptance and publication verification remain in progress. Status: NOT DONE.
+> **Implementation status, 2026-10-02:** The deterministic E2E simulator, CPU Blender adapter, dashboard and persisted observability are implemented. Two full local suite runs, seven Blender scenarios, security and publication builds pass. Clean-checkout verification and final-SHA remote CI/Pages gates remain to be completed. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -8,7 +8,7 @@
 
 Det här dokumentet är ett **arbetsunderlag för teknisk dialog**, inte ett manus som ska läsas upp ord för ord. Det hjälper projektägaren att presentera RobotOps Twin, förklara sina beslut och pröva antaganden tillsammans med Axel Kaliff och Per-Eric Olsson.
 
-Det ursprungliga designunderlaget kompletteras av aktuell implementationsevidens i statusrutan ovan. Formuleringar som ”jag har byggt”, ”testerna visar” eller ”det fungerar” får användas först när de motsvarar körbar kod och sparade resultat. Fram till dess är ”jag har specificerat”, ”jag föreslår” och ”jag vill testa” rätt ord.
+Det ursprungliga designunderlaget kompletteras av aktuell implementationsevidens i statusrutan ovan. Formuleringar som ”jag har byggt”, ”testerna visar” eller ”det fungerar” får användas först när de motsvarar körbar kod och sparade resultat. Den deterministiska kärnan och Blender-flödet finns nu; statusrutan och ACCEPTANCE_REPORT.md anger vad som har verifierats. För valfria modell- och hårdvarutillägg är ”jag föreslår” och ”jag vill testa” rätt ord.
 
 Samtalet ska visa förståelse, inte bara att många källor har lästs. En bra diskussion kan sluta med att ett eget designval behöver ändras. Det är ett användbart resultat.
 
@@ -30,7 +30,7 @@ Bakgrunden till fokus på kundintegration finns i rollannonsen. Det betyder inte
 |---|---|---|
 | Öppning | Syftet och en ärlig statusruta. | Är problemet rätt valt? |
 | Arkitektur | Kund, integration, modell, cell, Blender och verifierare. | Var går motsvarande gränser hos dem? |
-| Normalflöde | En order och dess planerade resa genom systemet. | Vilka kvittenser och observationer behövs? |
+| Normalflöde | En order och dess beständiga tidslinje genom systemet. | Vilka kvittenser och observationer behövs? |
 | Felväg | Förlorad kvittens efter effekt. | Hur hanterar de osäkra eller delvisa utfall? |
 | Fördjupning | En designavvägning, inte tio verktygsnamn. | Vad skulle de ändra och varför? |
 | Avslutning | Viktigaste lärdomen och nästa test. | Vad skulle vara ett relevant första arbetsresultat? |

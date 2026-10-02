@@ -1,6 +1,6 @@
 # Publicerings- och underhållsguide
 
-Detta repository innehåller ett **rapportpaket och en byggkedja för dokumentation**. Implementationsstatus finns i GOAL_PROGRESS.md och publication/status.json; fullständig runtime-acceptans återstår.
+Detta repository innehåller en **deterministisk simulator, ett rapportpaket och en byggkedja för dokumentation**. Implementationsstatus finns i GOAL_PROGRESS.md och publication/status.json; fullständig runtime-acceptans återstår.
 
 ## Innehåll och redigering
 
@@ -13,16 +13,35 @@ Källmarkörer som `[S03]` länkas automatiskt till en fullständig källförtec
 Använd Python 3.13 och en miljö med Pango, Fontconfig och DejaVu installerade. Exempel för Ubuntu:
 
 ```bash
-sudo apt-get install libpango-1.0-0 libpangoft2-1.0-0 fonts-dejavu-core
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install uv==0.12.13
+sudo apt-get install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core
 uv sync --locked --all-groups
 uv run --locked python -m tools.dev docs
 python -m http.server 8000 --directory _site
 ```
 
 Öppna `http://localhost:8000`. Bygget skriver endast i `_site/`. Lägg inte egen källkod eller manuella original där, eftersom katalogen återskapas. Systemtypsnitt används vid PDF-framställning, men inga typsnittsfiler distribueras i repositoryt.
+
+## Windows och PDF-bibliotek
+
+Runtime/testkommandona fungerar även i PowerShell. PDF-bygget behöver Pango,
+Fontconfig och typsnitt utöver de låsta Pythonpaketen. Följ
+[WeasyPrints officiella Windows-anvisning](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#windows)
+för MSYS2/Pango och sätt `WEASYPRINT_DLL_DIRECTORIES` till bibliotekskatalogen.
+Den lokala verifieringen använde en isolerad conda-forge-miljö med Pango 1.58.2,
+Cairo 1.18.6, Fontconfig 2.18.3 och Poppler 26.09.0. Den miljön är byggverktyg,
+inte ett runtime- eller GPU-beroende. Exempel efter installation av bibliotek:
+
+```powershell
+$env:WEASYPRINT_DLL_DIRECTORIES = 'C:\path\to\pdf-env\Library\bin'
+$env:PATH = $env:WEASYPRINT_DLL_DIRECTORIES + ';' + $env:PATH
+uv sync --locked --all-groups
+uv run --locked python -m tools.dev docs
+```
+
+CI använder Ubuntu-paketen ovan. PDF-sidantal kan skilja mellan plattformarnas
+typsnittsversioner; manifestet redovisar det verkliga sidantalet och filhasharna.
+Källornas kontrolltid är 1 oktober 2026; implementationsrevisionen är 1.1 från
+2 oktober 2026. De datumen avser olika saker.
 
 ## Utdata
 

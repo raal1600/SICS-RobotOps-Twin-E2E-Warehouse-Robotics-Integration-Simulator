@@ -36,8 +36,7 @@ def main() -> None:
         case "docs":
             run("tools/build_publication.py")
         case "security":
-            run("-m", "bandit", "-r", "robotops", "apps", "-c", "pyproject.toml")
-            run("-m", "pip_audit", "--strict", "--disable-pip")
+            run("-m", "tools.security_check")
         case "contracts":
             run("-m", "tools.export_contracts")
         case "demo":

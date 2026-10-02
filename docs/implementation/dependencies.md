@@ -4,6 +4,9 @@ Python is pinned in `.python-version`; `uv.lock` pins every resolved dependency
 and wheel hash for runtime, tests and documentation. Use `uv sync --locked --all-groups`.
 Do not update dependencies implicitly during tests. Updates require lock review,
 the full suite and security checks. CI uses CPU execution and no model account.
+Node 20.17.0 runs the built-in JavaScript playback control tests; CI selects this
+version explicitly. No npm dependency, browser CDN or Node process is required
+by the application. The browser uses its built-in Canvas API.
 
 Ruff checks new Python formatting/lint; mypy strict checks all runtime and API
 modules. The pre-existing publication generator retains its separate build and

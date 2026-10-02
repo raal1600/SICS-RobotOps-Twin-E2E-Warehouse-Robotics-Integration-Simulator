@@ -4,7 +4,9 @@ from typing import Annotated
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 
+from apps.api.playback import playback
 from robotops.blender.adapter import BlenderRuntime
+from robotops.blender.visualization import JobPlayback
 from robotops.cell.controller import CellController
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.domain.models import (
@@ -16,6 +18,7 @@ from robotops.domain.models import (
     Order,
     OrderRequest,
     PickJob,
+    RobotCommand,
 )
 from robotops.observability.metrics import prometheus
 from robotops.workflow.engine import Engine
@@ -95,6 +98,31 @@ def create_app(store: Store, engine: Engine | None = None) -> FastAPI:
     def evidence(job_id: str) -> JobEvidence:
         return workflow.evidence(job_id)
 
+    @app.get("/jobs/{job_id}/playback", response_model=JobPlayback)
+    def recorded_motion(job_id: str) -> JobPlayback:
+        return playback(workflow, job_id)
+
+    @app.post("/jobs/{job_id}/playback/import", response_model=JobPlayback)
+    def import_recorded_motion(job_id: str) -> JobPlayback:
+        job = store.job(job_id)
+        if not isinstance(workflow.runtime, BlenderRuntime) or job.command_id is None:
+            raise HTTPException(409, "No original Blender animation")
+        try:
+            workflow.runtime.import_motion(store.load(RobotCommand, job.command_id))
+        except (ValueError, OSError, TimeoutError) as exc:
+            raise HTTPException(409, "Cannot load original Blender recording") from exc
+        return playback(workflow, job_id)
+
+    @app.get("/jobs/{job_id}/artifact.png", response_class=FileResponse)
+    def job_artifact(job_id: str) -> FileResponse:
+        job = store.job(job_id)
+        path = None
+        if isinstance(workflow.runtime, BlenderRuntime) and job.command_id:
+            path = workflow.runtime.command_artifact(job.command_id, "capture.png")
+        if path is None:
+            raise HTTPException(404, "No Blender artifact for this job")
+        return FileResponse(path, media_type="image/png")
+
     @app.get("/metrics", response_class=PlainTextResponse)
     def metrics() -> PlainTextResponse:
         workflow.gateway.sync_events()
@@ -130,6 +158,12 @@ def create_app(store: Store, engine: Engine | None = None) -> FastAPI:
     def javascript() -> FileResponse:
         return FileResponse(
             Path(__file__).parents[1] / "erp_ui" / "app.js", media_type="text/javascript"
+        )
+
+    @app.get("/ui/playback.js", response_class=FileResponse)
+    def playback_javascript() -> FileResponse:
+        return FileResponse(
+            Path(__file__).parents[1] / "erp_ui" / "playback.js", media_type="text/javascript"
         )
 
     return app

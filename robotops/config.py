@@ -17,6 +17,7 @@ class Settings(Contract):
     lease_seconds: float = Field(default=120, gt=0)
     brain_timeout_seconds: float = Field(default=2, gt=0)
     runtime_timeout_seconds: float = Field(default=60, gt=0)
+    visual_frame_seconds: float = Field(default=0, ge=0, le=0.1, allow_inf_nan=False)
     retry_policy: str = "manual_after_proven_no_effect"
     products: tuple[Product, ...] = (
         Product(product_id="product-red", sku="RED"),

@@ -3,9 +3,11 @@ import json
 import os
 import shutil
 import subprocess
+import threading
 from pathlib import Path
 from typing import Any
 
+from robotops.blender.visualization import MotionRecording
 from robotops.cell.runtime import CommunicationTimeout, SyntheticRuntime
 from robotops.config import Settings
 from robotops.domain.models import (
@@ -38,6 +40,7 @@ def executable() -> str:
 class BlenderRuntime(SyntheticRuntime):
     def __init__(self, path: Path, settings: Settings | None = None):
         self.executable = executable()
+        self._import_lock = threading.Lock()
         self.artifacts = path.parent / "blender-artifacts"
         self.artifacts.mkdir(parents=True, exist_ok=True)
         super().__init__(path, settings)
@@ -52,11 +55,12 @@ class BlenderRuntime(SyntheticRuntime):
             "operation": operation,
             "world": world.model_dump(mode="json"),
             "command": command.model_dump(mode="json") if command else None,
+            "visual_frame_seconds": self.settings.visual_frame_seconds,
         }
         (directory / "request.json").write_text(json.dumps(request), encoding="utf-8")
         return directory
 
-    def _invoke(self, directory: Path) -> None:
+    def _invoke(self, directory: Path, *, record_existing: bool = False) -> None:
         args = [
             self.executable,
             "--background",
@@ -69,6 +73,8 @@ class BlenderRuntime(SyntheticRuntime):
             "--",
             str(directory.resolve()),
         ]
+        if record_existing:
+            args.append("--record-existing")
         try:
             process = subprocess.run(
                 args,
@@ -78,9 +84,13 @@ class BlenderRuntime(SyntheticRuntime):
                 check=False,
             )
         except subprocess.TimeoutExpired as exc:
-            (directory / "runtime.log").write_text(str(exc), encoding="utf-8")
+            (directory / ("replay.log" if record_existing else "runtime.log")).write_text(
+                str(exc), encoding="utf-8"
+            )
             raise CommunicationTimeout("BLENDER_PROCESS_TIMEOUT") from exc
-        (directory / "runtime.log").write_text(process.stdout + process.stderr, encoding="utf-8")
+        (directory / ("replay.log" if record_existing else "runtime.log")).write_text(
+            process.stdout + process.stderr, encoding="utf-8"
+        )
         if process.returncode:
             raise CommunicationTimeout("BLENDER_PROCESS_FAILED:" + str(process.returncode))
 
@@ -276,3 +286,52 @@ class BlenderRuntime(SyntheticRuntime):
         if not path.is_relative_to(self.artifacts.resolve()):
             raise ValueError("ARTIFACT_OUTSIDE_RUNTIME")
         return path if path.is_file() else None
+
+    def command_artifact(self, command_id: str, name: str) -> Path | None:
+        """Only fixed artifact names under the original durable command exchange."""
+        if name not in {"motion.json", "scene.blend", "response.json", "capture.png"}:
+            raise ValueError("INVALID_ARTIFACT_NAME")
+        with self.db.connect() as db:
+            row = db.execute(
+                "SELECT value FROM meta WHERE key=?", ("exchange:" + command_id,)
+            ).fetchone()
+        if row is None:
+            return None
+        path = (Path(row[0]) / name).resolve()
+        if not path.is_relative_to(self.artifacts.resolve()):
+            raise ValueError("ARTIFACT_OUTSIDE_RUNTIME")
+        return path if path.is_file() else None
+
+    def motion(self, command: RobotCommand) -> MotionRecording | None:
+        path = self.command_artifact(command.command_id, "motion.json")
+        if path is None:
+            return None
+        if path.stat().st_size > 2_000_000:
+            raise ValueError("RECORDING_TOO_LARGE")
+        recording = MotionRecording.model_validate_json(path.read_bytes())
+        if (
+            recording.command_id,
+            recording.job_id,
+            recording.scene_epoch,
+            recording.product_id,
+        ) != (command.command_id, command.job_id, command.scene_epoch, command.product_id):
+            raise ValueError("RECORDING_IDENTITY_MISMATCH")
+        response_path = self.command_artifact(command.command_id, "response.json")
+        if response_path:
+            response = json.loads(response_path.read_text(encoding="utf-8"))
+            expected = response.get("motion_sha256")
+            if expected and hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                raise ValueError("RECORDING_HASH_MISMATCH")
+        return recording
+
+    def import_motion(self, command: RobotCommand) -> None:
+        with self._import_lock:
+            if self.motion(command) is not None:
+                return
+            scene_path = self.command_artifact(command.command_id, "scene.blend")
+            if scene_path is None:
+                raise ValueError("NO_SAVED_SCENE")
+            # Fixed read-only scene export; does not call apply, journal or _complete.
+            self._invoke(scene_path.parent, record_existing=True)
+            if self.motion(command) is None:
+                raise ValueError("NO_RECORDED_MOTION")

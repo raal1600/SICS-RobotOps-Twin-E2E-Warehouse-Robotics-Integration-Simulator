@@ -12,6 +12,7 @@ import uvicorn
 from apps.api.app import create_app
 from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
+from robotops.config import Settings
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Store
 
@@ -20,7 +21,7 @@ async def serve(data: Path, session: Path, identity: str, runtime_name: str) -> 
     session.mkdir(parents=True, exist_ok=True)
     store = Store(data / "workflow.db")
     runtime = (BlenderRuntime if runtime_name == "blender" else SyntheticRuntime)(
-        data / "runtime.db"
+        data / "runtime.db", Settings(visual_frame_seconds=1 / 24)
     )
     engine = Engine(store, runtime)
     engine.recover()  # Original journal + fresh observation; never replay an uncertain pick.

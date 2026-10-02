@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -84,11 +85,76 @@ def scene(world):
     return gripper
 
 
+def record_motion(directory, command, pacing=0):
+    """Export evaluated Blender poses, including partial recordings after interruption."""
+    objects = sorted((obj for obj in bpy.data.objects if obj.type == "MESH"), key=lambda o: o.name)
+    bpy.context.scene.frame_set(1)
+    recording = {
+        "schema_version": "1.0",
+        "source": "BLENDER_EVALUATED_SCENE",
+        "command_id": command["command_id"],
+        "job_id": command["job_id"],
+        "scene_epoch": command["scene_epoch"],
+        "product_id": command["product_id"],
+        "frame_id": command["target_pose"]["frame_id"],
+        "unit": "m",
+        "fps": 24,
+        "total_frames": 100,
+        "complete": False,
+        "objects": [
+            {
+                "name": obj.name,
+                "position": list(obj.matrix_world.translation),
+                "size": list(obj.dimensions),
+                "color": list(obj.data.materials[0].diffuse_color[:3]),
+                "product_id": obj.get("product_id"),
+                "location_id": obj.get("location_id"),
+            }
+            for obj in objects
+        ],
+        "frames": [],
+    }
+    start = time.monotonic()
+    for frame in range(1, 101):
+        bpy.context.scene.frame_set(frame)
+        bpy.context.view_layer.update()
+        phase = next(
+            label
+            for end, label in [
+                (19, "APPROACH"),
+                (20, "ATTACH"),
+                (40, "LIFT"),
+                (70, "TRANSFER"),
+                (90, "DETACH"),
+                (100, "RETRACT"),
+            ]
+            if frame <= end
+        )
+        recording["frames"].append(
+            {
+                "frame": frame,
+                "phase": phase,
+                "positions": {
+                    obj.name: list(obj.matrix_world.translation)
+                    for obj in objects
+                    if obj.animation_data
+                },
+            }
+        )
+        recording["complete"] = frame == 100
+        if frame == 1 or frame % 4 == 0:
+            temporary = directory / "motion.tmp"
+            temporary.write_text(json.dumps(recording), encoding="utf-8")
+            temporary.replace(directory / "motion.json")
+        if pacing:
+            time.sleep(max(0, start + frame * pacing - time.monotonic()))
+
+
 def main():
     directory = Path(sys.argv[sys.argv.index("--") + 1]).resolve()
     request = json.loads((directory / "request.json").read_text(encoding="utf-8"))
     if (
-        set(request) != {"schema_version", "operation", "world", "command"}
+        set(request) - {"schema_version", "operation", "world", "command", "visual_frame_seconds"}
         or request["schema_version"] != "1.0"
     ):
         raise ValueError("INVALID_RUNTIME_ENVELOPE")
@@ -97,6 +163,21 @@ def main():
         raise ValueError("UNSUPPORTED_OPERATION")
     world = copy.deepcopy(request["world"])
     command = request["command"]
+    if "--record-existing" in sys.argv:
+        response = json.loads((directory / "response.json").read_text(encoding="utf-8"))
+        if (
+            operation != "pick"
+            or response["command_id"] != command["command_id"]
+            or response["scene_sha256"]
+            != hashlib.sha256((directory / "scene.blend").read_bytes()).hexdigest()
+        ):
+            raise ValueError("INVALID_SAVED_SCENE")
+        bpy.ops.wm.open_mainfile(filepath=str(directory / "scene.blend"), use_scripts=False)
+        record_motion(directory, command)
+        return
+    pacing = request.get("visual_frame_seconds", 0)
+    if not isinstance(pacing, (float, int)) or not math.isfinite(pacing) or not 0 <= pacing <= 0.1:
+        raise ValueError("INVALID_VISUAL_PACING")
     steps = []
     gripper = scene(world)
     if operation == "pick":
@@ -140,6 +221,8 @@ def main():
         gripper.location = target + Vector((0, 0, 0.35))
         gripper.keyframe_insert(data_path="location", frame=100)
         obj["location_id"] = command["destination_id"]
+        # Observe the actual keyed scene, not a separately invented browser trajectory.
+        record_motion(directory, command, pacing)
         bpy.context.scene.frame_set(100)
         bpy.context.view_layer.update()
         for item in world["objects"]:
@@ -161,6 +244,9 @@ def main():
         "steps": steps,
         "blender_version": bpy.app.version_string,
         "scene_sha256": hashlib.sha256((directory / "scene.blend").read_bytes()).hexdigest(),
+        "motion_sha256": hashlib.sha256((directory / "motion.json").read_bytes()).hexdigest()
+        if operation == "pick"
+        else None,
         "object_names": sorted(obj.name for obj in bpy.data.objects),
     }
     temporary = directory / "response.tmp"

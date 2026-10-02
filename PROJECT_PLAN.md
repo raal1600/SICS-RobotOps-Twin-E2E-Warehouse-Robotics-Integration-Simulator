@@ -156,6 +156,10 @@ Structured JSON events include timestamp, component, event type, correlation/cau
 
 Create/select fixture order; show order/job/cell state, observation/verifier summary, causal timeline, demo-safe fault controls, reconcile action, and latest Blender screenshot where practical. UI polish is secondary.
 
+The user-requested presentation extension adds live recorded Blender motion and
+per-order replay controls. This read-only illustration remains separate from
+WorldObservation and cannot change job outcomes or issue physical commands.
+
 ## Test strategy
 
 Unit: schemas, transition guards, idempotency, verifier, reconciliation decision table, observation degradation.

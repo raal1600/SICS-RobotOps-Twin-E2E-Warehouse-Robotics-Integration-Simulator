@@ -19,7 +19,9 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     settings = (
-        Settings.model_validate_json(args.settings.read_text()) if args.settings else Settings()
+        Settings.model_validate_json(args.settings.read_text())
+        if args.settings
+        else Settings(visual_frame_seconds=1 / 24)
     )
     store = Store(args.data_dir / "workflow.db")
     runtime = (BlenderRuntime if args.runtime == "blender" else SyntheticRuntime)(

@@ -42,6 +42,11 @@ SYNC_FILES = [
     "docs/security-exceptions.json",
     "docs/implementation/desktop.md",
     "docs/evidence/desktop-launcher.json",
+    "docs/implementation/playback.md",
+    "docs/implementation/blender.md",
+    "docs/implementation/operations.md",
+    "docs/implementation/contracts.md",
+    "docs/adr/0003-recorded-motion-illustration.md",
 ]
 
 

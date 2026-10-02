@@ -9,6 +9,9 @@ JSON accepts only reset/query/capture/pick operations; no code/eval/exec endpoin
 
 Each bounded exchange writes request.json, scene.blend, capture.png, runtime.log
 and an atomically renamed response.json. The scene has stable product identities.
+Pick exchanges also record evaluated animation poses in atomic motion.json
+snapshots for [live illustration and replay](playback.md). This separate display
+path never supplies verification evidence.
 The actual Blender object is attached, transferred and detached; its final Blender
 coordinates become the WorldState checkpoint. The .blend retains simplified
 product/gripper animation keyframes. These are synthetic kinematics, not validated
@@ -27,6 +30,9 @@ nor a screenshot alone is accepted by Verifier.
 there is no continuously running external Blender scene or live artist session.
 Capture reconstructs that checkpoint in a fresh process. This batch adapter is
 documented in ADR 0001. Existing user Blender sessions are never touched.
+Interactive execution paces frame export for the live illustration. Older saved
+scenes support a fixed `--record-existing` export mode after hash validation;
+it never replays the pick or modifies the original scene/checkpoint.
 
 Run:
 

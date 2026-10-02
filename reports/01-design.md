@@ -28,6 +28,8 @@ Tre frågor styr designen:
 
 Rapport 1 beskriver forskningsunderlag, arkitektur och testplan. Rapport 2 granskar överförbarheten till en verklig robotmiljö. Rapport 3 är ett samtalsunderlag för diskussion med Axel Kaliff och Per-Eric Olsson. Den som vill förstå huvudidén först kan läsa figur 1, avsnitt 7 och slutsatsen. Kontrakt och utvärderingsprotokoll är till för den tekniska fördjupningen.
 
+Den implementerade operationsvyn visar nu inspelade Blender-poser live och kan spela upp samma order igen utan ett nytt plockkommando. Illustrationen ?r simulatorns facit f?r betraktaren; verifieraren anv?nder fortfarande en separat WorldObservation. Se implementationens replay-dokumentation i governance-avsnittet.
+
 ### 1.1 Vad ordet ”Twin” betyder här
 
 Projektets namn är RobotOps Twin. I denna studie används dock den mer precisa beskrivningen **digital-tvilling-inspirerad integrationssimulator**. Det finns ännu ingen ansluten fysisk tillgång som modellen hålls synkroniserad med. En synlig Blender-scen är därför inte i sig en verifierad digital tvilling av Nowastes anläggning.

@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="850" viewBox="0 0 900 850" role="img" aria-labelledby="title desc">
-<title id="title">Systemgränser och ägarskap</title><desc id="desc">Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering.</desc>
+<title id="title">Systemgränser och ägarskap</title><desc id="desc">Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering. Windows desktop owns its local API and Blender process lifetime; durable journals survive window closure.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526473"/></marker><marker id="red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a34838"/></marker></defs>
 <rect width="100%" height="100%" fill="white"/>
 <g font-family="DejaVu Sans, Arial, sans-serif">
 <text x="28" y="34" font-size="23" text-anchor="start" fill="#182f43" font-weight="700">Systemgränser och ägarskap</text>
-<text x="28" y="62" font-size="16" text-anchor="start" fill="#526473" font-weight="400">Moduler är inte automatiskt separata mikrotjänster</text>
+<text x="28" y="62" font-size="16" text-anchor="start" fill="#526473" font-weight="400">Browser or Windows desktop - same typed runtime boundaries</text>
 <path d="M 270 144 L 330 144" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
 <path d="M 570 144 L 630 144" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
 <path d="M 450 198 V 275" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
@@ -19,8 +19,8 @@
 <rect x="30" y="90" width="240" height="108" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
 <rect x="30" y="100" width="4" height="88" rx="2" fill="#182f43"/>
 <text x="150" y="127.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">ERP / WMS</text>
-<text x="150" y="153.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Kundens order och</text>
-<text x="150" y="174.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">kvittens</text>
+<text x="150" y="153.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Web UI / Windows</text>
+<text x="150" y="174.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">desktop host</text>
 <rect x="330" y="90" width="240" height="108" rx="7" fill="#edf6f5" stroke="#126b70" stroke-width="1.3"/>
 <rect x="330" y="100" width="4" height="88" rx="2" fill="#126b70"/>
 <text x="450" y="138" font-size="18.964" text-anchor="middle" fill="#182f43" font-weight="700">Integrationskärna</text>

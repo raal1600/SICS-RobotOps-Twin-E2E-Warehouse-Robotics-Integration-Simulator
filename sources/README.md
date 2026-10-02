@@ -54,6 +54,17 @@ installation. [Toolchain and reviewed exceptions](docs/implementation/dependenci
 
 ## Demonstrations
 
+### Windows desktop app
+
+Double-click **RobotOps Twin** on your desktop to start its dashboard and Blender
+runtime. Closing the app stops its owned processes; orders and evidence persist.
+Build/install the launcher with
+`powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-desktop.ps1 -Install`.
+It uses the existing local checkout, Python environment and Blender installation.
+[Desktop lifecycle, data locations and tests](docs/implementation/desktop.md).
+
+### Command-line demos
+
 ```sh
 uv run --locked python -m tools.dev demo --runtime blender --scenario happy_path
 uv run --locked python -m tools.dev demo --runtime blender --scenario lost_ack_after_effect

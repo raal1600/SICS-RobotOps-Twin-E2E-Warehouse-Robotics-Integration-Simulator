@@ -1,50 +1,44 @@
-﻿# Goal Progress
+# Goal Progress
 Last updated: 2026-10-02 UTC
-Audited source: `17e45315f003ae84f384fc07caa89b33234d8264`
+Base: `13528bebf6eccce588bc8d8d905d2bad87167904` (completed core acceptance).
 
 ## Current phase
-P0-P5 implemented; P7 acceptance evidence covers every MUST. P6 is optional and
-unimplemented. Both remote workflows pass for the audited source. The final
-attestation/status commit is rechecked by CI and publication before release closes.
+User-requested Windows desktop launcher extension. Native EXE and WebView2 window
+implemented; starts its owned API and actual Blender runtime, stops them on close.
 
 ## MUST status
-- PASS: all 85 MUST criteria, individually mapped in ACCEPTANCE_REPORT.md.
-- No remaining implementation failures or permission blockers. User explicitly
-  authorized pushing and publishing on 2026-10-02.
-- SHOULD SC-BRAIN-005: optional external model fallback is unimplemented; non-blocking.
+The base has all 85 MUST PASS with exact-SHA CI/publication evidence. Rechecking
+all affected criteria for this extension: SC-DEMO-001/003, SC-PERSIST-002/003/004,
+SC-IDEM-001, SC-REC-004, SC-TEST-001/003/004/005/006 and SC-KB/DOC/ACC groups.
+No normative criterion or threshold changed. Core external-model fallback SHOULD
+SC-BRAIN-005 remains a documented non-blocking gap.
 
-## Evidence
-- Windows clean checkout: `docs/evidence/acceptance/20261002T175141/`, 219 tests
-  twice, 88.76% coverage against the unchanged 85% threshold.
-- Ubuntu CI: `docs/evidence/acceptance/20261002T190747/`, 219 tests twice, 88.60%
-  coverage, all quality/security gates and seven actual CPU Blender demos.
-- CI 37051979620 and publication 37051979852 pass. Artifact digest and URLs are
-  recorded in p7-ci-provenance.json. Exact-SHA public checks are in remote.json.
-- Lost-ack: UNKNOWN_OUTCOME -> RECONCILING -> COMPLETED; original command; one
-  effect and zero duplicates. Ambiguous: REQUIRES_INTERVENTION. Process restart,
-  before-effect lost ack, logical E-stop and cell fault preserve their semantics.
-- PDF/browser review: all 50 PDF pages, desktop/mobile, local HTTP responses and
-  180 merged internal link destinations. Public workflow verifies HTML/PDF/SVG.
-- New completion guards reject missing MUST or remote PASS evidence. Remote
-  refresh preserves the original local manifest and never upgrades failed tests.
+## Evidence added this iteration
+- Cross-platform desktop backend process tests: close/reopen, original-command
+  reconciliation with exactly one pick, separate ports and independent stop files.
+- Actual native EXE with Blender: rendered WebView, duplicate launch, graceful
+  window close, stopped port, persisted unknown-outcome recovery, crash cleanup,
+  closing during a real pick, terminating the owned Blender tree after a crash.
+- Full regression: 223 passed, 85.21% Windows coverage (threshold unchanged).
+- Lint/format, strict typing, dependency audit/security, drift and generated
+  publication all PASS. Evidence: docs/evidence/desktop-launcher.json.
+- App installed under LocalAppData/RobotOpsTwin/App with desktop shortcut.
 
-## Decisions / ADRs
-ADR 0001: durable stores, bounded batch Blender adapter and local ERP contract.
-ADR 0002: immutable inspected source identity, timestamped remote attestation,
-original local evidence preservation and exact final-SHA CI/publication evidence.
-A report does not invent its own commit hash or relabel earlier tests.
+## Decisions
+Native .NET Framework/WebView2 host follows the installed Asset Director pattern.
+Checksum-pinned SDK; no standalone Python/Blender bundle. OS-selected loopback
+port and session-specific filesystem lifecycle avoid changing the API contract.
+A private Windows Job Object receives the backend before its suspended process
+is resumed. Close drains work for up to 20 seconds, then terminates only owned
+children. Persistent journals retain existing conservative recovery semantics.
 
 ## Knowledge-base synchronization
-Drift detected and resolved: design-only status, obsolete report command/bridge,
-optional research experiments, publication covers/footers, source/diagram/API
-boundaries, developer commands, checklist and acceptance status. README, all
-reports, PUBLICATION, progress, acceptance, status, diagrams, dependency/security
-and acceptance documentation were synchronized. Company claims retain provenance.
-No normative MUST, state semantics or threshold was weakened.
+Updated README, operations, desktop/dependency docs and architecture diagram for
+window ownership, installation, data locations, closing, recovery and tests.
+Generated publication will be rebuilt through its existing workflow. The core
+architecture, command/observation contracts and research claims are unchanged.
 
-## Final release verification
-Push the coherent attestation/status commit, verify its full CI and publication
-runs, and verify its SHA in public build.json. The immutable CI artifact records
-that exact successor SHA; the repository report retains its honestly identified
-source snapshot (ADR 0002). Optional model, OPC UA, external ERP transport and real
-hardware remain non-blocking. No further feature implementation is required.
+## Next milestone
+Commit the verified implementation/tests/docs, run the new Windows desktop CI
+lane and full deterministic acceptance, then retain exact-SHA remote/publication
+attestations per ADR 0002. The installed app is ready to use.

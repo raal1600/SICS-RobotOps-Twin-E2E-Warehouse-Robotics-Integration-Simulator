@@ -115,3 +115,5 @@ Remote CI/publication remain unverified: push rejected by automatic approval rev
 
 P2 evidence: `docs/evidence/p2-checks.json`; runtime tests prove one/zero effects for after/before lost acknowledgement, duplicate and concurrent delivery, restart, cell interlocks and stale-epoch rejection.
 Synchronized README, reports 01/02/03 status, publication/status, runtime and contract docs. No external claims changed.
+
+P3: `docs/evidence/p3-checks.json` and `docs/evidence/p3-lost-ack-demo.json` record deterministic E2E evidence. Process-crash test confirms no blind redispatch. Coverage run: 207 passed, 90.92% (threshold 85%). Full acceptance mapping, Blender, UI and publication remain pending.

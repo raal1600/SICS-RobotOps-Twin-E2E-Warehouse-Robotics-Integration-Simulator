@@ -156,6 +156,127 @@
         "title": "AuditEvent",
         "type": "object"
       },
+      "CellMode": {
+        "enum": [
+          "READY",
+          "BUSY",
+          "FAULTED",
+          "ESTOP_LOGICAL",
+          "RESETTING",
+          "OFFLINE"
+        ],
+        "title": "CellMode",
+        "type": "string"
+      },
+      "CellState": {
+        "additionalProperties": false,
+        "properties": {
+          "causation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Causation Id",
+            "type": "string"
+          },
+          "cell_id": {
+            "default": "cell-1",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Cell Id",
+            "type": "string"
+          },
+          "correlation_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "generation": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Generation",
+            "type": "integer"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/CellMode",
+            "default": "READY"
+          },
+          "reason": {
+            "default": "INITIALIZED",
+            "title": "Reason",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "correlation_id",
+          "causation_id",
+          "timestamp"
+        ],
+        "title": "CellState",
+        "type": "object"
+      },
+      "ExecutionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "fault": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fault"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "title": "ExecutionRequest",
+        "type": "object"
+      },
+      "Fault": {
+        "enum": [
+          "DROP_ACK_AFTER_EFFECT",
+          "DROP_ACK_BEFORE_EFFECT",
+          "ROBOT_COMMAND_FAILURE",
+          "CELL_FAULT",
+          "LOGICAL_ESTOP",
+          "LOW_CONFIDENCE_OBSERVATION",
+          "CONTRADICTORY_OBSERVATION",
+          "STALE_OBSERVATION",
+          "MISSING_OBSERVATION",
+          "POSE_UNCERTAINTY",
+          "BRAIN_TIMEOUT",
+          "BRAIN_INVALID_OUTPUT"
+        ],
+        "title": "Fault",
+        "type": "string"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -500,6 +621,42 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/cell": {
+      "get": {
+        "operationId": "cell_cell_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CellState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Cell"
+      }
+    },
+    "/cell/reset": {
+      "post": {
+        "operationId": "reset_cell_cell_reset_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CellState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Reset Cell"
+      }
+    },
     "/health": {
       "get": {
         "operationId": "health_health_get",
@@ -559,6 +716,104 @@
           }
         },
         "summary": "Job"
+      }
+    },
+    "/jobs/{job_id}/reconcile": {
+      "post": {
+        "operationId": "reconcile_jobs__job_id__reconcile_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reconcile"
+      }
+    },
+    "/jobs/{job_id}/run": {
+      "post": {
+        "operationId": "run_jobs__job_id__run_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run"
       }
     },
     "/orders": {

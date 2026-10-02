@@ -1,6 +1,6 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** P2: durable intake, typed contracts, fenced claims and the deterministic headless runtime are implemented. Tests cover lost acknowledgement before/after effect, duplicate suppression, restart and logical cell interlocks. Brain/reconciliation E2E, Blender and UI remain in progress. NOT DONE.
-> Current evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the repository/governance section.
+> **Implementation status, 2026-10-02:** The deterministic headless E2E workflow is implemented and tested: local Brain, semantic validation, durable journals, degraded observations, conservative reconciliation, process-crash recovery and deterministic demos. Blender runtime and dashboard/publication acceptance remain in progress. Status: NOT DONE.
+> Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
 

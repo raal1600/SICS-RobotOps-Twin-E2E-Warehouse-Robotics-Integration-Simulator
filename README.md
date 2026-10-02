@@ -8,7 +8,7 @@
 
 Ett oberoende, svenskt rapportpaket om hur kundens lagerorder kan kopplas till AI-assisterad robotexekvering, verifiering och återhämtning. Blender är den **planerade simulatorvärlden**, inte en validerad kopia av en verklig anläggning.
 
-**Aktuell status:** P2: durable intake, typed contracts, fenced claims and the deterministic headless runtime are implemented. Tests cover lost acknowledgement before/after effect, duplicate suppression, restart and logical cell interlocks. Brain/reconciliation E2E, Blender and UI remain in progress. NOT DONE. Projektet är oberoende och inte godkänt av SICS AI.
+**Aktuell status:** The deterministic headless E2E workflow is implemented and tested: local Brain, semantic validation, durable journals, degraded observations, conservative reconciliation, process-crash recovery and deterministic demos. Blender runtime and dashboard/publication acceptance remain in progress. **NOT DONE** until all MUST criteria and remote workflows pass.
 
 ## Läs och ladda ned
 
@@ -90,10 +90,12 @@ Install uv, then run `uv sync --locked --all-groups` (equivalent to `make setup`
 Run `uv run --locked python -m tools.dev test`, `lint`, or `typecheck`.
 JSON schemas and OpenAPI: `uv run --locked python -m tools.dev contracts`.
 Publication: `uv run --locked python -m tools.dev docs`; Pango is required.
-The demo and acceptance commands are reserved for their implementation milestones.
+Run `uv run --locked python -m tools.dev demo` for happy path. Add `--scenario lost_ack_after_effect`, `--scenario ambiguous`, or `--scenario restart`. Each run saves inspectable evidence under runs/. The acceptance command is still in progress.
 See [dependency policy](docs/implementation/dependencies.md),
 [contracts](docs/implementation/contracts.md) and [ADR 0001](docs/adr/0001-durable-synthetic-boundaries.md).
 
 Persistence details: [durable state and claims](docs/implementation/persistence.md).
 
 [Runtime journal and fault semantics](docs/implementation/runtime.md).
+
+[Observation and reconciliation decision table](docs/implementation/reconciliation.md).

@@ -1,5 +1,10 @@
 # Windows desktop app
 
+The embedded dashboard includes [live Blender motion and per-order replay](playback.md).
+Close/reopen the app after updating this checkout to load the new backend and UI.
+Saved orders remain intact. Older runs expose **Load saved animation**, which
+exports their original `.blend` without executing another pick.
+
 Double-click **RobotOps Twin** on the desktop. The native window starts its own
 local API and opens the existing dashboard inside Microsoft Edge WebView2. Close
 the window to stop the API and its Blender children. There is no tray service,

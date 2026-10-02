@@ -1,0 +1,56 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "frame": {
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Frame",
+      "type": "integer"
+    },
+    "phase": {
+      "enum": [
+        "APPROACH",
+        "ATTACH",
+        "LIFT",
+        "TRANSFER",
+        "DETACH",
+        "RETRACT"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "positions": {
+      "additionalProperties": {
+        "maxItems": 3,
+        "minItems": 3,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Positions",
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "frame",
+    "phase",
+    "positions"
+  ],
+  "title": "VisualFrame",
+  "type": "object"
+}

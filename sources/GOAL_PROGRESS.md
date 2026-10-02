@@ -1,48 +1,49 @@
 # Goal Progress
 Last updated: 2026-10-02 UTC
-Audited source: `2380bd72b2dbba01467cf90bee82a7f4ea18fede`.
+Extension base: `62628444448a0440af7e47f586efef6ce8c75f4f`.
 
 ## Current phase
-User-requested Windows desktop extension implemented, tested and installed.
-The native EXE starts its own API and embedded dashboard, uses real Blender by
-default, and stops its owned process tree when its window closes. Persistent
-orders, journals and uncertainty retain the existing conservative recovery rules.
+P5/P7 user-requested extension: live Blender motion illustration and per-order
+replay implemented. Final clean acceptance and exact-SHA remote checks are next.
+The installed desktop launcher uses this checkout; reopening loads the new UI/API.
+Existing saved orders can import their original keyed animation without a pick.
 
 ## MUST status
-All 85 core MUST criteria pass against the audited source, with clean CI evidence
-in ACCEPTANCE_REPORT.md. Both mandatory suite runs contain 223 passing tests.
-The native Windows workflow exposed a long-path startup issue; the correction is
-covered by a real local window test with a data path over 260 characters. Its
-successor commit reruns all three workflows before final delivery.
-SHOULD SC-BRAIN-005 (optional external model fallback) remains non-blocking.
+All 85 core MUSTs have audited base evidence in ACCEPTANCE_REPORT.md. Extension
+verification: 239 tests pass, 86.57% coverage (unchanged 85% threshold), lint,
+strict types and security checks pass. Native desktop tests with real Blender
+pass, including close during motion and recovery with exactly one pick.
+The final extension revision is not yet attested by remote CI/publication.
+SHOULD SC-BRAIN-005 (optional model failure/fallback) remains non-blocking.
 
-## Evidence
-- docs/evidence/acceptance/20261002T195545: clean Ubuntu acceptance, repeated tests,
-  quality/security checks, seven actual Blender demos and publication.
-- docs/evidence/desktop-launcher.json: native WebView rendering, duplicate launch,
-  normal window close, stopped port, unknown-outcome recovery with one pick,
-  abrupt desktop termination and closing during a real Blender operation.
-- Long-path regression: native long-path support plus a short per-data-root browser
-  profile correct the Windows runner startup failure; same lifecycle assertions.
-- Installed copy verified in LocalAppData/RobotOpsTwin/App; desktop shortcut exists.
+## Evidence added
+- docs/evidence/replay-extension.json and replay-desktop.png: browser playback,
+  uncertainty/intervention and exactly one effect; native process lifecycle.
+- tests/blender/test_playback.py: live frame progression, actual evaluated poses,
+  restart, read-only legacy import, no fabricated success, corrupt/partial data,
+  path confinement and commands with no recorded effect.
+- tests/unit/test_visualization.py and tests/ui/playback.test.cjs: strict schemas,
+  no Node/CDN dependency at runtime, pause/scrub/replay and stale-selection guards.
+- Regenerated PDF architecture visually checked; 180 combined PDF destinations
+  and source links validated by the publication build.
 
-## Decisions
-Native .NET Framework/WebView2 host follows the Asset Director desktop pattern.
-Checksum-pinned SDK; existing local Python/Blender installation. OS-selected
-loopback port and session-specific files do not change the public API contract.
-A private Windows Job Object owns the backend before its suspended process resumes.
-Close drains work for up to 20 seconds, then terminates only owned descendants.
-No blind replay or fabricated success is introduced by shutdown/reopening.
+## Decisions / ADRs
+ADR 0003 separates presentation from observation/verification. Fixed Blender
+script exports evaluated frames; browser only illustrates received poses.
+Atomic recordings retain command/job/epoch identities and an export digest.
+Older scenes use hash-checked export-only mode, leaving original evidence intact.
+Interactive hosts pace at 24 simulated fps; batch acceptance need not wait.
+No state machine, effect-idempotency or reconciliation criterion changed.
 
 ## Knowledge-base synchronization
-README, desktop/operations/dependency docs, acceptance mapping/report, architecture
-diagram and this progress record reflect the extension and its evidence. Generated
-HTML/SVG/PDF were rebuilt and the affected architecture figure visually checked.
-No normative criterion, coverage threshold, runtime schema, or provenance class
-changed. The observed CI failure and its corrective evidence are retained.
+Drift detected: static-only dashboard descriptions; missing replay API/contracts;
+older contract guide still described completed phases in future tense.
+Synchronized README, PROJECT_PLAN, Blender/contracts/operations/desktop/dependency
+and playback guides, ADR 0003, design report, architecture diagram, OpenAPI and
+four presentation schemas, acceptance map/generator, reviewed subprocess scope
+and this progress record. Generated publication is rebuilt, never hand-edited.
+No external source claim or provenance class changed.
 
-## Release evidence
-The report retains its exact audited source identity. Per ADR 0002, later native
-path/evidence changes receive fresh exact-SHA CI artifacts and a public build.json;
-final verification checks all three workflows and deployed source identity. The
-installer records source hashes and clean/dirty state in windows-build.json.
+## Next milestone
+Commit coherent extension, run clean acceptance twice plus demos, refresh exact-SHA
+CI/publication evidence and current acceptance report, verify deployed sources.

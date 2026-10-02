@@ -24,8 +24,10 @@ Cell reset preserves uncertain jobs and does not restore products to the source.
 
 The dashboard exposes ERP order, job and logical cell status separately, plus
 original command identity, journal status, verifier reason, causal timeline,
-observation/reconciliation JSON and latest real Blender artifact. It never uses
-the screenshot to establish success. Fault controls are synthetic local fixtures.
+observation/reconciliation JSON, live motion and the selected order's Blender
+artifact. [Replay controls](playback.md) read evaluated Blender frames, preserve
+uncertainty and never send another pick. Neither images nor animation establish
+business success. Fault controls are synthetic local fixtures.
 
 `GET /metrics` derives counters from persisted events. Received/completed/failed/
 unknown/intervention totals count entries into those states; current-state gauges

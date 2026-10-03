@@ -1,0 +1,97 @@
+{
+  "checks": [
+    {
+      "difference": "Use this to compare normal operation with a test that deliberately breaks one part of the workflow.",
+      "kind": "scenario",
+      "meaning": "The baseline test: the planner supplies a valid plan, the controller moves the product and replies, and a fresh observation checks the result.",
+      "value": ""
+    },
+    {
+      "difference": "After effect means the product has moved. Before effect withholds a reply too, but the pick never starts. Both require evidence because silence alone cannot distinguish them.",
+      "kind": "scenario",
+      "meaning": "An acknowledgement is the controller's reply about a command. Here the pick happens and is recorded, but that reply is deliberately lost on its way back.",
+      "value": "DROP_ACK_AFTER_EFFECT"
+    },
+    {
+      "difference": "Before effect keeps the product at source; after effect moves it. The same timeout appears in both, so the system must investigate instead of assuming failure.",
+      "kind": "scenario",
+      "meaning": "The controller records that the pick never started, and its reply is deliberately lost. The orchestrator receives no confirmation of that no-effect outcome.",
+      "value": "DROP_ACK_BEFORE_EFFECT"
+    },
+    {
+      "difference": "The problem is conflicting locations. Low confidence is an unreliable report; stale evidence is an old capture time.",
+      "kind": "scenario",
+      "meaning": "After the pick, the simulated observation reports the same product in two different locations, such as source and destination. This tests handling of mutually conflicting detections.",
+      "value": "CONTRADICTORY_OBSERVATION"
+    },
+    {
+      "difference": "A detection is present but unreliable. Contradictory evidence gives conflicting locations; missing evidence gives no product detection at all.",
+      "kind": "scenario",
+      "meaning": "After the pick, the observation includes the product and a location, but its confidence score is deliberately reduced. This tests whether weak evidence is refused.",
+      "value": "LOW_CONFIDENCE_OBSERVATION"
+    },
+    {
+      "difference": "The problem is the report's age. A low-confidence report can be fresh but unreliable; a stale report has an unacceptable timestamp.",
+      "kind": "scenario",
+      "meaning": "Simulates delayed sensing by giving the post-pick observation an old capture time. Its location report may look plausible, but it is too old to establish the current outcome.",
+      "value": "STALE_OBSERVATION"
+    },
+    {
+      "difference": "A requested stop. Cell fault instead simulates a detected error. Both block movement, but record different reasons and cell states.",
+      "kind": "scenario",
+      "meaning": "Simulates a deliberate stop request, like an operator pressing the simulator's stop control. The cell enters a stopped state and refuses the pick until reset. This is not safety-rated.",
+      "value": "LOGICAL_ESTOP"
+    },
+    {
+      "difference": "A detected error, rather than the deliberate stop request in Logical E-stop. Brain failures occur earlier, before a robot command is created.",
+      "kind": "scenario",
+      "meaning": "Simulates the controller detecting a cell error before movement. It marks the cell faulted and refuses the pick until the logical state is reset.",
+      "value": "CELL_FAULT"
+    },
+    {
+      "difference": "A reply arrives but is invalid. Brain timeout tests a planner that does not supply a plan within its deadline.",
+      "kind": "scenario",
+      "meaning": "The Brain is the pick planner. This test supplies a reply that does not match the required action-plan format, so validation rejects it before a robot command can be created.",
+      "value": "BRAIN_INVALID_OUTPUT"
+    },
+    {
+      "difference": "No plan in time, instead of the invalid reply tested by Invalid Brain output. Lost-ack scenarios happen later, after a command has been sent.",
+      "kind": "scenario",
+      "meaning": "Simulates the pick planner missing its response deadline. The workflow handles the timeout before creating a robot command.",
+      "value": "BRAIN_TIMEOUT"
+    },
+    {
+      "difference": "Removes sensing degradation for this review only. It does not undo an execution fault or guarantee success: sufficient evidence can prove either completion or no effect.",
+      "kind": "observation",
+      "meaning": "Collects a new observation of this test world without deliberately altering its detections, confidence or capture time. The verifier compares it with the original command journal.",
+      "value": ""
+    },
+    {
+      "difference": "Conflicting detections. Low confidence supplies a weak detection; stale evidence has an old capture time; missing evidence has no product detection.",
+      "kind": "observation",
+      "meaning": "Reports the same product in two different locations in one observation. For example, it reports the product at both source and destination, even though the 3D product is not duplicated.",
+      "value": "CONTRADICTORY_OBSERVATION"
+    },
+    {
+      "difference": "The detection is present but weak. Missing evidence supplies no detection; contradictory evidence supplies incompatible locations.",
+      "kind": "observation",
+      "meaning": "Includes a detected product and location, but deliberately lowers the confidence score. It represents a sensor report that is not reliable enough to trust.",
+      "value": "LOW_CONFIDENCE_OBSERVATION"
+    },
+    {
+      "difference": "Too old to use, rather than low confidence or conflicting locations. This changes the observation timestamp; it does not rewind the 3D scene.",
+      "kind": "observation",
+      "meaning": "Gives the new capture an old timestamp to simulate a delayed sensor report. It tests the age of the evidence, even if the reported location looks plausible.",
+      "value": "STALE_OBSERVATION"
+    },
+    {
+      "difference": "No product detection at all. Low confidence still includes a detection. An absent detection cannot prove that the product was removed or that the pick failed.",
+      "kind": "observation",
+      "meaning": "Produces an empty observation with no detected products or location coverage, like a sensor that supplied no usable detections. The products remain in the 3D world.",
+      "value": "MISSING_OBSERVATION"
+    }
+  ],
+  "createDisabled": true,
+  "observationOpen": true,
+  "scenarioOpen": true
+}

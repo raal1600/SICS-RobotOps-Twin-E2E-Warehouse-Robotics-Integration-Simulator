@@ -1,0 +1,391 @@
+{
+  "status": "LOCAL_VERIFIED",
+  "recorded_at": "2026-10-03T22:01:10.478237+00:00",
+  "scope": "Local presentation-only follow-up; no new whole-system attestation. Nothing committed, pushed or deployed. Isolated test data only; the user app and saved tests were not accessed.",
+  "source": {
+    "commit": "348c786710a0e22f0dd7de0744eac7057da13ad8",
+    "dirty": true,
+    "source_sha256": "9614ae84d8a4d70bc16c902532ac080696bfc8d897baa965cf05bc905e4208f4"
+  },
+  "baseline_manifest": "docs/evidence/acceptance/20261003T205102/manifest.json",
+  "baseline_note": "389 mandatory tests twice and 99 UI checks belong to the earlier full-system source snapshot. This follow-up does not claim they were rerun on later source.",
+  "environment": {
+    "python": "3.13.15",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "node": "20.17.0",
+    "agent_browser": "0.27.0",
+    "pytest": "9.1.1"
+  },
+  "gates": {
+    "ui": {
+      "passed": true,
+      "command": "node --test tests/ui/playback.test.cjs tests/ui/dashboard.test.cjs tests/ui/workflow-guide.test.cjs",
+      "log": "docs/evidence/scenario-help-checks/ui-tests.log",
+      "tests_passed": 101
+    },
+    "affected_python": {
+      "passed": true,
+      "command": "python -m pytest tests/unit/test_visualization.py tests/unit/test_observation_verifier.py tests/contract tests/e2e/test_observability.py tests/e2e/test_reobservation.py tests/integration/test_simulation_tests.py -q --basetemp=artifacts/scenario-help/pytest-targets -o cache_dir=artifacts/scenario-help/pytest-cache",
+      "log": "docs/evidence/scenario-help-checks/affected-tests.log",
+      "tests_passed": 170,
+      "warning": "Existing Starlette TestClient httpx deprecation; no failures, skips or xfails."
+    },
+    "lint": {
+      "passed": true,
+      "command": "python -m tools.dev lint",
+      "log": "docs/evidence/scenario-help-checks/lint.log"
+    },
+    "typecheck": {
+      "passed": true,
+      "command": "python -m tools.dev typecheck",
+      "log": "docs/evidence/scenario-help-checks/typecheck.log"
+    },
+    "drift": {
+      "passed": true,
+      "command": "python -m tools.drift_check",
+      "log": "docs/evidence/scenario-help-checks/drift.log"
+    },
+    "publication": {
+      "passed": true,
+      "command": "python -m tools.dev docs",
+      "log": "docs/evidence/scenario-help-checks/docs.log",
+      "environment": {
+        "WEASYPRINT_DLL_DIRECTORIES": "C:\\Users\\ramis\\.cache\\robotops-build-tools\\pdf-env\\Library\\bin",
+        "PATH_prepend": [
+          "C:\\Users\\ramis\\.local\\bin",
+          "C:\\Users\\ramis\\.cache\\robotops-build-tools\\pdf-env\\Library\\bin"
+        ]
+      },
+      "checks": [
+        "reference IDs resolved",
+        "figure placeholders resolved",
+        "SVG XML parsed",
+        "PDF text extractable",
+        "relative links and fragments validated"
+      ]
+    }
+  },
+  "browser": {
+    "origin": "http://127.0.0.1:51170",
+    "runtime": "headless",
+    "data_root": "artifacts/scenario-help/world",
+    "session": "explanations",
+    "actions": [
+      "Opened isolated local app with agent-browser@0.27.0.",
+      "Selected every execution and observation option and inspected rendered definitions.",
+      "Expanded both comparison tables; verified 10 scenario and 5 observation rows.",
+      "Inspected 1440x1000 and 390x844 viewports, visible focus, readable text and no horizontal page overflow.",
+      "Verified zero orders after reading all help.",
+      "Clicked Create and run order with DROP_ACK_AFTER_EFFECT.",
+      "Changed all selections and expanded help while the original job remained UNKNOWN_OUTCOME.",
+      "Compared persisted evidence before/after help: exact equality, one order and one effect.",
+      "Explicitly selected normal observation and clicked Reconcile selected job.",
+      "Verified COMPLETED on the original command, one reconciliation and one effect.",
+      "Closed isolated browser; isolated backend stopped cleanly."
+    ],
+    "selected_explanations": {
+      "scenario": [
+        {
+          "value": "",
+          "label": "Happy path",
+          "phase": "Whole pick · no injected fault",
+          "meaning": "The baseline test: the planner supplies a valid plan, the controller moves the product and replies, and a fresh observation checks the result.",
+          "difference": "Use this to compare normal operation with a test that deliberately breaks one part of the workflow.",
+          "expected": "Expected: the machine moves the product to the destination and fresh evidence confirms completion."
+        },
+        {
+          "value": "DROP_ACK_AFTER_EFFECT",
+          "label": "Lose acknowledgement after effect",
+          "phase": "Communication · after movement",
+          "meaning": "An acknowledgement is the controller's reply about a command. Here the pick happens and is recorded, but that reply is deliberately lost on its way back.",
+          "difference": "After effect means the product has moved. Before effect withholds a reply too, but the pick never starts. Both require evidence because silence alone cannot distinguish them.",
+          "expected": "Expected: the product moves, but the acknowledgement is lost. Review the original pick with a fresh observation before continuing."
+        },
+        {
+          "value": "DROP_ACK_BEFORE_EFFECT",
+          "label": "Lose acknowledgement before effect",
+          "phase": "Communication · no movement started",
+          "meaning": "The controller records that the pick never started, and its reply is deliberately lost. The orchestrator receives no confirmation of that no-effect outcome.",
+          "difference": "Before effect keeps the product at source; after effect moves it. The same timeout appears in both, so the system must investigate instead of assuming failure.",
+          "expected": "Expected: no product movement and no acknowledgement. Review evidence to establish whether the original pick had any effect."
+        },
+        {
+          "value": "CONTRADICTORY_OBSERVATION",
+          "label": "Contradictory observation",
+          "phase": "Verification · first check after movement",
+          "meaning": "After the pick, the simulated observation reports the same product in two different locations, such as source and destination. This tests handling of mutually conflicting detections.",
+          "difference": "The problem is conflicting locations. Low confidence is an unreliable report; stale evidence is an old capture time.",
+          "expected": "Expected: the product moves, but the observation conflicts. The outcome stays uncertain until sufficient fresh evidence resolves it."
+        },
+        {
+          "value": "LOW_CONFIDENCE_OBSERVATION",
+          "label": "Low-confidence observation",
+          "phase": "Verification · first check after movement",
+          "meaning": "After the pick, the observation includes the product and a location, but its confidence score is deliberately reduced. This tests whether weak evidence is refused.",
+          "difference": "A detection is present but unreliable. Contradictory evidence gives conflicting locations; missing evidence gives no product detection at all.",
+          "expected": "Expected: the product moves, but observation confidence is too low. Review the original pick with another observation."
+        },
+        {
+          "value": "STALE_OBSERVATION",
+          "label": "Stale observation",
+          "phase": "Verification · first check after movement",
+          "meaning": "Simulates delayed sensing by giving the post-pick observation an old capture time. Its location report may look plausible, but it is too old to establish the current outcome.",
+          "difference": "The problem is the report's age. A low-confidence report can be fresh but unreliable; a stale report has an unacceptable timestamp.",
+          "expected": "Expected: the product moves, but the observation is too old. Review the original pick with another observation."
+        },
+        {
+          "value": "LOGICAL_ESTOP",
+          "label": "Logical E-stop",
+          "phase": "Cell control · before movement",
+          "meaning": "Simulates a deliberate stop request, like an operator pressing the simulator's stop control. The cell enters a stopped state and refuses the pick until reset. This is not safety-rated.",
+          "difference": "A requested stop. Cell fault instead simulates a detected error. Both block movement, but record different reasons and cell states.",
+          "expected": "Expected: the logical stop blocks the pick. The product stays still. Reset the logical cell before running another order."
+        },
+        {
+          "value": "CELL_FAULT",
+          "label": "Cell fault",
+          "phase": "Cell control · before movement",
+          "meaning": "Simulates the controller detecting a cell error before movement. It marks the cell faulted and refuses the pick until the logical state is reset.",
+          "difference": "A detected error, rather than the deliberate stop request in Logical E-stop. Brain failures occur earlier, before a robot command is created.",
+          "expected": "Expected: a cell fault blocks the pick. The product stays still. Reset the logical cell before running another order."
+        },
+        {
+          "value": "BRAIN_INVALID_OUTPUT",
+          "label": "Invalid Brain output",
+          "phase": "Planning · before command creation",
+          "meaning": "The Brain is the pick planner. This test supplies a reply that does not match the required action-plan format, so validation rejects it before a robot command can be created.",
+          "difference": "A reply arrives but is invalid. Brain timeout tests a planner that does not supply a plan within its deadline.",
+          "expected": "Expected: validation rejects the plan before dispatch. No product moves. Choose another scenario or repeat this rejection test."
+        },
+        {
+          "value": "BRAIN_TIMEOUT",
+          "label": "Brain timeout",
+          "phase": "Planning · before command creation",
+          "meaning": "Simulates the pick planner missing its response deadline. The workflow handles the timeout before creating a robot command.",
+          "difference": "No plan in time, instead of the invalid reply tested by Invalid Brain output. Lost-ack scenarios happen later, after a command has been sent.",
+          "expected": "Expected: planning times out before dispatch. No product moves. Choose another scenario or repeat this timeout test."
+        }
+      ],
+      "observation": [
+        {
+          "value": "",
+          "label": "Normal observation",
+          "phase": "Review capture · no injected sensing fault",
+          "meaning": "Collects a new observation of this test world without deliberately altering its detections, confidence or capture time. The verifier compares it with the original command journal.",
+          "difference": "Removes sensing degradation for this review only. It does not undo an execution fault or guarantee success: sufficient evidence can prove either completion or no effect.",
+          "expected": "Collect a fresh observation without injected degradation. The verifier still needs consistent evidence for this original command."
+        },
+        {
+          "value": "CONTRADICTORY_OBSERVATION",
+          "label": "Contradictory evidence",
+          "phase": "Review capture · conflicting locations",
+          "meaning": "Reports the same product in two different locations in one observation. For example, it reports the product at both source and destination, even though the 3D product is not duplicated.",
+          "difference": "Conflicting detections. Low confidence supplies a weak detection; stale evidence has an old capture time; missing evidence has no product detection.",
+          "expected": "Inject conflicting evidence. Expect the pick to remain unresolved; you can observe again in this same test."
+        },
+        {
+          "value": "LOW_CONFIDENCE_OBSERVATION",
+          "label": "Low confidence",
+          "phase": "Review capture · unreliable detection",
+          "meaning": "Includes a detected product and location, but deliberately lowers the confidence score. It represents a sensor report that is not reliable enough to trust.",
+          "difference": "The detection is present but weak. Missing evidence supplies no detection; contradictory evidence supplies incompatible locations.",
+          "expected": "Inject low confidence. Expect an inconclusive assessment; you can observe again in this same test."
+        },
+        {
+          "value": "STALE_OBSERVATION",
+          "label": "Stale evidence",
+          "phase": "Review capture · old timestamp",
+          "meaning": "Gives the new capture an old timestamp to simulate a delayed sensor report. It tests the age of the evidence, even if the reported location looks plausible.",
+          "difference": "Too old to use, rather than low confidence or conflicting locations. This changes the observation timestamp; it does not rewind the 3D scene.",
+          "expected": "Inject an old capture time. Expect an inconclusive assessment; you can observe again in this same test."
+        },
+        {
+          "value": "MISSING_OBSERVATION",
+          "label": "Missing evidence",
+          "phase": "Review capture · no detections",
+          "meaning": "Produces an empty observation with no detected products or location coverage, like a sensor that supplied no usable detections. The products remain in the 3D world.",
+          "difference": "No product detection at all. Low confidence still includes a detection. An absent detection cannot prove that the product was removed or that the pick failed.",
+          "expected": "Omit the product from the observation. Expect an inconclusive assessment; you can observe again in this same test."
+        }
+      ]
+    },
+    "uncertain_help": {
+      "checks": [
+        {
+          "difference": "Use this to compare normal operation with a test that deliberately breaks one part of the workflow.",
+          "kind": "scenario",
+          "meaning": "The baseline test: the planner supplies a valid plan, the controller moves the product and replies, and a fresh observation checks the result.",
+          "value": ""
+        },
+        {
+          "difference": "After effect means the product has moved. Before effect withholds a reply too, but the pick never starts. Both require evidence because silence alone cannot distinguish them.",
+          "kind": "scenario",
+          "meaning": "An acknowledgement is the controller's reply about a command. Here the pick happens and is recorded, but that reply is deliberately lost on its way back.",
+          "value": "DROP_ACK_AFTER_EFFECT"
+        },
+        {
+          "difference": "Before effect keeps the product at source; after effect moves it. The same timeout appears in both, so the system must investigate instead of assuming failure.",
+          "kind": "scenario",
+          "meaning": "The controller records that the pick never started, and its reply is deliberately lost. The orchestrator receives no confirmation of that no-effect outcome.",
+          "value": "DROP_ACK_BEFORE_EFFECT"
+        },
+        {
+          "difference": "The problem is conflicting locations. Low confidence is an unreliable report; stale evidence is an old capture time.",
+          "kind": "scenario",
+          "meaning": "After the pick, the simulated observation reports the same product in two different locations, such as source and destination. This tests handling of mutually conflicting detections.",
+          "value": "CONTRADICTORY_OBSERVATION"
+        },
+        {
+          "difference": "A detection is present but unreliable. Contradictory evidence gives conflicting locations; missing evidence gives no product detection at all.",
+          "kind": "scenario",
+          "meaning": "After the pick, the observation includes the product and a location, but its confidence score is deliberately reduced. This tests whether weak evidence is refused.",
+          "value": "LOW_CONFIDENCE_OBSERVATION"
+        },
+        {
+          "difference": "The problem is the report's age. A low-confidence report can be fresh but unreliable; a stale report has an unacceptable timestamp.",
+          "kind": "scenario",
+          "meaning": "Simulates delayed sensing by giving the post-pick observation an old capture time. Its location report may look plausible, but it is too old to establish the current outcome.",
+          "value": "STALE_OBSERVATION"
+        },
+        {
+          "difference": "A requested stop. Cell fault instead simulates a detected error. Both block movement, but record different reasons and cell states.",
+          "kind": "scenario",
+          "meaning": "Simulates a deliberate stop request, like an operator pressing the simulator's stop control. The cell enters a stopped state and refuses the pick until reset. This is not safety-rated.",
+          "value": "LOGICAL_ESTOP"
+        },
+        {
+          "difference": "A detected error, rather than the deliberate stop request in Logical E-stop. Brain failures occur earlier, before a robot command is created.",
+          "kind": "scenario",
+          "meaning": "Simulates the controller detecting a cell error before movement. It marks the cell faulted and refuses the pick until the logical state is reset.",
+          "value": "CELL_FAULT"
+        },
+        {
+          "difference": "A reply arrives but is invalid. Brain timeout tests a planner that does not supply a plan within its deadline.",
+          "kind": "scenario",
+          "meaning": "The Brain is the pick planner. This test supplies a reply that does not match the required action-plan format, so validation rejects it before a robot command can be created.",
+          "value": "BRAIN_INVALID_OUTPUT"
+        },
+        {
+          "difference": "No plan in time, instead of the invalid reply tested by Invalid Brain output. Lost-ack scenarios happen later, after a command has been sent.",
+          "kind": "scenario",
+          "meaning": "Simulates the pick planner missing its response deadline. The workflow handles the timeout before creating a robot command.",
+          "value": "BRAIN_TIMEOUT"
+        },
+        {
+          "difference": "Removes sensing degradation for this review only. It does not undo an execution fault or guarantee success: sufficient evidence can prove either completion or no effect.",
+          "kind": "observation",
+          "meaning": "Collects a new observation of this test world without deliberately altering its detections, confidence or capture time. The verifier compares it with the original command journal.",
+          "value": ""
+        },
+        {
+          "difference": "Conflicting detections. Low confidence supplies a weak detection; stale evidence has an old capture time; missing evidence has no product detection.",
+          "kind": "observation",
+          "meaning": "Reports the same product in two different locations in one observation. For example, it reports the product at both source and destination, even though the 3D product is not duplicated.",
+          "value": "CONTRADICTORY_OBSERVATION"
+        },
+        {
+          "difference": "The detection is present but weak. Missing evidence supplies no detection; contradictory evidence supplies incompatible locations.",
+          "kind": "observation",
+          "meaning": "Includes a detected product and location, but deliberately lowers the confidence score. It represents a sensor report that is not reliable enough to trust.",
+          "value": "LOW_CONFIDENCE_OBSERVATION"
+        },
+        {
+          "difference": "Too old to use, rather than low confidence or conflicting locations. This changes the observation timestamp; it does not rewind the 3D scene.",
+          "kind": "observation",
+          "meaning": "Gives the new capture an old timestamp to simulate a delayed sensor report. It tests the age of the evidence, even if the reported location looks plausible.",
+          "value": "STALE_OBSERVATION"
+        },
+        {
+          "difference": "No product detection at all. Low confidence still includes a detection. An absent detection cannot prove that the product was removed or that the pick failed.",
+          "kind": "observation",
+          "meaning": "Produces an empty observation with no detected products or location coverage, like a sensor that supplied no usable detections. The products remain in the 3D world.",
+          "value": "MISSING_OBSERVATION"
+        }
+      ],
+      "createDisabled": true,
+      "observationOpen": true,
+      "scenarioOpen": true
+    },
+    "page_width_px": 375,
+    "viewport_width_px": 390,
+    "evidence_identical_after_help": true,
+    "original_command_id": "c67e5510-c159-5f9a-b4f8-85e234177895",
+    "state_before_explicit_review": "UNKNOWN_OUTCOME",
+    "state_after_explicit_review": "COMPLETED",
+    "effect_count_after_explicit_review": 1,
+    "reconciliations": 1,
+    "artifacts": [
+      "docs/evidence/scenario-help-checks/orders-after-run.json",
+      "docs/evidence/scenario-help-checks/evidence-before-help.json",
+      "docs/evidence/scenario-help-checks/evidence-after-help.json",
+      "docs/evidence/scenario-help-checks/evidence-after-reconcile.json",
+      "docs/evidence/scenario-help-checks/selector-browser.json",
+      "docs/evidence/scenario-help-checks/uncertain-help-browser.json",
+      "docs/evidence/scenario-help-checks/scenario-desktop.png",
+      "docs/evidence/scenario-help-checks/comparison-desktop.png",
+      "docs/evidence/scenario-help-checks/observation-mobile.png",
+      "docs/evidence/scenario-help-checks/comparison-mobile.png"
+    ]
+  },
+  "new_regressions": [
+    "every selectable mode has a definition and comparison; browsing them cannot execute a test",
+    "execution and review help explain different stages without changing the uncertain outcome"
+  ],
+  "code_sha256": {
+    "apps/erp_ui/workflow-guide.js": "966ae4226c34c5a6acb996fff3c42e60036a25da33e2f66021c55cba8573a53d",
+    "apps/erp_ui/index.html": "8400c3b5965b9aa03ca22b44ab1c28b0a32b9a6d37b55af2c5250e2f5ffeb564",
+    "apps/erp_ui/app.js": "e53df355ab099c47af76e02765cf15ed4f481d27a5a5d9a8ade34bea28d94ca5",
+    "apps/erp_ui/theme.css": "23c0502b2468704b3b2dbbf1b0d5cfd531dfcd0994a60c8d50db13eabee2912f",
+    "tests/ui/dashboard.test.cjs": "76f1d47889492133f41bc6754af911989ed3a8d808d5bbd1f46667634c20113f"
+  },
+  "not_changed": [
+    "Fault injection, state machine, action validation, verification, journal identity and physical-effect semantics",
+    "Architecture and trust/ground-truth boundary diagrams",
+    "External source registry and provenance",
+    "User saved tests and the running app"
+  ],
+  "remote_gates": "Remain deferred under the user local-only instruction; this is not global DONE.",
+  "command_correction": {
+    "note": "The first affected-suite invocation referred to the wrong observability test directory and ran no tests. Corrected to tests/e2e/test_observability.py; the recorded 170-test run then passed.",
+    "command": "python -m pytest tests/unit/test_visualization.py tests/unit/test_observation_verifier.py tests/contract tests/integration/test_observability.py tests/e2e/test_reobservation.py tests/integration/test_simulation_tests.py -q --basetemp=artifacts/scenario-help/pytest-targets -o cache_dir=artifacts/scenario-help/pytest-cache",
+    "log": "docs/evidence/scenario-help-checks/initial-command-error.log"
+  },
+  "knowledge_base_synchronized": [
+    "README.md",
+    "PROJECT_PLAN.md",
+    "GOAL_PROGRESS.md",
+    "CODEX_GOAL_CHECKLIST.md",
+    "ACCEPTANCE_REPORT.md",
+    "PUBLICATION.md",
+    "publication/status.json",
+    "reports/01-design.md",
+    "reports/02-avgransning.md",
+    "reports/03-diskussion.md",
+    "docs/implementation/operations.md",
+    "docs/implementation/desktop.md",
+    "docs/implementation/acceptance.md",
+    "docs/implementation/scenarios.md",
+    "docs/adr/0009-guided-simulation-workflow.md",
+    "docs/acceptance-map.json",
+    "tools/acceptance.py"
+  ],
+  "artifact_sha256": {
+    "docs/evidence/scenario-help-checks/affected-tests.log": "ef68c5f9d48c87fc3c3bf484ba0276b0b2031dc39f38a9cc8f3daf2328d92741",
+    "docs/evidence/scenario-help-checks/comparison-desktop.png": "6b4d9d004d152d67a9e3a3915205a32352b52eeb543146a89075c79b09e1f78e",
+    "docs/evidence/scenario-help-checks/comparison-mobile.png": "25947623b1e4344827a1a5da4922fac413a3be802df26b82368c221232a80e85",
+    "docs/evidence/scenario-help-checks/docs.log": "aa6547c21162f9ceeacf0f2a928afc98864ab9162d42bc61188888c64722c208",
+    "docs/evidence/scenario-help-checks/drift.log": "c84596ffdf9eae81cca89f2b03275d7ff7b18fe4ecf9c5094b7d72f18cef5f17",
+    "docs/evidence/scenario-help-checks/evidence-after-help.json": "a05e0938fbb3bdad18026a090c7db780c8fe55e1dd93af2cdebbb664c5a890ae",
+    "docs/evidence/scenario-help-checks/evidence-after-reconcile.json": "67cf7cd35930d51df8dec5096eef8c3d819ac48c115fdf41860436cafcb3fa2e",
+    "docs/evidence/scenario-help-checks/evidence-before-help.json": "a05e0938fbb3bdad18026a090c7db780c8fe55e1dd93af2cdebbb664c5a890ae",
+    "docs/evidence/scenario-help-checks/initial-command-error.log": "751205740964848dc2fb02bf3f4726f0bbb67e3b4fb99ad8bb2db1221c847247",
+    "docs/evidence/scenario-help-checks/lint.log": "bbf11a649104ec807d846c19cb4f60b9fb6c4769b4be8867d7fae7774e7e1e10",
+    "docs/evidence/scenario-help-checks/observation-mobile.png": "2135bf85cf2ac1a415f6cb8d5fb746cac5e0eb4aa61accaff2b9a7ee74bea3f3",
+    "docs/evidence/scenario-help-checks/orders-after-run.json": "d88d7628d49f7ededc85a66371a041af819d5a68ea79f823ce7a084376df6157",
+    "docs/evidence/scenario-help-checks/scenario-desktop.png": "1f930b44e9140d8ddee3de054e780b237e9d03f5d4bc4aa262d01ccab3fa76c3",
+    "docs/evidence/scenario-help-checks/selector-browser.json": "107dad49f636940a7f470b196acd2f4ba346f54f2966a012f6ff121b1c9af83d",
+    "docs/evidence/scenario-help-checks/typecheck.log": "1e1d6ac2be96047a07942653589f26ef7f13f7a50cfcf3bf1ef87660f6bba961",
+    "docs/evidence/scenario-help-checks/ui-tests.log": "9295c688d749ad1001ef183eb7464a860a2c7287a4070243eb513a1cdba32a33",
+    "docs/evidence/scenario-help-checks/uncertain-help-browser.json": "d316a55fbf0bc35c3cd9529413d1f4a76601d2979b231e03a4b88ce4c1d2c75a"
+  }
+}

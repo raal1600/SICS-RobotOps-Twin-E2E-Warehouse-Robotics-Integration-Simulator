@@ -1,0 +1,4190 @@
+{
+  "status": "LOCAL_VERIFIED",
+  "recorded_at": "2026-10-03T21:11:35.660055+00:00",
+  "base": {
+    "commit": "348c786710a0e22f0dd7de0744eac7057da13ad8",
+    "dirty": true,
+    "source_sha256": "12b4ab9eef4c97fe9173c2546a23c7c23ec4bd75ce4b6a49aa58e56faebae0ff"
+  },
+  "scope": "Uncommitted local changes only; no push, deployment or remote completion attestation.",
+  "acceptance_manifest": "docs/evidence/acceptance/20261003T205102/manifest.json",
+  "mandatory_tests_per_run": 389,
+  "ui_tests_per_run": 99,
+  "coverage_percent": 89.33112216694306,
+  "targeted_pytest_passed": 57,
+  "commands": [
+    "node --test tests/ui/playback.test.cjs tests/ui/dashboard.test.cjs tests/ui/workflow-guide.test.cjs",
+    "python -m pytest tests/unit/test_visualization.py tests/contract -q --basetemp=artifacts/guided-ui/pytest-targets -o cache_dir=artifacts/guided-ui/pytest-cache",
+    "python -m tools.dev acceptance --local",
+    "powershell -NoProfile -ExecutionPolicy Bypass -File tools/test-desktop.ps1 -Runtime headless -DataRoot artifacts/guided-ui/native",
+    "agent-browser@0.27.0 --session guided: real local DOM interactions, evidence inspection, desktop/mobile screenshots"
+  ],
+  "browser": {
+    "origin": "http://127.0.0.1:64592",
+    "runtime": "blender",
+    "happy_and_resolved_lost_ack_delivery": {
+      "orders": [
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "b65a33ee-6fc5-52a3-aed3-5e0c27b98910",
+          "causation_id": "84da656f-190c-4ff0-aa64-b02f6577a2a0",
+          "timestamp": "2026-10-03T20:45:27.951695Z",
+          "order_id": "order-0abc3cbd-d630-4ed0-82f6-fa106aa224a7",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-red",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "7197a018-ef5f-5534-9136-3ebe03fdcf2b"
+          ],
+          "status": "COMPLETED"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "d19bbcf6-afa6-441c-b068-287b6dd2e781",
+          "timestamp": "2026-10-03T20:48:18.772888Z",
+          "order_id": "order-912719a7-98c8-40f8-ba2f-a4db2a2cae5e",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-blue",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "2591775f-6158-5aaa-9001-7e00ea11d050"
+          ],
+          "status": "COMPLETED"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "1eefd868-fa72-5a97-9eed-6d40fd771aaa",
+          "causation_id": "d2eec2e3-fbd5-417e-9b3c-9fd04e8cad5d",
+          "timestamp": "2026-10-03T20:53:46.625443Z",
+          "order_id": "order-31fe060b-89ad-42ca-b49a-11d886b272ea",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "876e5287-d716-5e73-a153-4a2dde79972e"
+          ],
+          "status": "COMPLETED"
+        }
+      ],
+      "journals": [
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "b65a33ee-6fc5-52a3-aed3-5e0c27b98910",
+          "causation_id": "df1aa9b3-d87b-5393-ac79-3167dc002fe9",
+          "timestamp": "2026-10-03T20:45:45.056496Z",
+          "command_id": "df1aa9b3-d87b-5393-ac79-3167dc002fe9",
+          "job_id": "7197a018-ef5f-5534-9136-3ebe03fdcf2b",
+          "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "82ccc775468ab69d865c33349cdd4b1ff45ceb0233cd533eeda053f255a0af58",
+          "journal_durable": true
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "timestamp": "2026-10-03T20:48:35.942303Z",
+          "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "0048f8b50870ca2102d4f9d5f765cc6467ecd0a7df412655355381040061a821",
+          "journal_durable": true
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "1eefd868-fa72-5a97-9eed-6d40fd771aaa",
+          "causation_id": "94a6be05-1415-5ac6-903c-69667e736bae",
+          "timestamp": "2026-10-03T20:53:55.549289Z",
+          "command_id": "94a6be05-1415-5ac6-903c-69667e736bae",
+          "job_id": "876e5287-d716-5e73-a153-4a2dde79972e",
+          "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "549f2da40cd2e9e3719021db7bd7717198748ee4563e73b0cab64cc3d3ce2829",
+          "journal_durable": true
+        }
+      ],
+      "frames_per_clip": [
+        100,
+        100,
+        100
+      ],
+      "pick_events_per_clip": [
+        1,
+        1,
+        1
+      ]
+    },
+    "after_effect_reconciliation": {
+      "schema_version": "1.0",
+      "job": {
+        "schema_version": "1.0",
+        "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+        "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+        "causation_id": "fc0ed72a-40e8-4d87-a5fd-f7ac547affb3",
+        "timestamp": "2026-10-03T20:52:53.645048Z",
+        "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+        "order_id": "order-912719a7-98c8-40f8-ba2f-a4db2a2cae5e",
+        "line": {
+          "schema_version": "1.0",
+          "order_line_id": "line-1",
+          "product_id": "product-blue",
+          "source_id": "source",
+          "destination_id": "destination",
+          "quantity": 1
+        },
+        "state": "COMPLETED",
+        "revision": 12,
+        "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+        "action_plan_id": "fe7e9612-5684-5065-8383-eae9f0e9b33d"
+      },
+      "command": {
+        "schema_version": "1.0",
+        "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+        "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+        "causation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+        "timestamp": "2026-10-03T20:48:19.072178Z",
+        "action_plan_id": "fe7e9612-5684-5065-8383-eae9f0e9b33d",
+        "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+        "order_id": "order-912719a7-98c8-40f8-ba2f-a4db2a2cae5e",
+        "order_line_id": "line-1",
+        "kind": "PICK_AND_PLACE",
+        "product_id": "product-blue",
+        "source_id": "source",
+        "destination_id": "destination",
+        "target_pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.6,
+            0.0,
+            0.2
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "cal-1"
+        },
+        "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+        "observation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+        "cell_generation": 0,
+        "brain_version": "deterministic-1",
+        "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e"
+      },
+      "journal": {
+        "schema_version": "1.0",
+        "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+        "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+        "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+        "timestamp": "2026-10-03T20:48:35.942303Z",
+        "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+        "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+        "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+        "status": "SUCCEEDED",
+        "reason": "BLENDER_PICK_APPLIED",
+        "effect_count": 1,
+        "payload_hash": "0048f8b50870ca2102d4f9d5f765cc6467ecd0a7df412655355381040061a821",
+        "journal_durable": true
+      },
+      "observations": [
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "timestamp": "2026-10-03T20:48:19.072178Z",
+          "observation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+          "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+          "step": 1,
+          "captured_at": "2026-10-03T20:48:19.072178Z",
+          "model_version": "synthetic-observer-1",
+          "calibration_version": "cal-1",
+          "objects": [
+            {
+              "schema_version": "1.0",
+              "product_id": "product-red",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-blue",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-green",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6000000238418579,
+                  0.18000000715255737,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            }
+          ],
+          "covered_locations": [
+            "source",
+            "destination"
+          ],
+          "cell_generation": 0
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "timestamp": "2026-10-03T20:49:20.864244Z",
+          "observation_id": "30342947-6c59-4f0a-a8eb-4604502ce872",
+          "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+          "step": 2,
+          "captured_at": "2026-10-03T20:49:20.864244Z",
+          "model_version": "synthetic-observer-1",
+          "calibration_version": "cal-1",
+          "objects": [
+            {
+              "schema_version": "1.0",
+              "product_id": "product-red",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-blue",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-green",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6000000238418579,
+                  0.18000000715255737,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-red",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-blue",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-green",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6000000238418579,
+                  0.18000000715255737,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            }
+          ],
+          "covered_locations": [
+            "source",
+            "destination"
+          ],
+          "cell_generation": 0
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "timestamp": "2026-10-03T20:51:16.055146Z",
+          "observation_id": "f25e3c6d-301e-42ed-bf62-64663e4fa349",
+          "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+          "step": 2,
+          "captured_at": "2026-10-03T20:51:16.055146Z",
+          "model_version": "synthetic-observer-1",
+          "calibration_version": "cal-1",
+          "objects": [
+            {
+              "schema_version": "1.0",
+              "product_id": "product-red",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 0.3,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-blue",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 0.3,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-green",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6000000238418579,
+                  0.18000000715255737,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 0.3,
+              "uncertainty_m": 0.0
+            }
+          ],
+          "covered_locations": [
+            "source",
+            "destination"
+          ],
+          "cell_generation": 0
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "timestamp": "2026-10-03T20:52:53.562981Z",
+          "observation_id": "8c2b1614-14d3-4d28-a6c6-bebd9927119e",
+          "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+          "step": 2,
+          "captured_at": "2026-10-03T20:52:53.562981Z",
+          "model_version": "synthetic-observer-1",
+          "calibration_version": "cal-1",
+          "objects": [
+            {
+              "schema_version": "1.0",
+              "product_id": "product-red",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-blue",
+              "location_id": "destination",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.6000000238418579,
+                  0.0,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-green",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6000000238418579,
+                  0.18000000715255737,
+                  0.20000000298023224
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            }
+          ],
+          "covered_locations": [
+            "source",
+            "destination"
+          ],
+          "cell_generation": 0
+        }
+      ],
+      "verifications": [
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "30342947-6c59-4f0a-a8eb-4604502ce872",
+          "timestamp": "2026-10-03T20:49:20.896169Z",
+          "verification_id": "faf79fbd-4f72-400f-8f26-6bcb9e3a9414",
+          "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "observation_id": "30342947-6c59-4f0a-a8eb-4604502ce872",
+          "verdict": "INCONCLUSIVE",
+          "reason": "CONTRADICTORY_OBSERVATION"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "f25e3c6d-301e-42ed-bf62-64663e4fa349",
+          "timestamp": "2026-10-03T20:51:16.080878Z",
+          "verification_id": "ccf62a62-80c5-4b68-bc51-792e689bd40c",
+          "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "observation_id": "f25e3c6d-301e-42ed-bf62-64663e4fa349",
+          "verdict": "INCONCLUSIVE",
+          "reason": "LOW_CONFIDENCE"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "8c2b1614-14d3-4d28-a6c6-bebd9927119e",
+          "timestamp": "2026-10-03T20:52:53.615717Z",
+          "verification_id": "4d56b796-7d02-4452-a47d-a54c207f98b1",
+          "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+          "observation_id": "8c2b1614-14d3-4d28-a6c6-bebd9927119e",
+          "verdict": "VERIFIED_SUCCESS",
+          "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+        }
+      ],
+      "reconciliations": [
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "30342947-6c59-4f0a-a8eb-4604502ce872",
+          "timestamp": "2026-10-03T20:49:20.896712Z",
+          "evidence_id": "d8e8c454-441a-424e-aba1-445d8069599e",
+          "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+            "timestamp": "2026-10-03T20:48:19.072178Z",
+            "action_plan_id": "fe7e9612-5684-5065-8383-eae9f0e9b33d",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "order_id": "order-912719a7-98c8-40f8-ba2f-a4db2a2cae5e",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-blue",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "observation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+            "cell_generation": 0,
+            "brain_version": "deterministic-1",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e"
+          },
+          "receipt": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "timestamp": "2026-10-03T20:48:35.942303Z",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "status": "SUCCEEDED",
+            "reason": "BLENDER_PICK_APPLIED",
+            "effect_count": 1,
+            "payload_hash": "0048f8b50870ca2102d4f9d5f765cc6467ecd0a7df412655355381040061a821",
+            "journal_durable": true
+          },
+          "observation": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "timestamp": "2026-10-03T20:49:20.864244Z",
+            "observation_id": "30342947-6c59-4f0a-a8eb-4604502ce872",
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "step": 2,
+            "captured_at": "2026-10-03T20:49:20.864244Z",
+            "model_version": "synthetic-observer-1",
+            "calibration_version": "cal-1",
+            "objects": [
+              {
+                "schema_version": "1.0",
+                "product_id": "product-red",
+                "location_id": "destination",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-blue",
+                "location_id": "destination",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-green",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.6000000238418579,
+                    0.18000000715255737,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-red",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-blue",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-green",
+                "location_id": "destination",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.6000000238418579,
+                    0.18000000715255737,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              }
+            ],
+            "covered_locations": [
+              "source",
+              "destination"
+            ],
+            "cell_generation": 0
+          },
+          "verification": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "30342947-6c59-4f0a-a8eb-4604502ce872",
+            "timestamp": "2026-10-03T20:49:20.896169Z",
+            "verification_id": "faf79fbd-4f72-400f-8f26-6bcb9e3a9414",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "observation_id": "30342947-6c59-4f0a-a8eb-4604502ce872",
+            "verdict": "INCONCLUSIVE",
+            "reason": "CONTRADICTORY_OBSERVATION"
+          }
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "f25e3c6d-301e-42ed-bf62-64663e4fa349",
+          "timestamp": "2026-10-03T20:51:16.080978Z",
+          "evidence_id": "9e391451-7c15-4835-8a72-72fc079537a9",
+          "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+            "timestamp": "2026-10-03T20:48:19.072178Z",
+            "action_plan_id": "fe7e9612-5684-5065-8383-eae9f0e9b33d",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "order_id": "order-912719a7-98c8-40f8-ba2f-a4db2a2cae5e",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-blue",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "observation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+            "cell_generation": 0,
+            "brain_version": "deterministic-1",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e"
+          },
+          "receipt": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "timestamp": "2026-10-03T20:48:35.942303Z",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "status": "SUCCEEDED",
+            "reason": "BLENDER_PICK_APPLIED",
+            "effect_count": 1,
+            "payload_hash": "0048f8b50870ca2102d4f9d5f765cc6467ecd0a7df412655355381040061a821",
+            "journal_durable": true
+          },
+          "observation": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "timestamp": "2026-10-03T20:51:16.055146Z",
+            "observation_id": "f25e3c6d-301e-42ed-bf62-64663e4fa349",
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "step": 2,
+            "captured_at": "2026-10-03T20:51:16.055146Z",
+            "model_version": "synthetic-observer-1",
+            "calibration_version": "cal-1",
+            "objects": [
+              {
+                "schema_version": "1.0",
+                "product_id": "product-red",
+                "location_id": "destination",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 0.3,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-blue",
+                "location_id": "destination",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 0.3,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-green",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.6000000238418579,
+                    0.18000000715255737,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 0.3,
+                "uncertainty_m": 0.0
+              }
+            ],
+            "covered_locations": [
+              "source",
+              "destination"
+            ],
+            "cell_generation": 0
+          },
+          "verification": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "f25e3c6d-301e-42ed-bf62-64663e4fa349",
+            "timestamp": "2026-10-03T20:51:16.080878Z",
+            "verification_id": "ccf62a62-80c5-4b68-bc51-792e689bd40c",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "observation_id": "f25e3c6d-301e-42ed-bf62-64663e4fa349",
+            "verdict": "INCONCLUSIVE",
+            "reason": "LOW_CONFIDENCE"
+          }
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+          "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+          "causation_id": "8c2b1614-14d3-4d28-a6c6-bebd9927119e",
+          "timestamp": "2026-10-03T20:52:53.615970Z",
+          "evidence_id": "0c3f6e17-10d8-4c5e-946d-e0d8ae06570a",
+          "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+            "timestamp": "2026-10-03T20:48:19.072178Z",
+            "action_plan_id": "fe7e9612-5684-5065-8383-eae9f0e9b33d",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "order_id": "order-912719a7-98c8-40f8-ba2f-a4db2a2cae5e",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-blue",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "observation_id": "5c0cedb0-5a47-4361-9624-ccc86af11b85",
+            "cell_generation": 0,
+            "brain_version": "deterministic-1",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e"
+          },
+          "receipt": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "timestamp": "2026-10-03T20:48:35.942303Z",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "status": "SUCCEEDED",
+            "reason": "BLENDER_PICK_APPLIED",
+            "effect_count": 1,
+            "payload_hash": "0048f8b50870ca2102d4f9d5f765cc6467ecd0a7df412655355381040061a821",
+            "journal_durable": true
+          },
+          "observation": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "timestamp": "2026-10-03T20:52:53.562981Z",
+            "observation_id": "8c2b1614-14d3-4d28-a6c6-bebd9927119e",
+            "scene_epoch": "b3752448-32d1-4597-be7e-6f71d2838fc8",
+            "step": 2,
+            "captured_at": "2026-10-03T20:52:53.562981Z",
+            "model_version": "synthetic-observer-1",
+            "calibration_version": "cal-1",
+            "objects": [
+              {
+                "schema_version": "1.0",
+                "product_id": "product-red",
+                "location_id": "destination",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-blue",
+                "location_id": "destination",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6000000238418579,
+                    0.0,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-green",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.6000000238418579,
+                    0.18000000715255737,
+                    0.20000000298023224
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              }
+            ],
+            "covered_locations": [
+              "source",
+              "destination"
+            ],
+            "cell_generation": 0
+          },
+          "verification": {
+            "schema_version": "1.0",
+            "run_id": "127a8a5d-ab78-452f-83a6-708f73c423ca",
+            "correlation_id": "f7896777-c6d7-5a0d-bc29-ee59f7da3f88",
+            "causation_id": "8c2b1614-14d3-4d28-a6c6-bebd9927119e",
+            "timestamp": "2026-10-03T20:52:53.615717Z",
+            "verification_id": "4d56b796-7d02-4452-a47d-a54c207f98b1",
+            "job_id": "2591775f-6158-5aaa-9001-7e00ea11d050",
+            "command_id": "f176fed5-71d0-5ee4-b776-6645b48e103e",
+            "observation_id": "8c2b1614-14d3-4d28-a6c6-bebd9927119e",
+            "verdict": "VERIFIED_SUCCESS",
+            "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+          }
+        }
+      ]
+    },
+    "before_effect_reconciliation": {
+      "schema_version": "1.0",
+      "job": {
+        "schema_version": "1.0",
+        "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+        "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+        "causation_id": "98f1ca1c-5e9a-4a54-8092-d2c26ebfd736",
+        "timestamp": "2026-10-03T20:57:04.162201Z",
+        "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+        "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+        "line": {
+          "schema_version": "1.0",
+          "order_line_id": "line-1",
+          "product_id": "product-green",
+          "source_id": "source",
+          "destination_id": "destination",
+          "quantity": 1
+        },
+        "state": "FAILED",
+        "revision": 10,
+        "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+        "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09"
+      },
+      "command": {
+        "schema_version": "1.0",
+        "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+        "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+        "causation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+        "timestamp": "2026-10-03T20:55:45.322294Z",
+        "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09",
+        "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+        "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+        "order_line_id": "line-1",
+        "kind": "PICK_AND_PLACE",
+        "product_id": "product-green",
+        "source_id": "source",
+        "destination_id": "destination",
+        "target_pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.6,
+            0.0,
+            0.2
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "cal-1"
+        },
+        "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+        "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+        "cell_generation": 0,
+        "brain_version": "deterministic-1",
+        "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906"
+      },
+      "journal": {
+        "schema_version": "1.0",
+        "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+        "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+        "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+        "timestamp": "2026-10-03T20:55:45.515378Z",
+        "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+        "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+        "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+        "status": "REJECTED",
+        "reason": "PROVEN_NOT_STARTED",
+        "effect_count": 0,
+        "payload_hash": "e85f06bc5bc6da401539a49db82e42ee0cafd087c98663e7b729c37f47278e1e",
+        "journal_durable": true
+      },
+      "observations": [
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+          "timestamp": "2026-10-03T20:55:45.322294Z",
+          "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+          "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+          "step": 0,
+          "captured_at": "2026-10-03T20:55:45.322294Z",
+          "model_version": "synthetic-observer-1",
+          "calibration_version": "cal-1",
+          "objects": [
+            {
+              "schema_version": "1.0",
+              "product_id": "product-red",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6,
+                  -0.18,
+                  0.2
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-blue",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6,
+                  0.0,
+                  0.2
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-green",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6,
+                  0.18,
+                  0.2
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            }
+          ],
+          "covered_locations": [
+            "source",
+            "destination"
+          ],
+          "cell_generation": 0
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+          "timestamp": "2026-10-03T20:56:17.043459Z",
+          "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+          "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+          "step": 0,
+          "captured_at": "2026-10-03T20:56:17.043459Z",
+          "model_version": "synthetic-observer-1",
+          "calibration_version": "cal-1",
+          "objects": [],
+          "covered_locations": [],
+          "cell_generation": 0
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+          "timestamp": "2026-10-03T20:57:04.092405Z",
+          "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+          "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+          "step": 0,
+          "captured_at": "2026-10-03T20:57:04.092405Z",
+          "model_version": "synthetic-observer-1",
+          "calibration_version": "cal-1",
+          "objects": [
+            {
+              "schema_version": "1.0",
+              "product_id": "product-red",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6,
+                  -0.18,
+                  0.2
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-blue",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6,
+                  0.0,
+                  0.2
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            },
+            {
+              "schema_version": "1.0",
+              "product_id": "product-green",
+              "location_id": "source",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.6,
+                  0.18,
+                  0.2
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0
+            }
+          ],
+          "covered_locations": [
+            "source",
+            "destination"
+          ],
+          "cell_generation": 0
+        }
+      ],
+      "verifications": [
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+          "timestamp": "2026-10-03T20:56:17.089769Z",
+          "verification_id": "03c1f90b-c814-4ed6-ba0f-954ea5fe592f",
+          "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+          "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+          "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+          "verdict": "INCONCLUSIVE",
+          "reason": "MISSING_OBSERVATION"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+          "timestamp": "2026-10-03T20:57:04.141977Z",
+          "verification_id": "b29b5eb9-fde5-4ce7-8296-4b46e1c50fa2",
+          "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+          "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+          "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+          "verdict": "VERIFIED_FAILURE",
+          "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+        }
+      ],
+      "reconciliations": [
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+          "timestamp": "2026-10-03T20:56:17.089871Z",
+          "evidence_id": "4bd897b8-197e-4e94-ad98-d78d95d0c4ab",
+          "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+            "timestamp": "2026-10-03T20:55:45.322294Z",
+            "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-green",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+            "cell_generation": 0,
+            "brain_version": "deterministic-1",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906"
+          },
+          "receipt": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "timestamp": "2026-10-03T20:55:45.515378Z",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "status": "REJECTED",
+            "reason": "PROVEN_NOT_STARTED",
+            "effect_count": 0,
+            "payload_hash": "e85f06bc5bc6da401539a49db82e42ee0cafd087c98663e7b729c37f47278e1e",
+            "journal_durable": true
+          },
+          "observation": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "timestamp": "2026-10-03T20:56:17.043459Z",
+            "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "step": 0,
+            "captured_at": "2026-10-03T20:56:17.043459Z",
+            "model_version": "synthetic-observer-1",
+            "calibration_version": "cal-1",
+            "objects": [],
+            "covered_locations": [],
+            "cell_generation": 0
+          },
+          "verification": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+            "timestamp": "2026-10-03T20:56:17.089769Z",
+            "verification_id": "03c1f90b-c814-4ed6-ba0f-954ea5fe592f",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+            "verdict": "INCONCLUSIVE",
+            "reason": "MISSING_OBSERVATION"
+          }
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+          "timestamp": "2026-10-03T20:57:04.142215Z",
+          "evidence_id": "7904a268-eb3f-4605-9cd0-04f93385170c",
+          "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+            "timestamp": "2026-10-03T20:55:45.322294Z",
+            "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-green",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+            "cell_generation": 0,
+            "brain_version": "deterministic-1",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906"
+          },
+          "receipt": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "timestamp": "2026-10-03T20:55:45.515378Z",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "status": "REJECTED",
+            "reason": "PROVEN_NOT_STARTED",
+            "effect_count": 0,
+            "payload_hash": "e85f06bc5bc6da401539a49db82e42ee0cafd087c98663e7b729c37f47278e1e",
+            "journal_durable": true
+          },
+          "observation": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "timestamp": "2026-10-03T20:57:04.092405Z",
+            "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "step": 0,
+            "captured_at": "2026-10-03T20:57:04.092405Z",
+            "model_version": "synthetic-observer-1",
+            "calibration_version": "cal-1",
+            "objects": [
+              {
+                "schema_version": "1.0",
+                "product_id": "product-red",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.6,
+                    -0.18,
+                    0.2
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-blue",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.6,
+                    0.0,
+                    0.2
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              },
+              {
+                "schema_version": "1.0",
+                "product_id": "product-green",
+                "location_id": "source",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.6,
+                    0.18,
+                    0.2
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0
+              }
+            ],
+            "covered_locations": [
+              "source",
+              "destination"
+            ],
+            "cell_generation": 0
+          },
+          "verification": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+            "timestamp": "2026-10-03T20:57:04.141977Z",
+            "verification_id": "b29b5eb9-fde5-4ce7-8296-4b46e1c50fa2",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+            "verdict": "VERIFIED_FAILURE",
+            "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+          }
+        }
+      ]
+    },
+    "no_mutation_from_navigation_or_mode_selection": true,
+    "fault_path_evidence": {
+      "test_id": "ebfe246e-b11a-4bd5-8f1c-dd579b68da90",
+      "orders": [
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+          "causation_id": "bb5faa3b-e0ba-436b-a19a-d71b7ff77e5b",
+          "timestamp": "2026-10-03T20:55:45.012634Z",
+          "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "77c07673-cad6-520c-9405-ffdd09b886d1"
+          ],
+          "status": "FAILED"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "9b56f7e1-2796-5aa0-ad40-96282a464080",
+          "causation_id": "7d9da895-379d-495f-bff4-99c10e5834cf",
+          "timestamp": "2026-10-03T20:58:07.572623Z",
+          "order_id": "order-4f523ef8-4ade-4255-b494-62cb81a07047",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "04507097-ef6b-51a2-8ef2-0082354f2518"
+          ],
+          "status": "FAILED"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "4f3b7a1a-b999-5d07-ad31-c97d53a29881",
+          "causation_id": "03a51268-c69a-4337-b4ea-c684e6f7c187",
+          "timestamp": "2026-10-03T21:00:10.538049Z",
+          "order_id": "order-75c47ca7-e578-4755-8ae9-1ea09bca6ee0",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "b4421b27-8354-5ab8-a54b-0ef2f8125644"
+          ],
+          "status": "FAILED"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "df721404-0a9f-54fd-9f3b-a5b735d70923",
+          "causation_id": "2db50748-9b3a-4521-a9e1-c06a39a34cf0",
+          "timestamp": "2026-10-03T21:03:13.364950Z",
+          "order_id": "order-c1544249-4e27-4e4b-9ecc-356651f63b15",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "47ff1c0a-d064-54bd-bb88-406cd78445f8"
+          ],
+          "status": "FAILED"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "6a42f548-a273-5884-9462-09437a9fab7e",
+          "causation_id": "0c6fcdf7-f741-49c1-9284-976adba85f4e",
+          "timestamp": "2026-10-03T21:04:40.599583Z",
+          "order_id": "order-4d4de063-1572-4580-b11b-5d3bf03f804d",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "f8a1d882-8d20-5bd8-95f2-33c687c7a402"
+          ],
+          "status": "FAILED"
+        },
+        {
+          "schema_version": "1.0",
+          "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+          "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+          "causation_id": "e3eb3397-31bb-4819-8f46-f63f7d0e7d36",
+          "timestamp": "2026-10-03T21:05:06.340933Z",
+          "order_id": "order-24d5316c-c4f9-4b98-9258-3f8d3dabd4c2",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "05d8294b-8ee5-5912-8fc8-08cacd7b7644"
+          ],
+          "status": "REQUIRES_INTERVENTION"
+        }
+      ],
+      "evidence": [
+        {
+          "schema_version": "1.0",
+          "job": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "98f1ca1c-5e9a-4a54-8092-d2c26ebfd736",
+            "timestamp": "2026-10-03T20:57:04.162201Z",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+            "line": {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            },
+            "state": "FAILED",
+            "revision": 10,
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09"
+          },
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+            "timestamp": "2026-10-03T20:55:45.322294Z",
+            "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-green",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+            "cell_generation": 0,
+            "brain_version": "deterministic-1",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906"
+          },
+          "journal": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+            "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "timestamp": "2026-10-03T20:55:45.515378Z",
+            "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+            "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "status": "REJECTED",
+            "reason": "PROVEN_NOT_STARTED",
+            "effect_count": 0,
+            "payload_hash": "e85f06bc5bc6da401539a49db82e42ee0cafd087c98663e7b729c37f47278e1e",
+            "journal_durable": true
+          },
+          "observations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+              "causation_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+              "timestamp": "2026-10-03T20:55:45.322294Z",
+              "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T20:55:45.322294Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 0
+            },
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+              "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+              "timestamp": "2026-10-03T20:56:17.043459Z",
+              "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T20:56:17.043459Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [],
+              "covered_locations": [],
+              "cell_generation": 0
+            },
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+              "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+              "timestamp": "2026-10-03T20:57:04.092405Z",
+              "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T20:57:04.092405Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 0
+            }
+          ],
+          "verifications": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+              "causation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+              "timestamp": "2026-10-03T20:56:17.089769Z",
+              "verification_id": "03c1f90b-c814-4ed6-ba0f-954ea5fe592f",
+              "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+              "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+              "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+              "verdict": "INCONCLUSIVE",
+              "reason": "MISSING_OBSERVATION"
+            },
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+              "causation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+              "timestamp": "2026-10-03T20:57:04.141977Z",
+              "verification_id": "b29b5eb9-fde5-4ce7-8296-4b46e1c50fa2",
+              "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+              "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+              "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+              "verdict": "VERIFIED_FAILURE",
+              "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+            }
+          ],
+          "reconciliations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+              "causation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+              "timestamp": "2026-10-03T20:56:17.089871Z",
+              "evidence_id": "4bd897b8-197e-4e94-ad98-d78d95d0c4ab",
+              "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+              "command": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+                "timestamp": "2026-10-03T20:55:45.322294Z",
+                "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09",
+                "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+                "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+                "order_line_id": "line-1",
+                "kind": "PICK_AND_PLACE",
+                "product_id": "product-green",
+                "source_id": "source",
+                "destination_id": "destination",
+                "target_pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6,
+                    0.0,
+                    0.2
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+                "cell_generation": 0,
+                "brain_version": "deterministic-1",
+                "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906"
+              },
+              "receipt": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "timestamp": "2026-10-03T20:55:45.515378Z",
+                "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "status": "REJECTED",
+                "reason": "PROVEN_NOT_STARTED",
+                "effect_count": 0,
+                "payload_hash": "e85f06bc5bc6da401539a49db82e42ee0cafd087c98663e7b729c37f47278e1e",
+                "journal_durable": true
+              },
+              "observation": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "timestamp": "2026-10-03T20:56:17.043459Z",
+                "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "step": 0,
+                "captured_at": "2026-10-03T20:56:17.043459Z",
+                "model_version": "synthetic-observer-1",
+                "calibration_version": "cal-1",
+                "objects": [],
+                "covered_locations": [],
+                "cell_generation": 0
+              },
+              "verification": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+                "timestamp": "2026-10-03T20:56:17.089769Z",
+                "verification_id": "03c1f90b-c814-4ed6-ba0f-954ea5fe592f",
+                "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+                "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "observation_id": "d0877ed7-ca58-41a7-8b55-df44d8e23193",
+                "verdict": "INCONCLUSIVE",
+                "reason": "MISSING_OBSERVATION"
+              }
+            },
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+              "causation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+              "timestamp": "2026-10-03T20:57:04.142215Z",
+              "evidence_id": "7904a268-eb3f-4605-9cd0-04f93385170c",
+              "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+              "command": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+                "timestamp": "2026-10-03T20:55:45.322294Z",
+                "action_plan_id": "79a8d419-0141-561b-8de9-eb837999be09",
+                "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+                "order_id": "order-67889580-9b1d-45d4-95be-7081d6e33fa4",
+                "order_line_id": "line-1",
+                "kind": "PICK_AND_PLACE",
+                "product_id": "product-green",
+                "source_id": "source",
+                "destination_id": "destination",
+                "target_pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6,
+                    0.0,
+                    0.2
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "observation_id": "797379a8-454f-4d9e-a276-6f2983b7ede6",
+                "cell_generation": 0,
+                "brain_version": "deterministic-1",
+                "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906"
+              },
+              "receipt": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "timestamp": "2026-10-03T20:55:45.515378Z",
+                "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "status": "REJECTED",
+                "reason": "PROVEN_NOT_STARTED",
+                "effect_count": 0,
+                "payload_hash": "e85f06bc5bc6da401539a49db82e42ee0cafd087c98663e7b729c37f47278e1e",
+                "journal_durable": true
+              },
+              "observation": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "timestamp": "2026-10-03T20:57:04.092405Z",
+                "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "step": 0,
+                "captured_at": "2026-10-03T20:57:04.092405Z",
+                "model_version": "synthetic-observer-1",
+                "calibration_version": "cal-1",
+                "objects": [
+                  {
+                    "schema_version": "1.0",
+                    "product_id": "product-red",
+                    "location_id": "source",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        -0.6,
+                        -0.18,
+                        0.2
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "cal-1"
+                    },
+                    "confidence": 1.0,
+                    "uncertainty_m": 0.0
+                  },
+                  {
+                    "schema_version": "1.0",
+                    "product_id": "product-blue",
+                    "location_id": "source",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        -0.6,
+                        0.0,
+                        0.2
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "cal-1"
+                    },
+                    "confidence": 1.0,
+                    "uncertainty_m": 0.0
+                  },
+                  {
+                    "schema_version": "1.0",
+                    "product_id": "product-green",
+                    "location_id": "source",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        -0.6,
+                        0.18,
+                        0.2
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "cal-1"
+                    },
+                    "confidence": 1.0,
+                    "uncertainty_m": 0.0
+                  }
+                ],
+                "covered_locations": [
+                  "source",
+                  "destination"
+                ],
+                "cell_generation": 0
+              },
+              "verification": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "d9eb3d64-e118-5fef-afbf-5f22bb7f4558",
+                "causation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+                "timestamp": "2026-10-03T20:57:04.141977Z",
+                "verification_id": "b29b5eb9-fde5-4ce7-8296-4b46e1c50fa2",
+                "job_id": "77c07673-cad6-520c-9405-ffdd09b886d1",
+                "command_id": "62895d03-bfe2-5b01-b85f-a31ad081f906",
+                "observation_id": "2242bb2c-2c69-4d94-8de6-9566c7a8fb1d",
+                "verdict": "VERIFIED_FAILURE",
+                "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+              }
+            }
+          ]
+        },
+        {
+          "schema_version": "1.0",
+          "job": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "9b56f7e1-2796-5aa0-ad40-96282a464080",
+            "causation_id": "e328550f-ad6c-4853-9f14-c4de37ad4993",
+            "timestamp": "2026-10-03T20:58:08.409064Z",
+            "job_id": "04507097-ef6b-51a2-8ef2-0082354f2518",
+            "order_id": "order-4f523ef8-4ade-4255-b494-62cb81a07047",
+            "line": {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            },
+            "state": "FAILED",
+            "revision": 7,
+            "command_id": "e32f3ba1-3562-503a-8d43-1d3d96af8b63",
+            "action_plan_id": "8ae45836-f7fe-576b-9021-c6fe1957ceb6"
+          },
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "9b56f7e1-2796-5aa0-ad40-96282a464080",
+            "causation_id": "11df79e6-da2c-4d30-b5c9-50cb00c04aed",
+            "timestamp": "2026-10-03T20:58:07.974151Z",
+            "action_plan_id": "8ae45836-f7fe-576b-9021-c6fe1957ceb6",
+            "job_id": "04507097-ef6b-51a2-8ef2-0082354f2518",
+            "order_id": "order-4f523ef8-4ade-4255-b494-62cb81a07047",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-green",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "observation_id": "11df79e6-da2c-4d30-b5c9-50cb00c04aed",
+            "cell_generation": 0,
+            "brain_version": "deterministic-1",
+            "command_id": "e32f3ba1-3562-503a-8d43-1d3d96af8b63"
+          },
+          "journal": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "9b56f7e1-2796-5aa0-ad40-96282a464080",
+            "causation_id": "e32f3ba1-3562-503a-8d43-1d3d96af8b63",
+            "timestamp": "2026-10-03T20:58:08.187044Z",
+            "command_id": "e32f3ba1-3562-503a-8d43-1d3d96af8b63",
+            "job_id": "04507097-ef6b-51a2-8ef2-0082354f2518",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "status": "REJECTED",
+            "reason": "CELL_NOT_READY",
+            "effect_count": 0,
+            "payload_hash": "26004d85aa4bb581be5812fff7d90806e3122fdb7e195659885b323f32f20d2f",
+            "journal_durable": true
+          },
+          "observations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "9b56f7e1-2796-5aa0-ad40-96282a464080",
+              "causation_id": "04507097-ef6b-51a2-8ef2-0082354f2518",
+              "timestamp": "2026-10-03T20:58:07.974151Z",
+              "observation_id": "11df79e6-da2c-4d30-b5c9-50cb00c04aed",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T20:58:07.974151Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 0
+            },
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "9b56f7e1-2796-5aa0-ad40-96282a464080",
+              "causation_id": "e32f3ba1-3562-503a-8d43-1d3d96af8b63",
+              "timestamp": "2026-10-03T20:58:08.354788Z",
+              "observation_id": "c9459e46-f625-4b48-959b-cf7686c86d69",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T20:58:08.354788Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 1
+            }
+          ],
+          "verifications": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "9b56f7e1-2796-5aa0-ad40-96282a464080",
+              "causation_id": "c9459e46-f625-4b48-959b-cf7686c86d69",
+              "timestamp": "2026-10-03T20:58:08.408842Z",
+              "verification_id": "22b123bf-f480-43a4-af99-6b5f9698f693",
+              "job_id": "04507097-ef6b-51a2-8ef2-0082354f2518",
+              "command_id": "e32f3ba1-3562-503a-8d43-1d3d96af8b63",
+              "observation_id": "c9459e46-f625-4b48-959b-cf7686c86d69",
+              "verdict": "VERIFIED_FAILURE",
+              "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+            }
+          ],
+          "reconciliations": []
+        },
+        {
+          "schema_version": "1.0",
+          "job": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "4f3b7a1a-b999-5d07-ad31-c97d53a29881",
+            "causation_id": "eb6a26f3-8ee5-4cd5-b171-2144d512cae2",
+            "timestamp": "2026-10-03T21:00:12.916562Z",
+            "job_id": "b4421b27-8354-5ab8-a54b-0ef2f8125644",
+            "order_id": "order-75c47ca7-e578-4755-8ae9-1ea09bca6ee0",
+            "line": {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            },
+            "state": "FAILED",
+            "revision": 7,
+            "command_id": "d4849d78-7701-5120-af19-cebf5d2df097",
+            "action_plan_id": "23915139-9191-5251-b41d-8fd3751e751f"
+          },
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "4f3b7a1a-b999-5d07-ad31-c97d53a29881",
+            "causation_id": "c0cca4b9-8fba-487b-aefc-e7a30bab53b0",
+            "timestamp": "2026-10-03T21:00:11.904982Z",
+            "action_plan_id": "23915139-9191-5251-b41d-8fd3751e751f",
+            "job_id": "b4421b27-8354-5ab8-a54b-0ef2f8125644",
+            "order_id": "order-75c47ca7-e578-4755-8ae9-1ea09bca6ee0",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-green",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "observation_id": "c0cca4b9-8fba-487b-aefc-e7a30bab53b0",
+            "cell_generation": 3,
+            "brain_version": "deterministic-1",
+            "command_id": "d4849d78-7701-5120-af19-cebf5d2df097"
+          },
+          "journal": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "4f3b7a1a-b999-5d07-ad31-c97d53a29881",
+            "causation_id": "d4849d78-7701-5120-af19-cebf5d2df097",
+            "timestamp": "2026-10-03T21:00:12.287685Z",
+            "command_id": "d4849d78-7701-5120-af19-cebf5d2df097",
+            "job_id": "b4421b27-8354-5ab8-a54b-0ef2f8125644",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "status": "REJECTED",
+            "reason": "CELL_NOT_READY",
+            "effect_count": 0,
+            "payload_hash": "2f9305b26fb681cb27c7ffd61c9e3770694945989e064ef6170771450317ec0f",
+            "journal_durable": true
+          },
+          "observations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "4f3b7a1a-b999-5d07-ad31-c97d53a29881",
+              "causation_id": "b4421b27-8354-5ab8-a54b-0ef2f8125644",
+              "timestamp": "2026-10-03T21:00:11.904982Z",
+              "observation_id": "c0cca4b9-8fba-487b-aefc-e7a30bab53b0",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T21:00:11.904982Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 3
+            },
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "4f3b7a1a-b999-5d07-ad31-c97d53a29881",
+              "causation_id": "d4849d78-7701-5120-af19-cebf5d2df097",
+              "timestamp": "2026-10-03T21:00:12.794276Z",
+              "observation_id": "ddff75b0-5f38-4dd5-ae41-f847f293d0ec",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T21:00:12.794276Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 4
+            }
+          ],
+          "verifications": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "4f3b7a1a-b999-5d07-ad31-c97d53a29881",
+              "causation_id": "ddff75b0-5f38-4dd5-ae41-f847f293d0ec",
+              "timestamp": "2026-10-03T21:00:12.916357Z",
+              "verification_id": "9bcfb5e6-b25e-4d98-8252-c80ace42f132",
+              "job_id": "b4421b27-8354-5ab8-a54b-0ef2f8125644",
+              "command_id": "d4849d78-7701-5120-af19-cebf5d2df097",
+              "observation_id": "ddff75b0-5f38-4dd5-ae41-f847f293d0ec",
+              "verdict": "VERIFIED_FAILURE",
+              "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+            }
+          ],
+          "reconciliations": []
+        },
+        {
+          "schema_version": "1.0",
+          "job": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "df721404-0a9f-54fd-9f3b-a5b735d70923",
+            "causation_id": "50995c95-8257-4119-960f-9ee50754e1a4",
+            "timestamp": "2026-10-03T21:03:13.833293Z",
+            "job_id": "47ff1c0a-d064-54bd-bb88-406cd78445f8",
+            "order_id": "order-c1544249-4e27-4e4b-9ecc-356651f63b15",
+            "line": {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            },
+            "state": "FAILED",
+            "revision": 3,
+            "command_id": null,
+            "action_plan_id": null
+          },
+          "command": null,
+          "journal": null,
+          "observations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "df721404-0a9f-54fd-9f3b-a5b735d70923",
+              "causation_id": "47ff1c0a-d064-54bd-bb88-406cd78445f8",
+              "timestamp": "2026-10-03T21:03:13.790163Z",
+              "observation_id": "e1da3ed6-fe22-4260-bb17-8de7e5c2f22e",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T21:03:13.790163Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 6
+            }
+          ],
+          "verifications": [],
+          "reconciliations": []
+        },
+        {
+          "schema_version": "1.0",
+          "job": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "6a42f548-a273-5884-9462-09437a9fab7e",
+            "causation_id": "375aa68f-d9ea-44de-8f3c-5f742ca55875",
+            "timestamp": "2026-10-03T21:04:41.299945Z",
+            "job_id": "f8a1d882-8d20-5bd8-95f2-33c687c7a402",
+            "order_id": "order-4d4de063-1572-4580-b11b-5d3bf03f804d",
+            "line": {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            },
+            "state": "FAILED",
+            "revision": 3,
+            "command_id": null,
+            "action_plan_id": null
+          },
+          "command": null,
+          "journal": null,
+          "observations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "6a42f548-a273-5884-9462-09437a9fab7e",
+              "causation_id": "f8a1d882-8d20-5bd8-95f2-33c687c7a402",
+              "timestamp": "2026-10-03T21:04:41.249801Z",
+              "observation_id": "22fd1b2a-8a40-4297-a38f-e421e8aab897",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T21:04:41.249801Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 6
+            }
+          ],
+          "verifications": [],
+          "reconciliations": []
+        },
+        {
+          "schema_version": "1.0",
+          "job": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+            "causation_id": "29cb10e1-9fb6-4eac-b3f3-de65987f6ccf",
+            "timestamp": "2026-10-03T21:06:31.785764Z",
+            "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+            "order_id": "order-24d5316c-c4f9-4b98-9258-3f8d3dabd4c2",
+            "line": {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-green",
+              "source_id": "source",
+              "destination_id": "destination",
+              "quantity": 1
+            },
+            "state": "REQUIRES_INTERVENTION",
+            "revision": 8,
+            "command_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+            "action_plan_id": "09235aa0-0b60-5819-bf2c-56808f26843c"
+          },
+          "command": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+            "causation_id": "16768ea0-2cde-4335-8904-9b6849b619c9",
+            "timestamp": "2026-10-03T21:05:06.836319Z",
+            "action_plan_id": "09235aa0-0b60-5819-bf2c-56808f26843c",
+            "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+            "order_id": "order-24d5316c-c4f9-4b98-9258-3f8d3dabd4c2",
+            "order_line_id": "line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-green",
+            "source_id": "source",
+            "destination_id": "destination",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.6,
+                0.0,
+                0.2
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "cal-1"
+            },
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "observation_id": "16768ea0-2cde-4335-8904-9b6849b619c9",
+            "cell_generation": 6,
+            "brain_version": "deterministic-1",
+            "command_id": "95b2adc3-4485-56ab-8529-51a02a7a850a"
+          },
+          "journal": {
+            "schema_version": "1.0",
+            "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+            "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+            "causation_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+            "timestamp": "2026-10-03T21:05:07.126209Z",
+            "command_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+            "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+            "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+            "status": "REJECTED",
+            "reason": "PROVEN_NOT_STARTED",
+            "effect_count": 0,
+            "payload_hash": "a7907bbf139c520c47788722243751d8e54844c2a8542c2359b41e7f2da72279",
+            "journal_durable": true
+          },
+          "observations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+              "causation_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+              "timestamp": "2026-10-03T21:05:06.836319Z",
+              "observation_id": "16768ea0-2cde-4335-8904-9b6849b619c9",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T21:05:06.836319Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 6
+            },
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+              "causation_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+              "timestamp": "2026-10-03T21:06:31.696192Z",
+              "observation_id": "bba880ad-b3e2-4b4d-aac6-cb4974ee4627",
+              "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+              "step": 0,
+              "captured_at": "2026-10-03T21:06:21.696192Z",
+              "model_version": "synthetic-observer-1",
+              "calibration_version": "cal-1",
+              "objects": [
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-red",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      -0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-blue",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.0,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                },
+                {
+                  "schema_version": "1.0",
+                  "product_id": "product-green",
+                  "location_id": "source",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.6,
+                      0.18,
+                      0.2
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0
+                }
+              ],
+              "covered_locations": [
+                "source",
+                "destination"
+              ],
+              "cell_generation": 6
+            }
+          ],
+          "verifications": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+              "causation_id": "bba880ad-b3e2-4b4d-aac6-cb4974ee4627",
+              "timestamp": "2026-10-03T21:06:31.757544Z",
+              "verification_id": "53665f64-3ed4-4d3d-9fa0-4397f539706e",
+              "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+              "command_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+              "observation_id": "bba880ad-b3e2-4b4d-aac6-cb4974ee4627",
+              "verdict": "INCONCLUSIVE",
+              "reason": "STALE_OR_FUTURE_OBSERVATION"
+            }
+          ],
+          "reconciliations": [
+            {
+              "schema_version": "1.0",
+              "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+              "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+              "causation_id": "bba880ad-b3e2-4b4d-aac6-cb4974ee4627",
+              "timestamp": "2026-10-03T21:06:31.757646Z",
+              "evidence_id": "d5701376-f411-4811-8263-a4e120929308",
+              "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+              "command": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+                "causation_id": "16768ea0-2cde-4335-8904-9b6849b619c9",
+                "timestamp": "2026-10-03T21:05:06.836319Z",
+                "action_plan_id": "09235aa0-0b60-5819-bf2c-56808f26843c",
+                "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+                "order_id": "order-24d5316c-c4f9-4b98-9258-3f8d3dabd4c2",
+                "order_line_id": "line-1",
+                "kind": "PICK_AND_PLACE",
+                "product_id": "product-green",
+                "source_id": "source",
+                "destination_id": "destination",
+                "target_pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.6,
+                    0.0,
+                    0.2
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "cal-1"
+                },
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "observation_id": "16768ea0-2cde-4335-8904-9b6849b619c9",
+                "cell_generation": 6,
+                "brain_version": "deterministic-1",
+                "command_id": "95b2adc3-4485-56ab-8529-51a02a7a850a"
+              },
+              "receipt": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+                "causation_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+                "timestamp": "2026-10-03T21:05:07.126209Z",
+                "command_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+                "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "status": "REJECTED",
+                "reason": "PROVEN_NOT_STARTED",
+                "effect_count": 0,
+                "payload_hash": "a7907bbf139c520c47788722243751d8e54844c2a8542c2359b41e7f2da72279",
+                "journal_durable": true
+              },
+              "observation": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+                "causation_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+                "timestamp": "2026-10-03T21:06:31.696192Z",
+                "observation_id": "bba880ad-b3e2-4b4d-aac6-cb4974ee4627",
+                "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+                "step": 0,
+                "captured_at": "2026-10-03T21:06:21.696192Z",
+                "model_version": "synthetic-observer-1",
+                "calibration_version": "cal-1",
+                "objects": [
+                  {
+                    "schema_version": "1.0",
+                    "product_id": "product-red",
+                    "location_id": "source",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        -0.6,
+                        -0.18,
+                        0.2
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "cal-1"
+                    },
+                    "confidence": 1.0,
+                    "uncertainty_m": 0.0
+                  },
+                  {
+                    "schema_version": "1.0",
+                    "product_id": "product-blue",
+                    "location_id": "source",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        -0.6,
+                        0.0,
+                        0.2
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "cal-1"
+                    },
+                    "confidence": 1.0,
+                    "uncertainty_m": 0.0
+                  },
+                  {
+                    "schema_version": "1.0",
+                    "product_id": "product-green",
+                    "location_id": "source",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        -0.6,
+                        0.18,
+                        0.2
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "cal-1"
+                    },
+                    "confidence": 1.0,
+                    "uncertainty_m": 0.0
+                  }
+                ],
+                "covered_locations": [
+                  "source",
+                  "destination"
+                ],
+                "cell_generation": 6
+              },
+              "verification": {
+                "schema_version": "1.0",
+                "run_id": "0c83e570-5349-411e-8070-d2d4f9bcd496",
+                "correlation_id": "387c2059-ffef-50c3-8728-aa09a10c7b6f",
+                "causation_id": "bba880ad-b3e2-4b4d-aac6-cb4974ee4627",
+                "timestamp": "2026-10-03T21:06:31.757544Z",
+                "verification_id": "53665f64-3ed4-4d3d-9fa0-4397f539706e",
+                "job_id": "05d8294b-8ee5-5912-8fc8-08cacd7b7644",
+                "command_id": "95b2adc3-4485-56ab-8529-51a02a7a850a",
+                "observation_id": "bba880ad-b3e2-4b4d-aac6-cb4974ee4627",
+                "verdict": "INCONCLUSIVE",
+                "reason": "STALE_OR_FUTURE_OBSERVATION"
+              }
+            }
+          ]
+        }
+      ],
+      "fixture": {
+        "runtime": "blender",
+        "products": [
+          {
+            "schema_version": "1.0",
+            "product_id": "product-red",
+            "sku": "RED"
+          },
+          {
+            "schema_version": "1.0",
+            "product_id": "product-blue",
+            "sku": "BLUE"
+          },
+          {
+            "schema_version": "1.0",
+            "product_id": "product-green",
+            "sku": "GREEN"
+          }
+        ],
+        "source_id": "source",
+        "destination_id": "destination",
+        "scene_epoch": "a437f2c6-cbe8-49cd-96f1-f5e3319ab23a",
+        "inventory": [
+          {
+            "product_id": "product-red",
+            "location_id": "source"
+          },
+          {
+            "product_id": "product-blue",
+            "location_id": "source"
+          },
+          {
+            "product_id": "product-green",
+            "location_id": "source"
+          }
+        ],
+        "scene_reset_blocked_reason": "SCENE_RESET_BLOCKED_UNRESOLVED_JOBS"
+      }
+    },
+    "archive_preserved_all_orders_assessments_journal_and_fixture": true,
+    "attention_focus": "review-heading",
+    "mobile": {
+      "viewport": [
+        390,
+        844
+      ],
+      "document_width": 375,
+      "horizontal_overflow": false,
+      "repeat_review_enabled": true
+    },
+    "checks": [
+      "Automatic original-pick review on UNKNOWN_OUTCOME and existing REQUIRES_INTERVENTION",
+      "Repeated contradictory, low-confidence, missing and stale observations remain inconclusive",
+      "Use normal observation changes selection and focus only",
+      "Inspect full evidence is read-only; the following explicit normal review resolves the original command",
+      "All three products continue in one delivery with exactly one effect each",
+      "No-effect command resolves FAILED with zero effects and all products at source",
+      "Logical E-stop and cell fault guide to explicit reset without running another order",
+      "Brain timeout and invalid output guide to setup; no command and reconciliation disabled",
+      "New test retains observation choice; archived inconclusive test is read-only with Return to current test"
+    ]
+  },
+  "native": {
+    "runtime": "headless",
+    "lifecycle": {
+      "data": "C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\guided-ui\\native",
+      "passed": true,
+      "checks": [
+        "native window rendered with owned loopback API",
+        "duplicate launch reuses window without new backend",
+        "window close drains backend and releases port",
+        "reopen reconciles original command with exactly one pick",
+        "abrupt desktop termination also stops owned backend",
+        "reopen after forced close preserves completed work"
+      ],
+      "source_dirty": true,
+      "source_commit": "348c786710a0e22f0dd7de0744eac7057da13ad8",
+      "test_script_sha256": "a5fee1d15146b912190fecd62cd6865db4483e0bf0485ff2c8a75dd15e30cabf",
+      "runtime": "headless"
+    },
+    "assets": [
+      {
+        "session": "20261003T205752-fa925e9a3e534fc2a490d99a704eb9a1",
+        "window_ready": true,
+        "theme_200": true,
+        "guide_200": true
+      },
+      {
+        "session": "20261003T205758-d8036915e3b449f0bf18d614f7db0617",
+        "window_ready": true,
+        "theme_200": true,
+        "guide_200": true
+      },
+      {
+        "session": "20261003T205801-9c052592a18f46b5bbe278e53b157aa5",
+        "window_ready": true,
+        "theme_200": true,
+        "guide_200": true
+      }
+    ]
+  },
+  "user_preservation": {
+    "all_orders_unchanged": 54,
+    "all_evidence_fixtures_deliveries_unchanged": true,
+    "active_test_unchanged": "0907671c-a2e7-42b5-9577-8bdf85ae3829",
+    "session_restarted": false,
+    "reason": "The current user test has an UNKNOWN_OUTCOME job. It was left untouched; only read-only evidence queries were made. Reopen the app once to load the new backend and UI."
+  },
+  "screenshots": [
+    "docs/evidence/guided-workflow-dark.png",
+    "docs/evidence/guided-workflow-mobile.png"
+  ],
+  "application_and_test_sha256": {
+    "apps/__init__.py": "24315af176e994ad85dbf10b3a1a1fb310b41d4a3a5be673df028bc4e8148b47",
+    "apps/api/app.py": "a8746e32f1b20721a7757e2fe2727bc3f9ee8b96a69540370f67ccd0bb09cb4d",
+    "apps/api/playback.py": "9594fec29c1b6b1f09312de1000bba12dd00c938ce6240157812d9ac40747a25",
+    "apps/api/test_sessions.py": "7baa5ca7c357958882ecb95664ee2103c3fa575d23dc64a91c9bf644d0ca2cfc",
+    "apps/api/__init__.py": "7a70cf857c3ce3f47d30ebdbbc22bd2db406bea2e58172ce2118273c6c9d5004",
+    "apps/api/__main__.py": "a71776497800c6b2e4ecca954f3a4e15e32021b47db97567aed3c76ee38719f8",
+    "apps/desktop/backend.py": "08847cd5f5f9be3ee37cf2a5af02c71ef9e47f3921dee6954d6150a1efd312a0",
+    "apps/desktop/OwnedProcess.cs": "3bc774b0977aa50f687a29572c10ca4f96004e4def4ccc761aa2f5e8d37b1f03",
+    "apps/desktop/RobotOpsLauncher.cs": "dd3d87c5beb1bb9f0f95e5c8423ec9676205ac1680f42466e6aba25a1039756c",
+    "apps/desktop/__init__.py": "b9e3d8b923d02f3bb7df0ef084bf10f8f62213cffa92ac6a3f21b3e06b4f782d",
+    "apps/erp_ui/app.js": "08cf174ac4caf9c892355030cbb93b192c637b2cce06526ba1d5e06958f6817c",
+    "apps/erp_ui/index.html": "856dbc053416b5c6fe21e47b5778cdc182c4d6e446f75ac5e8ec2a5313d8553e",
+    "apps/erp_ui/playback.js": "d983f69b058880a1ef204ffa5032d8babdced9c26353a4ef23c32c287afdc781",
+    "apps/erp_ui/scene-view.js": "c5f53aff4536ad796db907f888b8a0a3c00ad3a10c0d4b1ea5c1335ad2823c8b",
+    "apps/erp_ui/theme.css": "367757d243d31183d9edd598d4aa1fb0ecaea092abf8131928121ab745ef8073",
+    "apps/erp_ui/workflow-guide.js": "f6685e5a4744e475faa094b557f72f02a4393155383d8ce36f0a8b803ca1440b",
+    "apps/erp_ui/vendor/OrbitControls.js": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c",
+    "apps/erp_ui/vendor/three.core.min.js": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+    "apps/erp_ui/vendor/three.module.min.js": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+    "robotops/config.py": "f3c2f4b8b21e383d113a9c110ba487c8ec0e9b39fb50b23607fc0d39a1a407a8",
+    "robotops/demo.py": "51757f998173f784a0a7f54462b4a47afb026468889626fa2000ae41f825557e",
+    "robotops/presentation_io.py": "45d704fc31bb0d56a3daf9f4a5b83147dfdce81b90fbb1423d40507f0be97a24",
+    "robotops/scene_geometry.py": "3baea9f346687b387fd8b499e6492a035d29e4ed9c6c18262b4be24a6208066a",
+    "robotops/__init__.py": "f4ae601f4347daddf62e07247f50c8abedccfd3981a5aaf23234511635eb2ff9",
+    "robotops/blender/adapter.py": "546bfcc727f29b46cbb6ee5ecfab63391a799729415371e1701ac971264d28f3",
+    "robotops/blender/visualization.py": "e88132fc7b6dfc3e5adc00c02a65b32a1a64c66c7fe7b7e6f1841bc5724541e0",
+    "robotops/blender/__init__.py": "044ecd93d0183e5ebd0c1d674fda67c593b25c072ba374f6b22fb41de99692ce",
+    "robotops/brain/deterministic.py": "57374835c7b3aed39ada1dc63d153618fb9f306c85890e83e8522f5ae1f70126",
+    "robotops/brain/validation.py": "f39a3d93cfa26ec5d1dd2619a93ebf334a5e5ced86a722e7d1cab37108b4571c",
+    "robotops/brain/__init__.py": "013b24fb4b57e7947a47cb3678672f6d8b943690c55107c80e81876895bbd70e",
+    "robotops/cell/controller.py": "fd28806e7f0ec0f09b1571efdf44ff96d235350871f807411a66fc4a9eb34e4f",
+    "robotops/cell/runtime.py": "a1e43b5c849a530091a3af3917677b08ec8e74cc5311b72c70c21bb4cba3d36b",
+    "robotops/cell/__init__.py": "1d664129d5ab10c2ddd618461d6272df00c875ae8528ecf8facf64c008f1c559",
+    "robotops/domain/models.py": "06fab014b4b7717219ffc56bb65370a8410967f87707c50b5be757ae5b91b118",
+    "robotops/domain/ports.py": "5a8fd47979e49c2570e0be537ae89b07d8f2ace2f7fafb979364057fa3c7f6e4",
+    "robotops/domain/__init__.py": "a40c8c39942b0cc0918b254d9311fc4e48189540e87ade6b39e5962478218de9",
+    "robotops/faults/injection.py": "e1ef7d61d7c9ac6ed74560da58ab0032154cb40b9e84257b8f3fd0939b2e29cc",
+    "robotops/faults/__init__.py": "35d187a04a6a914e725619080c0599ba191106a80025eb757f9785c8dcf991fe",
+    "robotops/observability/metrics.py": "e3c3ef9b9001d607288a648ff14d55a6b4e35527363c0c6dfae8ac0adf340d9f",
+    "robotops/observability/__init__.py": "02b8ad9aff4ba0ebd08eb123d50a25a9f5c52c779b0716be4f2ff4bf7683e1f2",
+    "robotops/observation/model.py": "b769853898c7674c4757982c2154f099ea2d723b7fc991c2c0d31045544619d4",
+    "robotops/observation/quality.py": "bdea139245c2c414600f7b3b3bc82be3bd35c522e18f3cf478d21c54478fc78b",
+    "robotops/observation/__init__.py": "2c409c11a24bbd1912b16eb0cccfd6ada9b022874162883da58ea4a9c9313225",
+    "robotops/robot_gateway/gateway.py": "b0846a5832120c449eca6b5dad8ea55cff0f93ea2a739ad6690206f919c5e56f",
+    "robotops/robot_gateway/__init__.py": "3fbbbc3bd65a377e11549136c8133d024f9493c79d60e7aed02a116735fb34a0",
+    "robotops/verification/verifier.py": "ac84490427e3d02ed9f11d44e515c012bfb70101009fca267e97d9c3d0a4a035",
+    "robotops/verification/__init__.py": "fe0bac385608322e461ea37346fc510fbc90ad95e135fc6efd83002337e2287a",
+    "robotops/workflow/engine.py": "0a4094ee6678b6de066d40a6ee187de286213aab0783f3627c3d9be686333970",
+    "robotops/workflow/states.py": "80ae0d0c296472474fb31c33a8e450d63abc72f69f79c93b10cda3e46ee95c2c",
+    "robotops/workflow/store.py": "5547869d012a6446d83c41d9fd66e5d8090621d2dc9df3dc8c3bffd71438b1b8",
+    "robotops/workflow/__init__.py": "7a10e4902a996a5a68dcc20023d53154c6ba3653310e504d13211246bb169101",
+    "tests/conftest.py": "e92add11b0386602673c193b1512d279ee3b6aec73cd9d9ebcc51d404f9798ac",
+    "tests/blender/test_blender_runtime.py": "862536ad25dbe485613e6511477e10d2acd189f92d437617636051f0db79efe9",
+    "tests/blender/test_playback.py": "9aaad75d80db3f7d8d14dc2492dbb3618a3385d301778a697cbc4786e1570dc0",
+    "tests/contract/test_api.py": "b8b893de14d92c06efc4df3355d76113953f6ee18deafaf63a8247b4dd7c5ca5",
+    "tests/contract/test_completion.py": "73c48035f1754aebde7dc288349a56a1118fe5a81440c3ecf9c8879519283d38",
+    "tests/contract/test_governance.py": "b9f07c6624dd2fe9b59b38b2db6af39c304ad1015231b30af5f85d885a99e1a2",
+    "tests/contract/test_pdf_package.py": "440d4e1445d7e3a3685980f4dc4a6be6798524ba76f87bdecfca174618415125",
+    "tests/contract/test_schemas.py": "773256a76b4cceace283f4529dc7510f4d572b7af98e52bf66699e996277e30c",
+    "tests/e2e/test_observability.py": "db3001bd2b6e5a862f27161d5ea2dc494e059d6b80b91eee1e4d53bc97f5bb2c",
+    "tests/e2e/test_reobservation.py": "88bf4548523fda1ea1f1fb8f6260dcb396bead41207deb91f0ada5c950a3ec95",
+    "tests/e2e/test_workflow.py": "31f20b676886b1bfebdf7e1b45e6d09778d7ea36561f40ce45b7c04e09b80890",
+    "tests/integration/test_delivery_replay.py": "8362a5300bd4f41a665edb623183e0c34112e063a63c396f9d9ace99e091aa9f",
+    "tests/integration/test_desktop_backend.py": "f491381ecf7a819ecd00d2cc1d33e6b7595bac197950e3af63391d1af142628e",
+    "tests/integration/test_fresh_scene.py": "7f5849fdc183afc53ee577f655ef56c7fa15f0f28f7d0a5f2e0bfa21e0bafc09",
+    "tests/integration/test_process_restart.py": "49bc5d85de6e3917c8142a729b029471c3146a03f9bb2a4320db2ea4feed9fac",
+    "tests/integration/test_runtime.py": "571e622e691290613d388d909b35daba2fd4dbe580f3ba3bf96e85ea52764160",
+    "tests/integration/test_simulation_tests.py": "adc5eb22786d094fa28a5dfbde5076a3ec1b2ab365ce7471c1d66af0e2d72958",
+    "tests/integration/test_store.py": "99e3ac01f87972b948a43c30c3b2c5032733232ac5433e6563be5f058f9801dc",
+    "tests/ui/dashboard.test.cjs": "ac7763302cd457faba12a16c530ded35d022fbcdacd8a0be1dc59f15a8748853",
+    "tests/ui/playback.test.cjs": "e25577f2fef0678e97d15e71eaf341ae4998eb729128caba690372dddbab86a6",
+    "tests/ui/workflow-guide.test.cjs": "e3e2a02f4ca7bf9913806b1cb665c27adbc84e3550120467e8b5cc042da6476c",
+    "tests/unit/test_action_validation.py": "3355c64ed14e76ed17931a00ec232598b35525a99b6d95c38efb8979679659b3",
+    "tests/unit/test_observation_verifier.py": "d06cec18738f8cb5eed1e4814e5c940f97b79da694147cae9e9d3d59b70ff244",
+    "tests/unit/test_states.py": "1ed2b96437936578f53ae6c97eb24bac7f9a14ddb5a93d8f640829f1692de786",
+    "tests/unit/test_visualization.py": "e6c53fcc6501ffb0e3a8567dd937f6ece12dca0eced904cf9aed321d69dae078"
+  },
+  "documentation_closure": {
+    "status": "PASS",
+    "checks": {
+      "contracts": {
+        "passed": true,
+        "exit_code": 0,
+        "command": [
+          "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pytest",
+          "tests/contract",
+          "-q",
+          "--basetemp=artifacts/guided-ui/pytest-closure",
+          "-o",
+          "cache_dir=artifacts/guided-ui/closure-cache"
+        ],
+        "seconds": 2.1840545000013663,
+        "log": "docs/evidence/guided-workflow-checks/contracts.log"
+      },
+      "lint": {
+        "passed": true,
+        "exit_code": 0,
+        "command": [
+          "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+          "-m",
+          "tools.dev",
+          "lint"
+        ],
+        "seconds": 0.2449735000009241,
+        "log": "docs/evidence/guided-workflow-checks/lint.log"
+      },
+      "typecheck": {
+        "passed": true,
+        "exit_code": 0,
+        "command": [
+          "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+          "-m",
+          "tools.dev",
+          "typecheck"
+        ],
+        "seconds": 0.4242520000007062,
+        "log": "docs/evidence/guided-workflow-checks/typecheck.log"
+      },
+      "drift": {
+        "passed": true,
+        "exit_code": 0,
+        "command": [
+          "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+          "-m",
+          "tools.drift_check"
+        ],
+        "seconds": 0.37114889999793377,
+        "log": "docs/evidence/guided-workflow-checks/drift.log"
+      },
+      "publication": {
+        "passed": true,
+        "exit_code": 0,
+        "command": [
+          "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+          "-m",
+          "tools.dev",
+          "docs"
+        ],
+        "seconds": 10.364161699999386,
+        "log": "docs/evidence/guided-workflow-checks/publication.log"
+      }
+    },
+    "contract_tests_passed": 46,
+    "application_and_tests_unchanged": true,
+    "final_source": {
+      "commit": "348c786710a0e22f0dd7de0744eac7057da13ad8",
+      "dirty": true,
+      "source_sha256": "c56d66db766141459a6df540e6963fadab9c6089ab2114081fa03509dcc251f7"
+    },
+    "publication_build": {
+      "title": "RobotOps Twin publication",
+      "version": "1.1.0",
+      "date": "2026-10-02",
+      "source_checked_at": "2026-10-01",
+      "source_commit": "348c786710a0e22f0dd7de0744eac7057da13ad8",
+      "reports": [
+        {
+          "report": "01-design",
+          "title": "Fr\u00e5n kundorder till verifierad roboteffekt",
+          "pages": 26,
+          "words_approx": 4895,
+          "references": [
+            "S01",
+            "S02",
+            "S03",
+            "S04",
+            "S05",
+            "S06",
+            "S07",
+            "S08",
+            "S10",
+            "S11",
+            "S12",
+            "S13",
+            "S14",
+            "S15",
+            "S16",
+            "S17",
+            "S18",
+            "S19",
+            "S21",
+            "S22"
+          ],
+          "pdf_sha256": "56917f9a00f5792ee8999d35a07e41dc3d08d96a38e373bca68e494d9a115920"
+        },
+        {
+          "report": "02-avgransning",
+          "title": "Simulatorn och den verkliga robotcellen",
+          "pages": 12,
+          "words_approx": 2187,
+          "references": [
+            "S01",
+            "S03",
+            "S04",
+            "S07",
+            "S08",
+            "S10",
+            "S11",
+            "S12",
+            "S17",
+            "S18",
+            "S19"
+          ],
+          "pdf_sha256": "7b7dc97047bc5ce1ecf61859bd4eb34df7fae7e591a9e0134da1801c8a240d20"
+        },
+        {
+          "report": "03-diskussion",
+          "title": "Teknisk dialog om RobotOps Twin",
+          "pages": 14,
+          "words_approx": 2939,
+          "references": [
+            "S01",
+            "S03",
+            "S04",
+            "S05",
+            "S06",
+            "S07",
+            "S10",
+            "S11",
+            "S20"
+          ],
+          "pdf_sha256": "483b078ecd5ecb6ca511f05af0900661dbb25832db929325786174d9f0e86c8a"
+        }
+      ],
+      "diagrams": 7,
+      "references": 22,
+      "combined_pdf_pages": 52,
+      "pdf_package_checks": {
+        "pages": 52,
+        "internal_links_checked": 181,
+        "destinations_preserved": true
+      },
+      "simulator_status": {
+        "phase": "P7 - local guided dark workspace verified",
+        "status": "LOCAL VERIFIED",
+        "summary": "The deterministic simulator, full-delivery replay and independent tests are implemented. The dark workspace guides Prepare, Run, Review and Continue, directs attention to the original pick and explains its evidence beside repeat-observation controls. The unchanged verifier governs every outcome; review never repeats a pick. Local validation passed: 389 tests twice, 99 UI checks, all quality gates, seven Blender demos and isolated native lifecycle checks. Changes remain uncommitted and unpublished; remote acceptance remains pending."
+      },
+      "checks": [
+        "reference IDs resolved",
+        "figure placeholders resolved",
+        "SVG XML parsed",
+        "PDF text extractable",
+        "relative links and fragments validated"
+      ]
+    },
+    "synchronized_files": [
+      "README.md",
+      "PROJECT_PLAN.md",
+      "CODEX_GOAL_CHECKLIST.md",
+      "GOAL_PROGRESS.md",
+      "ACCEPTANCE_REPORT.md",
+      "PUBLICATION.md",
+      "reports/01-design.md",
+      "reports/02-avgransning.md",
+      "reports/03-diskussion.md",
+      "publication/status.json",
+      "publication/diagrams.json",
+      "contracts/openapi.json",
+      "docs/acceptance-map.json",
+      "tools/acceptance.py",
+      "docs/adr/0009-guided-simulation-workflow.md",
+      "docs/implementation/operations.md",
+      "docs/implementation/desktop.md",
+      "docs/implementation/playback.md",
+      "docs/implementation/reconciliation.md",
+      "docs/implementation/contracts.md",
+      "docs/implementation/acceptance.md",
+      "docs/evidence/guided-workflow-local.json",
+      "docs/evidence/guided-workflow-dark.png",
+      "docs/evidence/guided-workflow-mobile.png"
+    ],
+    "final_rebuild_command": "python -m tools.dev docs; builder validates local links, source copies and PDFs; no public deployment was attempted."
+  },
+  "remote_unverified_musts": [
+    "SC-DATA-005",
+    "SC-KB-006",
+    "SC-KB-007",
+    "SC-KB-008"
+  ],
+  "should_failure": "SC-BRAIN-005: optional model-provider fallback remains unimplemented."
+}

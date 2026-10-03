@@ -43,3 +43,21 @@ The optional external model provider, real ERP delivery, OPC UA and hardware
 integration are not completion gates. Missing optional model fallback is recorded
 against SHOULD SC-BRAIN-005. Reviewed subprocess exceptions are exact AST hashes;
 changes require review again. Dependency vulnerabilities have no exceptions.
+
+The guided workspace (ADR 0009) is exercised by the mandatory Node UI suite
+inside test_playback_controls_never_dispatch_and_preserve_partial_recording_limits.
+Pure guide tests reject substitution of planning observations or scene truth,
+explain degradation reasons and prioritize unresolved original work. Dashboard
+tests check navigation, focus preservation, explicit reset, repeated review,
+archived histories and all execution/observation combinations. Confined CSS/JS
+routes are verified alongside the pinned offline viewer assets. Isolated browser
+flows and the preservation snapshot are recorded in
+`docs/evidence/guided-workflow-local.json`; these are additional UI evidence, not a
+replacement for the twice-run mandatory suite or remote release gates.
+
+The later selector-explanation change is scoped separately in
+`docs/evidence/scenario-help-local.json`. The full-system baseline remains
+`docs/evidence/acceptance/20261003T205102`; it is not relabelled as a later run.
+Affected UI, observation, reconciliation, test-history and contract suites verify
+the follow-up. Browser checks cover all choices, comparison tables and narrow
+screens; reading help must leave the original uncertain command unchanged.

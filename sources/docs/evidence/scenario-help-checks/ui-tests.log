@@ -1,0 +1,515 @@
+TAP version 13
+# Subtest: three product clicks build one delivery; scenario selection is pure configuration and explicit restock preserves playback
+ok 1 - three product clicks build one delivery; scenario selection is pure configuration and explicit restock preserves playback
+  ---
+  duration_ms: 17.9679
+  ...
+# Subtest: exhausted happy path starts an explicit new delivery before issuing a new order
+ok 2 - exhausted happy path starts an explicit new delivery before issuing a new order
+  ---
+  duration_ms: 6.2972
+  ...
+# Subtest: scenario changes cannot dispatch or bypass an unresolved outcome
+ok 3 - scenario changes cannot dispatch or bypass an unresolved outcome
+  ---
+  duration_ms: 4.655
+  ...
+# Subtest: individual legacy execution without a saved delivery identity survives polling
+ok 4 - individual legacy execution without a saved delivery identity survives polling
+  ---
+  duration_ms: 4.243
+  ...
+# Subtest: DROP_ACK_AFTER_EFFECT: explain the paused next pick, reconcile original once, then allow another product
+ok 5 - DROP_ACK_AFTER_EFFECT: explain the paused next pick, reconcile original once, then allow another product
+  ---
+  duration_ms: 4.6293
+  ...
+# Subtest: DROP_ACK_BEFORE_EFFECT: explain the paused next pick, reconcile original once, then allow another product
+ok 6 - DROP_ACK_BEFORE_EFFECT: explain the paused next pick, reconcile original once, then allow another product
+  ---
+  duration_ms: 3.0212
+  ...
+# Subtest: next-step button reconciles the blocker even when historical execution details are selected
+ok 7 - next-step button reconciles the blocker even when historical execution details are selected
+  ---
+  duration_ms: 3.6807
+  ...
+# Subtest: contradictory fresh evidence keeps next pick blocked but allows another observation of the original pick
+ok 8 - contradictory fresh evidence keeps next pick blocked but allows another observation of the original pick
+  ---
+  duration_ms: 3.9255
+  ...
+# Subtest: continue same test: DROP_ACK_AFTER_EFFECT / CONTRADICTORY_OBSERVATION
+ok 9 - continue same test: DROP_ACK_AFTER_EFFECT / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.3454
+  ...
+# Subtest: continue same test: DROP_ACK_AFTER_EFFECT / LOW_CONFIDENCE_OBSERVATION
+ok 10 - continue same test: DROP_ACK_AFTER_EFFECT / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 2.9388
+  ...
+# Subtest: continue same test: DROP_ACK_AFTER_EFFECT / STALE_OBSERVATION
+ok 11 - continue same test: DROP_ACK_AFTER_EFFECT / STALE_OBSERVATION
+  ---
+  duration_ms: 2.8881
+  ...
+# Subtest: continue same test: DROP_ACK_AFTER_EFFECT / MISSING_OBSERVATION
+ok 12 - continue same test: DROP_ACK_AFTER_EFFECT / MISSING_OBSERVATION
+  ---
+  duration_ms: 3.7654
+  ...
+# Subtest: continue same test: DROP_ACK_BEFORE_EFFECT / CONTRADICTORY_OBSERVATION
+ok 13 - continue same test: DROP_ACK_BEFORE_EFFECT / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 2.7919
+  ...
+# Subtest: continue same test: DROP_ACK_BEFORE_EFFECT / LOW_CONFIDENCE_OBSERVATION
+ok 14 - continue same test: DROP_ACK_BEFORE_EFFECT / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 2.8999
+  ...
+# Subtest: continue same test: DROP_ACK_BEFORE_EFFECT / STALE_OBSERVATION
+ok 15 - continue same test: DROP_ACK_BEFORE_EFFECT / STALE_OBSERVATION
+  ---
+  duration_ms: 3.74
+  ...
+# Subtest: continue same test: DROP_ACK_BEFORE_EFFECT / MISSING_OBSERVATION
+ok 16 - continue same test: DROP_ACK_BEFORE_EFFECT / MISSING_OBSERVATION
+  ---
+  duration_ms: 2.7619
+  ...
+# Subtest: independent test: happy / normal
+ok 17 - independent test: happy / normal
+  ---
+  duration_ms: 3.3474
+  ...
+# Subtest: independent test: happy / CONTRADICTORY_OBSERVATION
+ok 18 - independent test: happy / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.8436
+  ...
+# Subtest: independent test: happy / LOW_CONFIDENCE_OBSERVATION
+ok 19 - independent test: happy / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.332
+  ...
+# Subtest: independent test: happy / STALE_OBSERVATION
+ok 20 - independent test: happy / STALE_OBSERVATION
+  ---
+  duration_ms: 3.1896
+  ...
+# Subtest: independent test: happy / MISSING_OBSERVATION
+ok 21 - independent test: happy / MISSING_OBSERVATION
+  ---
+  duration_ms: 5.3752
+  ...
+# Subtest: independent test: DROP_ACK_AFTER_EFFECT / normal
+ok 22 - independent test: DROP_ACK_AFTER_EFFECT / normal
+  ---
+  duration_ms: 4.9007
+  ...
+# Subtest: independent test: DROP_ACK_AFTER_EFFECT / CONTRADICTORY_OBSERVATION
+ok 23 - independent test: DROP_ACK_AFTER_EFFECT / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.5999
+  ...
+# Subtest: independent test: DROP_ACK_AFTER_EFFECT / LOW_CONFIDENCE_OBSERVATION
+ok 24 - independent test: DROP_ACK_AFTER_EFFECT / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.6417
+  ...
+# Subtest: independent test: DROP_ACK_AFTER_EFFECT / STALE_OBSERVATION
+ok 25 - independent test: DROP_ACK_AFTER_EFFECT / STALE_OBSERVATION
+  ---
+  duration_ms: 3.469
+  ...
+# Subtest: independent test: DROP_ACK_AFTER_EFFECT / MISSING_OBSERVATION
+ok 26 - independent test: DROP_ACK_AFTER_EFFECT / MISSING_OBSERVATION
+  ---
+  duration_ms: 3.7794
+  ...
+# Subtest: independent test: DROP_ACK_BEFORE_EFFECT / normal
+ok 27 - independent test: DROP_ACK_BEFORE_EFFECT / normal
+  ---
+  duration_ms: 5.2679
+  ...
+# Subtest: independent test: DROP_ACK_BEFORE_EFFECT / CONTRADICTORY_OBSERVATION
+ok 28 - independent test: DROP_ACK_BEFORE_EFFECT / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.663
+  ...
+# Subtest: independent test: DROP_ACK_BEFORE_EFFECT / LOW_CONFIDENCE_OBSERVATION
+ok 29 - independent test: DROP_ACK_BEFORE_EFFECT / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 6.1198
+  ...
+# Subtest: independent test: DROP_ACK_BEFORE_EFFECT / STALE_OBSERVATION
+ok 30 - independent test: DROP_ACK_BEFORE_EFFECT / STALE_OBSERVATION
+  ---
+  duration_ms: 3.4378
+  ...
+# Subtest: independent test: DROP_ACK_BEFORE_EFFECT / MISSING_OBSERVATION
+ok 31 - independent test: DROP_ACK_BEFORE_EFFECT / MISSING_OBSERVATION
+  ---
+  duration_ms: 3.5501
+  ...
+# Subtest: independent test: CONTRADICTORY_OBSERVATION / normal
+ok 32 - independent test: CONTRADICTORY_OBSERVATION / normal
+  ---
+  duration_ms: 3.4841
+  ...
+# Subtest: independent test: CONTRADICTORY_OBSERVATION / CONTRADICTORY_OBSERVATION
+ok 33 - independent test: CONTRADICTORY_OBSERVATION / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.499
+  ...
+# Subtest: independent test: CONTRADICTORY_OBSERVATION / LOW_CONFIDENCE_OBSERVATION
+ok 34 - independent test: CONTRADICTORY_OBSERVATION / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.706
+  ...
+# Subtest: independent test: CONTRADICTORY_OBSERVATION / STALE_OBSERVATION
+ok 35 - independent test: CONTRADICTORY_OBSERVATION / STALE_OBSERVATION
+  ---
+  duration_ms: 6.386
+  ...
+# Subtest: independent test: CONTRADICTORY_OBSERVATION / MISSING_OBSERVATION
+ok 36 - independent test: CONTRADICTORY_OBSERVATION / MISSING_OBSERVATION
+  ---
+  duration_ms: 3.562
+  ...
+# Subtest: independent test: LOW_CONFIDENCE_OBSERVATION / normal
+ok 37 - independent test: LOW_CONFIDENCE_OBSERVATION / normal
+  ---
+  duration_ms: 3.1371
+  ...
+# Subtest: independent test: LOW_CONFIDENCE_OBSERVATION / CONTRADICTORY_OBSERVATION
+ok 38 - independent test: LOW_CONFIDENCE_OBSERVATION / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.473
+  ...
+# Subtest: independent test: LOW_CONFIDENCE_OBSERVATION / LOW_CONFIDENCE_OBSERVATION
+ok 39 - independent test: LOW_CONFIDENCE_OBSERVATION / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.6924
+  ...
+# Subtest: independent test: LOW_CONFIDENCE_OBSERVATION / STALE_OBSERVATION
+ok 40 - independent test: LOW_CONFIDENCE_OBSERVATION / STALE_OBSERVATION
+  ---
+  duration_ms: 3.744
+  ...
+# Subtest: independent test: LOW_CONFIDENCE_OBSERVATION / MISSING_OBSERVATION
+ok 41 - independent test: LOW_CONFIDENCE_OBSERVATION / MISSING_OBSERVATION
+  ---
+  duration_ms: 5.7425
+  ...
+# Subtest: independent test: STALE_OBSERVATION / normal
+ok 42 - independent test: STALE_OBSERVATION / normal
+  ---
+  duration_ms: 3.5386
+  ...
+# Subtest: independent test: STALE_OBSERVATION / CONTRADICTORY_OBSERVATION
+ok 43 - independent test: STALE_OBSERVATION / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.4332
+  ...
+# Subtest: independent test: STALE_OBSERVATION / LOW_CONFIDENCE_OBSERVATION
+ok 44 - independent test: STALE_OBSERVATION / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.3259
+  ...
+# Subtest: independent test: STALE_OBSERVATION / STALE_OBSERVATION
+ok 45 - independent test: STALE_OBSERVATION / STALE_OBSERVATION
+  ---
+  duration_ms: 3.2915
+  ...
+# Subtest: independent test: STALE_OBSERVATION / MISSING_OBSERVATION
+ok 46 - independent test: STALE_OBSERVATION / MISSING_OBSERVATION
+  ---
+  duration_ms: 3.5395
+  ...
+# Subtest: independent test: LOGICAL_ESTOP / normal
+ok 47 - independent test: LOGICAL_ESTOP / normal
+  ---
+  duration_ms: 6.8606
+  ...
+# Subtest: independent test: LOGICAL_ESTOP / CONTRADICTORY_OBSERVATION
+ok 48 - independent test: LOGICAL_ESTOP / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.317
+  ...
+# Subtest: independent test: LOGICAL_ESTOP / LOW_CONFIDENCE_OBSERVATION
+ok 49 - independent test: LOGICAL_ESTOP / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.0311
+  ...
+# Subtest: independent test: LOGICAL_ESTOP / STALE_OBSERVATION
+ok 50 - independent test: LOGICAL_ESTOP / STALE_OBSERVATION
+  ---
+  duration_ms: 3.6356
+  ...
+# Subtest: independent test: LOGICAL_ESTOP / MISSING_OBSERVATION
+ok 51 - independent test: LOGICAL_ESTOP / MISSING_OBSERVATION
+  ---
+  duration_ms: 3.3504
+  ...
+# Subtest: independent test: CELL_FAULT / normal
+ok 52 - independent test: CELL_FAULT / normal
+  ---
+  duration_ms: 4.0543
+  ...
+# Subtest: independent test: CELL_FAULT / CONTRADICTORY_OBSERVATION
+ok 53 - independent test: CELL_FAULT / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 6.2079
+  ...
+# Subtest: independent test: CELL_FAULT / LOW_CONFIDENCE_OBSERVATION
+ok 54 - independent test: CELL_FAULT / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 4.2731
+  ...
+# Subtest: independent test: CELL_FAULT / STALE_OBSERVATION
+ok 55 - independent test: CELL_FAULT / STALE_OBSERVATION
+  ---
+  duration_ms: 3.2144
+  ...
+# Subtest: independent test: CELL_FAULT / MISSING_OBSERVATION
+ok 56 - independent test: CELL_FAULT / MISSING_OBSERVATION
+  ---
+  duration_ms: 3.24
+  ...
+# Subtest: independent test: BRAIN_INVALID_OUTPUT / normal
+ok 57 - independent test: BRAIN_INVALID_OUTPUT / normal
+  ---
+  duration_ms: 3.1219
+  ...
+# Subtest: independent test: BRAIN_INVALID_OUTPUT / CONTRADICTORY_OBSERVATION
+ok 58 - independent test: BRAIN_INVALID_OUTPUT / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.5424
+  ...
+# Subtest: independent test: BRAIN_INVALID_OUTPUT / LOW_CONFIDENCE_OBSERVATION
+ok 59 - independent test: BRAIN_INVALID_OUTPUT / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.0939
+  ...
+# Subtest: independent test: BRAIN_INVALID_OUTPUT / STALE_OBSERVATION
+ok 60 - independent test: BRAIN_INVALID_OUTPUT / STALE_OBSERVATION
+  ---
+  duration_ms: 6.3616
+  ...
+# Subtest: independent test: BRAIN_INVALID_OUTPUT / MISSING_OBSERVATION
+ok 61 - independent test: BRAIN_INVALID_OUTPUT / MISSING_OBSERVATION
+  ---
+  duration_ms: 4.176
+  ...
+# Subtest: independent test: BRAIN_TIMEOUT / normal
+ok 62 - independent test: BRAIN_TIMEOUT / normal
+  ---
+  duration_ms: 8.6226
+  ...
+# Subtest: independent test: BRAIN_TIMEOUT / CONTRADICTORY_OBSERVATION
+ok 63 - independent test: BRAIN_TIMEOUT / CONTRADICTORY_OBSERVATION
+  ---
+  duration_ms: 3.723
+  ...
+# Subtest: independent test: BRAIN_TIMEOUT / LOW_CONFIDENCE_OBSERVATION
+ok 64 - independent test: BRAIN_TIMEOUT / LOW_CONFIDENCE_OBSERVATION
+  ---
+  duration_ms: 3.2341
+  ...
+# Subtest: independent test: BRAIN_TIMEOUT / STALE_OBSERVATION
+ok 65 - independent test: BRAIN_TIMEOUT / STALE_OBSERVATION
+  ---
+  duration_ms: 2.9878
+  ...
+# Subtest: independent test: BRAIN_TIMEOUT / MISSING_OBSERVATION
+ok 66 - independent test: BRAIN_TIMEOUT / MISSING_OBSERVATION
+  ---
+  duration_ms: 2.9615
+  ...
+# Subtest: unreconciled test can be archived without reconciliation, then reviewed unchanged
+ok 67 - unreconciled test can be archived without reconciliation, then reviewed unchanged
+  ---
+  duration_ms: 2.6952
+  ...
+# Subtest: guide directs attention once; choosing evidence and inspecting it never submits a command
+ok 68 - guide directs attention once; choosing evidence and inspecting it never submits a command
+  ---
+  duration_ms: 3.4019
+  ...
+# Subtest: human review stays available for repeated bad observations without focus stealing
+ok 69 - human review stays available for repeated bad observations without focus stealing
+  ---
+  duration_ms: 2.603
+  ...
+# Subtest: guide review and full evidence target the active blocker while an earlier replay is selected
+ok 70 - guide review and full evidence target the active blocker while an earlier replay is selected
+  ---
+  duration_ms: 3.0525
+  ...
+# Subtest: LOGICAL_ESTOP: guide resets the cell explicitly without rerunning
+ok 71 - LOGICAL_ESTOP: guide resets the cell explicitly without rerunning
+  ---
+  duration_ms: 2.1302
+  ...
+# Subtest: CELL_FAULT: guide resets the cell explicitly without rerunning
+ok 72 - CELL_FAULT: guide resets the cell explicitly without rerunning
+  ---
+  duration_ms: 2.1035
+  ...
+# Subtest: BRAIN_TIMEOUT: guide explains rejection and focuses configuration without dispatch
+ok 73 - BRAIN_TIMEOUT: guide explains rejection and focuses configuration without dispatch
+  ---
+  duration_ms: 1.912
+  ...
+# Subtest: BRAIN_INVALID_OUTPUT: guide explains rejection and focuses configuration without dispatch
+ok 74 - BRAIN_INVALID_OUTPUT: guide explains rejection and focuses configuration without dispatch
+  ---
+  duration_ms: 1.8917
+  ...
+# Subtest: depleted delivery and saved test both have an explicit next action with history intact
+ok 75 - depleted delivery and saved test both have an explicit next action with history intact
+  ---
+  duration_ms: 4.6479
+  ...
+# Subtest: every selectable mode has a definition and comparison; browsing them cannot execute a test
+ok 76 - every selectable mode has a definition and comparison; browsing them cannot execute a test
+  ---
+  duration_ms: 2.1698
+  ...
+# Subtest: execution and review help explain different stages without changing the uncertain outcome
+ok 77 - execution and review help explain different stages without changing the uncertain outcome
+  ---
+  duration_ms: 2.1626
+  ...
+# Subtest: live playback waits at last received pose; pause survives incoming frames
+ok 78 - live playback waits at last received pose; pause survives incoming frames
+  ---
+  duration_ms: 3.1816
+  ...
+# Subtest: replay rewinds only the view; source outcome stays unknown
+ok 79 - replay rewinds only the view; source outcome stays unknown
+  ---
+  duration_ms: 1.7895
+  ...
+# Subtest: switching orders rejects late data and unavailable evidence clears motion
+ok 80 - switching orders rejects late data and unavailable evidence clears motion
+  ---
+  duration_ms: 0.9927
+  ...
+# Subtest: blocked scenarios replay audit events while all physical poses remain fixed
+ok 81 - blocked scenarios replay audit events while all physical poses remain fixed
+  ---
+  duration_ms: 4.6337
+  ...
+# Subtest: event replay brackets actual motion and freezes partial poses without inventing the endpoint
+ok 82 - event replay brackets actual motion and freezes partial poses without inventing the endpoint
+  ---
+  duration_ms: 1.1956
+  ...
+# Subtest: idle scene appears before orders and current-reference provenance is explicit
+ok 83 - idle scene appears before orders and current-reference provenance is explicit
+  ---
+  duration_ms: 0.8306
+  ...
+# Subtest: already-picked rejection explains how to repeat the scenario without hiding the failure
+ok 84 - already-picked rejection explains how to repeat the scenario without hiding the failure
+  ---
+  duration_ms: 0.8202
+  ...
+# Subtest: full delivery plays all three original clips with cumulative product positions and read-only replay
+ok 85 - full delivery plays all three original clips with cumulative product positions and read-only replay
+  ---
+  duration_ms: 2.0791
+  ...
+# Subtest: delivery stops at a partial clip and retains uncertain status; no future segment is invented
+ok 86 - delivery stops at a partial clip and retains uncertain status; no future segment is invented
+  ---
+  duration_ms: 1.5912
+  ...
+# Subtest: paused delivery cursor stays on its product when earlier reconciliation events are appended
+ok 87 - paused delivery cursor stays on its product when earlier reconciliation events are appended
+  ---
+  duration_ms: 2.2788
+  ...
+# Subtest: only persisted verification may describe success; scene and planning observation cannot
+ok 88 - only persisted verification may describe success; scene and planning observation cannot
+  ---
+  duration_ms: 1.0851
+  ...
+# Subtest: explain persisted CONTRADICTORY_OBSERVATION and keep investigation available
+ok 89 - explain persisted CONTRADICTORY_OBSERVATION and keep investigation available
+  ---
+  duration_ms: 0.1737
+  ...
+# Subtest: explain persisted LOW_CONFIDENCE and keep investigation available
+ok 90 - explain persisted LOW_CONFIDENCE and keep investigation available
+  ---
+  duration_ms: 0.0788
+  ...
+# Subtest: explain persisted STALE_OR_FUTURE_OBSERVATION and keep investigation available
+ok 91 - explain persisted STALE_OR_FUTURE_OBSERVATION and keep investigation available
+  ---
+  duration_ms: 0.083
+  ...
+# Subtest: explain persisted MISSING_OBSERVATION and keep investigation available
+ok 92 - explain persisted MISSING_OBSERVATION and keep investigation available
+  ---
+  duration_ms: 0.0759
+  ...
+# Subtest: explain persisted JOURNAL_UNAVAILABLE and keep investigation available
+ok 93 - explain persisted JOURNAL_UNAVAILABLE and keep investigation available
+  ---
+  duration_ms: 0.5047
+  ...
+# Subtest: explain persisted JOURNAL_IDENTITY_MISMATCH and keep investigation available
+ok 94 - explain persisted JOURNAL_IDENTITY_MISMATCH and keep investigation available
+  ---
+  duration_ms: 0.1518
+  ...
+# Subtest: explain persisted JOURNAL_OBSERVATION_CONFLICT_OR_INCOMPLETE and keep investigation available
+ok 95 - explain persisted JOURNAL_OBSERVATION_CONFLICT_OR_INCOMPLETE and keep investigation available
+  ---
+  duration_ms: 0.0837
+  ...
+# Subtest: explain persisted POSE_UNCERTAINTY and keep investigation available
+ok 96 - explain persisted POSE_UNCERTAINTY and keep investigation available
+  ---
+  duration_ms: 0.1164
+  ...
+# Subtest: missing assessed record never substitutes a different observation
+ok 97 - missing assessed record never substitutes a different observation
+  ---
+  duration_ms: 0.2077
+  ...
+# Subtest: latest repeated assessment is shown with exact capture and immutable attempt count
+ok 98 - latest repeated assessment is shown with exact capture and immutable attempt count
+  ---
+  duration_ms: 0.1369
+  ...
+# Subtest: uncertainty takes precedence over a stopped cell, exhausted inventory and success in another job
+ok 99 - uncertainty takes precedence over a stopped cell, exhausted inventory and success in another job
+  ---
+  duration_ms: 0.0912
+  ...
+# Subtest: archived test and running operation offer no mutation or premature review
+ok 100 - archived test and running operation offer no mutation or premature review
+  ---
+  duration_ms: 0.0887
+  ...
+# Subtest: proven no effect stays a failed pick; normal observation is never a promise of success
+ok 101 - proven no effect stays a failed pick; normal observation is never a promise of success
+  ---
+  duration_ms: 0.1729
+  ...
+1..101
+# tests 101
+# suites 0
+# pass 101
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 365.7138

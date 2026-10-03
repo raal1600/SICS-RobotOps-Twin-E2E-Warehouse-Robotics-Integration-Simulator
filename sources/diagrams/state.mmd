@@ -5,7 +5,7 @@ flowchart TD
   unknown["UNKNOWN_OUTCOME<br/>Communication loss / uncertain effect"]
   reconciling["RECONCILING<br/>Original journal + fresh observation"]
   completed["COMPLETED<br/>Verified business outcome"]
-  intervention["REQUIRES_INTERVENTION<br/>Insufficient / contradictory evidence"]
+  intervention["REQUIRES_INTERVENTION<br/>Paused / explicit re-observation"]
   failed["FAILED<br/>Proven failure; never timeout alone"]
   received --> planning
   planning --> executing
@@ -15,3 +15,4 @@ flowchart TD
   reconciling --> completed
   reconciling --> intervention
   reconciling --> failed
+  intervention -.-> reconciling

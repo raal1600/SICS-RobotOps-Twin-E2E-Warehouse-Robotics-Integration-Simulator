@@ -60,6 +60,7 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 - [x] Exactly one pick effect.
 - [x] Ambiguous -> intervention/unknown.
 - [x] Restart version of critical scenario passes.
+- [x] Explicit re-observation after intervention retains every assessment and the original command; no new pick (ADR 0008).
 
 ## Observability
 - [x] Structured causal event logs.
@@ -92,13 +93,26 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 
 ## Final acceptance
 - [x] Generate ACCEPTANCE_REPORT.md.
-- [x] Every MUST has inspectable PASS evidence.
+- [ ] Every MUST has inspectable PASS evidence for the current release; exact-commit remote gates are pending.
 - [x] SHOULD failures documented.
 - [x] Documentation-drift section completed.
 - [x] README/reports/diagrams/contracts aligned.
-- [x] Publication workflow green.
-- [x] Public Pages verified.
-- [x] Final SHA recorded.
+- [ ] Publication workflow green for the current local extension (earlier release evidence is retained).
+- [ ] Public Pages verified for the current release (publication now authorized; final-SHA checks pending).
+- [ ] Final release SHA verified by CI and public build.json (prior audited SHAs remain recorded).
 - [x] If any MUST fails: status remains NOT DONE.
 
 Local and remote evidence is indexed by ACCEPTANCE_REPORT.md. Final source/evidence successors are rechecked by CI and publication as documented in ADR 0002. This checklist is not proof by itself.
+
+## Local guided workflow milestone (ADR 0009)
+- [x] Dark theme and state-derived Prepare / Run / Review / Continue guidance.
+- [x] Direct attention to original-job review; evidence and observation controls together.
+- [x] UI action, no-ground-truth assessment and confined asset contract regressions.
+- [x] Final isolated browser/native checks, unchanged user history and local acceptance: 389 tests twice, 99 UI checks, all local gates pass.
+- [ ] Remote CI/Pages verification for these changes (publication now authorized; checks pending).
+
+## Local selector explanations
+- [x] Define every execution scenario and observation mode, its stage and key difference.
+- [x] Compare options in the same window; distinguish new-order faults from review captures.
+- [x] Verify selectors/comparisons do not execute work or resolve uncertainty (101 UI checks).
+- [x] Complete affected-suite/browser evidence (170 Python tests, all 15 real-browser choices) and regenerate local publication.

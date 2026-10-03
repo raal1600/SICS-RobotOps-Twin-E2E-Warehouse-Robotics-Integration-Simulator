@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="950" viewBox="0 0 900 950" role="img" aria-labelledby="title desc">
-<title id="title">Uppdragets tillstånd och osäkra utfall</title><desc id="desc">Figure 3. SIMULATOR_DESIGN. Only reconciliation evidence resolves an unknown effect. Timeout alone never proves failure. ERP exposes the verified business outcome.</desc>
+<title id="title">Uppdragets tillstånd och osäkra utfall</title><desc id="desc">Figure 3. SIMULATOR_DESIGN. Only reconciliation evidence resolves an unknown effect. Timeout alone never proves failure. ERP exposes the verified business outcome. Explicit operator re-observation may return REQUIRES_INTERVENTION to RECONCILING using the same command and fresh evidence. It never dispatches another pick; restart leaves intervention paused (ADR 0008).</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526473"/></marker><marker id="red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a34838"/></marker></defs>
 <rect width="100%" height="100%" fill="white"/>
 <g font-family="DejaVu Sans, Arial, sans-serif">
@@ -13,6 +13,7 @@
 <path d="M 680 515 V 552.5 H 220 V 590" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
 <path d="M 680 515 V 590" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
 <path d="M 870 462.5 H 886 V 723 H 450 V 755" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 490 642.5 H 465 V 462.5 H 490" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
 <rect x="30" y="90" width="380" height="105" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
 <rect x="30" y="100" width="4" height="85" rx="2" fill="#182f43"/>
 <text x="220" y="136.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">RECEIVED → VALIDATED</text>
@@ -40,11 +41,10 @@
 <rect x="490" y="590" width="380" height="105" rx="7" fill="#fbf4e6" stroke="#896321" stroke-width="1.3"/>
 <rect x="490" y="600" width="4" height="85" rx="2" fill="#896321"/>
 <text x="680" y="636.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">REQUIRES_INTERVENTION</text>
-<text x="680" y="662.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Insufficient / contradictory evidence</text>
+<text x="680" y="662.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Paused / explicit re-observation</text>
 <rect x="260" y="755" width="380" height="100" rx="7" fill="#fbf4e6" stroke="#896321" stroke-width="1.3"/>
 <rect x="260" y="765" width="4" height="80" rx="2" fill="#896321"/>
 <text x="450" y="799" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">FAILED</text>
 <text x="450" y="825" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Proven failure; never timeout alone</text>
-<text x="28" y="928" font-size="15" text-anchor="start" fill="#526473" font-weight="400">Known pre-dispatch errors also resolve to FAILED. The diagram groups sequential states; uncertain</text>
-<text x="28" y="947" font-size="15" text-anchor="start" fill="#526473" font-weight="400">effects require reconciliation.</text>
+<text x="28" y="928" font-size="15" text-anchor="start" fill="#526473" font-weight="400">Dashed return: explicit re-observation of the original command. No new pick is dispatched.</text>
 </g></svg>

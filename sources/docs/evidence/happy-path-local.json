@@ -1,0 +1,109 @@
+{
+  "captured_at": "2026-10-03T12:39:33.869053+00:00",
+  "base_commit": "348c786710a0e22f0dd7de0744eac7057da13ad8",
+  "source_dirty": true,
+  "scope": "Local uncommitted correction; no remote attestation",
+  "reproduction": "Persisted user scene had all three products at destination; new source picks rejected SOURCE_NOT_OBSERVED.",
+  "browser": "agent-browser 0.27.0 Chromium against independent copy of user data",
+  "browser_checks": {
+    "createDisabled": true,
+    "inventory": "All products are at the destination. Start a fresh scene to run another pick.",
+    "orders": [
+      {
+        "effects": 1,
+        "frames": 100,
+        "order_id": "order-8245f06e-154c-48f7-a6d7-9e8ecb550c7d",
+        "product": "product-red",
+        "state": "COMPLETED"
+      },
+      {
+        "effects": 1,
+        "frames": 100,
+        "order_id": "order-8c927463-95f3-4038-ac98-6d7b825eb060",
+        "product": "product-blue",
+        "state": "COMPLETED"
+      },
+      {
+        "effects": 1,
+        "frames": 100,
+        "order_id": "order-f7c746d3-78f6-44c9-be03-4be4a643057a",
+        "product": "product-green",
+        "state": "COMPLETED"
+      }
+    ]
+  },
+  "observed_phases": [
+    "PLANNING",
+    "OBSERVATION_CAPTURED",
+    "PLAN_VALIDATED",
+    "READY_TO_EXECUTE",
+    "EXECUTING",
+    "APPROACH - Blender frame 5/100 - 0.2 s simulated",
+    "APPROACH - Blender frame 10/100 - 0.4 s simulated",
+    "APPROACH - Blender frame 15/100 - 0.6 s simulated",
+    "APPROACH - Blender frame 19/100 - 0.8 s simulated",
+    "LIFT - Blender frame 24/100 - 1.0 s simulated",
+    "LIFT - Blender frame 29/100 - 1.2 s simulated",
+    "LIFT - Blender frame 34/100 - 1.4 s simulated",
+    "LIFT - Blender frame 39/100 - 1.6 s simulated",
+    "TRANSFER - Blender frame 44/100 - 1.8 s simulated",
+    "TRANSFER - Blender frame 48/100 - 2.0 s simulated",
+    "TRANSFER - Blender frame 53/100 - 2.2 s simulated",
+    "TRANSFER - Blender frame 58/100 - 2.4 s simulated",
+    "TRANSFER - Blender frame 63/100 - 2.6 s simulated",
+    "TRANSFER - Blender frame 68/100 - 2.8 s simulated",
+    "DETACH - Blender frame 73/100 - 3.0 s simulated",
+    "DETACH - Blender frame 77/100 - 3.2 s simulated",
+    "DETACH - Blender frame 82/100 - 3.4 s simulated",
+    "DETACH - Blender frame 87/100 - 3.6 s simulated",
+    "RETRACT - Blender frame 92/100 - 3.8 s simulated",
+    "RETRACT - Blender frame 97/100 - 4.0 s simulated",
+    "RETRACT - Blender frame 100/100 - 4.1 s simulated",
+    "PICK_EFFECT",
+    "VERIFYING",
+    "COMPLETED"
+  ],
+  "repeat_red": {
+    "order_id": "order-da20d797-37df-4dcb-a3aa-556e9c3e9d3e",
+    "state": "COMPLETED",
+    "frames": 100,
+    "scene_epoch": "22ef15ea-b311-459a-8399-12980dac2398"
+  },
+  "desktop_after_reload": {
+    "orders_preserved": 27,
+    "scene_epoch": "4b90a416-5268-461a-88bd-6c3f2ebd2c14",
+    "inventory": [
+      {
+        "product_id": "product-red",
+        "location_id": "source"
+      },
+      {
+        "product_id": "product-blue",
+        "location_id": "source"
+      },
+      {
+        "product_id": "product-green",
+        "location_id": "source"
+      }
+    ],
+    "scene_reset_blocked_reason": null,
+    "desktop_origin": "http://127.0.0.1:51339"
+  },
+  "source_sha256": {
+    "apps/api/app.py": "fb44a420cffdb7187cbbe1d3765501621183bf5a373f572f6eaecc7d482e0bf7",
+    "apps/erp_ui/app.js": "63a85f8b5b3f0fa9219a2411ec175952bf944ea17bc675b387b56bd3fb90f223",
+    "apps/erp_ui/playback.js": "246a0ec71c4208a293e8cc7219c00cd40e54ef542978daa92ec4dd949abb4f0c",
+    "apps/erp_ui/index.html": "7bee9fcd5e89ed5d868738d86badfd71827f57f8bb18118fed62a193d5ef032d",
+    "robotops/workflow/engine.py": "9d1940ea6932f351b0be333d01824a0b4c4a7c8affc9546c0e6e40fa4ae2952e",
+    "robotops/workflow/store.py": "c204c9833a62d65b30a66e412794bbbd118f9f939bf97af9314e8eaf489982d8",
+    "robotops/cell/runtime.py": "1b73d01181f9b769d486bf8e5fbf8efc27c0129039f7873f82d9484e7559573a",
+    "robotops/blender/adapter.py": "546bfcc727f29b46cbb6ee5ecfab63391a799729415371e1701ac971264d28f3",
+    "robotops/domain/ports.py": "26286b5057168bcdbb396cfb6ec6730e00d2e3c92fde987a4ce111d9e6a67315",
+    "tests/integration/test_fresh_scene.py": "7f5849fdc183afc53ee577f655ef56c7fa15f0f28f7d0a5f2e0bfa21e0bafc09"
+  },
+  "screenshots": {
+    "desktop-ready.png": "159983c880ff0f8bb007f18de98e3b65bd80a82bf3d68a8b6974bc8a32dd2171",
+    "repeated-red-completed.png": "e0d4bdb6b9ebb8ec01e03e7423d1f4a4df8191ccbb9999a004ddaa3d10e9eceb",
+    "exhausted-after-three.png": "558a5639d5825c79145012579e3bed0a3ffacb1f68d11278c2a9edba7f0dc8d9"
+  }
+}

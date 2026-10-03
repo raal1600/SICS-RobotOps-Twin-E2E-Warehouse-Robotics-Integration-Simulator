@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "JobState": {
+      "enum": [
+        "RECEIVED",
+        "VALIDATED",
+        "PLANNING",
+        "READY_TO_EXECUTE",
+        "EXECUTING",
+        "VERIFYING",
+        "UNKNOWN_OUTCOME",
+        "RECONCILING",
+        "COMPLETED",
+        "FAILED",
+        "REQUIRES_INTERVENTION"
+      ],
+      "title": "JobState",
+      "type": "string"
+    },
+    "SimulationTest": {
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "title": "Active",
+          "type": "boolean"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "number": {
+          "title": "Number",
+          "type": "integer"
+        },
+        "order_count": {
+          "title": "Order Count",
+          "type": "integer"
+        },
+        "outcomes": {
+          "items": {
+            "$ref": "#/$defs/JobState"
+          },
+          "title": "Outcomes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "test_id": {
+          "title": "Test Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "test_id",
+        "number",
+        "created_at",
+        "active",
+        "order_count",
+        "outcomes"
+      ],
+      "title": "SimulationTest",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "active_test_id": {
+      "title": "Active Test Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "tests": {
+      "items": {
+        "$ref": "#/$defs/SimulationTest"
+      },
+      "title": "Tests",
+      "type": "array"
+    }
+  },
+  "required": [
+    "active_test_id",
+    "tests"
+  ],
+  "title": "TestHistory",
+  "type": "object"
+}

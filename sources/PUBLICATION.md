@@ -74,3 +74,30 @@ Publicera inte anteckningar från ett framtida tekniskt möte eller nya interna 
 The operations viewer vendors Three.js 0.180.0 under its upstream MIT license,
 retained in apps/erp_ui/vendor/LICENSE. This software dependency is separate from
 the publication's original figures. The scenario model remains SIMULATOR_DESIGN.
+
+The independent-test extension (ADR 0007) is also SIMULATOR_DESIGN. Local builds
+include the general test lifecycle, isolated storage and preserved read-only
+history. These changes were initially retained locally at the user's request.
+The user has now authorized release of the complete workspace update. CI and the
+publication workflow must verify the exact committed source; the earlier local
+builds alone do not establish a public deployment or remote acceptance.
+
+ADR 0008 adds explicit re-observation after intervention within the same active
+test. The state and reconciliation diagrams include the evidence-only return
+path; old ambiguous assessments remain inspectable. This is SIMULATOR_DESIGN,
+not a new external research finding or a guarantee of successful recovery.
+
+ADR 0009 adds a dark operator workspace with a persisted-state next-step guide,
+scenario expectations and readable evidence beside explicit re-observation.
+Attention opens the original pick review; navigation never decides an outcome or
+sends a command. The architecture caption, operational guides and current-status
+sources describe this presentation boundary. Generated output still comes only
+from the publication builder; local rebuilding does not publish these changes.
+
+The selector-help follow-up adds definitions, affected stages and key differences
+for every execution scenario and observation mode, with in-app comparison tables.
+The [scenario guide](docs/implementation/scenarios.md) explains the different
+injection times and similar-looking outcomes. It changes presentation only;
+state, architecture, contracts and external source claims remain unchanged.
+The earlier full-system acceptance remains a dated baseline; the separate UI
+follow-up evidence records its own affected-suite and browser checks.

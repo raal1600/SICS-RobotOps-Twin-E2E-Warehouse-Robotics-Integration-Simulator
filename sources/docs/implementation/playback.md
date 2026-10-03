@@ -6,6 +6,37 @@ uses offline Three.js, with a software 3D fallback when WebGL is unavailable.
 The stylized Cartesian gantry is an explanatory synthetic model, not real robot
 kinematics. Blender and the initial view share the same cell geometry.
 
+The product selector shows current fixture availability. **Start new test** is
+always present and creates an independent world while keeping scenario and
+observation selections. **Test history** opens previous evidence and full-delivery
+replay read-only in the same window, even for unresolved outcomes. New test
+creation never resolves or replays the previous command. A running operation
+must finish first. Changing **Execution scenario** only configures the next order. After
+all products are picked, **Start new delivery and run order** explicitly prepares
+another scene before running the chosen product. **Start fresh scene** also
+remains available. Fresh scenes are blocked by active or unresolved jobs.
+**Reset logical cell state** clears a logical stop/fault but does not move products.
+
+**Delivery replay** selects a current or saved scene. **Full delivery (all products)**
+is the default scope: Replay and the scrubber span every product execution in
+the original execution order. **Selected product execution** replays just the
+chosen item in **Product execution details**. Three picks therefore appear as
+one delivery with three segments; each retains its own command and outcome.
+Earlier delivered products use their saved positions in later clips. Preparing
+a fresh scene preserves the earlier delivery; starting a new test retains that
+world's deliveries under Test history.
+
+An uncertain pick pauses the entire cell, including picks of different products.
+The Run button says **Next pick paused — reconcile first**, with a named-product
+explanation and **Reconcile [product]** action beside it. This action targets the
+blocking job even when historical details are selected, and uses the selected
+observation mode. It sends only reconciliation, never a replacement pick
+or the next order. If evidence is inconclusive, **Observe again: [product]**
+collects another selected fresh observation for the same command. The guard stays
+in force until sufficient evidence resolves it. Every assessment joins the replay
+as investigation events; the original motion appears only once. Evidence inspection
+remains available independently, and never changes the result (ADR 0008).
+
 - Drag to orbit, scroll to zoom, right-drag or Shift-drag to pan. The Rotate,
   zoom buttons and Reset camera also work with a keyboard.
 - Pause / Play stops or resumes the view. Replay restarts the same scenario;
@@ -46,6 +77,11 @@ original command ID, current job state, recording status, starting VisualScene,
 product identity, audit events and optional motion. GET /cell/scene supplies the
 current initial environment. PresentationSnapshot stores each new job's immutable
 starting WorldState in the workflow database, exclusively for human replay.
+`GET /deliveries` returns DeliverySummary/DeliveryExecution records grouped by
+saved scene identity. `GET /deliveries/{delivery_id}/playback` returns the original
+JobPlayback records in durable execution order through DeliveryPlayback. These
+are presentation groups, not new ERP orders. Old attempts with no saved scene
+identity remain available individually. No replay endpoint dispatches or resets.
 Statuses are WAITING, RECORDING, RECORDED, PARTIAL or UNAVAILABLE. An interrupted
 recording retains its last frame and is not extrapolated to the destination.
 If an abruptly killed job still holds its lease, RECORDING may remain visible;
@@ -64,7 +100,9 @@ Its final response includes the recording SHA-256. Reads validate schema,
 identity, size, frame continuity, path confinement and the digest when present.
 Older exports remain associated with the original hash-checked `.blend`.
 
-Playback GETs are read-only. Import is serialized within the local API instance.
+Playback GETs are read-only. Import is serialized across hosts by the test catalog
+and is unavailable for archived tests. New test paths prefix these routes with
+`/simulation-tests/<UUID>`; original test routes remain compatible.
 Restart reads the same persisted data. No playback endpoint reconciles a job or
 dispatches a command. The runtime's original effect and journal protocol remains
 authoritative, including if recording/rendering is interrupted.
@@ -86,3 +124,10 @@ world, journal, events, workflow history and the `.blend` hash do not change.
 
 [Pose provenance](../adr/0003-recorded-motion-illustration.md) and
 [3D scenario design](../adr/0004-full-3d-scenario-replay.md).
+
+The dark guided workspace keeps the full-delivery 3D view as default. Expand
+Choose delivery or product replay to inspect another recording. The Next step
+card uses persisted workflow/evidence and points to the active unresolved job even
+while an older recording is selected. It never uses the visible scene or replay
+poses as verification. Review evidence opens once when attention is needed; the
+scene, journal and sensor-observation provenance remain separate (ADR 0009).

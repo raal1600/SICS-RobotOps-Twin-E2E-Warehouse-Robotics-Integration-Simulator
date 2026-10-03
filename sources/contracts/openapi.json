@@ -345,6 +345,129 @@
         "title": "CommandStatus",
         "type": "string"
       },
+      "DeliveryExecution": {
+        "additionalProperties": false,
+        "properties": {
+          "job_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "order_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "product_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/JobState"
+          }
+        },
+        "required": [
+          "job_id",
+          "order_id",
+          "product_id",
+          "state"
+        ],
+        "title": "DeliveryExecution",
+        "type": "object"
+      },
+      "DeliveryPlayback": {
+        "additionalProperties": false,
+        "properties": {
+          "delivery_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Delivery Id",
+            "type": "string"
+          },
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/JobPlayback"
+            },
+            "title": "Jobs",
+            "type": "array"
+          },
+          "reason": {
+            "default": "Original executions in this scene, in durable execution order. Replay sends no commands.",
+            "title": "Reason",
+            "type": "string"
+          },
+          "scene": {
+            "$ref": "#/components/schemas/VisualScene"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delivery_id",
+          "scene"
+        ],
+        "title": "DeliveryPlayback",
+        "type": "object"
+      },
+      "DeliverySummary": {
+        "additionalProperties": false,
+        "properties": {
+          "current": {
+            "title": "Current",
+            "type": "boolean"
+          },
+          "delivery_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Delivery Id",
+            "type": "string"
+          },
+          "executions": {
+            "items": {
+              "$ref": "#/components/schemas/DeliveryExecution"
+            },
+            "title": "Executions",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delivery_id",
+          "started_at",
+          "current"
+        ],
+        "title": "DeliverySummary",
+        "type": "object"
+      },
       "ExecutionRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1306,6 +1429,104 @@
         "title": "RobotCommand",
         "type": "object"
       },
+      "SimulationTest": {
+        "additionalProperties": false,
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "order_count": {
+            "title": "Order Count",
+            "type": "integer"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/JobState"
+            },
+            "title": "Outcomes",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "test_id": {
+            "title": "Test Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "test_id",
+          "number",
+          "created_at",
+          "active",
+          "order_count",
+          "outcomes"
+        ],
+        "title": "SimulationTest",
+        "type": "object"
+      },
+      "StartTestRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id"
+        ],
+        "title": "StartTestRequest",
+        "type": "object"
+      },
+      "TestHistory": {
+        "additionalProperties": false,
+        "properties": {
+          "active_test_id": {
+            "title": "Active Test Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "tests": {
+            "items": {
+              "$ref": "#/components/schemas/SimulationTest"
+            },
+            "title": "Tests",
+            "type": "array"
+          }
+        },
+        "required": [
+          "active_test_id",
+          "tests"
+        ],
+        "title": "TestHistory",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1770,7 +1991,7 @@
     }
   },
   "info": {
-    "description": "Local independent synthetic simulator. Completion means verified business outcome. No physical safety guarantees; bind to loopback only.",
+    "description": "Local independent synthetic simulator. Completion means verified business outcome. No physical safety guarantees; bind to loopback only. Test history and creation use /simulation-tests. Original-world routes remain at /; other worlds use /simulation-tests/{test_id} plus the same route. Only the active test accepts writes. Archives retain their original outcomes.",
     "title": "RobotOps Twin",
     "version": "1.0"
   },
@@ -1852,6 +2073,67 @@
         "summary": "Scene"
       }
     },
+    "/deliveries": {
+      "get": {
+        "operationId": "recorded_deliveries_deliveries_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DeliverySummary"
+                  },
+                  "title": "Response Recorded Deliveries Deliveries Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Recorded Deliveries"
+      }
+    },
+    "/deliveries/{delivery_id}/playback": {
+      "get": {
+        "operationId": "recorded_delivery_deliveries__delivery_id__playback_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "delivery_id",
+            "required": true,
+            "schema": {
+              "title": "Delivery Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryPlayback"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Recorded Delivery"
+      }
+    },
     "/fixtures": {
       "get": {
         "operationId": "fixtures_fixtures_get",
@@ -1870,6 +2152,24 @@
           }
         },
         "summary": "Fixtures"
+      }
+    },
+    "/fixtures/fresh-scene": {
+      "post": {
+        "operationId": "fresh_scene_fixtures_fresh_scene_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisualScene"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Fresh Scene"
       }
     },
     "/health": {
@@ -2084,6 +2384,7 @@
     },
     "/jobs/{job_id}/reconcile": {
       "post": {
+        "description": "Collect fresh evidence for the original command, including after intervention.\n\nAn explicit request may reopen REQUIRES_INTERVENTION through RECONCILING.\nEach attempt retains its evidence; insufficient evidence pauses the job again.\nNo pick is sent. COMPLETED/FAILED jobs and archived tests cannot be reopened.",
         "operationId": "reconcile_jobs__job_id__reconcile_post",
         "parameters": [
           {
@@ -2351,6 +2652,60 @@
         "summary": "Timeline"
       }
     },
+    "/simulation-tests": {
+      "get": {
+        "operationId": "test_history_simulation_tests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestHistory"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Test History"
+      },
+      "post": {
+        "operationId": "start_test_simulation_tests_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartTestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationTest"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Test"
+      }
+    },
     "/ui/app.js": {
       "get": {
         "operationId": "javascript_ui_app_js_get",
@@ -2360,6 +2715,17 @@
           }
         },
         "summary": "Javascript"
+      }
+    },
+    "/ui/theme.css": {
+      "get": {
+        "operationId": "dashboard_styles_ui_theme_css_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Dashboard Styles"
       }
     },
     "/ui/vendor/{script}": {
@@ -2410,7 +2776,8 @@
             "schema": {
               "enum": [
                 "playback.js",
-                "scene-view.js"
+                "scene-view.js",
+                "workflow-guide.js"
               ],
               "title": "Script",
               "type": "string"

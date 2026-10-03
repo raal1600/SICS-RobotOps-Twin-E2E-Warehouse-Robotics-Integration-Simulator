@@ -1,0 +1,642 @@
+{
+  "$defs": {
+    "AuditEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "causation_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Causation Id",
+          "type": "string"
+        },
+        "command_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Command Id"
+        },
+        "component": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Component",
+          "type": "string"
+        },
+        "correlation_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "number"
+        },
+        "event_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Id"
+        },
+        "order_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Order Id"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "run_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "state_after": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "State After"
+        },
+        "state_before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "State Before"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "correlation_id",
+        "causation_id",
+        "timestamp",
+        "event_id",
+        "component",
+        "event_type",
+        "reason"
+      ],
+      "title": "AuditEvent",
+      "type": "object"
+    },
+    "CellMode": {
+      "enum": [
+        "READY",
+        "BUSY",
+        "FAULTED",
+        "ESTOP_LOGICAL",
+        "RESETTING",
+        "OFFLINE"
+      ],
+      "title": "CellMode",
+      "type": "string"
+    },
+    "JobPlayback": {
+      "additionalProperties": false,
+      "properties": {
+        "can_import": {
+          "default": false,
+          "title": "Can Import",
+          "type": "boolean"
+        },
+        "command_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Command Id"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/AuditEvent"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "job_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "job_state": {
+          "$ref": "#/$defs/JobState"
+        },
+        "product_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "recording": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MotionRecording"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "scene": {
+          "$ref": "#/$defs/VisualScene"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "WAITING",
+            "RECORDING",
+            "RECORDED",
+            "PARTIAL",
+            "UNAVAILABLE"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "command_id",
+        "job_state",
+        "status",
+        "reason",
+        "scene",
+        "product_id"
+      ],
+      "title": "JobPlayback",
+      "type": "object"
+    },
+    "JobState": {
+      "enum": [
+        "RECEIVED",
+        "VALIDATED",
+        "PLANNING",
+        "READY_TO_EXECUTE",
+        "EXECUTING",
+        "VERIFYING",
+        "UNKNOWN_OUTCOME",
+        "RECONCILING",
+        "COMPLETED",
+        "FAILED",
+        "REQUIRES_INTERVENTION"
+      ],
+      "title": "JobState",
+      "type": "string"
+    },
+    "MotionRecording": {
+      "additionalProperties": false,
+      "properties": {
+        "command_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "fps": {
+          "const": 24,
+          "default": 24,
+          "title": "Fps",
+          "type": "integer"
+        },
+        "frame_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "frames": {
+          "items": {
+            "$ref": "#/$defs/VisualFrame"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Frames",
+          "type": "array"
+        },
+        "job_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "objects": {
+          "items": {
+            "$ref": "#/$defs/VisualObject"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Objects",
+          "type": "array"
+        },
+        "product_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "scene_epoch": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Scene Epoch",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "const": "BLENDER_EVALUATED_SCENE",
+          "default": "BLENDER_EVALUATED_SCENE",
+          "title": "Source",
+          "type": "string"
+        },
+        "total_frames": {
+          "const": 100,
+          "default": 100,
+          "title": "Total Frames",
+          "type": "integer"
+        },
+        "unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "command_id",
+        "job_id",
+        "scene_epoch",
+        "product_id",
+        "frame_id",
+        "complete",
+        "objects",
+        "frames"
+      ],
+      "title": "MotionRecording",
+      "type": "object"
+    },
+    "VisualFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "frame": {
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Frame",
+          "type": "integer"
+        },
+        "phase": {
+          "enum": [
+            "APPROACH",
+            "ATTACH",
+            "LIFT",
+            "TRANSFER",
+            "DETACH",
+            "RETRACT"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "positions": {
+          "additionalProperties": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Positions",
+          "type": "object"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "frame",
+        "phase",
+        "positions"
+      ],
+      "title": "VisualFrame",
+      "type": "object"
+    },
+    "VisualObject": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Color",
+          "type": "array"
+        },
+        "location_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location Id"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "size": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Size",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "position",
+        "size",
+        "color"
+      ],
+      "title": "VisualObject",
+      "type": "object"
+    },
+    "VisualScene": {
+      "additionalProperties": false,
+      "properties": {
+        "cell_mode": {
+          "$ref": "#/$defs/CellMode"
+        },
+        "objects": {
+          "items": {
+            "$ref": "#/$defs/VisualObject"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Objects",
+          "type": "array"
+        },
+        "scene_epoch": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Scene Epoch",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "SAVED_START_SCENE",
+            "CURRENT_WORLD_REFERENCE"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scene_epoch",
+        "timestamp",
+        "cell_mode",
+        "objects"
+      ],
+      "title": "VisualScene",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "delivery_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Delivery Id",
+      "type": "string"
+    },
+    "jobs": {
+      "items": {
+        "$ref": "#/$defs/JobPlayback"
+      },
+      "title": "Jobs",
+      "type": "array"
+    },
+    "reason": {
+      "default": "Original executions in this scene, in durable execution order. Replay sends no commands.",
+      "title": "Reason",
+      "type": "string"
+    },
+    "scene": {
+      "$ref": "#/$defs/VisualScene"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "delivery_id",
+    "scene"
+  ],
+  "title": "DeliveryPlayback",
+  "type": "object"
+}

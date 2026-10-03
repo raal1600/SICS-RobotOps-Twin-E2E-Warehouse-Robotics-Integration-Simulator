@@ -24,7 +24,25 @@ never verification evidence. Legacy jobs without this record are labelled as
 current references instead of inventing their historical layout. See ADRs 0001
 and 0004.
 
+Only COMPLETED and FAILED are terminal. Explicit re-observation may claim an
+intervention job and enter RECONCILING with identity-matched evidence; normal
+execution and automatic restart recovery cannot claim it. Each assessment is an
+immutable record, returned in durable insertion order with the original causal
+transitions retained. No database migration or rewriting of old jobs is required.
+The same cell fence prevents competing evidence collectors (ADR 0008).
+
 The HTTP contract currently supports durable intake, current status, job lookup,
 timeline, health, execution, reconciliation, metrics and presentation. No endpoint
 reports an unimplemented success. OpenAPI is generated
 alongside schemas and compared in tests.
+
+The dashboard adds a durable test catalog at `simulation-tests/catalog.db`.
+Each new test has separate workflow/runtime files and Blender artifacts beneath
+its UUID directory. The original database paths are preserved. Start new test
+atomically switches the active pointer after initialization; prior worlds become
+read-only. Request UUIDs prevent duplicate creation or reactivation on a late retry.
+The catalog transaction spans API writes, including runtime calls, to serialize
+test creation with ongoing work across hosts. It does not extend the workflow or
+controller transactions. Direct Engine workers must use separate demo data.
+Live reads continue. Startup recovers only the active world; all prior outcomes
+and evidence remain archived. See [ADR 0007](../adr/0007-independent-simulation-tests.md).

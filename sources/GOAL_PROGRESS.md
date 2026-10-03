@@ -1,55 +1,62 @@
 # Goal Progress
 Last updated: 2026-10-03 UTC
-Implementation base: `bcc8a4ee856879a1287fc781910264e9b30055bb`.
+Audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
 ## Current phase
-P5/P7 user-requested extension: full 3D scene and all-scenario replay implemented.
-The environment, machine and products stay visible before orders and when a
-scenario has no effect. Recorded machine/product poses and saved events replay
-without commands. Final clean acceptance and exact-SHA remote checks remain.
+P5/P7 extension complete: full 3D cell, moving machine/product poses and scenario
+replay for every execution outcome. All 85 MUSTs pass for the audited clean
+source with local and exact-SHA remote evidence. Final evidence/status successors
+receive fresh CI artifacts and public build.json attestation (ADR 0002).
 
 ## MUST status
-Baseline: all 85 MUSTs passed before this extension. Current development suite:
-254 tests PASS, 87.35% coverage, no skips or xfails. Scenario matrix, persistence,
-legacy import, uncertainty and all-frame carrying-offset checks pass. Lint,
-strict types and Python/npm security checks pass. All eight real-Blender native
-checks pass after aligning drain deadlines with the existing runtime budget.
-No MUST, coverage threshold or state transition was weakened. The extension is
-not yet declared accepted.
+Both clean suites: 254 PASS, zero skips/xfails, 87.35% coverage (85% minimum).
+Setup, lint/format, strict typing, Python/npm security, seven real Blender demos,
+drift scan and publication pass. Exact-source workflows: core 37120767979,
+Windows 37120767929 and publication 37120767978 all SUCCESS. Public Pages exposes
+the matching source SHA, 22 references and seven synchronized diagrams.
+SHOULD SC-BRAIN-005 remains non-blocking; optional model/hardware work is unchanged.
 
 ## Evidence
-- artifacts/3d-regression-awake-tests.xml and coverage JSON: complete suite.
-- tests/blender/test_playback.py: every execution scenario, evaluated poses,
-  exactly one effect, no-effect stationary scenes, read-only replay/import.
-- tests/unit/test_visualization.py and tests/ui/playback.test.cjs: scene history,
-  offline asset integrity, event replay, partial clips and bounded file retry.
-- docs/evidence/3d-scenarios.json and 3d-{webgl,software,mobile}.png: real browser
-  checks and persisted one-effect/intervention evidence.
-- docs/evidence/3d-desktop.json: actual native window/process lifecycle, normal
-  close during a real pick and forced close ownership, with source hashes.
-- A broader test exposed a Windows reader/rename race; bounded presentation-only
-  retry fixes it. Another run experienced an eleven-hour host interruption and
-  failed existing timeout/lease checks. Its results were rejected and rerun;
-  timeouts and assertions were retained unchanged.
+- docs/evidence/acceptance/20261003T114649: clean manifest, two complete suites,
+  all gate logs/demos and verified remote status; ACCEPTANCE_REPORT.md maps all
+  85 MUSTs to inspectable evidence and names the tested source.
+- docs/evidence/3d-scenarios.json and 3d-{webgl,software,mobile}.png: actual browser
+  rendering, fixed/no-effect scenes, replay/scrub, mobile layout and exactly-one
+  pick despite ambiguous reconciliation.
+- docs/evidence/3d-desktop.json: all eight native/real-Blender lifecycle checks,
+  including normal close during a pick and termination of owned children on crash.
+- Tests cover the complete fault matrix, saved scenes after later orders/restart,
+  every carrying-frame offset, partial/corrupt recordings, read-only legacy import,
+  no replay dispatch, offline asset integrity and Windows sharing-lock retries.
+- One development run exposed a transient Windows reader/rename race (fixed).
+  Another encountered an eleven-hour host pause and failed existing deadlines;
+  that result was rejected and rerun without weakening runtime timeouts/assertions.
 
 ## Decisions / ADRs
-ADR 0004 extends ADR 0003: immutable PresentationSnapshot before execution,
-shared cell geometry, offline Three.js and software perspective rendering,
-read-only event/pose timeline, explicit legacy reference provenance. Cartesian
-machine illustration is synthetic, not validated kinematics. No renderer data
-enters Brain, ObservationModel or Verifier. Cell reset never erases history.
+ADR 0004 extends ADR 0003: presentation snapshots and audit-event playback,
+shared stylized gantry geometry, offline Three.js with software perspective
+fallback, and explicit legacy-reference provenance. No presentation data enters
+Brain, ObservationModel or Verifier. No state-machine or MUST changes.
+Native drain budgets now match the existing 60-second runtime deadline: 65 s
+server, 70 s owner, 75 s test observation. Measured valid paced picks exceeded the
+old 15-second drain; completion/effect assertions are retained. Idle shutdown is
+prompt. Rendering redraws only changed poses/camera/size.
+The updated versioned EXE is installed and the desktop shortcut points to it.
+An open older app and all user data remain untouched; close/reopen the shortcut.
 
 ## Knowledge-base synchronization
-Drift: prior motion-only/Canvas-only descriptions, absent no-motion history,
-stale persistence future tense and damaged Swedish report characters.
-Synchronized README, PROJECT_PLAN, PUBLICATION, report 01, registry S22,
-architecture source, OpenAPI and schemas, playback/Blender/desktop/operations/
-persistence/dependency/contract guides, ADRs 0003/0004 and acceptance mapping.
-Publication regenerated with 181 validated PDF internal destinations. Existing
-company claims and provenance classifications remain unchanged.
+Drift found and corrected: motion-only/Canvas-only descriptions, missing static
+scenario history, persistence future tense, damaged Swedish characters and the
+old native drain/install descriptions. Synchronized README, PROJECT_PLAN,
+PUBLICATION, report 01 and the shared status in reports 01-03, registry S22,
+architecture, schemas/OpenAPI, all affected
+implementation guides, scene README, ADRs 0003/0004, acceptance map/generator and
+this record. Publication is generated only from source; 181 PDF destinations
+validate. Existing external company claims retain their original provenance.
 
-## Next milestone
-Complete native launcher and clean acceptance; commit coherent implementation,
-verify CI and publication at that SHA, retain acceptance evidence, then verify
-the final evidence successor. Installed launcher uses this checkout: reopening
-loads the update without reinstalling or clearing the user's data.
+## Release evidence
+The committed report attests its audited source, not its own future commit hash.
+The final evidence successor must have all three workflows green and matching
+Pages build.json before delivery. Optional model/hardware integration remains
+explicitly non-blocking. No unresolved implementation or knowledge-base drift
+remains; final exact-SHA CI artifacts are the release attestation.

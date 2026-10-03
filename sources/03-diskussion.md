@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-02:** All 85 MUST criteria have inspectable PASS evidence. Deterministic CI and the publication workflow pass; the public site exposes the current governance documents. Lost-ack recovery applies exactly one simulated pick, ambiguous evidence requires intervention, and restart recovery is verified. Optional model and hardware integrations remain unimplemented and non-blocking. Status: DONE.
+> **Implementation status, 2026-10-03:** All 85 MUST criteria have inspectable PASS evidence. Deterministic CI and the publication workflow pass; the public site exposes the current governance documents. Lost-ack recovery applies exactly one simulated pick, ambiguous evidence requires intervention, and restart recovery is verified. Optional model and hardware integrations remain unimplemented and non-blocking. The app presents a full 3D cell for every execution scenario, with persisted scenes, recorded machine motion and read-only replay. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

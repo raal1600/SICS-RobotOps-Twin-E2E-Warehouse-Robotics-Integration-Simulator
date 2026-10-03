@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** All 85 MUST criteria have inspectable PASS evidence. Deterministic CI and the publication workflow pass; the public site exposes the current governance documents. Lost-ack recovery applies exactly one simulated pick, ambiguous evidence requires intervention, and restart recovery is verified. Optional model and hardware integrations remain unimplemented and non-blocking. **DONE**.
+**Aktuell status:** All 85 MUST criteria have inspectable PASS evidence. Deterministic CI and the publication workflow pass; the public site exposes the current governance documents. Lost-ack recovery applies exactly one simulated pick, ambiguous evidence requires intervention, and restart recovery is verified. Optional model and hardware integrations remain unimplemented and non-blocking. The app presents a full 3D cell for every execution scenario, with persisted scenes, recorded machine motion and read-only replay. **DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·

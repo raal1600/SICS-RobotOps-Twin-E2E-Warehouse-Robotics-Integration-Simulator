@@ -101,6 +101,8 @@ observation** only selects the next capture mode; click the named review action 
 collect it. Repeated bad evidence keeps review available. Completed picks lead to
 the next setup, stopped cells to reset, and saved tests back to the current test.
 [Guided workflow and evidence boundary](docs/adr/0009-guided-simulation-workflow.md).
+The saved Blender snapshot is available in the collapsed **Technical details**
+section; the full 3D view and replay are the main visualization.
 Reusing the data directory preserves state across restart.
 Use **Start new test** at the top for any new execution/observation combination.
 It keeps both selections, restores all products in an independent world and saves

@@ -9,6 +9,17 @@ Evidence/status successors run the full workflows again. Their exact-SHA reports
 
 [Full manifest and commands](docs/evidence/acceptance/20261003T220839/manifest.json). Logs and JUnit are in the same directory.
 
+## Compact snapshot follow-up
+
+Presentation follow-up to release `5db9bf9`: the saved Blender image now appears
+inside **Technical details**, collapsed by default. The primary 3D replay and
+snapshot generation are unchanged. All 101 existing UI checks and an isolated
+real-Blender browser check pass, including keyboard disclosure, narrow layout and
+exactly one effect. [Scoped evidence](docs/evidence/technical-details-local.json)
+records this small local change; it does not relabel the full-system results below.
+README, operations/playback guides and progress are synchronized. Architecture,
+contracts and diagrams do not change.
+
 ## Environment
 
 ```json

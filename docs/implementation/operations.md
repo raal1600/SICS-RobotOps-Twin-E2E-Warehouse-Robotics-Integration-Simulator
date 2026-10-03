@@ -68,8 +68,9 @@ it is distinct from creating another test (ADR 0007).
 The dashboard exposes ERP order, job and logical cell status separately, plus
 original command identity, journal status, verifier reason, causal timeline,
 observation/reconciliation JSON, an always-visible 3D cell, scenario events, live
-machine/product motion and the selected order's Blender
-artifact. [Replay controls](playback.md) read evaluated Blender frames, preserve
+machine/product motion. The selected order's saved Blender snapshot is available
+under **Technical details**, collapsed by default. The full 3D view and replay
+remain the main visualization. [Replay controls](playback.md) read evaluated Blender frames, preserve
 uncertainty and never send another pick. Neither images nor animation establish
 business success. Fault controls are synthetic local fixtures.
 The default Full delivery scope replays all product runs in the selected scene.

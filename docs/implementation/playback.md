@@ -90,6 +90,9 @@ the frame counter stops, and existing conservative recovery rules apply.
 `POST /jobs/{job_id}/playback/import` creates only a derived recording from the
 original hash-checked scene. `GET /jobs/{job_id}/artifact.png` retrieves that job's
 render. The old `/artifacts/latest.png` endpoint remains compatible.
+The dashboard keeps this static image under **Technical details**, collapsed by
+default and labelled **Saved Blender snapshot**. Opening it does not execute or
+reconcile anything; the full 3D cell and replay remain the primary visualization.
 
 MotionRecording includes command/job/product/epoch IDs, frame ID, metre units,
 24 fps, object geometry and 1..100 contiguous VisualFrame records. The Blender

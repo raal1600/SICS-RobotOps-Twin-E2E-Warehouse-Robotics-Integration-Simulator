@@ -2,7 +2,22 @@
 Last updated: 2026-10-03 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: P7 guided simulation workspace release verified
+## Current phase: P7 compact snapshot presentation follow-up
+Base: `5db9bf973026fd111adc97885cfb1080060a25c5` (published and verified).
+The saved Blender snapshot is now under **Technical details**, collapsed by
+default. The full 3D cell/replay stays primary. This is a native HTML disclosure;
+snapshot generation, API, workflow, verification and saved user data are unchanged.
+All 101 existing UI checks pass. An isolated real-Blender happy path confirms the
+image loads without opening the disclosure; keyboard expansion/collapse and
+390 px layout pass. The order completes with exactly one effect.
+[Scoped evidence](docs/evidence/technical-details-local.json) retains the checks
+and screenshots. README, operations/playback guides and the acceptance report
+describe the new placement. Architecture, contracts, diagrams and research claims
+do not change. The release evidence below remains its own audited snapshot.
+Documentation checks are recorded with the scoped evidence. Next: user testing of
+the compact disclosure; the earlier release gates retain their original scope.
+
+## Previous verified release: P7 guided simulation workspace
 Audited source: `59ace317d949cc8e6fbd77db13a10656737d9238`, clean checkout.
 The user's publication authorization supersedes the earlier local-only scope.
 All 85 MUST criteria PASS with inspectable evidence from GitHub CI and Pages.

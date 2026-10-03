@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 
-from apps.api.playback import playback
+from apps.api.playback import playback, visual_scene
 from robotops.blender.adapter import BlenderRuntime
-from robotops.blender.visualization import JobPlayback
+from robotops.blender.visualization import JobPlayback, VisualScene
 from robotops.cell.controller import CellController
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.domain.models import (
@@ -88,6 +88,10 @@ def create_app(store: Store, engine: Engine | None = None) -> FastAPI:
     def cell() -> CellState:
         return workflow.runtime.world().cell
 
+    @app.get("/cell/scene", response_model=VisualScene)
+    def scene() -> VisualScene:
+        return visual_scene(workflow)
+
     @app.post("/cell/reset", response_model=CellState)
     def reset_cell() -> CellState:
         cell = CellController(workflow.runtime).reset()
@@ -160,10 +164,19 @@ def create_app(store: Store, engine: Engine | None = None) -> FastAPI:
             Path(__file__).parents[1] / "erp_ui" / "app.js", media_type="text/javascript"
         )
 
-    @app.get("/ui/playback.js", response_class=FileResponse)
-    def playback_javascript() -> FileResponse:
+    @app.get("/ui/{script}", response_class=FileResponse)
+    def playback_javascript(script: Literal["playback.js", "scene-view.js"]) -> FileResponse:
         return FileResponse(
-            Path(__file__).parents[1] / "erp_ui" / "playback.js", media_type="text/javascript"
+            Path(__file__).parents[1] / "erp_ui" / script, media_type="text/javascript"
+        )
+
+    @app.get("/ui/vendor/{script}", response_class=FileResponse)
+    def vendor_javascript(
+        script: Literal["three.module.min.js", "three.core.min.js", "OrbitControls.js"],
+    ) -> FileResponse:
+        return FileResponse(
+            Path(__file__).parents[1] / "erp_ui" / "vendor" / script,
+            media_type="text/javascript",
         )
 
     return app

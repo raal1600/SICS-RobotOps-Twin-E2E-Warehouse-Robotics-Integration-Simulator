@@ -486,6 +486,13 @@
             ],
             "title": "Command Id"
           },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
           "job_id": {
             "maxLength": 160,
             "minLength": 1,
@@ -495,6 +502,13 @@
           },
           "job_state": {
             "$ref": "#/components/schemas/JobState"
+          },
+          "product_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Product Id",
+            "type": "string"
           },
           "reason": {
             "title": "Reason",
@@ -509,6 +523,9 @@
                 "type": "null"
               }
             ]
+          },
+          "scene": {
+            "$ref": "#/components/schemas/VisualScene"
           },
           "schema_version": {
             "const": "1.0",
@@ -533,7 +550,9 @@
           "command_id",
           "job_state",
           "status",
-          "reason"
+          "reason",
+          "scene",
+          "product_id"
         ],
         "title": "JobPlayback",
         "type": "object"
@@ -1582,6 +1601,58 @@
         "title": "VisualObject",
         "type": "object"
       },
+      "VisualScene": {
+        "additionalProperties": false,
+        "properties": {
+          "cell_mode": {
+            "$ref": "#/components/schemas/CellMode"
+          },
+          "objects": {
+            "items": {
+              "$ref": "#/components/schemas/VisualObject"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Objects",
+            "type": "array"
+          },
+          "scene_epoch": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Scene Epoch",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "SAVED_START_SCENE",
+              "CURRENT_WORLD_REFERENCE"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "scene_epoch",
+          "timestamp",
+          "cell_mode",
+          "objects"
+        ],
+        "title": "VisualScene",
+        "type": "object"
+      },
       "WorldObservation": {
         "additionalProperties": false,
         "properties": {
@@ -1761,6 +1832,24 @@
           }
         },
         "summary": "Reset Cell"
+      }
+    },
+    "/cell/scene": {
+      "get": {
+        "operationId": "scene_cell_scene_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisualScene"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Scene"
       }
     },
     "/fixtures": {
@@ -2273,12 +2362,74 @@
         "summary": "Javascript"
       }
     },
-    "/ui/playback.js": {
+    "/ui/vendor/{script}": {
       "get": {
-        "operationId": "playback_javascript_ui_playback_js_get",
+        "operationId": "vendor_javascript_ui_vendor__script__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "script",
+            "required": true,
+            "schema": {
+              "enum": [
+                "three.module.min.js",
+                "three.core.min.js",
+                "OrbitControls.js"
+              ],
+              "title": "Script",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Vendor Javascript"
+      }
+    },
+    "/ui/{script}": {
+      "get": {
+        "operationId": "playback_javascript_ui__script__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "script",
+            "required": true,
+            "schema": {
+              "enum": [
+                "playback.js",
+                "scene-view.js"
+              ],
+              "title": "Script",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "summary": "Playback Javascript"

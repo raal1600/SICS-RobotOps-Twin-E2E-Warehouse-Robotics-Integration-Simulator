@@ -2,7 +2,7 @@
 const byId = id => document.getElementById(id);
 const player = new MotionPlayer();
 let selectedJob = null, fixture = null, busy = false, refreshing = false, pollingMotion = false;
-let orderSignature = "";
+let orderSignature = "", nextMotionPoll = 0;
 async function api(path, body) {
   const options = body === undefined ? {cache:"no-store"} : {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)};
   const response = await fetch(path, options), data = await response.json();
@@ -49,10 +49,10 @@ async function refresh(preferred) {
     }
   } finally {refreshing=false;}
 }
-async function refreshMotion() {
-  if(!selectedJob || pollingMotion) return;
+async function refreshMotion(force=false) {
+  if(!selectedJob || pollingMotion || !force && Date.now()<nextMotionPoll) return;
   pollingMotion=true;
-  try {const data=await api(`/jobs/${selectedJob}/playback`);player.update(data);}
+  try {const data=await api(`/jobs/${selectedJob}/playback`);player.update(data);nextMotionPoll=Date.now()+(data.status==="RECORDING"||data.status==="WAITING"?200:1500);}
   catch(error){text("motion-state","Recording feed unavailable · reconnecting");}
   finally {pollingMotion=false;}
 }
@@ -61,18 +61,18 @@ async function action(fn) {
   text("message","Running… live motion and status update below.");
   try {await fn();text("message","Updated from persisted evidence. Replay only changes the view.");}
   catch(error){text("message",error.message);}
-  finally {busy=false;byId("create").disabled=false;byId("reset").disabled=false;await refresh();await refreshMotion();}
+  finally {busy=false;byId("create").disabled=false;byId("reset").disabled=false;await refresh();await refreshMotion(true);}
 }
 byId("create").addEventListener("click",()=>action(async()=>{
   const orderId="order-"+crypto.randomUUID();
   const response=await fetch("/orders",{method:"POST",headers:{"Content-Type":"application/json","Idempotency-Key":orderId},body:JSON.stringify({order_id:orderId,lines:[{order_line_id:"line-1",product_id:byId("product").value,source_id:fixture.source_id,destination_id:fixture.destination_id}]})});
   const order=await response.json();if(!response.ok)throw new Error(JSON.stringify(order));
-  await refresh(orderId); await refreshMotion();
+  await refresh(orderId); await refreshMotion(true);
   await api(`/jobs/${order.job_ids[0]}/run`,{fault:byId("scenario").value || null});
 }));
 byId("reconcile").onclick=()=>action(async()=>{if(selectedJob)await api(`/jobs/${selectedJob}/reconcile`,{fault:byId("observation").value || null});});
 byId("reset").onclick=()=>action(()=>api("/cell/reset",{}));
-byId("orders").onchange=async()=>{selectedJob=null;player.select(null);byId("visual-panel").hidden=true;await refresh();await refreshMotion();};
+byId("orders").onchange=async()=>{selectedJob=null;player.select(null);byId("visual-panel").hidden=true;await refresh();await refreshMotion(true);};
 byId("motion-import").onclick=()=>action(async()=>{
   byId("motion-import").disabled=true;
   try {await api(`/jobs/${selectedJob}/playback/import`,{});}
@@ -81,9 +81,10 @@ byId("motion-import").onclick=()=>action(async()=>{
 byId("visual").onload=()=>{byId("visual-panel").hidden=false;};
 byId("visual").onerror=()=>{byId("visual-panel").hidden=true;};
 (async()=>{try{
+  player.previewScene(await api("/cell/scene"));
   fixture=await api("/fixtures");fixture.products.forEach(item=>byId("product").add(new Option(item.sku+" · "+item.product_id,item.product_id)));
   text("runtime",fixture.runtime === "blender"?"Blender · CPU · synthetic world":"Deterministic headless world");
-  await refresh();await refreshMotion();
+  await refresh();await refreshMotion(true);
   setInterval(()=>refresh().catch(error=>text("message",error.message)),1000);
-  setInterval(refreshMotion,250);
+  setInterval(()=>refreshMotion(),250);
 }catch(error){text("message",error.message);}})();

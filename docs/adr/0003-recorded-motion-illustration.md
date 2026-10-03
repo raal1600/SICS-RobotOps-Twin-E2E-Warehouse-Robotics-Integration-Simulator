@@ -2,6 +2,9 @@
 
 Accepted 2026-10-02. Classification: SIMULATOR_DESIGN.
 
+The renderer choice below is superseded by [ADR 0004](0004-full-3d-scenario-replay.md).
+The pose provenance, read-only replay and verification boundaries remain in force.
+
 The user requested a live illustration and replay instead of only a static final
 render. Keep the bounded batch Blender runtime. Export its evaluated object poses
 at each of the existing 100 animation frames, at 24 simulated frames per second.

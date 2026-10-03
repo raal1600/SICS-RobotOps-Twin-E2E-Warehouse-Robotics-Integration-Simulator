@@ -12,6 +12,10 @@ from pathlib import Path
 import bpy
 from mathutils import Vector
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from robotops.presentation_io import write_snapshot  # noqa: E402
+from robotops.scene_geometry import cell_meshes  # noqa: E402
+
 
 def cube(name, location, scale, color):
     bpy.ops.mesh.primitive_cube_add(size=1, location=location)
@@ -44,28 +48,12 @@ def scene(world):
     bpy.ops.object.delete(use_global=False)
     collection = bpy.data.collections.new("RobotOpsTwin")
     bpy.context.scene.collection.children.link(collection)
-    cube("RobotOpsTwin/Cell", (0, 0, -0.05), (2.7, 1.8, 0.1), (0.12, 0.18, 0.23))
-    cube("Robot", (0, 0.6, 0.4), (0.18, 0.18, 0.8), (0.18, 0.5, 0.62))
-    cube("RobotArm", (0, 0.25, 0.85), (0.15, 0.8, 0.12), (0.3, 0.65, 0.72))
-    gripper = cube("Gripper", (0, 0, 0.8), (0.15, 0.14, 0.14), (0.85, 0.65, 0.17))
-    for i, loc in enumerate(world["locations"]):
-        x, y, z = loc["pose"]["position"]
-        name = "SourceTote" if i == 0 else "DestinationTote"
-        tote = cube(name, (x, y, 0.04), (0.55, 0.65, 0.08), (0.2, 0.32, 0.38))
-        tote["location_id"] = loc["location_id"]
-        for dx, dy, sx, sy in [
-            (-0.28, 0, 0.025, 0.65),
-            (0.28, 0, 0.025, 0.65),
-            (0, -0.33, 0.56, 0.025),
-            (0, 0.33, 0.56, 0.025),
-        ]:
-            cube(name + f"Wall{dx}{dy}", (x + dx, y + dy, 0.11), (sx, sy, 0.15), (0.3, 0.45, 0.52))
-    colors = [(0.76, 0.19, 0.15), (0.15, 0.38, 0.72), (0.22, 0.62, 0.3)]
-    for i, item in enumerate(world["objects"]):
-        ident = item["product"]["product_id"]
-        obj = cube("Products/" + ident, item["pose"]["position"], (0.13, 0.13, 0.13), colors[i % 3])
-        obj["product_id"] = ident
-        obj["location_id"] = item["location_id"]
+    for mesh in cell_meshes(world):
+        obj = cube(mesh["name"], mesh["position"], mesh["size"], mesh["color"])
+        for label in ("product_id", "location_id"):
+            if label in mesh:
+                obj[label] = mesh[label]
+    gripper = bpy.data.objects["Gripper"]
     overview = camera("OverviewCamera", (2.6, -3.6, 2.8), (0, 0, 0.25))
     camera("ObservationCamera", (0, 0, 3), (0, 0, 0))
     bpy.context.scene.camera = overview
@@ -143,9 +131,7 @@ def record_motion(directory, command, pacing=0):
         )
         recording["complete"] = frame == 100
         if frame == 1 or frame % 4 == 0:
-            temporary = directory / "motion.tmp"
-            temporary.write_text(json.dumps(recording), encoding="utf-8")
-            temporary.replace(directory / "motion.json")
+            write_snapshot(directory / "motion.json", recording)
         if pacing:
             time.sleep(max(0, start + frame * pacing - time.monotonic()))
 
@@ -190,36 +176,54 @@ def main():
         target = Vector(command["target_pose"]["position"])
         if not all(math.isfinite(v) for v in target):
             raise ValueError("INVALID_POSE")
-        obj.keyframe_insert(data_path="location", frame=1)
-        for frame, position, label in [
-            (10, source + Vector((0, 0, 0.35)), "APPROACH"),
-            (20, source, "ATTACH"),
-            (40, source + Vector((0, 0, 0.4)), "LIFT"),
-            (70, target + Vector((0, 0, 0.4)), "TRANSFER"),
-            (90, target, "DETACH"),
-        ]:
-            gripper.location = position
-            gripper.keyframe_insert(data_path="location", frame=frame)
-            if frame == 20:
-                obj.parent = gripper
-                obj.location = (0, 0, 0)
-            if frame == 90:
-                obj.parent = None
-                obj.location = target
-            steps.append(label)
-        obj.animation_data_clear()
-        for frame, position in [
+
+        def machine_key(frame, position):
+            x, y, z = position
+            poses = {
+                "Gripper": (x, y, z),
+                "GripperLeft": (x - 0.095, y, z - 0.06),
+                "GripperRight": (x + 0.095, y, z - 0.06),
+                "RobotSpindle": (x, y, z + 0.525),
+                "RobotCarriage": (x, 0.5, 1.3),
+                "RobotArm": (x, y + 0.2, 1.18),
+            }
+            for name, pose in poses.items():
+                part = bpy.data.objects[name]
+                part.location = pose
+                part.keyframe_insert(data_path="location", frame=frame)
+
+        home = gripper.location.copy()
+        product_keys = [
             (1, source),
             (20, source),
             (40, source + Vector((0, 0, 0.4))),
             (70, target + Vector((0, 0, 0.4))),
             (90, target),
             (100, target),
-        ]:
-            obj.location = position
+        ]
+        machine_keys = [
+            (1, home),
+            (10, source + Vector((0, 0, 0.46))),
+            (20, source + Vector((0, 0, 0.11))),
+            (40, source + Vector((0, 0, 0.51))),
+            (70, target + Vector((0, 0, 0.51))),
+            (90, target + Vector((0, 0, 0.11))),
+            (100, home),
+        ]
+
+        def interpolate(keys, frame):
+            for (start, a), (end, b) in zip(keys, keys[1:], strict=False):
+                if start <= frame <= end:
+                    return a.lerp(b, (frame - start) / (end - start))
+            raise ValueError("FRAME_OUTSIDE_TRAJECTORY")
+
+        # Bake every sampled pose. Independent Bezier handles could otherwise
+        # make a product slip relative to its gripper between phase boundaries.
+        for frame in range(1, 101):
+            obj.location = interpolate(product_keys, frame)
             obj.keyframe_insert(data_path="location", frame=frame)
-        gripper.location = target + Vector((0, 0, 0.35))
-        gripper.keyframe_insert(data_path="location", frame=100)
+            machine_key(frame, interpolate(machine_keys, frame))
+        steps = ["APPROACH", "ATTACH", "LIFT", "TRANSFER", "DETACH"]
         obj["location_id"] = command["destination_id"]
         # Observe the actual keyed scene, not a separately invented browser trajectory.
         record_motion(directory, command, pacing)

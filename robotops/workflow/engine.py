@@ -15,6 +15,7 @@ from robotops.domain.models import (
     JobEvidence,
     JobState,
     PickJob,
+    PresentationSnapshot,
     ReconciliationEvidence,
     RobotCommand,
     Verdict,
@@ -29,7 +30,7 @@ from robotops.observation.model import ObservationModel
 from robotops.robot_gateway.gateway import RobotGateway
 from robotops.verification.verifier import Verifier
 from robotops.workflow.states import UNCERTAIN
-from robotops.workflow.store import Claim, Conflict, Store, metadata
+from robotops.workflow.store import Claim, Conflict, NotFound, Store, metadata
 
 
 class Engine:
@@ -87,6 +88,16 @@ class Engine:
         start = monotonic()
         try:
             job = self.store.job(job_id)
+            if job.state == JobState.RECEIVED:
+                try:
+                    self.store.load(PresentationSnapshot, job_id)
+                except NotFound:
+                    self.store.save(
+                        job_id,
+                        PresentationSnapshot(
+                            **metadata(job), job_id=job_id, world=self.runtime.world()
+                        ),
+                    )
             self._inject(job, fault)
             if job.state == JobState.RECEIVED:
                 job = self.store.transition(

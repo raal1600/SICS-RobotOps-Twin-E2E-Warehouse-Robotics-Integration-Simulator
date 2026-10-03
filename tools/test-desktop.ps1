@@ -42,7 +42,7 @@ function Start-OwnedApp {
     }
 }
 function Assert-Exited($App) {
-    if (-not $App.process.WaitForExit(25000)) { throw 'Desktop did not stop' }
+    if (-not $App.process.WaitForExit(75000)) { throw 'Desktop did not stop' }
     if (-not $App.backend.WaitForExit(5000)) { throw 'Backend outlived the desktop' }
     $client=New-Object Net.Sockets.TcpClient
     try {

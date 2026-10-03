@@ -3,6 +3,7 @@
 import ast
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -88,6 +89,19 @@ def main() -> None:
         check=False,
     )
     raw = json.loads((out / "bandit.json").read_text(encoding="utf-8"))
+    vendor = ROOT / "apps/erp_ui/vendor"
+    manifest = json.loads((vendor / "manifest.json").read_text())
+    vendor_integrity = all(
+        hashlib.sha256((vendor / name).read_bytes()).hexdigest() == digest
+        for name, digest in manifest["sha256"].items()
+    )
+    npm = shutil.which("npm")
+    if npm is None:
+        raise RuntimeError("npm is required for the vendored library security audit")
+    javascript_audit = subprocess.run(
+        [npm, "audit", "--json", "--omit=dev"], cwd=vendor, capture_output=True, check=False
+    )
+    (out / "npm-audit.json").write_bytes(javascript_audit.stdout)
     exceptions = json.loads((ROOT / "docs/security-exceptions.json").read_text())
     reviewed = review(raw["results"], exceptions)
     passed = (
@@ -95,12 +109,16 @@ def main() -> None:
         and not raw["errors"]
         and all(item["reviewed"] for item in reviewed)
         and audit.returncode == 0
+        and javascript_audit.returncode == 0
+        and vendor_integrity
     )
     result = {
         "passed": passed,
         "lock_sha256": hashlib.sha256((ROOT / "uv.lock").read_bytes()).hexdigest(),
         "bandit_exit": bandit.returncode,
         "pip_audit_exit": audit.returncode,
+        "npm_audit_exit": javascript_audit.returncode,
+        "vendor_integrity": vendor_integrity,
         "findings": reviewed,
     }
     (out / "security-review.json").write_text(json.dumps(result, indent=2) + "\n")

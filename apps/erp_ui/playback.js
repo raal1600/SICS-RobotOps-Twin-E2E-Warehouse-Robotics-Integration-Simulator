@@ -1,124 +1,130 @@
 "use strict";
-// Presentation only: all motion comes from evaluated Blender frames. No command writes.
+// Read-only scenario playback. Event pacing is presentation time, not measured latency.
+const scenarioNames = {
+  DROP_ACK_AFTER_EFFECT: "Acknowledgement lost after effect",
+  DROP_ACK_BEFORE_EFFECT: "Acknowledgement lost before effect",
+  CONTRADICTORY_OBSERVATION: "Contradictory observation",
+  LOW_CONFIDENCE_OBSERVATION: "Low-confidence observation",
+  STALE_OBSERVATION: "Stale observation", MISSING_OBSERVATION: "Missing observation",
+  POSE_UNCERTAINTY: "Pose uncertainty", LOGICAL_ESTOP: "Logical E-stop",
+  CELL_FAULT: "Cell fault", BRAIN_INVALID_OUTPUT: "Invalid Brain output",
+  BRAIN_TIMEOUT: "Brain timeout", ROBOT_COMMAND_FAILURE: "Robot command failure"
+};
 class MotionPlayer {
   constructor() {
-    this.canvas = document.getElementById("motion-canvas");
-    this.ctx = this.canvas.getContext("2d");
-    this.job = null; this.recording = null; this.cursor = 0;
-    this.playing = false; this.speed = 1; this.yaw = -0.35; this.last = null;
-    this.byId = id => document.getElementById(id);
-    this.byId("motion-play").onclick = () => {
-      if (!this.playing && this.atEnd() && this.recording.complete) this.cursor = 0;
-      this.playing = !this.playing; this.controls();
+    this.view=new SceneView(document.getElementById("motion-canvas"));
+    this.byId=id=>document.getElementById(id);
+    this.job=null;this.scene=null;this.preview=null;this.recording=null;this.data=null;
+    this.cursor=0;this.track=[];this.playing=false;this.manualPause=false;this.speed=1;this.last=null;
+    this.byId("motion-play").onclick=()=>{
+      if(!this.playing&&this.atEnd())this.cursor=0;
+      this.playing=!this.playing;this.manualPause=!this.playing;this.controls();
     };
-    this.byId("motion-replay").onclick = () => {this.cursor = 0; this.playing = true; this.controls();};
-    this.byId("motion-scrub").oninput = event => {
-      this.cursor = Math.min(Number(event.target.value), this.recording.frames.length - 1);
-      this.playing = false; this.controls(); this.draw();
-    };
-    this.byId("motion-speed").onchange = event => {this.speed = Number(event.target.value);};
-    this.byId("motion-rotate").onclick = () => {this.yaw += Math.PI / 6; this.draw();};
-    requestAnimationFrame(time => this.tick(time));
-    this.draw();
+    this.byId("motion-replay").onclick=()=>{this.cursor=0;this.playing=true;this.manualPause=false;this.controls();};
+    this.byId("motion-scrub").oninput=e=>{this.cursor=Math.max(0,Math.min(Number(e.target.value),this.limit()));this.playing=false;this.manualPause=true;this.controls();this.draw();};
+    this.byId("motion-speed").onchange=e=>{this.speed=Number(e.target.value);};
+    this.byId("motion-rotate").onclick=()=>this.view.rotate();
+    this.byId("motion-home").onclick=()=>this.view.reset();
+    this.byId("motion-zoom-in").onclick=()=>this.view.zoom(0.8);
+    this.byId("motion-zoom-out").onclick=()=>this.view.zoom(1.25);
+    requestAnimationFrame(time=>this.tick(time));this.controls();
   }
-  select(job) {
-    if (this.job === job) return;
-    this.job = job; this.recording = null; this.cursor = 0; this.playing = false;
-    this.byId("motion-state").textContent = "Waiting for recorded motion";
-    this.byId("motion-detail").textContent = "The scene appears when Blender supplies evaluated poses.";
-    this.byId("motion-import").hidden = true;
-    this.controls(); this.draw();
+  previewScene(scene){this.preview=scene;if(!this.job){this.scene=scene;this.byId("motion-state").textContent="3D cell ready";this.controls();this.draw();}}
+  select(job){
+    if(this.job===job)return;
+    this.job=job;this.recording=null;this.scene=this.preview;this.data=null;this.track=[];
+    this.cursor=0;this.playing=false;this.manualPause=false;
+    this.byId("motion-state").textContent="Loading selected scenario";
+    this.byId("motion-import").hidden=true;this.controls();this.draw();
   }
-  update(data) {
-    if (data.job_id !== this.job) return;
-    const first = !this.recording;
-    this.recording = data.recording;
-    if (first && this.recording) {this.cursor = 0; this.playing = true;}
-    if (!this.recording) this.playing = false;
-    this.byId("motion-state").textContent = {
-      WAITING: "Waiting for Blender", RECORDING: "Live recording", RECORDED: "Recorded motion",
-      PARTIAL: "Partial recording · outcome uncertain", UNAVAILABLE: "No motion available"
-    }[data.status];
-    this.byId("motion-outcome").textContent = "Job: " + data.job_state;
-    this.byId("motion-outcome").classList.toggle("uncertain", ["UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION"].includes(data.job_state));
-    this.byId("motion-detail").textContent = data.recording
-      ? `${data.recording.product_id} · ${data.command_id} · ${data.recording.frames.length}/100 frames received`
-      : data.reason;
-    this.byId("motion-import").hidden = !data.can_import;
-    this.controls(); this.draw();
+  buildTrack(data){
+    const track=[],events=(data.events||[]).filter(e=>e.state_after||["FAULT_INJECTED","PLAN_VALIDATED","PICK_EFFECT","OBSERVATION_CAPTURED","COMMAND_REJECTED","COMMAND_FAILED"].includes(e.event_type));
+    let inserted=false;
+    const motion=()=>{if(inserted||!data.recording)return;inserted=true;data.recording.frames.forEach((frame,i)=>track.push({kind:"motion",frame:i}));};
+    for(const event of events){
+      for(let i=0;i<12;i++)track.push({kind:"event",event,afterMotion:inserted});
+      if(event.state_after==="EXECUTING"){
+        motion();
+        // A partial recording stops here: later events must not suggest a completed trajectory.
+        if(data.recording&&!data.recording.complete)return track;
+      }
+    }
+    motion();return track;
   }
-  atEnd() { return this.recording && this.cursor >= this.recording.frames.length - 1; }
-  controls() {
-    for (const id of ["motion-play", "motion-replay", "motion-scrub", "motion-speed", "motion-rotate"]) {
-      this.byId(id).disabled = !this.recording;
-    }
-    this.byId("motion-play").textContent = this.playing ? "Pause" : "Play";
-    this.byId("motion-scrub").value = Math.round(this.cursor);
+  update(data){
+    if(data.job_id!==this.job)return;
+    const wasEnd=this.atEnd(),first=!this.data,oldLength=this.track.length;
+    this.data=data;this.scene=data.scene;this.recording=data.recording;this.track=this.buildTrack(data);
+    if((first||this.track.length>oldLength&&wasEnd)&&!this.manualPause)this.playing=true;
+    if(!this.track.length)this.playing=false;
+    this.cursor=Math.min(this.cursor,this.limit());
+    this.byId("motion-state").textContent=data.recording
+      ? ({RECORDING:"Live Blender motion",RECORDED:"Recorded 3D scenario",PARTIAL:"Partial motion - outcome uncertain"}[data.status]||data.status)
+      : "Scenario events - stationary scene";
+    this.byId("motion-outcome").textContent="Job: "+data.job_state;
+    const fault=(data.events||[]).find(e=>e.event_type==="FAULT_INJECTED");
+    this.byId("motion-scenario").textContent="Execution: "+(scenarioNames[fault?.reason]||"Normal execution");
+    this.byId("motion-outcome").classList.toggle("uncertain",["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(data.job_state));
+    const provenance=data.recording?"Original Blender poses":data.scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
+    this.byId("motion-detail").textContent=`${provenance}. ${data.reason}`;
+    this.byId("motion-import").hidden=!data.can_import;
+    this.controls();this.draw();
   }
-  tick(time) {
-    const delta = this.last === null ? 0 : Math.min((time - this.last) / 1000, 0.1);
-    this.last = time;
-    if (this.playing && this.recording) {
-      this.cursor = Math.min(this.cursor + delta * 24 * this.speed, this.recording.frames.length - 1);
-      if (this.atEnd() && this.recording.complete) this.playing = false;
-      this.controls(); this.draw();
-    }
-    requestAnimationFrame(next => this.tick(next));
+  limit(){return Math.max(0,this.track.length-1);}
+  atEnd(){return this.cursor>=this.limit();}
+  controls(){
+    for(const id of ["motion-play","motion-replay","motion-scrub","motion-speed"])this.byId(id).disabled=!this.track.length;
+    for(const id of ["motion-rotate","motion-home","motion-zoom-in","motion-zoom-out"])this.byId(id).disabled=!this.scene&&!this.recording;
+    this.byId("motion-play").textContent=this.playing?"Pause":"Play";
+    this.byId("motion-scrub").max=this.limit();this.byId("motion-scrub").value=Math.round(this.cursor);
   }
-  draw() {
-    const c = this.ctx, w = this.canvas.width, h = this.canvas.height;
-    c.clearRect(0, 0, w, h);
-    const background = c.createLinearGradient(0, 0, 0, h);
-    background.addColorStop(0, "#101f2d"); background.addColorStop(1, "#203b4b");
-    c.fillStyle = background; c.fillRect(0, 0, w, h);
-    const scale = 210, cos = Math.cos(this.yaw), sin = Math.sin(this.yaw);
-    const camera = ([x, y, z]) => [cos*x-sin*y, sin*x+cos*y, z];
-    const project = point => {const [x,y,z] = camera(point); return [w/2+x*scale, h*0.70+y*scale*0.5-z*scale];};
-    const line = (a,b,color) => {c.beginPath();c.moveTo(...project(a));c.lineTo(...project(b));c.strokeStyle=color;c.stroke();};
-    c.lineWidth = 1;
-    for (let n=-8;n<=8;n++) {
-      line([n/4,-2,-0.12],[n/4,2,-0.12],"#345260");
-      line([-2,n/4,-0.12],[2,n/4,-0.12],"#345260");
+  tick(time){
+    const delta=this.last===null?0:Math.min((time-this.last)/1000,0.1);this.last=time;
+    if(this.playing&&this.track.length){
+      this.cursor=Math.min(this.cursor+delta*24*this.speed,this.limit());
+      if(this.atEnd()&&!['WAITING','RECORDING'].includes(this.data.status))this.playing=false;
+      this.controls();
     }
-    if (!this.recording) {
-      c.fillStyle="#c1d9e2";c.font="20px system-ui";c.textAlign="center";
-      c.fillText("Select an order to see its recorded motion",w/2,h/2-40);
-      this.byId("motion-phase").textContent="No frames recorded";
-      return;
+    this.draw();requestAnimationFrame(next=>this.tick(next));
+  }
+  pose(){
+    const step=this.track[Math.floor(this.cursor)],rec=this.recording;
+    const objects=rec?.objects||this.scene?.objects||[];
+    let positions={},phase="Cell ready",event=null;
+    if(step?.kind==="motion"){
+      const frame=rec.frames[step.frame],next=rec.frames[Math.min(step.frame+1,rec.frames.length-1)],fraction=this.cursor-Math.floor(this.cursor);
+      for(const obj of objects){const a=frame.positions[obj.name]||obj.position,b=next.positions[obj.name]||a;positions[obj.name]=a.map((v,i)=>v+(b[i]-v)*fraction);}
+      phase=`${frame.phase} - Blender frame ${step.frame+1}/100 - ${(step.frame/24).toFixed(1)} s simulated`;
+    }else if(step){
+      event=step.event;phase=event.state_after||event.event_type;
+      if(step.afterMotion&&rec)positions=rec.frames.at(-1).positions;
     }
-    const rec = this.recording, index = Math.min(Math.floor(this.cursor),rec.frames.length-1);
-    const frame = rec.frames[index], next = rec.frames[Math.min(index+1,rec.frames.length-1)];
-    const fraction = this.cursor-index;
-    const position = obj => {
-      const a=frame.positions[obj.name] || obj.position, b=next.positions[obj.name] || a;
-      return a.map((v,i) => v+(b[i]-v)*fraction);
-    };
-    const faces=[];
-    for (const obj of rec.objects) {
-      const center=position(obj), s=obj.size.map(v=>v/2);
-      const vertices=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]]
-        .map(corner=>corner.map((v,i)=>center[i]+v*s[i]));
-      [[0,1,2,3],[0,4,5,1],[1,5,6,2],[2,6,7,3],[3,7,4,0],[4,7,6,5]].forEach((indices,i)=>{
-        const points=indices.map(v=>vertices[v]);
-        const depth=points.reduce((sum,p)=>{const q=camera(p);return sum+q[1]-q[2]*2;},0)/4;
-        faces.push({points,depth,color:obj.color,shade:[0.5,0.72,0.85,0.67,0.8,1.12][i],selected:obj.product_id===rec.product_id});
-      });
+    return {objects,positions,phase,event};
+  }
+  draw(){
+    const {objects,positions,phase,event}=this.pose();
+    this.view.render(objects,positions,this.data?.product_id||this.recording?.product_id);
+    let message=this.job?"Waiting for persisted execution events":"Environment ready. Create and run an order to begin.";
+    let tone="normal";
+    if(event){
+      message=event.event_type==="FAULT_INJECTED"?"Scenario configured: "+(scenarioNames[event.reason]||event.reason):event.reason;
+      if(event.reason.startsWith("PLANNING_REJECTED:"))message=event.reason.includes("BRAIN_TIMEOUT")?"Brain timed out. No action plan was accepted.":"Action planning or validation failed. Inspect the causal timeline for the rejection details.";
+      if(event.state_after==="UNKNOWN_OUTCOME")message="Outcome uncertain. Reconcile the original command; do not issue another pick. "+event.reason;
+      if(event.state_after==="REQUIRES_INTERVENTION")message="Evidence could not establish success. Human intervention required. "+event.reason;
+      if(["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(event.state_after))tone="uncertain";
+      if(event.state_after==="FAILED"||/ESTOP|CELL_FAULT/.test(event.reason))tone="blocked";
+      if(event.state_after==="COMPLETED")tone="success";
+    }else if(this.recording&&this.track.length)message="Machine and product follow evaluated Blender poses.";
+    if(this.data&&!this.recording){
+      const dispatched=(this.data.events||[]).some(e=>e.state_after==="EXECUTING");
+      const rejected=(this.data.events||[]).some(e=>["COMMAND_REJECTED","COMMAND_FAILED"].includes(e.event_type));
+      message+=" "+(!dispatched?"No pick dispatched at this stage.":rejected?"Controller recorded no pick effect. Machine and product stay still.":"No motion recording is available; a stationary view is not proof of no effect.");
     }
-    faces.sort((a,b)=>b.depth-a.depth);
-    for (const face of faces) {
-      c.beginPath();face.points.forEach((p,i)=>i ? c.lineTo(...project(p)) : c.moveTo(...project(p)));c.closePath();
-      c.fillStyle=`rgb(${face.color.map(v=>Math.min(255,Math.round(v*255*face.shade))).join(",")})`;c.fill();
-      c.lineWidth=face.selected?1.8:0.6;c.strokeStyle=face.selected?"#ffdc87":"#24424c";c.stroke();
-    }
-    const label=(value,p,color)=>{const [x,y]=project(p);c.font="bold 13px system-ui";c.textAlign="center";
-      const width=c.measureText(value).width+18;c.fillStyle="#101f2de8";c.fillRect(x-width/2,y-17,width,25);
-      c.fillStyle=color;c.fillText(value,x,y);};
-    rec.objects.filter(o=>["SourceTote","DestinationTote"].includes(o.name)).forEach(o=>{
-      label(o.name==="SourceTote"?"SOURCE":"DESTINATION",[o.position[0],o.position[1]-0.48,0.01],"#b4d9e6");
-    });
-    const product=rec.objects.find(o=>o.product_id===rec.product_id);
-    if(product){const p=position(product);label(rec.product_id.replace("product-","").toUpperCase(),[p[0],p[1],p[2]+0.18],"#ffdc87");}
-    this.byId("motion-phase").textContent=`${frame.phase} · Frame ${index+1}/100 · ${(this.cursor/24).toFixed(1)} s simulated`;
-    this.canvas.setAttribute("aria-label",`Recorded Blender motion: ${frame.phase}, frame ${index+1}. Product ${rec.product_id}.`);
+    const banner=this.byId("motion-event");
+    if(banner.textContent!==message)banner.textContent=message;
+    if(banner.dataset.tone!==tone)banner.dataset.tone=tone;
+    if(this.byId("motion-phase").textContent!==phase)this.byId("motion-phase").textContent=phase;
+    const description=`3D warehouse cell. ${phase}. ${message}`;
+    if(this.view.canvas.getAttribute("aria-label")!==description)this.view.canvas.setAttribute("aria-label",description);
   }
 }

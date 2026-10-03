@@ -47,6 +47,12 @@ SYNC_FILES = [
     "docs/implementation/operations.md",
     "docs/implementation/contracts.md",
     "docs/adr/0003-recorded-motion-illustration.md",
+    "docs/adr/0004-full-3d-scenario-replay.md",
+    "docs/implementation/persistence.md",
+    "contracts/schemas/PresentationSnapshot.json",
+    "contracts/schemas/VisualScene.json",
+    "contracts/schemas/JobPlayback.json",
+    "apps/erp_ui/vendor/manifest.json",
 ]
 
 
@@ -274,7 +280,7 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
         "",
         "## Documentation drift and synchronization",
         "",
-        "Drift detected: yes. Design-only status, obsolete report command example, proposed network bridge, publication covers, tool commands and operational checklist lagged implementation. They were synchronized with the durable workflow, bounded Blender adapter, observation/recovery semantics and P7 evidence. External company claims were not promoted to independently verified facts.",
+        "Drift detected: yes. Earlier motion-only and dependency-free viewer descriptions lagged the full 3D scenario extension. Documentation now covers persisted starting scenes, audit-event replay for stationary scenarios, shared gantry geometry, offline Three.js with software fallback, bounded Windows file-publication retry and dependency audits. A stale future-tense persistence paragraph and damaged Swedish characters were corrected. Architecture sources, schemas, guides, research, provenance and acceptance evidence were synchronized. External company claims were not promoted to independently verified facts.",
         "",
         "Synchronized source files:",
         "",

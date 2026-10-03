@@ -160,7 +160,8 @@ internal sealed class Desktop : Form {
             File.WriteAllText(Path.Combine(session,"stop"),sessionId);
             if (child != null) {
                 var owned=child;
-                bool drained=await Task.Run(()=>owned.Process.WaitForExit(20000));
+                // Allow the backend's 65 s drain budget plus process cleanup.
+                bool drained=await Task.Run(()=>owned.Process.WaitForExit(70000));
                 File.WriteAllText(Path.Combine(session,"launcher-stopped.json"),json.Serialize(new { session_id=sessionId, backend_exited=drained, forced=!drained }));
                 child.Dispose(); child=null; // Also closes lingering owned Blender children.
             }

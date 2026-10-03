@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from apps.api.app import create_app
 from robotops.blender.adapter import BlenderRuntime
 from robotops.config import Settings
-from robotops.domain.models import Fault, JobState, RobotCommand
+from robotops.domain.models import Fault, JobState, PresentationSnapshot, RobotCommand
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Store
 
@@ -49,6 +49,15 @@ def test_live_recording_replay_restart_and_legacy_import_are_read_only(tmp_path,
     assert frames[69]["positions"][name][0] == pytest.approx(target[0])
     assert frames[89]["positions"][name] == pytest.approx(target)
     assert frames[99]["positions"][name] == pytest.approx(runtime.world().objects[0].pose.position)
+    for part in ("RobotCarriage", "RobotArm", "RobotSpindle", "GripperLeft", "GripperRight"):
+        assert frames[39]["positions"][part] != frames[69]["positions"][part]
+    for index in range(19, 90):
+        assert frames[index]["positions"]["Gripper"][0:2] == pytest.approx(
+            frames[index]["positions"][name][0:2]
+        )
+        assert frames[index]["positions"]["Gripper"][2] == pytest.approx(
+            frames[index]["positions"][name][2] + 0.11
+        )
     assert client.get(f"/jobs/{job_id}/artifact.png").content.startswith(b"\x89PNG")
     assert client.get("/ui/playback.js").status_code == 200
     before = (
@@ -135,7 +144,15 @@ def test_recording_corruption_partial_and_path_boundaries(tmp_path, order_reques
 
 
 @pytest.mark.parametrize(
-    "fault", [Fault.DROP_ACK_BEFORE_EFFECT, Fault.LOGICAL_ESTOP, Fault.BRAIN_INVALID_OUTPUT]
+    "fault",
+    [
+        Fault.DROP_ACK_BEFORE_EFFECT,
+        Fault.LOGICAL_ESTOP,
+        Fault.CELL_FAULT,
+        Fault.BRAIN_INVALID_OUTPUT,
+        Fault.BRAIN_TIMEOUT,
+        Fault.ROBOT_COMMAND_FAILURE,
+    ],
 )
 def test_unexecuted_commands_never_invent_motion(tmp_path, order_request, fault):
     store = Store(tmp_path / "workflow.db")
@@ -146,6 +163,48 @@ def test_unexecuted_commands_never_invent_motion(tmp_path, order_request, fault)
     client = TestClient(create_app(store, engine))
     result = client.get(f"/jobs/{job_id}/playback").json()
     assert result["recording"] is None and not result["can_import"]
+    assert result["scene"]["source"] == "SAVED_START_SCENE"
+    names = {obj["name"] for obj in result["scene"]["objects"]}
+    assert {"RobotOpsTwin/Cell", "Robot", "Gripper", "Products/product-red"} <= names
+    assert any(event["reason"] == fault.value for event in result["events"])
+    snapshot = store.load(PresentationSnapshot, job_id)
+    assert runtime.world().objects == snapshot.world.objects
+    assert not any(event.event_type == "PICK_EFFECT" for event in runtime.events())
     assert client.get(f"/jobs/{job_id}/artifact.png").status_code == 404
     assert client.post(f"/jobs/{job_id}/playback/import").status_code == 409
     assert not list(runtime.artifacts.glob("*/motion.json"))
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        None,
+        Fault.CONTRADICTORY_OBSERVATION,
+        Fault.LOW_CONFIDENCE_OBSERVATION,
+        Fault.STALE_OBSERVATION,
+        Fault.MISSING_OBSERVATION,
+        Fault.POSE_UNCERTAINTY,
+    ],
+)
+def test_scenario_motion_is_independent_of_verification(tmp_path, order_request, fault):
+    store = Store(tmp_path / "workflow.db")
+    runtime = BlenderRuntime(tmp_path / "runtime.db")
+    engine = Engine(store, runtime)
+    job_id = store.intake(order_request, "key").job_ids[0]
+    job = engine.run(job_id, fault)
+    client = TestClient(create_app(store, engine))
+    result = client.get(f"/jobs/{job_id}/playback").json()
+    assert result["recording"]["complete"]
+    assert job.state == (JobState.COMPLETED if fault is None else JobState.UNKNOWN_OUTCOME)
+    assert sum(e.event_type == "PICK_EFFECT" for e in runtime.events()) == 1
+    product = "Products/" + job.line.product_id
+    assert result["recording"]["frames"][-1]["positions"][product] == pytest.approx(
+        runtime.world().objects[0].pose.position
+    )
+    if fault:
+        assert any(e["reason"] == fault.value for e in result["events"])
+    # Repeated presentation reads are physically and logically inert.
+    before = runtime.events(), store.timeline(), runtime.world()
+    for _ in range(3):
+        assert client.get(f"/jobs/{job_id}/playback").json() == result
+    assert before == (runtime.events(), store.timeline(), runtime.world())

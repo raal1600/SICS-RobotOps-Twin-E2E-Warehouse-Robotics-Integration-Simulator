@@ -292,6 +292,13 @@ class ReconciliationEvidence(Record):
     verification: VerificationResult
 
 
+class PresentationSnapshot(Record):
+    """Persisted before execution for human replay; never sensor evidence."""
+
+    job_id: Identifier
+    world: WorldState
+
+
 class JobEvidence(Contract):
     job: PickJob
     command: RobotCommand | None
@@ -302,6 +309,7 @@ class JobEvidence(Contract):
 
 
 SCHEMAS: tuple[type[Contract], ...] = (
+    PresentationSnapshot,
     JobEvidence,
     Product,
     InventoryLocation,

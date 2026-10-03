@@ -37,7 +37,9 @@ foreach ($name in @('apps/desktop/OwnedProcess.cs','apps/desktop/RobotOpsLaunche
 }
 @{ source_commit=(git -C $repository rev-parse HEAD); source_dirty=[bool](git -C $repository status --porcelain); source_sha256=$sources; sdk_version='1.0.3800.47'; sdk_sha256=$expectedHash.ToLowerInvariant(); files=$hashes } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output 'windows-build.json') -Encoding UTF8
 if ($Install) {
-    $installed = Join-Path $env:LOCALAPPDATA 'RobotOpsTwin\App'
+    # Install alongside an open older host; never overwrite its loaded EXE/DLLs.
+    $release = (Get-FileHash -LiteralPath (Join-Path $output 'RobotOps Twin.exe') -Algorithm SHA256).Hash.Substring(0,16).ToLowerInvariant()
+    $installed = Join-Path (Join-Path $env:LOCALAPPDATA 'RobotOpsTwin\App') ('build-'+$release)
     New-Item -ItemType Directory -Path $installed -Force | Out-Null
     Get-ChildItem -LiteralPath $output -File | Copy-Item -Destination $installed -Force
     $shell = New-Object -ComObject WScript.Shell

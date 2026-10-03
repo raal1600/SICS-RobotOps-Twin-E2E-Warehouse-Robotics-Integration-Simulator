@@ -2,9 +2,9 @@
 
 from typing import Literal, Self
 
-from pydantic import Field, FiniteFloat, model_validator
+from pydantic import AwareDatetime, Field, FiniteFloat, model_validator
 
-from robotops.domain.models import Contract, Identifier, JobState
+from robotops.domain.models import AuditEvent, CellMode, Contract, Identifier, JobState
 
 Vector3 = tuple[FiniteFloat, FiniteFloat, FiniteFloat]
 
@@ -52,6 +52,14 @@ class MotionRecording(Contract):
         return self
 
 
+class VisualScene(Contract):
+    source: Literal["SAVED_START_SCENE", "CURRENT_WORLD_REFERENCE"]
+    scene_epoch: Identifier
+    timestamp: AwareDatetime
+    cell_mode: CellMode
+    objects: list[VisualObject] = Field(min_length=1, max_length=100)
+
+
 class JobPlayback(Contract):
     job_id: Identifier
     command_id: Identifier | None
@@ -60,6 +68,9 @@ class JobPlayback(Contract):
     reason: str
     can_import: bool = False
     recording: MotionRecording | None = None
+    scene: VisualScene
+    product_id: Identifier
+    events: list[AuditEvent] = Field(default_factory=list)
 
 
-VISUAL_SCHEMAS = (VisualObject, VisualFrame, MotionRecording, JobPlayback)
+VISUAL_SCHEMAS = (VisualObject, VisualFrame, MotionRecording, VisualScene, JobPlayback)

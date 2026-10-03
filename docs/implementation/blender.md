@@ -12,9 +12,11 @@ and an atomically renamed response.json. The scene has stable product identities
 Pick exchanges also record evaluated animation poses in atomic motion.json
 snapshots for [live illustration and replay](playback.md). This separate display
 path never supplies verification evidence.
-The actual Blender object is attached, transferred and detached; its final Blender
-coordinates become the WorldState checkpoint. The .blend retains simplified
-product/gripper animation keyframes. These are synthetic kinematics, not validated
+The actual Blender object follows a baked gripper-relative carrying pose between
+attach and detach; its final Blender coordinates become the WorldState checkpoint.
+The .blend retains product, carriage, arm, spindle and gripper keyframes for a
+stylized Cartesian gantry. The API and Blender use the same cell mesh definitions.
+Every sampled carrying pose preserves the gripper offset. These are synthetic kinematics, not validated
 robot dynamics, safety evidence, or a Cognibotics/HKM1800 simulation.
 
 Before launching Blender, the adapter commits RUNNING and reserves the cell.

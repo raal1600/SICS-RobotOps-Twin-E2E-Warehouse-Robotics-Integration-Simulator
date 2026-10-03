@@ -18,5 +18,9 @@ alone never proves that a product left its source.
 Durable intake, execution, status and reconciliation APIs are implemented;
 contracts/openapi.json is generated and tested. The JobPlayback/MotionRecording
 schemas document the read-only visualization path, including partial/missing
-recordings. They are not accepted by the observation/verifier boundary.
+recordings. JobPlayback also includes the selected job's audit events and a
+VisualScene, with explicit SAVED_START_SCENE or CURRENT_WORLD_REFERENCE provenance.
+GET /cell/scene supplies the initial environment before any order exists.
+PresentationSnapshot persists the starting WorldState solely for human replay.
+None of these presentation records is accepted by the observation/verifier boundary.
 Current evidence is in GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md.

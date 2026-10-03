@@ -156,9 +156,12 @@ Structured JSON events include timestamp, component, event type, correlation/cau
 
 Create/select fixture order; show order/job/cell state, observation/verifier summary, causal timeline, demo-safe fault controls, reconcile action, and latest Blender screenshot where practical. UI polish is secondary.
 
-The user-requested presentation extension adds live recorded Blender motion and
-per-order replay controls. This read-only illustration remains separate from
-WorldObservation and cannot change job outcomes or issue physical commands.
+The user-requested presentation extension adds an always-visible 3D cell, live
+recorded Blender machine/product motion and per-order scenario replay. A saved
+starting scene and audit events illustrate orders with no movement. Orbit, pan,
+zoom and playback controls remain separate from WorldObservation and cannot
+change job outcomes or issue physical commands. Missing historical recordings
+remain explicit; a stationary reference is never evidence of no effect.
 
 ## Test strategy
 

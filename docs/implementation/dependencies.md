@@ -5,14 +5,18 @@ and wheel hash for runtime, tests and documentation. Use `uv sync --locked --all
 Do not update dependencies implicitly during tests. Updates require lock review,
 the full suite and security checks. CI uses CPU execution and no model account.
 Node 20.17.0 runs the built-in JavaScript playback control tests; CI selects this
-version explicitly. No npm dependency, browser CDN or Node process is required
-by the application. The browser uses its built-in Canvas API.
+version explicitly. Three.js 0.180.0 and OrbitControls are vendored from the
+official npm archive with its SHA-512, per-file SHA-256, package lock and MIT
+license in apps/erp_ui/vendor. The application serves these files locally; no CDN,
+npm install or Node process is required at runtime. A perspective Canvas renderer
+retains camera controls if WebGL is unavailable. The security gate runs npm audit
+against the committed vendor lockfile and checks the served files' hashes.
 
 Ruff checks new Python formatting/lint; mypy strict checks all runtime and API
 modules. The pre-existing publication generator retains its separate build and
 link/PDF checks. Coverage must be at least 85% for the combined mandatory suite;
 the threshold is fixed before implementation and must not be lowered to pass.
-Bandit plus pip-audit are the selected security checks; reviewed exceptions, if
+Bandit, pip-audit and npm audit are the selected security checks; reviewed exceptions, if
 needed, must identify the advisory, scope and rationale. No blanket exceptions.
 
 `tools.security_check` saves full Bandit and pip-audit output. The five low-severity

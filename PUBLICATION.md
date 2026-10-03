@@ -101,3 +101,11 @@ injection times and similar-looking outcomes. It changes presentation only;
 state, architecture, contracts and external source claims remain unchanged.
 The earlier full-system acceptance remains a dated baseline; the separate UI
 follow-up evidence records its own affected-suite and browser checks.
+
+The guided-workspace release is verified for clean source `59ace31`: all MUST
+criteria pass, and CI, Windows native lifecycle checks and public publication are
+green. [Release provenance](docs/evidence/workspace-release.json) retains artifact
+checksums and workflow URLs; the acceptance report names its audited source. The
+evidence/status successor is checked again by CI and Pages, whose artifacts and
+public build.json record that final SHA (ADR 0002). Earlier local-only notes are
+historical and do not restrict the now-authorized publication.

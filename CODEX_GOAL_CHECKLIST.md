@@ -93,13 +93,13 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 
 ## Final acceptance
 - [x] Generate ACCEPTANCE_REPORT.md.
-- [ ] Every MUST has inspectable PASS evidence for the current release; exact-commit remote gates are pending.
+- [x] Every MUST has inspectable PASS evidence for audited source 59ace31; evidence successors receive independent exact-SHA checks.
 - [x] SHOULD failures documented.
 - [x] Documentation-drift section completed.
 - [x] README/reports/diagrams/contracts aligned.
-- [ ] Publication workflow green for the current local extension (earlier release evidence is retained).
-- [ ] Public Pages verified for the current release (publication now authorized; final-SHA checks pending).
-- [ ] Final release SHA verified by CI and public build.json (prior audited SHAs remain recorded).
+- [x] Publication workflow green for audited source 59ace31; its evidence is retained.
+- [x] Public Pages verified for audited source 59ace31, including 18 HTML/PDF/diagram responses.
+- [x] Audited release SHA recorded and verified; the final evidence successor is attested by its own CI artifact and public build.json (ADR 0002).
 - [x] If any MUST fails: status remains NOT DONE.
 
 Local and remote evidence is indexed by ACCEPTANCE_REPORT.md. Final source/evidence successors are rechecked by CI and publication as documented in ADR 0002. This checklist is not proof by itself.
@@ -109,7 +109,7 @@ Local and remote evidence is indexed by ACCEPTANCE_REPORT.md. Final source/evide
 - [x] Direct attention to original-job review; evidence and observation controls together.
 - [x] UI action, no-ground-truth assessment and confined asset contract regressions.
 - [x] Final isolated browser/native checks, unchanged user history and local acceptance: 389 tests twice, 99 UI checks, all local gates pass.
-- [ ] Remote CI/Pages verification for these changes (publication now authorized; checks pending).
+- [x] Remote CI/Pages verification for audited source 59ace31; final evidence successor checks remain mandatory.
 
 ## Local selector explanations
 - [x] Define every execution scenario and observation mode, its stage and key difference.

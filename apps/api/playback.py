@@ -1,11 +1,68 @@
 """Presentation-only access to recorded Blender motion; never dispatches commands."""
 
 from robotops.blender.adapter import BlenderRuntime
-from robotops.blender.visualization import JobPlayback, VisualObject, VisualScene
+from robotops.blender.visualization import (
+    DeliveryExecution,
+    DeliveryPlayback,
+    DeliverySummary,
+    JobPlayback,
+    VisualObject,
+    VisualScene,
+)
 from robotops.domain.models import JobState, PresentationSnapshot, RobotCommand
 from robotops.scene_geometry import cell_meshes
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import NotFound
+
+
+def deliveries(workflow: Engine) -> list[DeliverySummary]:
+    world = workflow.runtime.world()
+    groups: dict[str, DeliverySummary] = {}
+    for job in workflow.store.execution_jobs():
+        try:
+            snapshot = workflow.store.load(PresentationSnapshot, job.job_id)
+            epoch, started = snapshot.world.scene_epoch, snapshot.timestamp
+        except NotFound:
+            if job.command_id is None:
+                continue  # No evidence tying this older attempt to a particular scene.
+            command = workflow.store.load(RobotCommand, job.command_id)
+            epoch, started = command.scene_epoch, command.timestamp
+        if epoch not in groups:
+            groups[epoch] = DeliverySummary(
+                delivery_id=epoch,
+                started_at=started,
+                current=epoch == world.scene_epoch,
+            )
+        groups[epoch].executions.append(
+            DeliveryExecution(
+                job_id=job.job_id,
+                order_id=job.order_id,
+                product_id=job.line.product_id,
+                state=job.state,
+            )
+        )
+    if world.scene_epoch not in groups:
+        groups[world.scene_epoch] = DeliverySummary(
+            delivery_id=world.scene_epoch,
+            started_at=world.timestamp,
+            current=True,
+        )
+    return list(groups.values())
+
+
+def delivery_playback(workflow: Engine, delivery_id: str) -> DeliveryPlayback:
+    summary = next((item for item in deliveries(workflow) if item.delivery_id == delivery_id), None)
+    if summary is None:
+        raise NotFound(delivery_id)
+    jobs = [playback(workflow, item.job_id) for item in summary.executions]
+    scene = jobs[0].scene if jobs else visual_scene(workflow)
+    if not jobs and scene.scene_epoch != delivery_id:
+        raise NotFound(delivery_id)  # A concurrent reset changed the empty current scene.
+    return DeliveryPlayback(
+        delivery_id=delivery_id,
+        scene=scene,
+        jobs=jobs,
+    )
 
 
 def visual_scene(workflow: Engine, job_id: str | None = None) -> VisualScene:

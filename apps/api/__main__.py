@@ -28,8 +28,7 @@ def main() -> None:
         args.data_dir / "runtime.db", settings
     )
     engine = Engine(store, runtime, settings)
-    engine.recover()
-    uvicorn.run(create_app(store, engine), host="127.0.0.1", port=args.port)
+    uvicorn.run(create_app(store, engine, recover=True), host="127.0.0.1", port=args.port)
 
 
 if __name__ == "__main__":

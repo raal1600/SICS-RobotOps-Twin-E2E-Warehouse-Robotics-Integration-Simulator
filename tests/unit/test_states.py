@@ -19,7 +19,12 @@ def test_forbidden_transitions_and_evidence_requirements(before, after, order_re
     )
     permitted_without_evidence = (
         after in ALLOWED[before]
-        and before not in {JobState.UNKNOWN_OUTCOME, JobState.RECONCILING}
+        and before
+        not in {
+            JobState.UNKNOWN_OUTCOME,
+            JobState.RECONCILING,
+            JobState.REQUIRES_INTERVENTION,
+        }
         and after != JobState.COMPLETED
         and not (before == JobState.VERIFYING and after == JobState.FAILED)
     )

@@ -1,0 +1,89 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\ramis\source\repos\robotops-twin
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.2, cov-7.1.0
+collected 265 items
+
+tests\blender\test_blender_runtime.py .....                              [  1%]
+tests\blender\test_playback.py ..............                            [  7%]
+tests\contract\test_api.py ..                                            [  7%]
+tests\contract\test_completion.py ..                                     [  8%]
+tests\contract\test_governance.py ....                                   [ 10%]
+tests\contract\test_pdf_package.py .                                     [ 10%]
+tests\contract\test_schemas.py ...............................           [ 22%]
+tests\e2e\test_observability.py .                                        [ 22%]
+tests\e2e\test_workflow.py ......................                        [ 30%]
+tests\integration\test_desktop_backend.py ..                             [ 31%]
+tests\integration\test_fresh_scene.py ...........                        [ 35%]
+tests\integration\test_process_restart.py .                              [ 36%]
+tests\integration\test_runtime.py .............                          [ 41%]
+tests\integration\test_store.py .....                                    [ 43%]
+tests\unit\test_action_validation.py ................                    [ 49%]
+tests\unit\test_observation_verifier.py ...                              [ 50%]
+tests\unit\test_states.py .............................................. [ 67%]
+........................................................................ [ 94%]
+...                                                                      [ 95%]
+tests\unit\test_visualization.py ...........                             [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path C:\Users\ramis\source\repos\robotops-twin\.pytest_cache\v\cache\nodeids: [WinError 5] Access is denied: 'C:\\Users\\ramis\\source\\repos\\robotops-twin\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261003T123412\tests-2.xml -
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.13.15-final-0 _______________
+
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+apps\__init__.py                         0      0   100%
+apps\api\__init__.py                     0      0   100%
+apps\api\__main__.py                    24     24     0%   1-36
+apps\api\app.py                        120      3    98%   59, 89, 169
+apps\api\playback.py                    33      0   100%
+apps\desktop\__init__.py                 0      0   100%
+apps\desktop\backend.py                 53     53     0%   3-82
+robotops\__init__.py                     0      0   100%
+robotops\blender\__init__.py             0      0   100%
+robotops\blender\adapter.py            183     23    87%   31, 35, 86-90, 95, 100, 111, 117, 120, 123, 250, 270-273, 281-288, 337
+robotops\blender\visualization.py       58      0   100%
+robotops\brain\__init__.py               0      0   100%
+robotops\brain\deterministic.py          7      0   100%
+robotops\brain\validation.py            32      3    91%   54, 77, 87
+robotops\cell\__init__.py                0      0   100%
+robotops\cell\controller.py             12      0   100%
+robotops\cell\runtime.py               140      7    95%   116, 214, 216, 218, 316-320
+robotops\config.py                      20      0   100%
+robotops\demo.py                        55     55     0%   3-148
+robotops\domain\__init__.py              0      0   100%
+robotops\domain\models.py              223      1    99%   101
+robotops\domain\ports.py                 6      0   100%
+robotops\faults\__init__.py              0      0   100%
+robotops\faults\injection.py             3      0   100%
+robotops\observability\__init__.py       0      0   100%
+robotops\observability\metrics.py       24      0   100%
+robotops\observation\__init__.py         0      0   100%
+robotops\observation\model.py           28      0   100%
+robotops\observation\quality.py         22      2    91%   16, 31
+robotops\presentation_io.py             14      0   100%
+robotops\robot_gateway\__init__.py       0      0   100%
+robotops\robot_gateway\gateway.py       32      1    97%   16
+robotops\scene_geometry.py              30      0   100%
+robotops\verification\__init__.py        0      0   100%
+robotops\verification\verifier.py       35      3    91%   39, 43, 54
+robotops\workflow\__init__.py            0      0   100%
+robotops\workflow\engine.py            145      5    97%   158, 187, 201, 218, 276
+robotops\workflow\states.py             24      2    92%   42, 46
+robotops\workflow\store.py             263     11    96%   129, 215, 222, 238-241, 384, 407, 448, 485, 534, 536
+------------------------------------------------------------------
+TOTAL                                 1586    193    88%
+Coverage JSON written to file C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261003T123412\coverage-2.json
+Required test coverage of 85.0% reached. Total coverage: 87.83%
+================= 265 passed, 2 warnings in 144.11s (0:02:24) =================

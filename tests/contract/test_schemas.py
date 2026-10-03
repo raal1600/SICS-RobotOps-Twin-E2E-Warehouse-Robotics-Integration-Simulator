@@ -5,11 +5,12 @@ import pytest
 from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
+from apps.api.test_sessions import TEST_SCHEMAS
 from robotops.blender.visualization import VISUAL_SCHEMAS
 from robotops.domain.models import SCHEMAS, OrderRequest, Pose, WorldObservation, WorldState
 
 
-@pytest.mark.parametrize("model", (*SCHEMAS, *VISUAL_SCHEMAS))
+@pytest.mark.parametrize("model", (*SCHEMAS, *VISUAL_SCHEMAS, *TEST_SCHEMAS))
 def test_versioned_schema_matches_source(model):
     schema = json.loads(Path(f"contracts/schemas/{model.__name__}.json").read_text())
     Draft202012Validator.check_schema(schema)

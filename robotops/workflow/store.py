@@ -30,7 +30,7 @@ from robotops.domain.models import (
     stable_id,
     utc_now,
 )
-from robotops.workflow.states import TERMINAL, UNCERTAIN, guard
+from robotops.workflow.states import RECONCILABLE, TERMINAL, guard
 
 
 class Conflict(ValueError):
@@ -239,6 +239,8 @@ class Store:
                     "INSERT INTO idempotency VALUES (?,?,?)", (key, hashed, request.order_id)
                 )
                 return self._order(db, request.order_id)
+            if db.execute("SELECT 1 FROM meta WHERE key='scene_reset'").fetchone():
+                raise Conflict("SCENE_RESET_IN_PROGRESS")
             now = utc_now()
             event_id = new_id()
             common = dict(
@@ -334,6 +336,20 @@ class Store:
                 for row in db.execute("SELECT id FROM orders ORDER BY rowid")
             ]
 
+    def execution_jobs(self) -> list[PickJob]:
+        """Presentation ordering follows durable execution events, not order intake time."""
+        with self.connect() as db:
+            return [
+                PickJob.model_validate_json(row[0])
+                for row in db.execute("""
+                SELECT j.body FROM jobs j LEFT JOIN (
+                    SELECT job_id, MIN(sequence) AS started FROM events
+                    WHERE json_extract(body, '$.state_after')='PLANNING' GROUP BY job_id
+                ) e ON e.job_id=j.id
+                ORDER BY e.started IS NULL, e.started, j.rowid
+            """)
+            ]
+
     def timeline(self, order_id: str | None = None) -> list[AuditEvent]:
         with self.connect() as db:
             rows = db.execute(
@@ -366,17 +382,16 @@ class Store:
         now = now or utc_now()
         with self.transaction() as db:
             job = self._job(db, job_id)
-            if job.state in TERMINAL or (job.state in UNCERTAIN and not reconcile):
+            if db.execute("SELECT 1 FROM meta WHERE key='scene_reset'").fetchone():
+                return None
+            if job.state in TERMINAL or (job.state in RECONCILABLE and not reconcile):
                 return None
             row = db.execute("SELECT * FROM lease WHERE cell_id='cell-1'").fetchone()
             if row and row["job_id"] is not None and datetime.fromisoformat(row["expires"]) > now:
                 return None
             # An uncertain different job quarantines the cell even after lease expiration.
             uncertain = db.execute("SELECT id,state FROM jobs WHERE id != ?", (job_id,)).fetchall()
-            if any(
-                JobState(r["state"]) in UNCERTAIN | {JobState.REQUIRES_INTERVENTION}
-                for r in uncertain
-            ):
+            if any(JobState(r["state"]) in RECONCILABLE for r in uncertain):
                 return None
             fence = int(row["fence"]) + 1 if row else 1
             expires = now + timedelta(seconds=seconds)
@@ -385,6 +400,92 @@ class Store:
                 (job_id, owner, fence, expires.isoformat()),
             )
             return Claim(job_id, owner, fence, expires)
+
+    @staticmethod
+    def _scene_reset_blocker(db: sqlite3.Connection) -> str | None:
+        if db.execute(
+            "SELECT 1 FROM jobs WHERE state NOT IN ('COMPLETED','FAILED') LIMIT 1"
+        ).fetchone():
+            return "SCENE_RESET_BLOCKED_UNRESOLVED_JOBS"
+        lease = db.execute("SELECT * FROM lease WHERE cell_id='cell-1'").fetchone()
+        if lease and lease["owner"] and datetime.fromisoformat(lease["expires"]) > utc_now():
+            return "SCENE_RESET_BLOCKED_ACTIVE_WORKER"
+        return None
+
+    def scene_reset_blocker(self) -> str | None:
+        with self.connect() as db:
+            if db.execute("SELECT 1 FROM meta WHERE key='scene_reset'").fetchone():
+                return "SCENE_RESET_IN_PROGRESS"
+            return self._scene_reset_blocker(db)
+
+    def test_operation_in_progress(self) -> bool:
+        """A separate experiment may archive uncertainty, but never interrupt work."""
+        with self.connect() as db:
+            if db.execute("SELECT 1 FROM meta WHERE key='scene_reset'").fetchone():
+                return True
+            if db.execute(
+                "SELECT 1 FROM jobs WHERE state IN "
+                "('VALIDATED','PLANNING','READY_TO_EXECUTE','EXECUTING','VERIFYING','RECONCILING')"
+            ).fetchone():
+                return True
+            lease = db.execute("SELECT * FROM lease WHERE cell_id='cell-1'").fetchone()
+            return bool(
+                lease and lease["owner"] and datetime.fromisoformat(lease["expires"]) > utc_now()
+            )
+
+    def pending_scene_reset(self) -> str | None:
+        with self.connect() as db:
+            row = db.execute("SELECT value FROM meta WHERE key='scene_reset'").fetchone()
+            return str(row[0]) if row else None
+
+    def begin_scene_reset(self) -> str:
+        """Persist an exclusive maintenance intent; crashes never expire this guard."""
+        with self.transaction() as db:
+            pending = db.execute("SELECT value FROM meta WHERE key='scene_reset'").fetchone()
+            if pending:
+                return str(pending[0])
+            reason = self._scene_reset_blocker(db)
+            if reason:
+                raise Conflict(reason)
+            epoch = new_id()
+            db.execute("INSERT INTO meta VALUES ('scene_reset',?)", (epoch,))
+            self._event(
+                db,
+                AuditEvent(
+                    run_id=self.run_id,
+                    correlation_id=epoch,
+                    causation_id=epoch,
+                    timestamp=utc_now(),
+                    event_id=stable_id(epoch, "requested"),
+                    component="fixture",
+                    event_type="SCENE_RESET_REQUESTED",
+                    reason="EXPLICIT_FRESH_SCENE",
+                ),
+            )
+            return epoch
+
+    def finish_scene_reset(self, epoch: str) -> None:
+        with self.transaction() as db:
+            ident = stable_id(epoch, "completed")
+            if db.execute("SELECT 1 FROM events WHERE id=?", (ident,)).fetchone():
+                return
+            pending = db.execute("SELECT value FROM meta WHERE key='scene_reset'").fetchone()
+            if not pending or pending[0] != epoch:
+                raise Conflict("SCENE_RESET_IDENTITY_MISMATCH")
+            self._event(
+                db,
+                AuditEvent(
+                    run_id=self.run_id,
+                    correlation_id=epoch,
+                    causation_id=stable_id(epoch, "requested"),
+                    timestamp=utc_now(),
+                    event_id=ident,
+                    component="fixture",
+                    event_type="SCENE_RESET_COMPLETED",
+                    reason="PRODUCTS_RESTORED_HISTORY_RETAINED",
+                ),
+            )
+            db.execute("DELETE FROM meta WHERE key='scene_reset' AND value=?", (epoch,))
 
     def release(self, claim: Claim) -> None:
         with self.transaction() as db:
@@ -488,12 +589,17 @@ class Store:
     def recoverable(self) -> list[PickJob]:
         with self.connect() as db:
             jobs = [PickJob.model_validate_json(r[0]) for r in db.execute("SELECT body FROM jobs")]
-            return [job for job in jobs if job.state not in TERMINAL]
+            # An inconclusive intervention remains paused across restart until
+            # the operator explicitly requests another observation.
+            return [
+                job for job in jobs if job.state not in TERMINAL | {JobState.REQUIRES_INTERVENTION}
+            ]
 
     def records_for_job[T: Contract](self, model: type[T], job_id: str) -> tuple[T, ...]:
         with self.connect() as db:
             rows = db.execute(
-                "SELECT body FROM records WHERE kind=? AND json_extract(body,'$.job_id')=?",
+                "SELECT body FROM records WHERE kind=? AND json_extract(body,'$.job_id')=? "
+                "ORDER BY rowid",
                 (model.__name__, job_id),
             ).fetchall()
             return tuple(model.model_validate_json(row[0]) for row in rows)

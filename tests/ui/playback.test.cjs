@@ -75,3 +75,53 @@ test('idle scene appears before orders and current-reference provenance is expli
   p.select('legacy');p.update({job_id:'legacy',job_state:'FAILED',status:'UNAVAILABLE',recording:null,scene,events:[]});
   assert.match(el('motion-detail').textContent,/historical starting scene unavailable/);
 });
+
+test('already-picked rejection explains how to repeat the scenario without hiding the failure',()=>{
+  const {player:p,el}=setup();p.select('j1');
+  p.update({job_id:'j1',job_state:'FAILED',status:'UNAVAILABLE',recording:null,
+    scene:{source:'SAVED_START_SCENE',objects:[]},events:[{event_type:'JOB_TRANSITION',state_after:'FAILED',reason:'PLANNING_REJECTED:SOURCE_NOT_OBSERVED'}]});
+  p.draw();assert.match(el('motion-event').textContent,/Start fresh scene/);
+  assert.match(el('motion-event').textContent,/No pick dispatched/);
+  p.select(null);assert.equal(p.track.length,0);assert.equal(el('motion-outcome').textContent,'Current cell');
+});
+
+function deliveryClips(){
+  return ['red','blue','green'].map((product,index)=>{
+    const data=clip(100,true,'job-'+product);data.product_id=product;data.job_state='COMPLETED';
+    data.events=[{event_type:'JOB_TRANSITION',state_after:'EXECUTING',reason:'DISPATCH_INTENT'},
+      {event_type:'JOB_TRANSITION',state_after:'COMPLETED',reason:'VERIFIED_SUCCESS'}];
+    data.recording.objects=['red','blue','green'].map((name,i)=>({name,position:[i<index?1:-1,0,0]}));
+    data.recording.frames.forEach((frame,f)=>{frame.positions=Object.fromEntries(data.recording.objects.map(obj=>[obj.name,obj.name===product?[-1+2*f/99,0,0]:obj.position]));});
+    return data;
+  });
+}
+test('full delivery plays all three original clips with cumulative product positions and read-only replay',()=>{
+  const {player:p,el}=setup(),jobs=deliveryClips();p.select('delivery:scene');
+  p.updateDelivery({delivery_id:'scene',scene:jobs[0].scene,jobs,reason:'Original clips'});
+  assert.equal(p.track.length,372);assert.equal(el('motion-outcome').textContent,'3/3 completed');
+  for(let i=0;i<3;i++){
+    p.cursor=i*124+12;let pose=p.pose();
+    assert.equal(pose.data.product_id,['red','blue','green'][i]);
+    for(const previous of ['red','blue','green'].slice(0,i))assert.equal(pose.positions[previous][0],1);
+    p.cursor=i*124+111;assert.equal(p.pose().positions[['red','blue','green'][i]][0],1);
+  }
+  el('motion-replay').onclick();assert.equal(p.cursor,0);assert.equal(p.pose().data.product_id,'red');
+  p.updateDelivery({delivery_id:'other',jobs:[],scene:{objects:[]}});assert.equal(p.track.length,372);
+});
+test('delivery stops at a partial clip and retains uncertain status; no future segment is invented',()=>{
+  const {player:p,el}=setup(),jobs=deliveryClips();p.select('delivery:scene');
+  jobs[1].job_state='UNKNOWN_OUTCOME';jobs[1].status='PARTIAL';jobs[1].recording.complete=false;jobs[1].recording.frames.length=20;
+  p.updateDelivery({delivery_id:'scene',jobs,scene:jobs[0].scene});
+  assert.equal(p.track.length,156);p.cursor=p.limit();assert.equal(p.pose().data.product_id,'blue');
+  assert.equal(p.pose().positions.blue[0],-1+2*19/99);
+  assert.match(el('motion-outcome').textContent,/uncertain outcome/);
+});
+test('paused delivery cursor stays on its product when earlier reconciliation events are appended',()=>{
+  const {player:p,el}=setup(),jobs=deliveryClips();p.select('delivery:scene');
+  const data={delivery_id:'scene',jobs,scene:jobs[0].scene};p.updateDelivery(data);
+  el('motion-scrub').oninput({target:{value:124+62}});
+  const before=p.pose().positions.blue[0];
+  jobs[0].events.push({event_type:'JOB_TRANSITION',state_after:'COMPLETED',reason:'LATE_AUDIT'});
+  p.updateDelivery(data);assert.equal(p.playing,false);assert.equal(p.pose().data.product_id,'blue');
+  assert.equal(p.pose().positions.blue[0],before);
+});

@@ -1,9 +1,34 @@
 # Windows desktop app
 
-The embedded dashboard includes [full 3D cell and per-scenario replay](playback.md).
+The embedded dashboard uses dark mode and includes
+[full 3D cell and per-scenario replay](playback.md). A persistent Next step guide
+leads through Prepare, Run, Review and Continue. Jobs needing human attention
+open Review evidence automatically, with a plain-language journal/observation/
+decision summary and the next explicit action together (ADR 0009).
+Both selectors also explain what each choice simulates, where it acts, and its
+key difference from similar choices. Expand the comparison panels to read all
+options in the same window. Execution choices apply to a new order; observation
+choices apply to the next explicit review capture. See [scenario definitions](scenarios.md).
 Close/reopen the app after updating this checkout to load the new backend and UI.
 Saved orders remain intact. Older runs expose **Load saved animation**, which
 exports their original `.blend` without executing another pick.
+Use the permanent **Start new test** control for any new execution/observation
+combination. It keeps selections and creates a fresh independent world in the
+same window. **Test history** retains all earlier outcomes, evidence and replay
+read-only, including unknown and intervention states. Only running work blocks
+creation; **Return to current test** resumes the active world. Changing a scenario
+only configures the next order. Restock this test remains a separate guarded
+operation for resolved jobs. The
+default Full delivery replay spans all products already executed in that scene;
+use Delivery replay to revisit a previous scene or select individual execution
+details to inspect one product.
+Lost acknowledgement pauses the next pick for every product. The **Review evidence** panel names the uncertain product and offers Reconcile [product]; choose Normal
+observation to check the original command before creating another order. If the
+evidence requires intervention, the panel offers **Observe again: [product]**.
+Choose an observation mode and collect another assessment in the same test. Run stays
+paused until sufficient evidence resolves the original command. Bad observations
+can be repeated without freezing investigation, issuing another pick, or starting
+a new test. Restart retains intervention until you explicitly request observation.
 
 Double-click **RobotOps Twin** on the desktop. The native window starts its own
 local API and opens the existing dashboard inside Microsoft Edge WebView2. Close
@@ -35,6 +60,8 @@ The EXE is unsigned. Its DLLs must remain beside it; use the shortcut elsewhere.
 Data survives closing and reopening:
 
 - `%LOCALAPPDATA%\RobotOpsTwin\data`: orders, world, journals and Blender artifacts.
+- `data\simulation-tests`: durable test catalog and separate worlds; startup
+  recovers only the active world, preserving archived uncertainty.
 - `%LOCALAPPDATA%\RobotOpsTwin\sessions`: startup, server and shutdown evidence.
 - `%LOCALAPPDATA%\RobotOpsTwin\WebView2`: isolated profiles keyed by data root.
 

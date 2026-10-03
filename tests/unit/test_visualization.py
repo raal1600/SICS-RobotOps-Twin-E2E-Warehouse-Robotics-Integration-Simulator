@@ -72,6 +72,10 @@ def test_offline_viewer_assets_have_pinned_integrity_and_confined_routes(tmp_pat
             response = client.get("/ui/vendor/" + name)
             assert response.content == (vendor / name).read_bytes()
     assert client.get("/ui/scene-view.js").status_code == 200
+    for name, media_type in [("workflow-guide.js", "text/javascript"), ("theme.css", "text/css")]:
+        response = client.get("/ui/" + name)
+        assert response.content == (Path("apps/erp_ui") / name).read_bytes()
+        assert response.headers["content-type"].startswith(media_type)
     assert client.get("/ui/vendor/manifest.json").status_code == 422
     assert client.get("/ui/unknown.js").status_code == 422
 
@@ -107,7 +111,15 @@ def test_visual_schema_rejects_fabricated_or_noncontiguous_records(invalid):
 
 def test_playback_controls_never_dispatch_and_preserve_partial_recording_limits():
     result = subprocess.run(
-        ["node", "--test", "tests/ui/playback.test.cjs"], capture_output=True, text=True
+        [
+            "node",
+            "--test",
+            "tests/ui/playback.test.cjs",
+            "tests/ui/dashboard.test.cjs",
+            "tests/ui/workflow-guide.test.cjs",
+        ],
+        capture_output=True,
+        text=True,
     )
     assert result.returncode == 0, result.stdout + result.stderr
     assert Path("apps/erp_ui/playback.js").is_file()

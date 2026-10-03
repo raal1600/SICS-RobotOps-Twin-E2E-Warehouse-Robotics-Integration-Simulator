@@ -29,7 +29,7 @@ from robotops.faults.injection import OBSERVATION_FAULTS, RUNTIME_FAULTS
 from robotops.observation.model import ObservationModel
 from robotops.robot_gateway.gateway import RobotGateway
 from robotops.verification.verifier import Verifier
-from robotops.workflow.states import UNCERTAIN
+from robotops.workflow.states import RECONCILABLE, UNCERTAIN
 from robotops.workflow.store import Claim, Conflict, NotFound, Store, metadata
 
 
@@ -197,7 +197,7 @@ class Engine:
 
     def reconcile(self, job_id: str, fault: Fault | None = None) -> PickJob:
         job = self.store.job(job_id)
-        if job.state not in UNCERTAIN:
+        if job.state not in RECONCILABLE:
             raise Conflict("JOB_NOT_UNCERTAIN")
         claim = self.store.claim(job_id, new_id(), self.settings.lease_seconds, reconcile=True)
         if claim is None:
@@ -230,11 +230,13 @@ class Engine:
             observation=observation,
             verification=result,
         )
-        if job.state == JobState.UNKNOWN_OUTCOME:
+        if job.state in {JobState.UNKNOWN_OUTCOME, JobState.REQUIRES_INTERVENTION}:
             job = self.store.transition(
                 job.job_id,
                 JobState.RECONCILING,
-                "EVIDENCE_COLLECTED",
+                "OPERATOR_REOBSERVATION"
+                if job.state == JobState.REQUIRES_INTERVENTION
+                else "EVIDENCE_COLLECTED",
                 claim=claim,
                 evidence=evidence,
             )
@@ -255,7 +257,15 @@ class Engine:
         )
         return job
 
+    def start_fresh_scene(self) -> None:
+        epoch = self.store.begin_scene_reset()
+        self.runtime.reset(scene_epoch=epoch)
+        self.gateway.sync_events()
+        self.store.finish_scene_reset(epoch)
+
     def recover(self) -> list[PickJob]:
+        if self.store.pending_scene_reset():
+            self.start_fresh_scene()
         recovered = []
         for job in self.store.recoverable():
             if job.state in UNCERTAIN:
@@ -287,7 +297,7 @@ class Engine:
         return JobEvidence(
             job=job,
             command=command,
-            journal=self.runtime.journal(job.command_id) if job.command_id else None,
+            journal=self.runtime.recorded_journal(job.command_id) if job.command_id else None,
             observations=observations,
             verifications=tuple(results.values()),
             reconciliations=reconciliations,

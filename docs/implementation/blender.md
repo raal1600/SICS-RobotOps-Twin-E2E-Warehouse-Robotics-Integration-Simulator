@@ -25,6 +25,8 @@ hash allow the controller journal and world checkpoint to commit together. If th
 adapter dies after Blender finishes, querying the original journal can finalize
 that same checkpoint; no motion is rerun. Missing/corrupt checkpoints remain
 STATUS_UNKNOWN and quarantine the runtime even after a logical cell reset.
+Evidence views instead use recorded_journal, a pure saved-receipt read. They never
+finish a pending checkpoint, including when viewing an archived test (ADR 0007).
 Fresh observation is still required for business completion. Neither a receipt
 nor a screenshot alone is accepted by Verifier.
 

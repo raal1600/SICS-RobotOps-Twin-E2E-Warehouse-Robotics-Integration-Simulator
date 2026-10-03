@@ -11,8 +11,11 @@ class TransitionError(ValueError):
     pass
 
 
-TERMINAL = {JobState.COMPLETED, JobState.FAILED, JobState.REQUIRES_INTERVENTION}
+TERMINAL = {JobState.COMPLETED, JobState.FAILED}
+# Recovery may retry uncertain evidence collection automatically. Intervention
+# requires an explicit operator request; neither path is allowed to dispatch.
 UNCERTAIN = {JobState.EXECUTING, JobState.VERIFYING, JobState.UNKNOWN_OUTCOME, JobState.RECONCILING}
+RECONCILABLE = UNCERTAIN | {JobState.REQUIRES_INTERVENTION}
 ALLOWED: dict[JobState, set[JobState]] = {
     JobState.RECEIVED: {JobState.VALIDATED, JobState.FAILED},
     JobState.VALIDATED: {JobState.PLANNING, JobState.FAILED},
@@ -24,7 +27,7 @@ ALLOWED: dict[JobState, set[JobState]] = {
     JobState.RECONCILING: {JobState.COMPLETED, JobState.FAILED, JobState.REQUIRES_INTERVENTION},
     JobState.COMPLETED: set(),
     JobState.FAILED: set(),
-    JobState.REQUIRES_INTERVENTION: set(),
+    JobState.REQUIRES_INTERVENTION: {JobState.RECONCILING},
 }
 
 
@@ -35,7 +38,11 @@ def guard(
 ) -> None:
     if target not in ALLOWED[job.state]:
         raise TransitionError(f"FORBIDDEN_TRANSITION:{job.state}->{target}")
-    if job.state in {JobState.UNKNOWN_OUTCOME, JobState.RECONCILING}:
+    if job.state in {
+        JobState.UNKNOWN_OUTCOME,
+        JobState.RECONCILING,
+        JobState.REQUIRES_INTERVENTION,
+    }:
         if not isinstance(evidence, ReconciliationEvidence):
             raise TransitionError("RECONCILIATION_EVIDENCE_REQUIRED")
         if evidence.job_id != job.job_id or evidence.command.command_id != job.command_id:

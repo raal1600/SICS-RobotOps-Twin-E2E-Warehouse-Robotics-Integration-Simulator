@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-03:** All 85 MUST criteria have inspectable PASS evidence. Deterministic CI and the publication workflow pass; the public site exposes the current governance documents. Lost-ack recovery applies exactly one simulated pick, ambiguous evidence requires intervention, and restart recovery is verified. Optional model and hardware integrations remain unimplemented and non-blocking. The app presents a full 3D cell for every execution scenario, with persisted scenes, recorded machine motion and read-only replay. Status: DONE.
+> **Implementation status, 2026-10-03:** The deterministic simulator now includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and definitions for every execution scenario and observation mode. The local baseline passed 389 tests twice; the explanation follow-up passed 101 UI checks and 170 affected Python tests. Publication is authorized; final committed-source CI and Pages verification are pending. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -213,6 +213,12 @@ ett framtida integrationsarbete, inte en implementerad kundkvittenskanal.
 UNKNOWN_OUTCOME kan endast lösas via RECONCILING och lagrad evidens.
 Otillräckligt eller motstridigt underlag ger REQUIRES_INTERVENTION, aldrig
 påhittad framgång. Timeout är inte bevis för FAILED.
+
+REQUIRES_INTERVENTION pausar nya plock men tillåter en uttrycklig begäran om ny
+observation för samma kommando. Via RECONCILING kan tillräcklig ny evidens lösa
+utfallet; annars pausas uppdraget igen. Varje bedömning sparas. Omstart eller
+granskning av evidens öppnar inte intervention automatiskt, och inget nytt plock
+skickas vid avstämningen. Detta är vårt simulatorval enligt ADR 0008.
 
 Cellen har READY, BUSY, FAULTED, ESTOP_LOGICAL, RESETTING och OFFLINE.
 Reset bevisar inte oförändrad värld. Osäkra uppdrag behöver ny observation och

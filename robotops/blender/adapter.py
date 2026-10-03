@@ -253,8 +253,8 @@ class BlenderRuntime(SyntheticRuntime):
             raise CommunicationTimeout("ACKNOWLEDGEMENT_LOST")
         return receipt
 
-    def reset(self) -> WorldState:
-        world = super().reset()
+    def reset(self, scene_epoch: str | None = None) -> WorldState:
+        world = super().reset(scene_epoch=scene_epoch)
         directory = self._exchange("reset", world)
         self._invoke(directory)
         return world

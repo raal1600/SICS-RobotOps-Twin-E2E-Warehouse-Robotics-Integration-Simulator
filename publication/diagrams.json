@@ -122,10 +122,10 @@
   "architecture": {
     "number": 2,
     "title": "Systemgränser och ägarskap",
-    "subtitle": "Browser or Windows desktop - same typed runtime boundaries",
+    "subtitle": "One window - independent tests - original runtime boundaries",
     "width": 900,
     "height": 850,
-    "caption": "Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering. Windows desktop owns its local API and Blender process lifetime; durable journals survive window closure. The human 3D view reads saved starting scenes, audit events and recorded Blender poses, including stationary blocked scenarios. It is not sensor evidence and has no path into Verifier.",
+    "caption": "Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering. Windows desktop owns its local API and Blender process lifetime; durable journals survive window closure. The human 3D view reads saved starting scenes, audit events and recorded Blender poses, including stationary blocked scenarios. It is not sensor evidence and has no path into Verifier. Explicit fresh-scene preparation passes through a durable maintenance guard to Runtime.reset; unresolved jobs block it, and historical evidence is retained. Delivery replay concatenates original product clips by saved scene epoch and durable execution order; scenario selection changes configuration only. The Integration API routes a durable test identity to separate workflow/runtime stores. Only the active test accepts writes and restart recovery; prior worlds retain their original outcomes and replay as read-only history. Start new test creates a separate world, never resolves the previous command (ADR 0007). The dark UI next-step guide reads persisted job and verification records and directs attention to the original pick; navigation and replay cannot verify an outcome (ADR 0009).",
     "nodes": [
       [
         "erp",
@@ -134,7 +134,7 @@
         240,
         108,
         "ERP / WMS",
-        "Web UI / Windows desktop host",
+        "Current test / preserved history",
         "business"
       ],
       [
@@ -143,8 +143,8 @@
         90,
         240,
         108,
-        "Integrationskärna",
-        "Uppdrag och samordning",
+        "Integration API / test scope",
+        "Active writes / read-only history",
         "core"
       ],
       [
@@ -174,7 +174,7 @@
         240,
         108,
         "Beständig lagring",
-        "Order • plan • command • audit",
+        "Test catalog / per-test evidence",
         "business"
       ],
       [
@@ -316,7 +316,7 @@
     "subtitle": "Normative PROJECT_PLAN state machine",
     "width": 900,
     "height": 950,
-    "caption": "Figure 3. SIMULATOR_DESIGN. Only reconciliation evidence resolves an unknown effect. Timeout alone never proves failure. ERP exposes the verified business outcome.",
+    "caption": "Figure 3. SIMULATOR_DESIGN. Only reconciliation evidence resolves an unknown effect. Timeout alone never proves failure. ERP exposes the verified business outcome. Explicit operator re-observation may return REQUIRES_INTERVENTION to RECONCILING using the same command and fresh evidence. It never dispatches another pick; restart leaves intervention paused (ADR 0008).",
     "nodes": [
       [
         "received",
@@ -385,7 +385,7 @@
         380,
         105,
         "REQUIRES_INTERVENTION",
-        "Insufficient / contradictory evidence",
+        "Paused / explicit re-observation",
         "warn"
       ],
       [
@@ -433,9 +433,15 @@
         "failed",
         "normal",
         "M 870 462.5 H 886 V 723 H 450 V 755"
+      ],
+      [
+        "intervention",
+        "reconciling",
+        "dashed",
+        "M 490 642.5 H 465 V 462.5 H 490"
       ]
     ],
-    "footer": "Known pre-dispatch errors also resolve to FAILED. The diagram groups sequential states; uncertain effects require reconciliation."
+    "footer": "Dashed return: explicit re-observation of the original command. No new pick is dispatched."
   },
   "ack-loss": {
     "number": 4,
@@ -444,7 +450,7 @@
     "subtitle": "Implemented against headless and Blender runtimes",
     "width": 900,
     "height": 795,
-    "caption": "Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning.",
+    "caption": "Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning. Efter otillr?cklig evidens kan operat?ren uttryckligen upprepa steg 6?9 f?r samma kommando. Varje bed?mning sparas; ingen ny plockeffekt beg?rs.",
     "participants": [
       [
         "integration",

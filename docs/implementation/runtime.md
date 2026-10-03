@@ -3,7 +3,8 @@
 P2 implements the headless Runtime protocol in `robotops/cell/runtime.py` and a
 logical `CellController`. It shares transaction utilities with Store, using a
 separate database and no business-state decisions. The first empty initialization
-is atomic. Restart reads the existing world; it never resets an existing scene.
+is atomic. Restart reads the existing world. Only an explicitly requested,
+persisted fresh-scene intent may resume fixture preparation during recovery.
 
 World update, one PICK_EFFECT event and final controller receipt commit together
 for this discrete synthetic adapter. Duplicate IDs with identical canonical
@@ -18,10 +19,22 @@ to distinguish these outcomes. Reconciliation must also obtain a fresh observati
 Cell faults and logical E-stop are persistent states. Reset goes through RESETTING
 to READY, preserves world/journal, and changes the generation. Old plans are
 invalid. Scene reset creates a new epoch without deleting earlier command history.
+An explicit fresh-scene action restores fixture products, with a durable workflow
+maintenance guard and an idempotent runtime epoch checkpoint. It is blocked by
+pending/uncertain jobs, active owners or unresolved controller commands. See
+[ADR 0005](../adr/0005-explicit-fresh-fixture-scene.md).
 All non-READY states block new motion. This is not a safety-rated cell.
 
 RobotGateway accepts only the persisted original RobotCommand and imports immutable
 RobotEvents into the business timeline. Runtime events are linked through command
 identity to the durable intent. Transport outcomes and controller outcomes remain
 distinct. The headless capture operation writes a JSON diagnostic; it is never
-labelled a Blender screenshot. The Blender adapter is P4 work.
+labelled a Blender screenshot. The implemented Blender adapter uses the same
+reset identity and renders the prepared fixture through its bounded runtime.
+
+## Read-only evidence
+
+Runtime.recorded_journal reads the persisted receipt without recovery. Evidence
+GETs use this boundary so viewing a saved test cannot finish a pending Blender
+checkpoint. Runtime.journal remains the recovery-capable query for reconciliation.
+See ADR 0007 for independent test storage and active-only restart recovery.

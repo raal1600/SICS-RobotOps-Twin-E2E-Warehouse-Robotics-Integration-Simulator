@@ -14,7 +14,7 @@ class MotionPlayer {
   constructor() {
     this.view=new SceneView(document.getElementById("motion-canvas"));
     this.byId=id=>document.getElementById(id);
-    this.job=null;this.scene=null;this.preview=null;this.recording=null;this.data=null;
+    this.job=null;this.scene=null;this.preview=null;this.recording=null;this.data=null;this.delivery=null;
     this.cursor=0;this.track=[];this.playing=false;this.manualPause=false;this.speed=1;this.last=null;
     this.byId("motion-play").onclick=()=>{
       if(!this.playing&&this.atEnd())this.cursor=0;
@@ -32,9 +32,16 @@ class MotionPlayer {
   previewScene(scene){this.preview=scene;if(!this.job){this.scene=scene;this.byId("motion-state").textContent="3D cell ready";this.controls();this.draw();}}
   select(job){
     if(this.job===job)return;
-    this.job=job;this.recording=null;this.scene=this.preview;this.data=null;this.track=[];
+    this.job=job;this.recording=null;this.scene=this.preview;this.data=null;this.delivery=null;this.track=[];
     this.cursor=0;this.playing=false;this.manualPause=false;
     this.byId("motion-state").textContent="Loading selected scenario";
+    if(!job){
+      this.byId("motion-state").textContent="3D cell ready";
+      this.byId("motion-outcome").textContent="Current cell";
+      this.byId("motion-outcome").classList.toggle("uncertain",false);
+      this.byId("motion-scenario").textContent="Choose an execution scenario on the left.";
+      this.byId("motion-detail").textContent="Current scene. Saved orders retain their original replay.";
+    }
     this.byId("motion-import").hidden=true;this.controls();this.draw();
   }
   buildTrack(data){
@@ -53,21 +60,45 @@ class MotionPlayer {
   }
   update(data){
     if(data.job_id!==this.job)return;
+    this.acceptClips([data],null,data.scene);
+  }
+  updateDelivery(delivery){
+    if(this.job!=="delivery:"+delivery.delivery_id)return;
+    this.acceptClips(delivery.jobs,delivery,delivery.scene);
+  }
+  acceptClips(clips,delivery,scene){
     const wasEnd=this.atEnd(),first=!this.data,oldLength=this.track.length;
-    this.data=data;this.scene=data.scene;this.recording=data.recording;this.track=this.buildTrack(data);
+    const previousStep=this.track[Math.floor(this.cursor)],fraction=this.cursor-Math.floor(this.cursor);
+    const oldClipOffset=previousStep?this.track.filter((step,i)=>i<Math.floor(this.cursor)&&step.clip.job_id===previousStep.clip.job_id).length:0;
+    const data=clips.at(-1);
+    this.delivery=delivery;this.data=data;this.scene=scene;this.recording=data?.recording||null;this.track=[];
+    for(const [index,clip] of clips.entries()){
+      this.track.push(...this.buildTrack(clip).map(step=>({...step,clip,index})));
+      if(clip.recording&&!clip.recording.complete)break;
+    }
+    // New events on an earlier pick must not move a paused cursor to another product.
+    if(previousStep){
+      const start=this.track.findIndex(step=>step.clip.job_id===previousStep.clip.job_id);
+      if(start>=0)this.cursor=start+oldClipOffset+fraction;
+    }
     if((first||this.track.length>oldLength&&wasEnd)&&!this.manualPause)this.playing=true;
     if(!this.track.length)this.playing=false;
     this.cursor=Math.min(this.cursor,this.limit());
-    this.byId("motion-state").textContent=data.recording
+    this.byId("motion-state").textContent=delivery?(clips.length?"Full delivery replay · "+clips.length+" product executions":"3D cell ready") :data.recording
       ? ({RECORDING:"Live Blender motion",RECORDED:"Recorded 3D scenario",PARTIAL:"Partial motion - outcome uncertain"}[data.status]||data.status)
       : "Scenario events - stationary scene";
-    this.byId("motion-outcome").textContent="Job: "+data.job_state;
-    const fault=(data.events||[]).find(e=>e.event_type==="FAULT_INJECTED");
-    this.byId("motion-scenario").textContent="Execution: "+(scenarioNames[fault?.reason]||"Normal execution");
-    this.byId("motion-outcome").classList.toggle("uncertain",["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(data.job_state));
-    const provenance=data.recording?"Original Blender poses":data.scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
-    this.byId("motion-detail").textContent=`${provenance}. ${data.reason}`;
-    this.byId("motion-import").hidden=!data.can_import;
+    const uncertain=clips.some(clip=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(clip.job_state));
+    const completed=clips.filter(clip=>clip.job_state==="COMPLETED").length;
+    this.byId("motion-outcome").textContent=delivery?(clips.length?`${completed}/${clips.length} completed${uncertain?" · uncertain outcome":""}`:"Ready for a new delivery"):"Job: "+data.job_state;
+    const fault=clips.flatMap(clip=>clip.events||[]).find(e=>e.event_type==="FAULT_INJECTED");
+    this.byId("motion-scenario").textContent=delivery&&!clips.length?"New delivery · ready for the selected scenario.":(delivery?"Delivery scenario: ":"Execution: ")+(scenarioNames[fault?.reason]||"Happy path");
+    this.byId("motion-outcome").classList.toggle("uncertain",uncertain);
+    const provenance=data?.recording?"Original Blender poses":scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
+    const missing=clips.filter(clip=>!clip.recording).length;
+    this.byId("motion-detail").textContent=delivery
+      ? (clips.length?`${delivery.reason}${missing?` ${missing} executions have no motion recording; their events and scene provenance remain explicit.`:""}`:"Create an order to start this delivery. Previous deliveries remain available above.")
+      : `${provenance}. ${data.reason}`;
+    this.byId("motion-import").hidden=!!delivery||!data?.can_import;
     this.controls();this.draw();
   }
   limit(){return Math.max(0,this.track.length-1);}
@@ -82,14 +113,14 @@ class MotionPlayer {
     const delta=this.last===null?0:Math.min((time-this.last)/1000,0.1);this.last=time;
     if(this.playing&&this.track.length){
       this.cursor=Math.min(this.cursor+delta*24*this.speed,this.limit());
-      if(this.atEnd()&&!['WAITING','RECORDING'].includes(this.data.status))this.playing=false;
+      if(this.atEnd()&&!['WAITING','RECORDING'].includes(this.track.at(-1)?.clip.status))this.playing=false;
       this.controls();
     }
     this.draw();requestAnimationFrame(next=>this.tick(next));
   }
   pose(){
-    const step=this.track[Math.floor(this.cursor)],rec=this.recording;
-    const objects=rec?.objects||this.scene?.objects||[];
+    const step=this.track[Math.floor(this.cursor)],data=step?.clip||this.data,rec=data?.recording;
+    const objects=rec?.objects||data?.scene?.objects||this.scene?.objects||[];
     let positions={},phase="Cell ready",event=null;
     if(step?.kind==="motion"){
       const frame=rec.frames[step.frame],next=rec.frames[Math.min(step.frame+1,rec.frames.length-1)],fraction=this.cursor-Math.floor(this.cursor);
@@ -99,26 +130,34 @@ class MotionPlayer {
       event=step.event;phase=event.state_after||event.event_type;
       if(step.afterMotion&&rec)positions=rec.frames.at(-1).positions;
     }
-    return {objects,positions,phase,event};
+    if(this.delivery&&step)phase=`${step.index+1}/${this.delivery.jobs.length} · ${data.product_id} · ${phase}`;
+    return {objects,positions,phase,event,data};
   }
   draw(){
-    const {objects,positions,phase,event}=this.pose();
-    this.view.render(objects,positions,this.data?.product_id||this.recording?.product_id);
+    const {objects,positions,phase,event,data}=this.pose();
+    this.view.render(objects,positions,data?.product_id);
     let message=this.job?"Waiting for persisted execution events":"Environment ready. Create and run an order to begin.";
     let tone="normal";
     if(event){
       message=event.event_type==="FAULT_INJECTED"?"Scenario configured: "+(scenarioNames[event.reason]||event.reason):event.reason;
-      if(event.reason.startsWith("PLANNING_REJECTED:"))message=event.reason.includes("BRAIN_TIMEOUT")?"Brain timed out. No action plan was accepted.":"Action planning or validation failed. Inspect the causal timeline for the rejection details.";
+      if(event.reason.startsWith("PLANNING_REJECTED:")){
+        const reason=event.reason.slice("PLANNING_REJECTED:".length);
+        message=reason==="SOURCE_NOT_OBSERVED"?"The product was not observed at the source. If it was already picked, use Start fresh scene before creating a new order."
+          :reason==="CELL_NOT_READY"?"The cell is stopped or faulted. Reset logical cell state before creating another order."
+          :reason==="BRAIN_TIMEOUT"?"Brain timed out. No action plan was accepted."
+          :"Action planning or validation rejected: "+reason;
+      }
       if(event.state_after==="UNKNOWN_OUTCOME")message="Outcome uncertain. Reconcile the original command; do not issue another pick. "+event.reason;
-      if(event.state_after==="REQUIRES_INTERVENTION")message="Evidence could not establish success. Human intervention required. "+event.reason;
+      if(event.state_after==="REQUIRES_INTERVENTION")message="Evidence was inconclusive. Request another observation to continue investigating the original pick. "+event.reason;
       if(["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(event.state_after))tone="uncertain";
       if(event.state_after==="FAILED"||/ESTOP|CELL_FAULT/.test(event.reason))tone="blocked";
       if(event.state_after==="COMPLETED")tone="success";
-    }else if(this.recording&&this.track.length)message="Machine and product follow evaluated Blender poses.";
-    if(this.data&&!this.recording){
-      const dispatched=(this.data.events||[]).some(e=>e.state_after==="EXECUTING");
-      const rejected=(this.data.events||[]).some(e=>["COMMAND_REJECTED","COMMAND_FAILED"].includes(e.event_type));
+    }else if(data?.recording&&this.track.length)message="Machine and product follow evaluated Blender poses.";
+    if(data&&!data.recording){
+      const dispatched=(data.events||[]).some(e=>e.state_after==="EXECUTING");
+      const rejected=(data.events||[]).some(e=>["COMMAND_REJECTED","COMMAND_FAILED"].includes(e.event_type));
       message+=" "+(!dispatched?"No pick dispatched at this stage.":rejected?"Controller recorded no pick effect. Machine and product stay still.":"No motion recording is available; a stationary view is not proof of no effect.");
+      if(data.scene.source==="CURRENT_WORLD_REFERENCE")message+=" Current cell reference; historical starting scene unavailable.";
     }
     const banner=this.byId("motion-event");
     if(banner.textContent!==message)banner.textContent=message;

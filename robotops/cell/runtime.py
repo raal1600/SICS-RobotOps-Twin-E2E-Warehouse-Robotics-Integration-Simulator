@@ -43,13 +43,40 @@ class SyntheticRuntime:
             if not db.execute("SELECT 1 FROM runtime_world WHERE id=1").fetchone():
                 self._reset(db)
 
-    def reset(self) -> WorldState:
+    def reset(self, scene_epoch: str | None = None) -> WorldState:
         with self.db.transaction() as db:
-            return self._reset(db)
+            epoch = scene_epoch or new_id()
+            previous = db.execute(
+                "SELECT body FROM records WHERE kind='WorldState' AND id=?", (epoch,)
+            ).fetchone()
+            if previous:
+                return WorldState.model_validate_json(previous[0])
+            if any(
+                CommandReceipt.model_validate_json(row[0]).status
+                in {CommandStatus.RUNNING, CommandStatus.STATUS_UNKNOWN}
+                for row in db.execute("SELECT receipt FROM controller_journal")
+            ):
+                raise Conflict("SCENE_RESET_BLOCKED_UNCERTAIN_COMMAND")
+            world = self._reset(db, epoch)
+            self.db._record(db, epoch, world)
+            event = RobotEvent(
+                **metadata(world),
+                event_id=new_id(),
+                component="fixture",
+                event_type="SCENE_RESET",
+                reason="EXPLICIT_FIXTURE_RESTOCK",
+                scene_epoch=epoch,
+                step=0,
+            )
+            db.execute(
+                "INSERT INTO robot_events(command_id,body) VALUES (NULL,?)",
+                (event.model_dump_json(),),
+            )
+            return world
 
-    def _reset(self, db: sqlite3.Connection) -> WorldState:
+    def _reset(self, db: sqlite3.Connection, scene_epoch: str | None = None) -> WorldState:
         now = utc_now()
-        epoch = new_id()
+        epoch = scene_epoch or new_id()
         common = dict(
             run_id=self.db.run_id, correlation_id=epoch, causation_id=epoch, timestamp=now
         )
@@ -127,6 +154,10 @@ class SyntheticRuntime:
             return cell
 
     def journal(self, command_id: str) -> CommandReceipt | None:
+        return self.recorded_journal(command_id)
+
+    def recorded_journal(self, command_id: str) -> CommandReceipt | None:
+        """Presentation reads persisted receipts without completing pending checkpoints."""
         with self.db.connect() as db:
             row = db.execute(
                 "SELECT receipt FROM controller_journal WHERE id=?", (command_id,)

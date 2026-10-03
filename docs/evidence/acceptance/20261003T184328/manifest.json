@@ -1,0 +1,77 @@
+{
+  "started_at": "2026-10-03T18:43:28.742742+00:00",
+  "source": {
+    "commit": "348c786710a0e22f0dd7de0744eac7057da13ad8",
+    "dirty": true,
+    "source_sha256": "50e8628822db0218959cf9b1afeb3515811723ceaa6b60bc3cd67e99dfd82970"
+  },
+  "environment": {
+    "python": "3.13.15 (main, Sep  1 2026, 14:16:48) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "dependencies": {
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "pytest": "9.1.1",
+      "ruff": "0.16.10",
+      "mypy": "2.4.0",
+      "weasyprint": "70.0",
+      "bandit": "1.9.4",
+      "pip-audit": "2.10.1"
+    },
+    "lock_sha256": "33bbc8b179d9e4b731b1630291380ecd8900b93ea2e9a36f816c5b081c196921"
+  },
+  "gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\.local\\bin\\uv.EXE",
+        "sync",
+        "--locked",
+        "--all-groups"
+      ],
+      "seconds": 0.03307719999793335,
+      "log": "docs/evidence/acceptance/20261003T184328/setup.log"
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+        "--version"
+      ],
+      "seconds": 0.11710369999855175,
+      "log": "docs/evidence/acceptance/20261003T184328/blender_version.log"
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "security"
+      ],
+      "seconds": 7.628584299996874,
+      "log": "docs/evidence/acceptance/20261003T184328/security.log"
+    },
+    "tests_1": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-wnlfh_1t/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261003T184328\\tests-1.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261003T184328\\coverage-1.json",
+        "--cov-report=term"
+      ],
+      "seconds": 496.72565210000175,
+      "log": "docs/evidence/acceptance/20261003T184328/tests_1.log"
+    }
+  }
+}

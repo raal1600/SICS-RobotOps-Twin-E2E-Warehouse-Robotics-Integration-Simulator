@@ -1,7 +1,7 @@
 # PROJECT_PLAN.md — RobotOps Twin Implementation Contract
 
 **Status:** Normative implementation plan  
-**Version:** 1.0 — 2026-10-01
+**Version:** 1.0 — 2026-10-01; local continuation addendum 2026-10-03 (ADR 0008)
 
 ## Mission
 
@@ -86,9 +86,19 @@ deterministic pre/post error -> FAILED
 EXECUTING/VERIFYING + uncertain external effect
  -> UNKNOWN_OUTCOME -> RECONCILING
  -> COMPLETED | FAILED | REQUIRES_INTERVENTION
+
+REQUIRES_INTERVENTION + explicit operator re-observation -> RECONCILING
+ -> COMPLETED | FAILED | REQUIRES_INTERVENTION
 ```
 
 Timeout after a side-effecting command MUST NOT directly imply failure. No exit from UNKNOWN_OUTCOME without reconciliation evidence. Ambiguous evidence never becomes fabricated success. Persist transitions transactionally with audit events.
+
+REQUIRES_INTERVENTION pauses motion but permits explicit collection of another
+fresh observation for the same original command. Each attempt requires journal
+and observation evidence, preserves earlier results, and uses the unchanged
+verifier. Restart does not automatically reopen intervention. Only COMPLETED and
+FAILED are terminal; no direct intervention-to-success, execution or reset path
+is allowed. This user-requested continuation is recorded in ADR 0008.
 
 ## Robot command state
 
@@ -118,6 +128,15 @@ Blender is a synthetic test world, not validated robot physics. Stable scene con
 
 Runtime supports deterministic scene reset, ground-truth query, simplified robot/gripper motion, attach/detach product, command journal/events, dropped acknowledgement after effect, logical cell faults, and screenshots.
 
+The dashboard exposes explicit fixture preparation as Start fresh scene, retaining
+old orders, journals and replay evidence. Durable maintenance identity serializes
+it with intake/claims and survives restart. Pending or uncertain jobs block it;
+logical cell reset remains distinct. See ADR 0005.
+Scenario selection changes configuration only. Full-delivery
+replay groups original executions by saved scene identity without merging ERP
+orders or changing job/command semantics; individual replay remains available.
+See ADR 0006.
+
 MCP may author/debug assets, but runtime control uses a bounded documented adapter/protocol, not unrestricted natural-language execution.
 
 ## Ground truth, observation, verification
@@ -141,6 +160,9 @@ Verification returns exactly `VERIFIED_SUCCESS | VERIFIED_FAILURE | INCONCLUSIVE
 7. Proven no-effect may create a new explicitly related attempt only under retry policy.
 8. Contradictory/insufficient evidence -> REQUIRES_INTERVENTION.
 9. Persist evidence and causal links.
+10. An operator may request another observation after intervention. Repeat steps
+    3–9 under the same fenced cell claim and command identity; never dispatch a
+    replacement pick. Sufficient new evidence permits continuing the same test.
 
 The required demo proves the product moves exactly once when the effect occurred but its acknowledgement was lost.
 
@@ -162,6 +184,14 @@ starting scene and audit events illustrate orders with no movement. Orbit, pan,
 zoom and playback controls remain separate from WorldObservation and cannot
 change job outcomes or issue physical commands. Missing historical recordings
 remain explicit; a stationary reference is never evidence of no effect.
+
+Start new test and Test history provide a general experiment lifecycle in the
+same window for every execution/observation combination. A new test gets separate
+workflow/runtime storage and fresh products. Previous outcomes and replay remain
+read-only, including uncertainty and intervention. Selections are retained; no
+pick is issued by creation. A durable catalog serializes test creation with API
+mutations and startup recovers only the active world (ADR 0007). Job state-machine,
+idempotency, reconciliation and observation-boundary rules are unchanged.
 
 ## Test strategy
 
@@ -198,7 +228,13 @@ Separate ground truth from observation; verifier and reconciliation decision tab
 Create bounded Blender adapter/scene preserving the same runtime contract. Exit: happy path and lost-ack run against Blender and generate artifacts.
 
 ### P5 — UI/observability
-ERP UI, dashboard/timeline, metrics and demo controls. Exit: one-command demo explains causal history.
+ERP UI, dashboard/timeline, metrics and demo controls. The implemented dark UI
+provides a state-derived next-step guide and co-located evidence/re-observation
+controls (ADR 0009). Every selectable scenario and review observation explains
+what it simulates, its stage and its key difference, with same-window comparisons.
+Execution choices affect new orders; review choices affect the next explicit
+evidence capture. Expectations and replay never substitute for verification.
+Exit: one-command demo explains causal history.
 
 ### P6 — Optional model adapter
 Only after deterministic path passes. Strict schema and safe failure. Never blocks acceptance.

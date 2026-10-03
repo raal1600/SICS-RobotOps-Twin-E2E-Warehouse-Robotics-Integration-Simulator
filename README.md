@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** All 85 MUST criteria have inspectable PASS evidence. Deterministic CI and the publication workflow pass; the public site exposes the current governance documents. Lost-ack recovery applies exactly one simulated pick, ambiguous evidence requires intervention, and restart recovery is verified. Optional model and hardware integrations remain unimplemented and non-blocking. The app presents a full 3D cell for every execution scenario, with persisted scenes, recorded machine motion and read-only replay. **DONE**.
+**Aktuell status:** The deterministic simulator now includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and definitions for every execution scenario and observation mode. The local baseline passed 389 tests twice; the explanation follow-up passed 101 UI checks and 170 affected Python tests. Publication is authorized; final committed-source CI and Pages verification are pending. **NOT DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -85,9 +85,51 @@ uses the same contracts with an atomic synthetic world for fast logic experiment
 uv run --locked python -m apps.api --runtime blender --data-dir runs/my-demo --port 8000
 ```
 
-Open http://127.0.0.1:8000 for the local ERP dashboard. Select a product and fault,
-run the order, inspect job/cell status, observation, verifier and timeline, then
-reconcile uncertain work. Reusing the data directory preserves state across restart.
+Open http://127.0.0.1:8000 for the local dashboard. The dark workspace guides you
+through **Prepare / Run / Review / Continue** with a persistent **Next step** card.
+Choose a product and scenario in **Set up a pick**. Each choice explains **What
+this simulates**, its stage, its **Key difference** and the expected result.
+Expand **Compare all execution scenarios** or **Compare all observation modes**
+to read the options together. The execution selector changes a new order; the
+observation selector changes only a later review capture for the original pick.
+[Scenario and observation definitions](docs/implementation/scenarios.md).
+Watch **Live cell & replay**, then follow the guide's next action.
+If attention is needed, **Review evidence** opens and receives focus automatically.
+It explains the original journal, the assessed observation and the latest decision,
+with observation choices and the reconciliation action together. **Use normal
+observation** only selects the next capture mode; click the named review action to
+collect it. Repeated bad evidence keeps review available. Completed picks lead to
+the next setup, stopped cells to reset, and saved tests back to the current test.
+[Guided workflow and evidence boundary](docs/adr/0009-guided-simulation-workflow.md).
+Reusing the data directory preserves state across restart.
+Use **Start new test** at the top for any new execution/observation combination.
+It keeps both selections, restores all products in an independent world and saves
+the previous test unchanged. This works after success, failure, uncertainty or
+intervention; a running operation must finish first. **Test history** opens saved
+evidence and replay in the same window, read-only. **Return to current test**
+resumes the active test. Startup recovers only that active world.
+
+Changing **Execution scenario** changes the next order's configuration only.
+**Restock this test → Start fresh scene** restores products within a resolved
+test; unresolved jobs still block it. **Reset logical cell state** does not move products.
+When all products are picked, the main button offers **Start new delivery and run
+order**. **Full delivery (all products)** replays every execution in the selected
+scene; **Choose delivery or product replay** exposes current or saved deliveries, and individual
+product replay remains available.
+
+After a lost acknowledgement, the **Next step** card names the unresolved product
+and opens **Review evidence**. Select **Normal observation** and use
+**Reconcile [product]** to check that original pick before running another product.
+Each pick in the lost-ack scenario needs this step. Contradictory or insufficient
+evidence pauses the next pick but allows **Observe again and reconcile** in the
+same test. Choose an observation mode and try again; **Normal observation**
+removes the injected degradation for that new capture. Each attempt checks the
+original command and stays in the timeline. Sufficient evidence resolves the job
+and unlocks the next explicit order; inconclusive evidence keeps it paused.
+No new pick is sent by observation. Restart leaves intervention paused.
+You can always start an independent test with **Start new test**; the previous
+uncertain/intervention outcome remains recorded and is never labelled resolved.
+
 **Live cell & replay** always shows the 3D environment, machine and products.
 Orbit, pan and zoom around the cell. Orders with an effect move the machine and
 product using recorded Blender poses; blocked orders replay their events with
@@ -103,6 +145,7 @@ This local demo API has no production authentication and binds to loopback.
 ```mermaid
 flowchart LR
     ERP[ERP/WMS UI] --> API[Integration API]
+    API --> TEST[Test catalog: active world / read-only history]
     API --> WF[Durable workflow]
     WF --> B[DeterministicBrain]
     B --> V[Action validation]

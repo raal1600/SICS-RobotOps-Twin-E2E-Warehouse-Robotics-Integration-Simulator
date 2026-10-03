@@ -305,13 +305,16 @@
       "tests_2"
     ],
     "tests": [
-      "test_forbidden_transitions_and_evidence_requirements"
+      "test_forbidden_transitions_and_evidence_requirements",
+      "test_reobserve_intervention_and_continue_same_delivery"
     ],
     "files": [
       "robotops/workflow/states.py",
-      "tests/unit/test_states.py"
+      "tests/unit/test_states.py",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md"
     ],
-    "explanation": "All job-state pairs checked by the central transition guard."
+    "explanation": "All job-state pairs checked by the central transition guard. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue."
   },
   "SC-STATE-002": {
     "gates": [
@@ -337,13 +340,16 @@
     "tests": [
       "test_lost_ack_after_effect",
       "test_lost_ack_before_effect",
-      "test_forbidden_transitions_and_evidence_requirements"
+      "test_forbidden_transitions_and_evidence_requirements",
+      "test_reobserve_intervention_and_continue_same_delivery"
     ],
     "files": [
       "robotops/workflow/states.py",
-      "robotops/workflow/engine.py"
+      "robotops/workflow/engine.py",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md"
     ],
-    "explanation": "A dispatched timeout becomes UNKNOWN_OUTCOME; reconciliation evidence is mandatory to resolve it."
+    "explanation": "A dispatched timeout becomes UNKNOWN_OUTCOME; reconciliation evidence is mandatory to resolve it. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue."
   },
   "SC-STATE-004": {
     "gates": [
@@ -353,14 +359,17 @@
     ],
     "tests": [
       "test_ambiguous_reconciliation_never_fabricates_success",
-      "test_degraded_post_execution_observation_is_unknown"
+      "test_degraded_post_execution_observation_is_unknown",
+      "test_reobserve_intervention_and_continue_same_delivery"
     ],
     "files": [
       "robotops/observation/model.py",
       "robotops/verification/verifier.py",
-      "tests/e2e/test_workflow.py"
+      "tests/e2e/test_workflow.py",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md"
     ],
-    "explanation": "Missing, low-confidence, stale, contradictory and uncertain-pose evidence is inconclusive, never fabricated success."
+    "explanation": "Missing, low-confidence, stale, contradictory and uncertain-pose evidence is inconclusive, never fabricated success. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue."
   },
   "SC-OBS-003": {
     "gates": [
@@ -404,14 +413,17 @@
     ],
     "tests": [
       "test_ambiguous_reconciliation_never_fabricates_success",
-      "test_degraded_post_execution_observation_is_unknown"
+      "test_degraded_post_execution_observation_is_unknown",
+      "test_reobserve_intervention_and_continue_same_delivery"
     ],
     "files": [
       "robotops/observation/model.py",
       "robotops/verification/verifier.py",
-      "tests/e2e/test_workflow.py"
+      "tests/e2e/test_workflow.py",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md"
     ],
-    "explanation": "Missing, low-confidence, stale, contradictory and uncertain-pose evidence is inconclusive, never fabricated success."
+    "explanation": "Missing, low-confidence, stale, contradictory and uncertain-pose evidence is inconclusive, never fabricated success. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue."
   },
   "SC-STATE-005": {
     "gates": [
@@ -647,7 +659,9 @@
     "tests": [
       "test_restart_unknown_outcome",
       "test_process_dies_after_effect_before_orchestrator_receipt",
-      "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick"
+      "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick",
+      "test_restart_recovers_only_active_world_and_keeps_uncertain_archive",
+      "test_creation_is_idempotent_even_after_a_later_test_has_started"
     ],
     "files": [
       "robotops/workflow/engine.py",
@@ -655,9 +669,13 @@
       "tests/integration/test_process_restart.py",
       "apps/desktop/backend.py",
       "tests/integration/test_desktop_backend.py",
-      "docs/implementation/desktop.md"
+      "docs/implementation/desktop.md",
+      "apps/api/test_sessions.py",
+      "tests/integration/test_simulation_tests.py",
+      "docs/adr/0007-independent-simulation-tests.md",
+      "docs/evidence/test-lifecycle-local.json"
     ],
-    "explanation": "Abrupt process death after runtime commit recovers original command and persisted causal evidence without replay. Desktop close/reopen preserves the original command and reconciles with exactly one pick."
+    "explanation": "Abrupt process death after runtime commit recovers original command and persisted causal evidence without replay. Desktop close/reopen preserves the original command and reconciles with exactly one pick. Independent test history preserves original outcomes and recordings; only the active world can recover or reconcile. Evidence views use pure persisted journal reads."
   },
   "SC-BRAIN-001": {
     "gates": [
@@ -929,14 +947,17 @@
     ],
     "tests": [
       "test_lost_ack_after_effect",
-      "test_real_blender_pick_and_lost_ack"
+      "test_real_blender_pick_and_lost_ack",
+      "test_reobserve_intervention_and_continue_same_delivery"
     ],
     "files": [
       "tests/e2e/test_workflow.py",
       "tests/blender/test_blender_runtime.py",
-      "docs/implementation/reconciliation.md"
+      "docs/implementation/reconciliation.md",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md"
     ],
-    "explanation": "Actual pick, UNKNOWN_OUTCOME, original journal query, fresh observation and RECONCILING -> COMPLETED; one effect and zero duplicate picks."
+    "explanation": "Actual pick, UNKNOWN_OUTCOME, original journal query, fresh observation and RECONCILING -> COMPLETED; one effect and zero duplicate picks. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue."
   },
   "SC-REC-003": {
     "gates": [
@@ -963,14 +984,17 @@
     ],
     "tests": [
       "test_lost_ack_after_effect",
-      "test_real_blender_pick_and_lost_ack"
+      "test_real_blender_pick_and_lost_ack",
+      "test_reobserve_intervention_and_continue_same_delivery"
     ],
     "files": [
       "tests/e2e/test_workflow.py",
       "tests/blender/test_blender_runtime.py",
-      "docs/implementation/reconciliation.md"
+      "docs/implementation/reconciliation.md",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md"
     ],
-    "explanation": "Actual pick, UNKNOWN_OUTCOME, original journal query, fresh observation and RECONCILING -> COMPLETED; one effect and zero duplicate picks."
+    "explanation": "Actual pick, UNKNOWN_OUTCOME, original journal query, fresh observation and RECONCILING -> COMPLETED; one effect and zero duplicate picks. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue."
   },
   "SC-REC-007": {
     "gates": [
@@ -980,14 +1004,22 @@
     ],
     "tests": [
       "test_lost_ack_after_effect",
-      "test_real_blender_pick_and_lost_ack"
+      "test_real_blender_pick_and_lost_ack",
+      "test_evidence_reads_never_commit_a_pending_blender_checkpoint",
+      "test_reobserve_intervention_and_continue_same_delivery"
     ],
     "files": [
       "tests/e2e/test_workflow.py",
       "tests/blender/test_blender_runtime.py",
-      "docs/implementation/reconciliation.md"
+      "docs/implementation/reconciliation.md",
+      "apps/api/test_sessions.py",
+      "tests/integration/test_simulation_tests.py",
+      "docs/adr/0007-independent-simulation-tests.md",
+      "docs/evidence/test-lifecycle-local.json",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md"
     ],
-    "explanation": "Actual pick, UNKNOWN_OUTCOME, original journal query, fresh observation and RECONCILING -> COMPLETED; one effect and zero duplicate picks."
+    "explanation": "Actual pick, UNKNOWN_OUTCOME, original journal query, fresh observation and RECONCILING -> COMPLETED; one effect and zero duplicate picks. Independent test history preserves original outcomes and recordings; only the active world can recover or reconcile. Evidence views use pure persisted journal reads. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue."
   },
   "SC-DEMO-002": {
     "gates": [
@@ -1125,7 +1157,13 @@
       "test_live_recording_replay_restart_and_legacy_import_are_read_only",
       "test_scenario_motion_is_independent_of_verification",
       "test_scene_is_visible_before_execution_and_historical_snapshot_survives_later_orders",
-      "test_snapshot_publication_retries_only_sharing_lock_and_retains_old_data"
+      "test_snapshot_publication_retries_only_sharing_lock_and_retains_old_data",
+      "test_every_combination_can_start_an_independent_test_without_changing_old_evidence",
+      "test_archived_api_is_read_only_for_every_mutation_and_request_is_pinned",
+      "test_blender_history_keeps_exact_recording_after_new_test_and_restart",
+      "test_playback_controls_never_dispatch_and_preserve_partial_recording_limits",
+      "test_reobserve_intervention_and_continue_same_delivery",
+      "test_offline_viewer_assets_have_pinned_integrity_and_confined_routes"
     ],
     "files": [
       "robotops/observability/metrics.py",
@@ -1141,9 +1179,23 @@
       "docs/implementation/playback.md",
       "tests/blender/test_playback.py",
       "robotops/scene_geometry.py",
-      "docs/adr/0004-full-3d-scenario-replay.md"
+      "docs/adr/0004-full-3d-scenario-replay.md",
+      "apps/api/test_sessions.py",
+      "tests/integration/test_simulation_tests.py",
+      "docs/adr/0007-independent-simulation-tests.md",
+      "docs/evidence/test-lifecycle-local.json",
+      "tests/e2e/test_reobservation.py",
+      "docs/adr/0008-explicit-reobservation-after-intervention.md",
+      "apps/erp_ui/workflow-guide.js",
+      "apps/erp_ui/theme.css",
+      "tests/ui/workflow-guide.test.cjs",
+      "tests/ui/dashboard.test.cjs",
+      "docs/adr/0009-guided-simulation-workflow.md",
+      "docs/evidence/guided-workflow-local.json",
+      "docs/implementation/scenarios.md",
+      "docs/evidence/scenario-help-local.json"
     ],
-    "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained. Desktop close/reopen preserves the original command and reconciles with exactly one pick."
+    "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained. Desktop close/reopen preserves the original command and reconciles with exactly one pick. Independent test history preserves original outcomes and recordings; only the active world can recover or reconcile. Evidence views use pure persisted journal reads. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue. The dark state-derived guide directs attention to the original pick, explains the exact assessed evidence and keeps repeated review available. Navigation and observation-mode selection do not dispatch or reconcile; historical replay cannot misdirect the pending-job action. Every selectable execution and review mode has a distinct definition, stage, key difference and comparison row. Reading explanations or changing the selected mode cannot mutate command evidence or resolve uncertainty. The later explanation-only validation is scoped separately from the baseline full-system run."
   },
   "SC-DEMO-004": {
     "gates": [

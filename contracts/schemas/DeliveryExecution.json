@@ -1,0 +1,62 @@
+{
+  "$defs": {
+    "JobState": {
+      "enum": [
+        "RECEIVED",
+        "VALIDATED",
+        "PLANNING",
+        "READY_TO_EXECUTE",
+        "EXECUTING",
+        "VERIFYING",
+        "UNKNOWN_OUTCOME",
+        "RECONCILING",
+        "COMPLETED",
+        "FAILED",
+        "REQUIRES_INTERVENTION"
+      ],
+      "title": "JobState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "job_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Job Id",
+      "type": "string"
+    },
+    "order_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Order Id",
+      "type": "string"
+    },
+    "product_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Product Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/JobState"
+    }
+  },
+  "required": [
+    "job_id",
+    "order_id",
+    "product_id",
+    "state"
+  ],
+  "title": "DeliveryExecution",
+  "type": "object"
+}

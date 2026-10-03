@@ -73,4 +73,48 @@ class JobPlayback(Contract):
     events: list[AuditEvent] = Field(default_factory=list)
 
 
-VISUAL_SCHEMAS = (VisualObject, VisualFrame, MotionRecording, VisualScene, JobPlayback)
+class DeliveryExecution(Contract):
+    job_id: Identifier
+    order_id: Identifier
+    product_id: Identifier
+    state: JobState
+
+
+class DeliverySummary(Contract):
+    delivery_id: Identifier
+    started_at: AwareDatetime
+    current: bool
+    executions: list[DeliveryExecution] = Field(default_factory=list)
+
+
+class DeliveryPlayback(Contract):
+    delivery_id: Identifier
+    scene: VisualScene
+    jobs: list[JobPlayback] = Field(default_factory=list)
+    reason: str = (
+        "Original executions in this scene, in durable execution order. Replay sends no commands."
+    )
+
+    @model_validator(mode="after")
+    def original_identities(self) -> Self:
+        if len({job.job_id for job in self.jobs}) != len(self.jobs):
+            raise ValueError("DUPLICATE_DELIVERY_EXECUTION")
+        for job in self.jobs:
+            if (
+                job.scene.source == "SAVED_START_SCENE"
+                and job.scene.scene_epoch != self.delivery_id
+            ) or (job.recording and job.recording.scene_epoch != self.delivery_id):
+                raise ValueError("DELIVERY_SCENE_MISMATCH")
+        return self
+
+
+VISUAL_SCHEMAS = (
+    VisualObject,
+    VisualFrame,
+    MotionRecording,
+    VisualScene,
+    JobPlayback,
+    DeliveryExecution,
+    DeliverySummary,
+    DeliveryPlayback,
+)

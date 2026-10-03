@@ -23,11 +23,12 @@ async def serve(data: Path, session: Path, identity: str, runtime_name: str) -> 
     runtime = (BlenderRuntime if runtime_name == "blender" else SyntheticRuntime)(
         data / "runtime.db", Settings(visual_frame_seconds=1 / 24)
     )
-    engine = Engine(store, runtime)
-    engine.recover()  # Original journal + fresh observation; never replay an uncertain pick.
+    engine = Engine(store, runtime, runtime.settings)
     server = uvicorn.Server(
         # Runtime deadline is 60 s, plus 2 s planning and 3 s to persist/reply.
-        uvicorn.Config(create_app(store, engine), log_level="info", timeout_graceful_shutdown=65)
+        uvicorn.Config(
+            create_app(store, engine, recover=True), log_level="info", timeout_graceful_shutdown=65
+        )
     )
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))

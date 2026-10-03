@@ -1,8 +1,284 @@
 # Goal Progress
 Last updated: 2026-10-03 UTC
-Audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
+Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase
+## Current phase: P7 publishing the complete local workspace update
+The user authorized committing and pushing all completed changes on 2026-10-04
+(Europe/Stockholm), superseding the earlier local-only restriction. Base:
+`348c786710a0e22f0dd7de0744eac7057da13ad8`; origin/main is identical to that base.
+The release includes full-delivery replay, independent tests with preserved
+history, explicit repeat evidence review, the guided dark workspace, and detailed
+scenario/observation help. Existing evidence remains immutable and scoped to its
+original run; it is not relabelled as committed-source acceptance.
+Local implementation and affected checks pass as recorded below. Remote MUSTs
+SC-DATA-005 and SC-KB-006/007/008 are in progress until the released commit is
+verified. SHOULD SC-BRAIN-005 remains the documented optional-provider limitation.
+README, publication status, research status blocks, publication policy and the
+checklist are synchronized with the newly authorized release scope. The external
+source registry and implemented architecture require no further change.
+Next: commit/push this milestone, run final CI/publication on its exact source,
+retain the resulting acceptance evidence, and verify the published successor.
+
+## Previous verified extension: P7 scenario and observation explanations
+The local follow-up replaces outcome-only help with definitions, failure stage,
+key differences and expandable comparisons for every visible execution scenario
+and observation mode. The UI explains new-order injection versus later evidence
+collection, including similar-looking no-motion and inconclusive outcomes.
+Base: 348c786710a0e22f0dd7de0744eac7057da13ad8; no commit, push or deployment.
+Production workflow, faults, contracts and verification rules are unchanged.
+SC-DEMO-003 follow-up: all 101 UI checks and 170 affected Python tests pass.
+The isolated browser exercised all 10 execution and 5 observation selections,
+compared every option and verified the desktop and 390 px layouts. Browsing help
+preserved identical UNKNOWN_OUTCOME evidence, one order and one pick effect;
+only an explicit normal reconciliation completed the original command.
+Lint/format, strict type checks, drift scan and local publication pass. Evidence and all executed commands are
+in [the scoped local record](docs/evidence/scenario-help-local.json).
+The full acceptance run below remains the prior baseline, not a new whole-system
+attestation. Knowledge-base synchronization covers README, report status blocks,
+PROJECT_PLAN, publication status, operator/desktop/acceptance guides, the new
+scenario guide, ADR 0009, acceptance mapping/report and checklist. Architecture,
+diagrams, external source provenance and contracts require no change because
+this follow-up only describes the existing behavior.
+Next: user testing of the explained choices; remote MUSTs remain deferred under
+the local-only scope. No user test data was read or changed in this follow-up.
+
+## Previous verified extension: P7 guided dark workspace
+The dark workspace provides a persistent next-step guide, scenario expectations
+and readable original-command evidence beside explicit re-observation. Attention
+opens and focuses review once; polling and repeat assessments retain focus.
+Resolved, stopped-cell, depleted-delivery and archived states have explicit next
+actions. ADR 0009 preserves the unchanged verifier, command identity, quarantine
+and ground-truth boundaries. No new dependency or domain transition was introduced.
+Base: 348c786710a0e22f0dd7de0744eac7057da13ad8; no commit, push or deployment.
+
+Local acceptance: 389 tests PASS twice, zero skips/xfails, 89.33% coverage.
+All 99 UI checks, setup, security, lint/format, strict types, seven real Blender
+demos, drift and local publication PASS. Evidence:
+`docs/evidence/acceptance/20261003T205102` and `ACCEPTANCE_REPORT.md`.
+SC-DEMO-003 is explicitly extended with guide, action and confined-asset evidence.
+All local MUST gates pass; SC-DATA-005, SC-KB-006/007/008 remain unverified for
+these uncommitted changes under local-only scope. SHOULD SC-BRAIN-005 remains
+unimplemented; optional backlog is unchanged. This is not a new DONE attestation.
+
+[Browser/native evidence](docs/evidence/guided-workflow-local.json): real Blender
+happy path; lost acknowledgement after effect; contradictory/low-confidence
+reviews followed by normal evidence on the same command; continued three-product
+delivery with one effect and 100 original frames per product; lost acknowledgement
+before effect followed by missing/normal evidence (FAILED, zero effects); logical
+stop/cell-fault reset; planning timeout/invalid output; stale evidence archived
+unchanged and reviewed read-only. Inspecting evidence and choosing normal
+observation left the original records identical. Desktop and 390 px layout/focus
+were inspected with no horizontal overflow. Native isolated headless lifecycle
+checks and all new asset requests pass. The user's open session, all 54 orders,
+every assessment, fixture and delivery remain unchanged. Its UNKNOWN_OUTCOME job
+was not reconciled or restarted; the new version loads on the next app reopen.
+
+Initial targeted failures were permissions on a pre-existing Windows pytest temp
+folder, resolved using a fresh local fixture root. A history-selection regression
+was fixed by capturing the selected test before disabling controls. No assertion,
+mandatory test or acceptance threshold was weakened.
+
+Drift corrected: scattered-control instructions, stale UI labels and status counts.
+Synchronized README, operations, desktop, playback, contracts, reconciliation,
+acceptance guide/map/generator/report, PROJECT_PLAN, checklist, PUBLICATION,
+report/status sources, architecture caption, generated OpenAPI, ADR 0009 and this
+record. Research provenance and domain state diagrams are unchanged. Final
+source-document checks/publication and application/test hash equality are recorded
+in the linked evidence. Generated pages/PDFs use only the repository builder.
+Next: reopen the local app once and follow Next step. Remote CI/Pages verification
+remains deferred under the local-only instruction; no Git actions are pending here.
+
+## Previous verified extension: P7 same-test re-observation
+An active REQUIRES_INTERVENTION job now accepts an explicit fresh observation
+through RECONCILING. It retains the original command, every assessment and the
+same delivery. The unchanged verifier either resolves the outcome or pauses it
+again. No new pick, fixture reset or automatic restart resolution occurs.
+Base: 348c786710a0e22f0dd7de0744eac7057da13ad8; no commit, push or deployment.
+
+Local acceptance: 389 tests PASS twice, zero skips/xfails, 89.31% coverage.
+All 77 UI checks, setup, security, lint/format, strict types, seven real Blender
+demos, drift and local publication PASS. Evidence:
+`docs/evidence/acceptance/20261003T194506` and `ACCEPTANCE_REPORT.md`.
+SC-STATE-001/003/004, SC-REC-002/004/005/007 and SC-DEMO-003 are revalidated.
+All local MUST gates pass; SC-DATA-005, SC-KB-006, SC-KB-007 and SC-KB-008
+remain unverified for these uncommitted changes under the local-only instruction.
+This is not a new published DONE attestation. Optional backlog is unchanged.
+
+ADR 0008 records the evidence-only return from intervention. Only COMPLETED and
+FAILED remain terminal; intervention requires an explicit reconciliation claim
+and stays paused across restart. Fencing and quarantine still prevent concurrent
+work or blind retries. Evidence arrays now follow durable insertion order instead
+of UUID sorting, preserving a correct latest assessment across repeat attempts.
+Tests cover every observation degradation twice, missing journal, both lost-ack
+outcomes, restart, archived write rejection, competing claims and continuation of
+the same delivery. Gateway dispatch and controller delivery are distinct logged
+events for the same single command; assertions check each component once.
+
+[Browser/native evidence](docs/evidence/reobservation-local.json): five degraded
+assessments stayed inconclusive, normal fresh evidence completed the original
+pick, and blue/green then completed in the same test/delivery. Exactly three
+pick effects and three original 100-frame clips remain, one per product.
+The native app was gracefully reloaded once. Its current Test 2, all 49 orders,
+observations, assessments, fixture and delivery history were verified unchanged.
+Its existing intervention now offers Observe again and reconcile; no user job was
+reconciled for them. Desktop and 390 px controls, plus diagrams, were inspected.
+
+Knowledge-base drift corrected: intervention as a permanent terminal state,
+inspection-only guidance, UUID evidence ordering, stale current-status counts
+and the released checklist's remote claims. Synchronized PROJECT_PLAN, checklist,
+README, reports/status, PUBLICATION, state/ack-loss diagrams, OpenAPI, contracts,
+persistence/reconciliation/operations/desktop/playback guides, ADR 0008, acceptance
+mapping/generator/report and this record. External source claims are unchanged.
+Publication is rebuilt only through the existing builder. Final documentation-only
+checks and application/test hash equality are recorded in the linked evidence.
+Next: user continues Test 2 with Fresh observation and Observe again and reconcile.
+Local implementation is ready; remote CI/Pages verification awaits authorization.
+
+## Previous verified extension: P7 independent tests in one window
+Start new test now provides the same lifecycle for every execution/observation
+combination. It retains both choices, creates separate workflow/runtime storage
+and archives previous outcomes and replay read-only in the same window. Running
+operations finish first. Scenario selection changes configuration only; existing
+restock, state-machine, idempotency and observation guards remain intact.
+Base: 348c786710a0e22f0dd7de0744eac7057da13ad8; no commit, push or deployment.
+
+Local acceptance: 382 tests PASS twice, zero skips/xfails, 89.14% coverage.
+All 69 UI control checks (including 50 combinations), 91 API combinations,
+setup, security, lint/format, types, seven Blender demos, drift and publication PASS.
+Evidence: docs/evidence/acceptance/20261003T185730, ACCEPTANCE_REPORT.md and
+[local browser/desktop evidence](docs/evidence/test-lifecycle-local.json).
+All local MUST gates pass. SC-DATA-005, SC-KB-006, SC-KB-007 and SC-KB-008
+remain unverified under the
+user's local-only instruction; this is not a new published DONE attestation.
+
+ADR 0007 records isolated worlds, durable catalog identity, idempotent creation,
+cross-host write serialization, immutable archives and active-only recovery.
+Final review caught a recovery-capable journal read in evidence presentation.
+Runtime.recorded_journal now reads saved receipts only. Real Blender regressions
+prove that viewing a valid pending checkpoint cannot commit it, while explicit
+reconciliation still resolves the active test exactly once. The earlier 380-test
+attempt predates this correction and was superseded, not used as final evidence.
+
+Browser verification: lost acknowledgement after effect plus contradictory fresh
+evidence retained one effect and intervention; before effect retained zero effects
+and intervention with the same observation choice. A third test completed all
+three products with 300 recorded frames. Earlier evidence/replay stayed identical.
+History disabled writes, kept Start new test available and fit a 390 px viewport.
+The updated desktop is open in one window. All 49 previous user orders, evidence
+and replays were verified unchanged, including the prior separate reconciliation
+test copied into history. Its original files remain intact.
+
+Knowledge-base drift corrected: automatic scenario restock, separate-window
+workarounds, archive recovery/read semantics and old current-status counts.
+Synchronized README, reports/status, PROJECT_PLAN, PUBLICATION, architecture,
+API/OpenAPI/schemas, persistence/contracts/runtime/Blender/operations/desktop/
+playback/reconciliation guides, ADRs 0006/0007, acceptance mapping/generator/report
+and this record. Final status/evidence documentation is rebuilt locally and checked
+separately; application and test files remain identical to the two accepted runs.
+Next: user review of the permanent Start new test and Test history controls.
+No remaining implementation blocker for this local change; remote release awaits
+an explicit change to the local-only instruction.
+
+## Previous verified extension: P7 local next-pick guidance
+User reported that another product did nothing after a lost acknowledgement.
+Read-only inspection found green UNKNOWN_OUTCOME, one durable pick effect and
+no second order. The cell quarantine is correct; the UI did not make the next
+step prominent. Added a named blocking-product prompt and reconciliation action
+beside Run, plus intervention inspection. Existing API/state/verification rules
+are unchanged. Local acceptance: 277 tests PASS twice, zero skips/xfails, 87.90% coverage;
+18 UI control checks, setup, security, lint/format, type checking, seven Blender
+demos, drift and local publication PASS. Evidence is in
+`docs/evidence/acceptance/20261003T172709`, `ACCEPTANCE_REPORT.md`, and
+`docs/evidence/ack-guidance-local.json`. The same four remote-gate MUSTs remain
+unverified because the user requested local changes only.
+
+Actual browser checks with isolated Blender fixtures: green moved once, normal
+reconciliation completed its original command without creating another order,
+then red ran and entered UNKNOWN_OUTCOME under the same fault. Contradictory
+fresh evidence required intervention and kept the next pick blocked. A read-only
+check of the user session also showed the named blocking-product prompt.
+The user continued testing; no user job was changed or application restarted.
+Reopen after the current test to load the updated UI.
+
+Knowledge-base sync: README, reports shared status, operations, desktop, playback,
+reconciliation guide, ADR 0006 clarification, acceptance generator/report and
+this record. This changes UI guidance only; API, architecture and state-machine
+contracts are unchanged. Generated publication rebuilt locally only.
+Next: user review. No commit or push requested.
+
+## Previous verified extension: P7 local delivery replay
+User confirmed happy path works, then found that changing scenarios left an
+exhausted fixture and Replay covered only the last product. Scenario changes now
+prepare fresh products through the existing guarded operation. Full delivery is
+the default replay scope and includes every original product clip in durable
+execution order. Saved deliveries and individual execution details remain
+available. Active or uncertain jobs still block preparation and new dispatch.
+Base: 348c786710a0e22f0dd7de0744eac7057da13ad8, intentionally uncommitted.
+
+Local acceptance: 277 tests PASS twice, zero skips/xfails, 87.90% coverage.
+Setup, security, lint/format, strict typing, all seven Blender demos, drift and
+local publication PASS. Evidence: `docs/evidence/acceptance/20261003T132825` and
+`ACCEPTANCE_REPORT.md`. The four remote-gate MUSTs remain unverified for this
+local change at the user's request; no new published DONE claim is made.
+
+Browser evidence: `docs/evidence/delivery-replay-local.json`. Actual Replay at
+2x traversed red, blue and green in the user's saved delivery (300 Blender
+frames), and three new UI runs formed another full delivery in an isolated copy.
+Changing to logical E-stop restored all three products without creating an
+order; running it then produced a rejected command with zero effects. Saved
+delivery playback and orders remained unchanged. Fourteen dashboard/playback
+control tests also cover exhausted-fixture continuation, legacy individual
+selection, partial clips, paused cursors and unresolved-outcome guards.
+
+The actual desktop was gracefully reopened with the new source. All 30 user
+orders and the completed scene remain unchanged; the default full replay has
+three completed clips. No fixture reset was applied to the user's saved delivery.
+
+ADR 0006 defines scene-epoch grouping as presentation only, with no merged
+business orders or new physical commands. Drift corrected: single-product replay
+and manual-only scene preparation descriptions. Synchronized README, reports'
+shared status, PROJECT_PLAN, architecture caption, API/OpenAPI and schemas,
+operations/desktop/playback/contracts guides, acceptance generator/report and
+this progress record. Publication is rebuilt locally; public Pages retains the
+earlier released source. Final documentation-only checks are recorded in
+`docs/evidence/delivery-replay-local.json`.
+
+Next: user review in the open desktop app. No commit or push requested.
+
+## Previous local correction
+User requested local changes only: no commit, push or publication. Base remains
+348c786710a0e22f0dd7de0744eac7057da13ad8; working source is intentionally dirty.
+Reported SOURCE_NOT_OBSERVED reproduced from the user's persisted scene: all
+three fixture products were already at destination. Added explicit guarded
+fresh-scene preparation, current availability and specific rejection messages.
+Source validation and uncertain-outcome rules are unchanged. ADR 0005 records
+durable reset identity, exclusive maintenance and crash recovery.
+
+Local verification: 265 tests PASS twice, zero failures/skips/xfails, 87.83%
+coverage; setup, lint/format, strict typing, security, all seven Blender demos,
+drift and local publication builds PASS. Evidence is in
+`docs/evidence/acceptance/20261003T123412` and `ACCEPTANCE_REPORT.md`.
+Four MUSTs involving remote gates are unverified for this local change by user request;
+this is a verified local correction, not a new published DONE attestation.
+
+Browser evidence: `docs/evidence/happy-path-local.json` and screenshots under
+`artifacts/happy-path-fix`. A copy of the depleted user scene completed all three
+products through actual UI buttons, streamed approach/lift/transfer/detach poses,
+then completed another red pick after fresh-scene preparation. Saved replays,
+old-command suppression, restart and reset/intake races have regression coverage.
+The actual desktop was gracefully reloaded and prepared with all three products
+at source; its 27 previous orders remain byte-for-byte unchanged through the API.
+
+Knowledge-base sync: README, reports' shared status, PROJECT_PLAN, runtime/API,
+operations, playback and desktop guides, architecture caption, OpenAPI, ADR 0005,
+acceptance generator/report and this record. A stale runtime implementation
+future-tense sentence was also corrected. Generated publication was rebuilt
+locally only. Public Pages still represents the earlier released source.
+
+Next: user tests Happy path in the open local app. Repeating a picked product
+uses Start fresh scene; no Git commit/push until requested.
+
+## Previous released phase
 P5/P7 extension complete: full 3D cell, moving machine/product poses and scenario
 replay for every execution outcome. All 85 MUSTs pass for the audited clean
 source with local and exact-SHA remote evidence. Final evidence/status successors

@@ -53,6 +53,8 @@ SYNC_FILES = [
     "contracts/schemas/VisualScene.json",
     "contracts/schemas/JobPlayback.json",
     "apps/erp_ui/vendor/manifest.json",
+    "docs/evidence/3d-scenarios.json",
+    "docs/evidence/3d-desktop.json",
 ]
 
 
@@ -274,9 +276,13 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
         "",
         "## Windows desktop extension",
         "",
-        "The native EXE starts an owned API in an embedded WebView2 window and closes its process tree on exit. Persistent state uses the same recovery rules. [Desktop lifecycle and build](docs/implementation/desktop.md), [actual Windows/Blender evidence](docs/evidence/desktop-launcher.json), and [Windows workflow](https://github.com/"
+        "The native EXE starts an owned API in an embedded WebView2 window and closes its process tree on exit. Persistent state uses the same recovery rules. [Desktop lifecycle and build](docs/implementation/desktop.md), [actual Windows/Blender evidence](docs/evidence/3d-desktop.json), and [Windows workflow](https://github.com/"
         + REPO
         + "/actions/workflows/desktop.yml) record its separate native build/window checks. Cross-platform close/reopen and independent-port tests are included in both mandatory suite runs above.",
+        "",
+        "## Full 3D scenario replay",
+        "",
+        "The cell, machine and products remain visible for every scenario. Immutable starting scenes and audit events cover no-motion orders; evaluated Blender poses cover actual movement. Replay is read-only and cannot resolve uncertainty. [Scenario behavior](docs/implementation/playback.md), [browser evidence](docs/evidence/3d-scenarios.json) and [ADR 0004](docs/adr/0004-full-3d-scenario-replay.md) document the presentation boundary, offline renderer/fallback, Windows file publication and aligned native drain budgets. Scene history, every execution fault, carried-product poses and immutable replay are exercised by the mandatory suite.",
         "",
         "## Documentation drift and synchronization",
         "",

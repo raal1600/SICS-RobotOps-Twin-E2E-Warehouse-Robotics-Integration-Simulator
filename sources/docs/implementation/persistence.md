@@ -16,10 +16,15 @@ independent boundary in P2. Transactions do not encompass external runtime calls
 Job transitions and audit events commit together. Commands and plans are immutable
 and durable before dispatch. Transition guards forbid a direct timeout-to-FAILED
 path and require verification/reconciliation evidence for resolution. History is
-never cleared by a cell reset. Snapshot/command journals belong to the runtime
-database, not the business store. See ADR 0001.
+never cleared by a cell reset. Authoritative world checkpoints and controller
+command journals belong to the runtime database. PresentationSnapshot stores a
+separate immutable starting world in the workflow record store before a new job
+executes, under the cell claim. It supports historical no-motion replay and is
+never verification evidence. Legacy jobs without this record are labelled as
+current references instead of inventing their historical layout. See ADRs 0001
+and 0004.
 
 The HTTP contract currently supports durable intake, current status, job lookup,
-timeline and health. Execution/reconciliation/metrics are added with their owning
-components; no endpoint reports an unimplemented success. OpenAPI is generated
+timeline, health, execution, reconciliation, metrics and presentation. No endpoint
+reports an unimplemented success. OpenAPI is generated
 alongside schemas and compared in tests.

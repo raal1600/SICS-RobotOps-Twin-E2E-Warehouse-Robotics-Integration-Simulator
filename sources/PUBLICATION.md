@@ -70,3 +70,7 @@ Kontrollera omslag, innehållsförteckning, tabeller, kodblock, samtliga figurer
 Repositoryts befintliga MIT-licens behålls. Egna rapporter och illustrationer omfattas av den, medan länkade källor och varumärken tillhör respektive rättighetsinnehavare. Inga tredje parts originalfigurer har kopierats. Inget samarbete eller godkännande från SICS AI, KTH, Cognibotics eller övriga källägare antyds.
 
 Publicera inte anteckningar från ett framtida tekniskt möte eller nya interna uppgifter utan att först klargöra vad som får delas. Rapporternas diskussionsprotokoll är avsiktligt tomt.
+
+The operations viewer vendors Three.js 0.180.0 under its upstream MIT license,
+retained in apps/erp_ui/vendor/LICENSE. This software dependency is separate from
+the publication's original figures. The scenario model remains SIMULATOR_DESIGN.

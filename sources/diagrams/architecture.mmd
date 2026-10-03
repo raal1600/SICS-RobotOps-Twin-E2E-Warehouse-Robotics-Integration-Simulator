@@ -9,7 +9,7 @@ flowchart TD
   verify["Verifierare<br/>Observation → bedömning"]
   cell["CellController<br/>READY • ESTOP_LOGICAL • FAULTED"]
   observation["ObservationModel<br/>WorldState → WorldObservation"]
-  replay["Motion illustration<br/>Recorded poses / read-only replay"]
+  replay["3D scenario replay<br/>Start scene / events / Blender poses"]
   erp <--> core
   core <--> gateway
   core <--> db
@@ -23,3 +23,4 @@ flowchart TD
   observation --> verify
   world -.-> replay
   replay -.-> erp
+  db -.-> replay

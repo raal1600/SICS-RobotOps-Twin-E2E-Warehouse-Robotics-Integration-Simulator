@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "CellMode": {
+      "enum": [
+        "READY",
+        "BUSY",
+        "FAULTED",
+        "ESTOP_LOGICAL",
+        "RESETTING",
+        "OFFLINE"
+      ],
+      "title": "CellMode",
+      "type": "string"
+    },
+    "VisualObject": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Color",
+          "type": "array"
+        },
+        "location_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location Id"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "size": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Size",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "position",
+        "size",
+        "color"
+      ],
+      "title": "VisualObject",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "cell_mode": {
+      "$ref": "#/$defs/CellMode"
+    },
+    "objects": {
+      "items": {
+        "$ref": "#/$defs/VisualObject"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Objects",
+      "type": "array"
+    },
+    "scene_epoch": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Scene Epoch",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "SAVED_START_SCENE",
+        "CURRENT_WORLD_REFERENCE"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source",
+    "scene_epoch",
+    "timestamp",
+    "cell_mode",
+    "objects"
+  ],
+  "title": "VisualScene",
+  "type": "object"
+}

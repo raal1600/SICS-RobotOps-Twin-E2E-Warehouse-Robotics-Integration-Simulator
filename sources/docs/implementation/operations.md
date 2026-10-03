@@ -24,7 +24,8 @@ Cell reset preserves uncertain jobs and does not restore products to the source.
 
 The dashboard exposes ERP order, job and logical cell status separately, plus
 original command identity, journal status, verifier reason, causal timeline,
-observation/reconciliation JSON, live motion and the selected order's Blender
+observation/reconciliation JSON, an always-visible 3D cell, scenario events, live
+machine/product motion and the selected order's Blender
 artifact. [Replay controls](playback.md) read evaluated Blender frames, preserve
 uncertainty and never send another pick. Neither images nor animation establish
 business success. Fault controls are synthetic local fixtures.

@@ -804,14 +804,19 @@
       "test_real_blender_pick_and_lost_ack",
       "test_real_blender_reset_capture_and_epoch",
       "test_blender_response_loss_or_corruption_never_reexecutes",
-      "test_live_recording_replay_restart_and_legacy_import_are_read_only"
+      "test_live_recording_replay_restart_and_legacy_import_are_read_only",
+      "test_scenario_motion_is_independent_of_verification",
+      "test_scene_is_visible_before_execution_and_historical_snapshot_survives_later_orders",
+      "test_snapshot_publication_retries_only_sharing_lock_and_retains_old_data"
     ],
     "files": [
       "blender/scripts/runtime.py",
       "robotops/blender/adapter.py",
       "docs/evidence/p4-blender-lost-ack.png",
       "docs/implementation/playback.md",
-      "tests/blender/test_playback.py"
+      "tests/blender/test_playback.py",
+      "robotops/scene_geometry.py",
+      "docs/adr/0004-full-3d-scenario-replay.md"
     ],
     "explanation": "Actual CPU Blender stable objects, attach/transfer/detach, checkpoint journal, capture and lost-response recovery tested."
   },
@@ -1117,7 +1122,10 @@
       "test_metrics_timeline_and_dashboard_survive_restart",
       "test_happy_path",
       "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick",
-      "test_live_recording_replay_restart_and_legacy_import_are_read_only"
+      "test_live_recording_replay_restart_and_legacy_import_are_read_only",
+      "test_scenario_motion_is_independent_of_verification",
+      "test_scene_is_visible_before_execution_and_historical_snapshot_survives_later_orders",
+      "test_snapshot_publication_retries_only_sharing_lock_and_retains_old_data"
     ],
     "files": [
       "robotops/observability/metrics.py",
@@ -1131,7 +1139,9 @@
       "docs/evidence/desktop-launcher.json",
       "docs/evidence/desktop-window-lost-ack.png",
       "docs/implementation/playback.md",
-      "tests/blender/test_playback.py"
+      "tests/blender/test_playback.py",
+      "robotops/scene_geometry.py",
+      "docs/adr/0004-full-3d-scenario-replay.md"
     ],
     "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained. Desktop close/reopen preserves the original command and reconciles with exactly one pick."
   },
@@ -1143,7 +1153,10 @@
     "tests": [
       "test_metrics_timeline_and_dashboard_survive_restart",
       "test_happy_path",
-      "test_live_recording_replay_restart_and_legacy_import_are_read_only"
+      "test_live_recording_replay_restart_and_legacy_import_are_read_only",
+      "test_scenario_motion_is_independent_of_verification",
+      "test_scene_is_visible_before_execution_and_historical_snapshot_survives_later_orders",
+      "test_snapshot_publication_retries_only_sharing_lock_and_retains_old_data"
     ],
     "files": [
       "robotops/observability/metrics.py",
@@ -1152,7 +1165,9 @@
       "docs/evidence/p5-browser-evidence.json",
       "docs/evidence/ui-p5-completed.png",
       "docs/implementation/playback.md",
-      "tests/blender/test_playback.py"
+      "tests/blender/test_playback.py",
+      "robotops/scene_geometry.py",
+      "docs/adr/0004-full-3d-scenario-replay.md"
     ],
     "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained."
   },

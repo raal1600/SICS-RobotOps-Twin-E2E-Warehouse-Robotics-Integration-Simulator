@@ -1,6 +1,6 @@
 # Windows desktop app
 
-The embedded dashboard includes [live Blender motion and per-order replay](playback.md).
+The embedded dashboard includes [full 3D cell and per-scenario replay](playback.md).
 Close/reopen the app after updating this checkout to load the new backend and UI.
 Saved orders remain intact. Older runs expose **Load saved animation**, which
 exports their original `.blend` without executing another pick.
@@ -27,7 +27,9 @@ it does not change machine policy. The build downloads Microsoft.Web.WebView2
 1.0.3800.47 from NuGet and verifies its pinned SHA-256 before compilation. Generated
 EXE/DLLs, license, configuration and hash manifest are under
 `artifacts/desktop/RobotOps Twin/`; they are not committed. Installation copies
-them into `%LOCALAPPDATA%\RobotOpsTwin\App` and creates a desktop shortcut.
+them into a versioned directory under `%LOCALAPPDATA%\RobotOpsTwin\App` and updates
+the desktop shortcut. An open older version keeps running; close and reopen via
+the shortcut to load the new host. Earlier installed versions and data are retained.
 The EXE is unsigned. Its DLLs must remain beside it; use the shortcut elsewhere.
 
 Data survives closing and reopening:
@@ -49,8 +51,10 @@ Blender session. For a fresh independent fixture, launch the EXE with
 fast synthetic adapter for development; normal desktop startup uses Blender.
 
 Closing first requests graceful shutdown through a private session stop file.
-It stops accepting requests and allows current work to drain. After at most 20
-seconds the owner closes its Windows Job Object, terminating remaining owned
+It stops accepting requests and allows current work to drain for up to 65 seconds,
+matching the runtime's 60-second deadline plus planning and persistence. Idle
+shutdown returns promptly. After at most 70 seconds the owner closes its Windows
+Job Object, terminating remaining owned
 processes. The job also cleans up if the desktop crashes. A forced close may leave
 an uncertain command, which remains subject to the existing lease, journal and
 fresh-observation recovery rules. It does not declare success or retry a pick.

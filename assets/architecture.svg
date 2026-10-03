@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="850" viewBox="0 0 900 850" role="img" aria-labelledby="title desc">
-<title id="title">Systemgränser och ägarskap</title><desc id="desc">Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering. Windows desktop owns its local API and Blender process lifetime; durable journals survive window closure. The human replay view reads recorded Blender poses; it is not sensor evidence and has no path into Verifier.</desc>
+<title id="title">Systemgränser och ägarskap</title><desc id="desc">Figur 2. Egen komponentarkitektur. Integrationskärnan äger uppdraget; Blender äger simulatortillståndet. Verifiering lagras och återkopplas till kunden. Dubbelriktade pilar anger begäran/svar eller läsning/återkoppling, inte gemensamma transaktioner. Celltillåtelse är här en logisk emulering. Windows desktop owns its local API and Blender process lifetime; durable journals survive window closure. The human 3D view reads saved starting scenes, audit events and recorded Blender poses, including stationary blocked scenarios. It is not sensor evidence and has no path into Verifier.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526473"/></marker><marker id="red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a34838"/></marker></defs>
 <rect width="100%" height="100%" fill="white"/>
 <g font-family="DejaVu Sans, Arial, sans-serif">
@@ -18,6 +18,7 @@
 <path d="M 750 660 V 614 H 450 V 568" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
 <path d="M 870 329 H 886 V 820 H 150 V 770" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
 <path d="M 30 715 H 12 V 144 H 30" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<path d="M 330 329 H 300 V 630 H 150 V 660" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
 <rect x="30" y="90" width="240" height="108" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
 <rect x="30" y="100" width="4" height="88" rx="2" fill="#182f43"/>
 <text x="150" y="127.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">ERP / WMS</text>
@@ -67,8 +68,7 @@
 <text x="750" y="745.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">WorldObservation</text>
 <rect x="30" y="660" width="240" height="110" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
 <rect x="30" y="670" width="4" height="90" rx="2" fill="#182f43"/>
-<text x="150" y="687" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Motion</text>
-<text x="150" y="710" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">illustration</text>
-<text x="150" y="736" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Recorded poses / read-</text>
-<text x="150" y="757" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">only replay</text>
+<text x="150" y="698.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">3D scenario replay</text>
+<text x="150" y="724.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Start scene / events /</text>
+<text x="150" y="745.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Blender poses</text>
 </g></svg>

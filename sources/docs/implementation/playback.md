@@ -1,32 +1,51 @@
-# Live cell illustration and replay
+# Full 3D cell and scenario replay
 
-The Windows EXE and browser dashboard share **Live cell & replay**. New Blender
-orders show motion as evaluated frames arrive. The selected order owns the clip;
-choosing an older order never substitutes the most recent order's image or motion.
+The Windows EXE and browser dashboard always show the environment, machine and
+products, before orders and for every scenario. The interactive perspective view
+uses offline Three.js, with a software 3D fallback when WebGL is unavailable.
+The stylized Cartesian gantry is an explanatory synthetic model, not real robot
+kinematics. Blender and the initial view share the same cell geometry.
 
-- **Pause / Play** stops or resumes the view.
-- **Replay** starts the same recording from frame 1. It sends no robot command.
-- **Recorded frame** scrubs to a received frame; keyboard arrows also work.
-- **Speed** selects 0.25x, 0.5x, 1x or 2x simulated playback time.
-- **Rotate view** changes the illustration's viewing angle.
-- **Load saved animation** appears for older runs with a saved Blender scene but
-  no recording. It reads that original animation without executing another pick.
+- Drag to orbit, scroll to zoom, right-drag or Shift-drag to pan. The Rotate,
+  zoom buttons and Reset camera also work with a keyboard.
+- Pause / Play stops or resumes the view. Replay restarts the same scenario;
+  it never sends a command. The slider scrubs received motion and saved events.
+- Speed selects 0.25x, 0.5x, 1x or 2x playback time. Event steps use a readable
+  half-second pace, while motion labels show Blender frames and simulation time.
+  Original event timestamps remain available in the causal timeline.
+- Load saved animation reads an older order's original keyed Blender scene
+  without a new pick. It does not replace that scene with today's model.
 
-Try lost acknowledgement after effect: the product visibly moves but the job
-becomes UNKNOWN_OUTCOME. Replay it repeatedly, then reconcile. Contradictory
-evidence still requires intervention even though the illustration shows a move.
-Missing/pre-dispatch/rejected commands have no invented movement. A headless run
-explicitly reports that it has no Blender recording.
+| Execution scenario | Machine and product | Business result before reconciliation |
+|---|---|---|
+| Happy path | Recorded pick and place | COMPLETED |
+| Lost acknowledgement after effect | Recorded pick and place | UNKNOWN_OUTCOME |
+| Lost acknowledgement before effect | Stationary starting scene; controller rejection event | UNKNOWN_OUTCOME |
+| Contradictory / low-confidence / stale observation | Recorded pick and place; observation problem in event replay | UNKNOWN_OUTCOME |
+| Logical E-stop / cell fault | Stationary scene; blocked/rejected event | FAILED with fresh no-effect evidence |
+| Invalid Brain output / Brain timeout | Stationary scene; planning rejection | FAILED, no dispatch |
 
-The geometric view uses recorded Blender box dimensions/colors and evaluated
-world positions. Its simplified shading differs from the CPU-rendered checkpoint.
-The phase and current frame are also exposed as text. Illustration data is
-simulator truth for the human viewer, not input to verification or sensor output.
+Missing observations, pose uncertainty and robot-command failure are also
+supported by the API and scenario tests. Missing/corrupt/partial recordings are
+explicitly labelled. A stationary reference alone never proves no effect.
+
+New orders save their starting layout before planning; later orders and restart
+cannot change that historical view. Legacy orders with neither a starting snapshot
+nor recorded poses show a labelled current cell reference, not invented history.
+Headless runs show scene and events but explicitly have no Blender motion trace.
+
+Try lost acknowledgement after effect: the product moves, but the job remains
+UNKNOWN_OUTCOME. Replay repeatedly, then reconcile with contradictory evidence:
+it still requires intervention. Scene/motion data is simulator truth for human
+explanation, not WorldObservation or input to Brain/Verifier.
 
 ## Protocol and persistence
 
 `GET /jobs/{job_id}/playback` returns the versioned JobPlayback contract with the
-original command ID, current job state, recording status and optional motion.
+original command ID, current job state, recording status, starting VisualScene,
+product identity, audit events and optional motion. GET /cell/scene supplies the
+current initial environment. PresentationSnapshot stores each new job's immutable
+starting WorldState in the workflow database, exclusively for human replay.
 Statuses are WAITING, RECORDING, RECORDED, PARTIAL or UNAVAILABLE. An interrupted
 recording retains its last frame and is not extrapolated to the destination.
 If an abruptly killed job still holds its lease, RECORDING may remain visible;
@@ -39,6 +58,8 @@ render. The old `/artifacts/latest.png` endpoint remains compatible.
 MotionRecording includes command/job/product/epoch IDs, frame ID, metre units,
 24 fps, object geometry and 1..100 contiguous VisualFrame records. The Blender
 process writes atomic snapshots to its original command exchange's `motion.json`.
+Windows sharing-lock conflicts retry only the atomic file rename, bounded to
+50 attempts with 10 ms intervals; no physical command is retried.
 Its final response includes the recording SHA-256. Reads validate schema,
 identity, size, frame continuity, path confinement and the digest when present.
 Older exports remain associated with the original hash-checked `.blend`.
@@ -63,4 +84,5 @@ See tests/blender/test_playback.py, tests/unit/test_visualization.py and
 tests/ui/playback.test.cjs. The test that imports an older scene verifies that
 world, journal, events, workflow history and the `.blend` hash do not change.
 
-[Design decision](../adr/0003-recorded-motion-illustration.md).
+[Pose provenance](../adr/0003-recorded-motion-illustration.md) and
+[3D scenario design](../adr/0004-full-3d-scenario-replay.md).

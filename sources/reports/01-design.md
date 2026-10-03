@@ -28,7 +28,9 @@ Tre frågor styr designen:
 
 Rapport 1 beskriver forskningsunderlag, arkitektur och testplan. Rapport 2 granskar överförbarheten till en verklig robotmiljö. Rapport 3 är ett samtalsunderlag för diskussion med Axel Kaliff och Per-Eric Olsson. Den som vill förstå huvudidén först kan läsa figur 1, avsnitt 7 och slutsatsen. Kontrakt och utvärderingsprotokoll är till för den tekniska fördjupningen.
 
-Den implementerade operationsvyn visar nu inspelade Blender-poser live och kan spela upp samma order igen utan ett nytt plockkommando. Illustrationen ?r simulatorns facit f?r betraktaren; verifieraren anv?nder fortfarande en separat WorldObservation. Se implementationens replay-dokumentation i governance-avsnittet.
+Den implementerade operationsvyn visar en interaktiv 3D-cell med maskin och produkter även när ett scenario inte leder till rörelse. Sparat starttillstånd och händelser förklarar stopp; inspelade Blender-poser visar utförda plock. Samma order kan spelas upp igen utan ett nytt plockkommando. Illustrationen är simulatorns facit för betraktaren; verifieraren använder fortfarande en separat WorldObservation. Se implementationens replay-dokumentation i governance-avsnittet.
+
+Den lokala 3D-vyn använder Three.js med kamerakontroller för rotation, panorering och zoom [S22]. Detta är ett visningsval i vår simulator, inte ett påstående om en verklig robots arkitektur.
 
 ### 1.1 Vad ordet ”Twin” betyder här
 

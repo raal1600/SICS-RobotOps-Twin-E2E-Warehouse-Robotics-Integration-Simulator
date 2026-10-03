@@ -22,7 +22,8 @@ Install [uv 0.12.13](https://docs.astral.sh/uv/getting-started/installation/) an
 [Blender 5.2.1 LTS](https://download.blender.org/release/Blender5.2/).
 Python 3.13.15 is selected by `.python-version`; uv can install it automatically.
 Set `BLENDER_EXECUTABLE` to the Blender executable when it is not on PATH.
-Install Node 20.17.0 for the playback control tests (no npm packages required).
+Install Node 20.17.0 and its npm for playback tests and dependency auditing.
+Viewer assets are already vendored; no npm install is needed to run the app.
 The standard Windows Blender 5.2 installation is also detected.
 
 ```sh
@@ -87,8 +88,11 @@ uv run --locked python -m apps.api --runtime blender --data-dir runs/my-demo --p
 Open http://127.0.0.1:8000 for the local ERP dashboard. Select a product and fault,
 run the order, inspect job/cell status, observation, verifier and timeline, then
 reconcile uncertain work. Reusing the data directory preserves state across restart.
-**Live cell & replay** shows recorded Blender motion during execution, with
-play/pause, scrubbing, speed and rotate controls. Replay sends no new pick.
+**Live cell & replay** always shows the 3D environment, machine and products.
+Orbit, pan and zoom around the cell. Orders with an effect move the machine and
+product using recorded Blender poses; blocked orders replay their events with
+the saved starting scene held still. Play/pause, scrubbing and speed affect only
+the view. Replay sends no new pick. Software 3D remains available without WebGL.
 For older orders, **Load saved animation** reads their original `.blend`.
 [Playback behavior and evidence boundary](docs/implementation/playback.md).
 `/metrics` exposes persisted counts and pipeline latency; `/docs` exposes OpenAPI.
@@ -127,7 +131,7 @@ uncertain. No natural-language MCP execution or generated code controls the runt
 | `robotops/brain/`, `robotops/verification/`, `robotops/observation/` | [Validation and reconciliation](docs/implementation/reconciliation.md) |
 | `robotops/cell/`, `robotops/robot_gateway/` | [Journal and fault semantics](docs/implementation/runtime.md) |
 | `robotops/blender/`, `blender/scripts/` | [Bounded Blender runtime](docs/implementation/blender.md) |
-| `apps/erp_ui/playback.js`, `apps/api/playback.py` | [Live illustration and replay](docs/implementation/playback.md) |
+| `apps/erp_ui/playback.js`, `scene-view.js`, `apps/api/playback.py` | [3D scenario replay](docs/implementation/playback.md) |
 | `tests/`, `tools/`, `.github/workflows/` | [Acceptance process](docs/implementation/acceptance.md) |
 
 Material design decisions are recorded in [ADR 0001](docs/adr/0001-durable-synthetic-boundaries.md).

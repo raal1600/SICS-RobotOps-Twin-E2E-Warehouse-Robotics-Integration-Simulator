@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** The deterministic simulator now includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and definitions for every execution scenario and observation mode. The local baseline passed 389 tests twice; the explanation follow-up passed 101 UI checks and 170 affected Python tests. Publication is authorized; final committed-source CI and Pages verification are pending. **NOT DONE**.
+**Aktuell status:** The deterministic simulator includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and explanations for every scenario and observation mode. Audited source 59ace31 passed all 85 MUST criteria: 389 tests twice, 101 UI checks, 89.22% coverage, seven Blender demos, security, types and documentation checks. GitHub CI, Windows lifecycle checks and Pages passed. The optional model-provider fallback remains a documented SHOULD limitation. Final evidence commits receive their own CI and Pages attestations. **DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·

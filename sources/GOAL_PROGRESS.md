@@ -2,22 +2,32 @@
 Last updated: 2026-10-03 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: P7 publishing the complete local workspace update
-The user authorized committing and pushing all completed changes on 2026-10-04
-(Europe/Stockholm), superseding the earlier local-only restriction. Base:
-`348c786710a0e22f0dd7de0744eac7057da13ad8`; origin/main is identical to that base.
-The release includes full-delivery replay, independent tests with preserved
-history, explicit repeat evidence review, the guided dark workspace, and detailed
-scenario/observation help. Existing evidence remains immutable and scoped to its
-original run; it is not relabelled as committed-source acceptance.
-Local implementation and affected checks pass as recorded below. Remote MUSTs
-SC-DATA-005 and SC-KB-006/007/008 are in progress until the released commit is
-verified. SHOULD SC-BRAIN-005 remains the documented optional-provider limitation.
-README, publication status, research status blocks, publication policy and the
-checklist are synchronized with the newly authorized release scope. The external
-source registry and implemented architecture require no further change.
-Next: commit/push this milestone, run final CI/publication on its exact source,
-retain the resulting acceptance evidence, and verify the published successor.
+## Current phase: P7 guided simulation workspace release verified
+Audited source: `59ace317d949cc8e6fbd77db13a10656737d9238`, clean checkout.
+The user's publication authorization supersedes the earlier local-only scope.
+All 85 MUST criteria PASS with inspectable evidence from GitHub CI and Pages.
+389 mandatory tests pass twice without skips/xfails; all 101 UI checks pass in
+each suite. Coverage is 89.22%, above the unchanged 85% floor. Setup, security,
+lint/format, types, seven real Blender demos, drift and publication pass.
+Windows native launch/duplicate launch/close/restart checks also pass.
+Lost acknowledgement after effect and restart retain exactly one pick;
+ambiguous evidence does not fabricate success.
+
+Evidence: [audited manifest](docs/evidence/acceptance/20261003T220839/manifest.json),
+[release provenance](docs/evidence/workspace-release.json) and ACCEPTANCE_REPORT.md.
+The original local CI manifest is preserved; remote refresh adds same-source
+workflow and public-link evidence without relabelling any test result.
+SHOULD SC-BRAIN-005 remains unimplemented (optional model-provider fallback).
+The OPTIONAL model/hardware/real-ERP backlog remains non-blocking.
+
+Drift detected: the current status still described unpublished local work.
+Synchronized README, reports, publication status/policy, checklist, progress and
+acceptance report with verified release evidence. The earlier local-only records
+below remain historical. Source provenance, contracts and architecture diagrams
+are unchanged by this evidence-only closure. Publication is rebuilt from sources.
+Next: push the evidence/status successor and verify its own CI, Windows workflow
+and public build.json, as required by ADR 0002. The final successor is attested by
+its CI artifact and deployed manifest rather than by changing an earlier report's SHA.
 
 ## Previous verified extension: P7 scenario and observation explanations
 The local follow-up replaces outcome-only help with definitions, failure stage,

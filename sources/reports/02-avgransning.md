@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-03:** The deterministic simulator now includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and definitions for every execution scenario and observation mode. The local baseline passed 389 tests twice; the explanation follow-up passed 101 UI checks and 170 affected Python tests. Publication is authorized; final committed-source CI and Pages verification are pending. Status: NOT DONE.
+> **Implementation status, 2026-10-03:** The deterministic simulator includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and explanations for every scenario and observation mode. Audited source 59ace31 passed all 85 MUST criteria: 389 tests twice, 101 UI checks, 89.22% coverage, seven Blender demos, security, types and documentation checks. GitHub CI, Windows lifecycle checks and Pages passed. The optional model-provider fallback remains a documented SHOULD limitation. Final evidence commits receive their own CI and Pages attestations. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

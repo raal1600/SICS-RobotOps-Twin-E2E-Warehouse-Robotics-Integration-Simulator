@@ -1,0 +1,88 @@
+{
+  "evidence_type": "SCOPED_INDEPENDENT_DEMO_AUDIT_ARCHIVE",
+  "source_commit": "ca7798798f916c8130e1833cf16b4d4d3f10d546",
+  "acceptance_run": "20261004T122253",
+  "reviewed_audit_passed": true,
+  "archived_raw_files": [
+    {
+      "file": "initial-audit.json",
+      "original_path": "artifacts/hkm-final-demos-audit.json",
+      "sha256": "972f48087fd8cc86380416b8051c20b4bc30c52152a3038a4e468ac34d4ee888",
+      "bytes": 7467,
+      "original_bytes_preserved": true
+    },
+    {
+      "file": "reviewed-audit.json",
+      "original_path": "artifacts/hkm-final-demos-audit-reviewed.json",
+      "sha256": "4785978c2b996d73a145ba3375ed24ff5c3f302cb093e19ff6687ac62b2637b6",
+      "bytes": 22370,
+      "original_bytes_preserved": true
+    },
+    {
+      "file": "precision-review.json",
+      "original_path": "artifacts/hkm-final-demos-audit-precision-review.json",
+      "sha256": "f8b5525fed88add1e3a88272bffc1ae0104870919609de9ed9e5e88a3cfb2a13",
+      "bytes": 32761,
+      "original_bytes_preserved": true
+    },
+    {
+      "file": "initial-harness.py.txt",
+      "original_path": "artifacts/audit-hkm-final-demos.py",
+      "sha256": "354406c66c027fd6876fe6f8dcc9f616649a186fc2e9aa033fa7e072a7da87c9",
+      "bytes": 21137,
+      "original_bytes_preserved": true
+    },
+    {
+      "file": "reviewed-harness.py.txt",
+      "original_path": "artifacts/audit-hkm-final-demos-reviewed.py",
+      "sha256": "d36d952bcedd0199fc6dfc0234a4fa2f8929f5afaf504fd0caf6b6bb63c59a81",
+      "bytes": 22475,
+      "original_bytes_preserved": true
+    }
+  ],
+  "primary_tracked_demo_evidence": [
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo-lost_ack_after_effect.json",
+      "sha256": "13c7bdcf61b42814fc7fd1ff85e8d1a10fca78fa62d1b404781a8b1062cd3d1a",
+      "bytes": 127166
+    },
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo_lost_ack_after_effect.log",
+      "sha256": "18cdc50e97e687f977c6387082801a6d91afa9a6f1e2a03262f59d810b7518cd",
+      "bytes": 341
+    },
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo-restart.json",
+      "sha256": "1aeb4ce7f0c748f176496aaea68b2cea5b3d992e56ab081c885b9fafd0bd6897",
+      "bytes": 127149
+    },
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo_restart.log",
+      "sha256": "320d8c3f03b4502f63b46a020799d1463ff6b65a7f0f450a46fde1047f5cb75d",
+      "bytes": 343
+    },
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo-ambiguous.json",
+      "sha256": "f5fb251bd298d6038438e2b469f33ae66db944fe1ecfd9d97869a9b36b92cdd7",
+      "bytes": 138645
+    },
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo_ambiguous.log",
+      "sha256": "1ce591855a969a338b878305070874b8c53a2f8b1dee60db58691b1ecb570504",
+      "bytes": 329
+    },
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo-tool_showcase.json",
+      "sha256": "cf612b6b56dcda89afb401ee46d4c48f342ae1dd0fa3f37b5f926e3628116785",
+      "bytes": 620515
+    },
+    {
+      "file": "docs/evidence/acceptance/20261004T122253/demo_tool_showcase.log",
+      "sha256": "c540e533cf92fd7a0c6676b163e23c3fc81f81fd92216ee2a3316ca0906c20fa",
+      "bytes": 319
+    }
+  ],
+  "original_local_inputs": "Original SQLite databases, Blender request/response exchanges and scene/motion files remain under ignored runs/20261004T122253; reviewed-audit.json records their original SHA256 values. No database, scene or request/response copies are duplicated here.",
+  "initial_comparison_correction": "The initial ad hoc audit compared unrelated-object pose dictionaries exactly, across Python float64 input and Blender float32 output. All non-transform fields were identical. The largest residual across 45 unrelated-product comparisons was 2.384185793236071e-08. The reviewed harness consistently uses the existing actual-Blender 1e-6 transform precision. No production or mandatory-test threshold changed.",
+  "scope": "This independent four-scenario audit supplements the formal acceptance evidence. It does not replace full-suite, coverage, remote CI, or publication gates."
+}

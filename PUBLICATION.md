@@ -4,11 +4,12 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
-### HKM-inspired revision in progress (2026-10-04)
+### HKM-inspired accepted revision (2026-10-04)
 
-The new adaptation is a separate acceptance revision. Current public status is
-NOT DONE; the verified 59ace31 deterministic-system release remains historical
-evidence. Exact prior and fresh eaf35b4 baseline reports are archived with hashes
+The HKM-inspired adaptation is a separate accepted revision. Its audited source,
+110 MUST results and exact-source publication evidence are recorded in
+ACCEPTANCE_REPORT.md. The verified 59ace31 deterministic-system release remains
+historical evidence. Exact prior and fresh eaf35b4 baseline reports are archived with hashes
 in [baseline provenance](docs/evidence/hkm-baseline-eaf35b4/provenance.json).
 The fresh baseline retains its repeated obsolete UI-label failure; no historical
 report was rewritten to make the enhancement appear accepted.
@@ -59,8 +60,8 @@ CI använder Ubuntu-paketen ovan. PDF-sidantal kan skilja mellan plattformarnas
 typsnittsversioner; manifestet redovisar det verkliga sidantalet och filhasharna.
 Basgranskningen av källor gjordes 1 oktober 2026; HKM-kompletteringen granskades
 4 oktober. Varje registerpost behåller sitt eget kontrolldatum och sin
-proveniensklass. Publikationsrevisionen är 1.2 från 4 oktober 2026; pågående
-implementation och aktuell acceptans visas separat i den gemensamma statusrutan.
+proveniensklass. Publikationsrevisionen är 1.2 från 4 oktober 2026; implementationens
+verifiering och aktuell acceptans visas separat i den gemensamma statusrutan.
 
 ## Utdata
 

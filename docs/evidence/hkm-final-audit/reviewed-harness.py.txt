@@ -1,0 +1,324 @@
+"""Read-only independent SQL/evidence audit; never imports application runtime."""
+import argparse
+import hashlib
+import json
+import sqlite3
+import sys
+import time
+from collections import Counter
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+RUN = "20261004T122253"
+SOURCE_SHA = "ca7798798f916c8130e1833cf16b4d4d3f10d546"
+ACCEPTANCE = ROOT / "docs/evidence/acceptance" / RUN
+RUNS = ROOT / "runs" / RUN
+OUTPUT = ROOT / "artifacts/hkm-final-demos-audit-reviewed.json"
+SCENARIOS = ("lost_ack_after_effect", "restart", "ambiguous", "tool_showcase")
+PREFERRED = {
+    "SKU-A": "EE_VAC_SINGLE",
+    "SKU-B": "EE_VAC_ARRAY",
+    "SKU-C": "EE_ADAPTIVE_SOFT",
+    "SKU-D": "EE_PINCH_NARROW",
+    "SKU-E": "EE_PINCH_WIDE",
+    "SKU-F": "EE_SUPPORT_FORK",
+}
+hashes = {}
+
+
+def digest_file(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def record_hash(path):
+    key = path.relative_to(ROOT).as_posix()
+    hashes[key] = digest_file(path)
+    return hashes[key]
+
+
+def load(path):
+    record_hash(path)
+    return json.loads(path.read_bytes())
+
+
+def check(value, reason):
+    if not value:
+        raise AssertionError(reason)
+
+
+def parse_time(value):
+    result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    check(result.utcoffset() is not None, "Timestamp is not timezone aware")
+    return result
+
+
+def read_sql(path, runtime=False):
+    # No Store/Runtime construction, migrations, journal recovery or checkpoints.
+    before = {file: digest_file(file) for file in (path, path.with_name(path.name + "-wal")) if file.exists()}
+    with sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True) as db:
+        db.row_factory = sqlite3.Row
+        db.execute("PRAGMA query_only=ON")
+        check(db.execute("PRAGMA integrity_check").fetchone()[0] == "ok", "SQLite integrity failure")
+        tables = ("controller_journal", "runtime_world", "robot_events", "meta") if runtime else ("orders", "jobs", "records", "events")
+        result = {}
+        for table in tables:
+            order = "sequence" if table in {"events", "robot_events"} else "rowid"
+            result[table] = [dict(row) for row in db.execute(f"SELECT * FROM {table} ORDER BY {order}")]
+    for file, digest in before.items():
+        check(file.exists() and digest_file(file) == digest, "Read-only audit changed database/WAL bytes")
+        hashes[file.relative_to(ROOT).as_posix()] = digest
+    return result
+
+
+def body_rows(rows):
+    return [json.loads(row["body"]) for row in rows]
+
+
+def command_digest(command):
+    return hashlib.sha256(json.dumps(command, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def same_blender_pose(actual, expected):
+    # The existing actual-Blender tests use 1e-6 for evaluated float32 transforms.
+    # Spatial identity stays exact; this audit does not alter runtime tolerances.
+    return all(actual[key] == expected[key] for key in ("unit", "frame_id", "calibration_version")) and all(
+        abs(a - b) <= 1e-6
+        for key in ("position", "quaternion_xyzw")
+        for a, b in zip(actual[key], expected[key], strict=True)
+    )
+
+
+def audit_scenario(scenario, run_directory=None, exported_path=None):
+    path = run_directory or RUNS / scenario
+    # Summary files are compared with independently queried SQL, never trusted
+    # for their no-replacement / duplicate-pick boolean conclusions.
+    saved = load(path / "result.json")
+    exported = load(exported_path or ACCEPTANCE / f"demo-{scenario}.json")
+    check(saved == exported, "Exported demo JSON differs from original run")
+    check(saved["runtime"] == "blender", "Mandatory demo did not use Blender")
+    workflow = read_sql(path / "workflow.db")
+    runtime = read_sql(path / "runtime.db", runtime=True)
+    orders, jobs = body_rows(workflow["orders"]), body_rows(workflow["jobs"])
+    records = {(row["kind"], row["id"]): json.loads(row["body"]) for row in workflow["records"]}
+    commands = {identity: body for (kind, identity), body in records.items() if kind == "RobotCommand"}
+    plans = {identity: body for (kind, identity), body in records.items() if kind == "ActionPlan"}
+    observed = {identity: body for (kind, identity), body in records.items() if kind == "WorldObservation"}
+    reconciliations = [body for (kind, _), body in records.items() if kind == "ReconciliationEvidence"]
+    events, robot_events = body_rows(workflow["events"]), body_rows(runtime["robot_events"])
+    world = json.loads(runtime["runtime_world"][0]["body"])
+    settings = json.loads(next(row["value"] for row in runtime["meta"] if row["key"] == "execution_settings"))
+    check(world["schema_version"] == "2.0", "Expected HKM schema-2 world")
+    check(settings["robot_profile_version"] == "hkm_inspired_v1", "Unexpected persisted execution profile")
+    count = 6 if scenario == "tool_showcase" else 1
+    final_state = "REQUIRES_INTERVENTION" if scenario == "ambiguous" else "COMPLETED"
+    check(len(orders) == 1 and len(jobs) == count, "Unexpected order/job cardinality")
+    check(len(commands) == len(plans) == len(runtime["controller_journal"]) == count, "Replacement/missing plan, command or journal")
+    check(all(job["state"] == final_state for job in jobs), "Wrong persisted job outcome")
+    # Orders retain immutable intake data; ERP status is a projection of job
+    # rows. Independently prove those rows, then compare the exported projection.
+    check(set(orders[0]["job_ids"]) == {job["job_id"] for job in jobs}, "Order/job linkage mismatch")
+    check(all(job["order_id"] == orders[0]["order_id"] for job in jobs), "Job belongs to another order")
+    check(saved["order"]["status"] == final_state, "ERP status projection disagrees with independently read job states")
+    check(set(job["command_id"] for job in jobs) == set(commands), "Job did not preserve original command")
+    check(set(job["action_plan_id"] for job in jobs) == set(plans), "Job plan identity mismatch")
+    effect_events = [event for event in robot_events if event["event_type"] == "PICK_EFFECT"]
+    effect_counts = Counter(event["command_id"] for event in effect_events)
+    check(effect_counts == Counter({identity: 1 for identity in commands}), "Not exactly one physical transfer per original command")
+    check(Counter(event["command_id"] for event in events if event["event_type"] == "PICK_EFFECT") == effect_counts, "Workflow/controller effect evidence disagrees")
+    # Gateway dispatch and controller dispatch are distinct causal events with
+    # the same event name; neither can be counted as a replacement command.
+    for event_name, component in (("COMMAND_CREATED", "runtime"), ("COMMAND_INTENT", "validator"), ("COMMAND_DISPATCHED", "gateway")):
+        check(Counter(event["command_id"] for event in events if event["event_type"] == event_name and event["component"] == component) == effect_counts, f"Unexpected {component}/{event_name} count/identity")
+    journal = {}
+    for row in runtime["controller_journal"]:
+        command, receipt = json.loads(row["command"]), json.loads(row["receipt"])
+        check(command == commands[row["id"]], "Journal command differs from durable workflow command")
+        expected_hash = command_digest(command)
+        check(row["payload_hash"] == receipt["payload_hash"] == expected_hash, "Original command digest mismatch")
+        check(receipt["status"] == "SUCCEEDED" and receipt["effect_count"] == 1 and receipt["journal_durable"], "Missing durable exact-one controller result")
+        check(receipt["command_id"] == row["id"], "Receipt identity mismatch")
+        journal[row["id"]] = receipt
+        moved = [obj for obj in world["objects"] if obj["product"]["product_id"] == command["product_id"]]
+        check(len(moved) == 1 and moved[0]["location_id"] == command["destination_id"] and same_blender_pose(moved[0]["pose"], command["target_pose"]) and not moved[0]["attached"], "Independent simulator oracle does not show one final destination product")
+    # Every real Blender operation is inspectable as a durable request/response,
+    # with matching original command hashes and actual saved-scene/motion hashes.
+    exchanges = []
+    for request_path in sorted((path / "blender-artifacts").glob("*/request.json")):
+        request = load(request_path)
+        if request["operation"] != "pick":
+            continue
+        response_path = request_path.with_name("response.json")
+        response = load(response_path)
+        identity = request["command"]["command_id"]
+        check(identity in commands and request["command"] == commands[identity], "Unrecognized Blender pick request")
+        check(request["durable_payload_hash"] == command_digest(commands[identity]), "Blender request hash mismatch")
+        check(response["effect_count"] == 1 and response["command_id"] == identity, "Blender response identity/effect mismatch")
+        before_objects = {obj["product"]["product_id"]: obj for obj in request["world"]["objects"]}
+        after_objects = {obj["product"]["product_id"]: obj for obj in response["world"]["objects"]}
+        product_id = commands[identity]["product_id"]
+        check(before_objects.keys() == after_objects.keys(), "Product inventory changed during transfer")
+        check(before_objects[product_id]["location_id"] == commands[identity]["source_id"], "Pick did not begin at its original source")
+        check(after_objects[product_id]["location_id"] == commands[identity]["destination_id"], "Pick did not end at its intended destination")
+        check(all(
+            {field: value for field, value in before_objects[key].items() if field != "pose"}
+            == {field: value for field, value in after_objects[key].items() if field != "pose"}
+            and same_blender_pose(before_objects[key]["pose"], after_objects[key]["pose"])
+            for key in before_objects if key != product_id
+        ), "An unrelated product changed during the one transfer")
+        check(response["world"]["step"] == request["world"]["step"] + 1 and response["world"]["scene_epoch"] == request["world"]["scene_epoch"], "Unexpected world-step/epoch change")
+        for kind in ("scene", "motion"):
+            artifact = request_path.with_name("scene.blend" if kind == "scene" else "motion.json")
+            check(record_hash(artifact) == response[kind + "_sha256"], "Blender artifact digest mismatch")
+        exchanges.append((identity, request, response))
+    check(Counter(identity for identity, _, _ in exchanges) == effect_counts, "Replacement/repeated/missing Blender pick invocation")
+    observations_used = []
+    if scenario != "tool_showcase":
+        job, command = jobs[0], next(iter(commands.values()))
+        transitions = [event["state_after"] for event in events if event.get("job_id") == job["job_id"] and event.get("state_after")]
+        unknown_index = transitions.index("UNKNOWN_OUTCOME")
+        reconcile_index = transitions.index("RECONCILING", unknown_index + 1)
+        check(transitions.index(final_state, reconcile_index + 1) > reconcile_index, "Missing uncertain/reconciliation/final progression")
+        check(len(reconciliations) == 1, "Unexpected reconciliation-attempt count")
+        evidence = reconciliations[0]
+        observation, verification = evidence["observation"], evidence["verification"]
+        check(evidence["command"] == command and evidence["receipt"] == journal[command["command_id"]], "Reconciliation substituted command or journal")
+        check(observation == observed[observation["observation_id"]], "Reconciliation observation not durably stored")
+        check(observation["observation_id"] != command["observation_id"], "Reconciliation reused pre-action observation")
+        check(verification["observation_id"] == observation["observation_id"] and verification["command_id"] == command["command_id"], "Verification not tied to assessed evidence/original command")
+        check(parse_time(observation["captured_at"]) >= parse_time(evidence["receipt"]["timestamp"]), "Observation predates controller result")
+        queries = [event for event in events if event["event_type"] == "JOURNAL_QUERIED"]
+        captures = [event for event in events if event["event_type"] == "OBSERVATION_CAPTURED" and observation["observation_id"] in event["evidence_ids"]]
+        check(len(queries) == len(captures) == 1 and queries[0]["command_id"] == command["command_id"], "Missing original journal/fresh observation causal events")
+        check(parse_time(queries[0]["timestamp"]) <= parse_time(observation["captured_at"]) <= parse_time(captures[0]["timestamp"]), "Journal/observation chronology inconsistent")
+        check(any(event["event_type"] == "COMMAND_STATUS_UNKNOWN" for event in events), "No uncertain communication result recorded")
+        product_observations = [obj for obj in observation["objects"] if obj["product_id"] == command["product_id"]]
+        if scenario == "ambiguous":
+            check(verification["verdict"] == "INCONCLUSIVE", "Ambiguous observation fabricated certainty")
+            check(verification["reason"] == "CONTRADICTORY_OBSERVATION", "Expected deliberately contradictory evidence")
+            check({command["source_id"], command["destination_id"]} <= {obj["location_id"] for obj in product_observations}, "Contradictory source/destination observations absent")
+        else:
+            check(verification["verdict"] == "VERIFIED_SUCCESS", "Fresh evidence did not verify completion")
+            check(len(product_observations) == 1 and product_observations[0]["location_id"] == command["destination_id"], "Product not uniquely observed at destination")
+            check({command["source_id"], command["destination_id"]} <= set(observation["covered_locations"]), "Source/destination observation coverage incomplete")
+        observations_used.append({"observation_id": observation["observation_id"], "captured_at": observation["captured_at"], "verification_id": verification["verification_id"], "verdict": verification["verdict"], "reason": verification["reason"]})
+        if scenario == "restart":
+            log_path = ACCEPTANCE / "demo_restart.log"
+            record_hash(log_path)
+            check('"recovered": ["COMPLETED"]' in log_path.read_text(encoding="utf-8"), "Separate resume-process result is absent from restart demo log")
+    else:
+        check(not reconciliations, "Showcase unexpectedly needed reconciliation")
+        check(len(observed) == 12, "Showcase did not persist pre/post evidence for each of six picks")
+        actual_preferences = {}
+        changes = []
+        command_order = [event["command_id"] for event in events if event["event_type"] == "COMMAND_CREATED"]
+        for index, identity in enumerate(command_order):
+            command = commands[identity]
+            sku = command["tool_selection"]["sku"]
+            expected = PREFERRED[sku]
+            actual_preferences[sku] = command["required_tool_id"]
+            check(command["selected_tool_id"] == command["required_tool_id"] == expected, "Wrong preferred tool")
+            check(len(command["tool_selection"]["candidate_tools"]) == 6, "Missing persisted selection alternatives")
+            receipt = journal[identity]
+            check(receipt["active_tool_id"] == expected and receipt["tool_change_performed"] == bool(index), "Receipt tool-change metadata wrong")
+            current_events = [event for event in robot_events if event["command_id"] == identity]
+            names = [event["event_type"] for event in current_events]
+            preparation = "TOOL_CHANGE_NOT_REQUIRED" if index == 0 else "TOOL_CHANGE_COMPLETED"
+            check(names.count(preparation) == 1 and names.index(preparation) < names.index("PICK_EFFECT"), "Preparation did not precede the one transfer")
+            if index:
+                check(names.count("TOOL_CHANGE_REQUESTED") == 1, "Missing requested tool change")
+            _, request, response = next(row for row in exchanges if row[0] == identity)
+            initial_tool = request["world"]["tool_state"]["active_tool_id"]
+            expected_initial = PREFERRED[list(PREFERRED)[max(0, index - 1)]]
+            check(initial_tool == expected_initial, "Tool state was not carried between commands")
+            state = response["world"]["tool_state"]
+            check(state["active_tool_id"] == expected and set(state["rack_tool_ids"]) == set(PREFERRED.values()) - {expected}, "Tool rack/mount occupancy mismatch")
+            changes.append({"command_id": identity, "sku": sku, "from_tool": initial_tool, "to_tool": expected, "event": preparation})
+            verdicts = [record for (kind, _), record in records.items() if kind == "VerificationResult" and record["command_id"] == identity]
+            check(len(verdicts) == 1 and verdicts[0]["verdict"] == "VERIFIED_SUCCESS", "Showcase pick did not have persisted observed verification")
+            observations_used.append({"command_id": identity, "observation_id": verdicts[0]["observation_id"], "verdict": verdicts[0]["verdict"]})
+        check(actual_preferences == PREFERRED, "Showcase SKU/tool mapping differs from independent oracle")
+        check(world["tool_state"]["active_tool_id"] == "EE_SUPPORT_FORK", "Final persisted tool state wrong")
+    return {
+        "passed": True,
+        "scenario": scenario,
+        "order_ids": [order["order_id"] for order in orders],
+        "job_ids": [job["job_id"] for job in jobs],
+        "original_command_ids": list(commands),
+        "command_payload_hashes": {identity: command_digest(command) for identity, command in commands.items()},
+        "controller_effect_counts": dict(effect_counts),
+        "pick_effect_events": [{"event_id": event["event_id"], "command_id": event["command_id"], "timestamp": event["timestamp"]} for event in effect_events],
+        "final_job_states": [job["state"] for job in jobs],
+        "observations_assessed": observations_used,
+        "tool_changes": changes if scenario == "tool_showcase" else [],
+        "order_count": len(orders),
+        "job_count": len(jobs),
+        "command_count": len(commands),
+        "journal_count": len(journal),
+        "blender_pick_invocations": len(exchanges),
+        "replacement_commands": 0,
+        "runtime_oracle_label": "SIMULATION GROUND TRUTH - NOT VERIFICATION EVIDENCE",
+    }
+
+
+def ready():
+    needed = [ACCEPTANCE / "manifest.json"]
+    for scenario in SCENARIOS:
+        needed.extend([ACCEPTANCE / f"demo-{scenario}.json", RUNS / scenario / "result.json", RUNS / scenario / "workflow.db", RUNS / scenario / "runtime.db"])
+    missing = [path.relative_to(ROOT).as_posix() for path in needed if not path.exists()]
+    return missing
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--wait", action="store_true")
+    args = parser.parse_args()
+    while missing := ready():
+        print(json.dumps({"status": "WAITING_FOR_DEMO_ARTIFACTS", "missing_count": len(missing)}), flush=True)
+        if not args.wait:
+            return 2
+        time.sleep(45)  # At most one filesystem readiness poll per 45 seconds.
+    # All four demo exports exist. Only now create the independent audit result.
+    # The acceptance runner still appends later gates to its manifest. Capture
+    # the immutable source context below, not a soon-stale hash of that live file.
+    manifest = json.loads((ACCEPTANCE / "manifest.json").read_bytes())
+    check(manifest["source"]["commit"] == SOURCE_SHA, "Unexpected acceptance source SHA")
+    results = []
+    for scenario in SCENARIOS:
+        try:
+            results.append(audit_scenario(scenario))
+        except Exception as exc:
+            results.append({"scenario": scenario, "passed": False, "error_type": type(exc).__name__, "error": str(exc)})
+    report = {
+        "audit_type": "INDEPENDENT_READ_ONLY_SQLITE_AND_BLENDER_DEMO_AUDIT",
+        "audit_revision": 2,
+        "audit_precision_review": {
+            "prior_report": "artifacts/hkm-final-demos-audit.json",
+            "prior_report_sha256": record_hash(ROOT / "artifacts/hkm-final-demos-audit.json"),
+            "prior_report_preserved": True,
+            "reason": "Initial audit compared all unrelated object JSON byte-for-byte across Python float64 inputs and Blender float32 transforms. Location/attachment/product identity were unchanged; transform differences were floating-point representation. Revision 2 applies the same existing 1e-6 Blender pose precision already used for moved-object checks, with exact non-pose object fields. No runtime, test, acceptance threshold, or source file changed."
+        },
+        "audited_at_utc": datetime.now(timezone.utc).isoformat(),
+        "source_commit": SOURCE_SHA,
+        "acceptance_source_context": manifest["source"],
+        "acceptance_run": RUN,
+        "passed": all(item["passed"] for item in results),
+        "scenarios": results,
+        "input_sha256": hashes,
+        "boundary": "No application runtime imports, constructors, mutations, reconciliation or replay are invoked. SQL read-only/query_only connections and raw files provide independent evidence. WorldState is inspected only as a labelled test oracle, never as verifier input.",
+        "restart_process_scope": "The recorded demo command and checked-in subprocess resume implementation establish separate-process recovery; SQL independently proves original command identity and exactly one transfer. Database rows do not record process IDs.",
+        "full_acceptance_claim": False,
+        "remote_publication_claim": False,
+    }
+    check(not OUTPUT.exists(), "Audit output already exists; refusing to overwrite prior result")
+    OUTPUT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"passed": report["passed"], "output": OUTPUT.relative_to(ROOT).as_posix(), "scenarios": [{"scenario": row["scenario"], "passed": row["passed"], "error": row.get("error")} for row in results]}), flush=True)
+    return 0 if report["passed"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

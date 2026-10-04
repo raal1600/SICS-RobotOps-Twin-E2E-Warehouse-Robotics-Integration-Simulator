@@ -60,9 +60,10 @@ No MCP/natural-language/generated code is permitted in runtime commands.
 
 The procedural cell, six-product/tool catalogue, deterministic selection,
 segmented preflight, visible tool preparation and quaternion replay are now
-implemented. Continue from the current source and scoped evidence in
-GOAL_PROGRESS.md; do not restart this work as scaffolding. Final clean repeated
-acceptance and current-SHA CI/publication remain outstanding.
+implemented and accepted at the audited source identified in ACCEPTANCE_REPORT.md.
+Continue from that implementation and preserve the archived evidence in
+GOAL_PROGRESS.md; do not restart this work as scaffolding. Later material changes
+require fresh scoped evidence and the applicable acceptance gates.
 
 Use the one canonical catalogue in `robotops/robotics/catalogue-v1.json` for
 products, tools, fixture layout and camera calibration. Shared geometry supplies

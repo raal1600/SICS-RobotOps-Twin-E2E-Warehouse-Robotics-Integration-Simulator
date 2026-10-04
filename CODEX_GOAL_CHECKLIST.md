@@ -2,13 +2,13 @@
 
 Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain normative.
 
-## Active HKM-inspired revision — NOT DONE
+## Accepted HKM-inspired revision
 
-The completed items below this section describe the previous audited release,
-not acceptance of the new scene/tool revision. All 85 original MUSTs remain;
-25 additional HKM MUSTs require new evidence. Checked implementation items below
-have targeted evidence; they do not imply full-revision acceptance. The final
-clean repeated suite, visual review and exact-SHA remote gates remain open.
+The HKM-inspired revision adds 25 MUST criteria to the original 85. All 110
+criteria pass for the audited source recorded in ACCEPTANCE_REPORT.md, including
+clean repeated suites, browser review and exact-source remote/public-link evidence.
+The historical checklist below retains the prior release's scope; this checklist
+is not proof by itself.
 
 - [x] Record actual clean baseline HEAD eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98.
 - [x] Archive exact previous and baseline reports with hashes; preserve historical release evidence.
@@ -21,14 +21,14 @@ clean repeated suite, visual review and exact-SHA remote gates remain open.
 - [x] Validate workspace, calibration and conservative collision preflight with negative tests.
 - [x] Run the six-tool showcase in actual Blender and inspect product attachment/release.
 - [x] Add HKM-P2 deterministic/negative contracts/scenarios and targeted uncertainty/idempotency/race/restart evidence.
-- [ ] Re-run every original and new mandatory test twice on the final revision.
+- [x] Re-run every original and new mandatory test twice on the final revision.
 - [x] Prove original-command journal plus fresh observation resolves one transfer; contradictory evidence remains intervention.
 - [x] Prove verifier/reconciliation cannot read hidden WorldState and replay cannot mutate runtime.
 - [x] Implement HKM-P3 status/tool reasoning/evidence/camera controls and simulation boundaries.
-- [ ] Complete final actual-browser review of the implemented HKM workflow.
-- [ ] Synchronize implemented schemas, diagrams, generated catalogue docs, research sources and README.
-- [ ] Run final clean suites twice, quality/security gates and all Blender demos including showcase.
-- [ ] Regenerate acceptance, Pages and PDFs; obtain all110 MUST PASS with exact-SHA remote/public-link evidence.
+- [x] Complete final actual-browser review of the implemented HKM workflow.
+- [x] Synchronize implemented schemas, diagrams, generated catalogue docs, research sources and README.
+- [x] Run final clean suites twice, quality/security gates and all Blender demos including showcase.
+- [x] Regenerate acceptance, Pages and PDFs; obtain all 110 MUST PASS with exact-SHA remote/public-link evidence.
 
 Baseline and implemented revision are recorded in [GOAL_PROGRESS.md](GOAL_PROGRESS.md),
 [ADR 0010](docs/adr/0010-hkm-inspired-versioned-cell.md) and

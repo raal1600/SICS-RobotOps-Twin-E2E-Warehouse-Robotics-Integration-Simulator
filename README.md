@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** The HKM-inspired cell and six-tool workflow are implemented. Clean-source acceptance at 0d8a8db found two failures among 619 tests (91.17% coverage). The planning-cost correction now passes 144 affected regression tests with unchanged decisions and trajectories; timing and safety limits remain unchanged. A new clean-source repeated acceptance run is required. Historical evidence remains archived. **NOT DONE**.
+**Aktuell status:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. **DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -23,9 +23,10 @@ legacy tests retain their original Cartesian scene, command hashes and evidence.
 [Actual Blender evidence](docs/evidence/hkm-blender-local/result.json) covers the
 six-tool showcase, attachment/release, uncertainty, restart and read-only replay.
 [The baseline archive](docs/evidence/hkm-baseline-eaf35b4/provenance.json) preserves
-the earlier release and the fresh baseline failure. These scoped results do not
-establish final acceptance: clean repeated suites, final visual review and
-current-commit CI/publication checks remain required. **NOT DONE**.
+the earlier release and the fresh baseline failure. Scoped development results
+retain their original source attribution. [Current acceptance](ACCEPTANCE_REPORT.md)
+records all 110 MUST criteria, repeated mandatory suites and the exact audited
+source with CI/publication evidence.
 
 This is an independent simulator inspired by public sources and general practice.
 It does not reproduce SICS AI proprietary architecture or AGI. Blender supplies

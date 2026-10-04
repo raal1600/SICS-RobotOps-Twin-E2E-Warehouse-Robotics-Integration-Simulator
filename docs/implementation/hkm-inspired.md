@@ -1,12 +1,13 @@
 # HKM-inspired warehouse cell adaptation
 
-Status: implementation under verification; final acceptance remains pending.
+Status: accepted for the audited source recorded in [ACCEPTANCE_REPORT.md](../../ACCEPTANCE_REPORT.md); all 110 MUST criteria pass.
 Base: `eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98`.
 All values and mechanics below are SIMULATOR_DESIGN unless explicitly identified
 as attributed manufacturer information in the source registry. This document
 describes the new implementation and its required boundaries; the archived
-baseline did not implement six tools. Targeted evidence is scoped separately
-from the pending full enhancement acceptance.
+baseline did not implement six tools. Targeted development evidence retains its
+original scope; the full enhancement acceptance is recorded separately in
+[ACCEPTANCE_REPORT.md](../../ACCEPTANCE_REPORT.md).
 
 ## Boundary and versioning
 
@@ -68,7 +69,7 @@ alone do not establish end-to-end acceptance.
 
 ## Tool and trajectory semantics
 
-Selection filters compatibility, actual mass, geometry and availability before
+Selection filters compatibility, conservative catalogue maximum mass (or explicitly supplied typed mass), geometry and availability before
 deterministic scoring. Stable catalogue order and tool identity break ties.
 Persisted candidates explain why a preferred tool won and why alternatives lost.
 Normally one tool is mounted and five remain visible in their rack docks. During
@@ -144,7 +145,7 @@ contains 12 passing Blender tests, six preferred tools/six exact-one transfers,
 actual camera/hierarchy inspection, read-only saved-scene export, conservative
 uncertainty/restart handling and eight native lifecycle checks. It also preserves
 the initial defects and their fixes. These working-tree checks do not replace
-the pending full repeated suite or exact-SHA CI/publication gates.
+the separately recorded full repeated suite and exact-SHA CI/publication evidence.
 See [ADR 0010](../adr/0010-hkm-inspired-versioned-cell.md),
 [acceptance criteria](../../SUCCESS_CRITERIA.md) and
 [progress](../../GOAL_PROGRESS.md).

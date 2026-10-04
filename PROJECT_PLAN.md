@@ -330,11 +330,12 @@ controls remain read-only; simulation timing is distinct from UTC/real latency.
 The UI exposes IDs, state, tool reasoning and exact observation/reconciliation
 evidence with an unobtrusive Simulation Boundaries explanation.
 
-The implementation is under final verification, not accepted as DONE. Targeted
-actual-Blender evidence covers all six tools, transform agreement, product
-attachment/release and original-command recovery. Clean repeated full suites,
-the final browser review and exact-current-SHA CI/publication attestation are
-still required; the historical baseline is not reused as enhancement acceptance.
+The HKM-inspired revision has passed all 110 MUST criteria at the audited source
+identified in ACCEPTANCE_REPORT.md. Its evidence records repeated mandatory
+suites, actual Blender six-tool/transform/attachment tests, original-command
+recovery, browser review and exact-source CI/publication verification. The
+historical baseline remains separately attributed. The phase definitions below
+retain the implementation and exit requirements used for this revision.
 
 ### HKM-P0 — Model and adapter
 

@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** The HKM-inspired cell and six-tool workflow are implemented. Clean-source acceptance at 0d8a8db found two failures among 619 tests (91.17% coverage). The planning-cost correction now passes 144 affected regression tests with unchanged decisions and trajectories; timing and safety limits remain unchanged. A new clean-source repeated acceptance run is required. Historical evidence remains archived. Status: NOT DONE.
+> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -123,7 +123,7 @@ Simulatorn behöver ingen B200. Den ska i stället kunna beskriva modellversion,
 
 ### 4.1 Ett litet system med verkliga ansvarsskillnader
 
-Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en HKM-inspirerad manipulator. Den implementerade utökningen har riktad Blender-evidens för verktygsbyte, plock och återställning, men full upprepad acceptans och publicering för slutlig källrevision återstår. En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag. Gamla körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.
+Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en HKM-inspirerad manipulator. Den implementerade utökningen har verifierats med upprepad full acceptans, Blender-tester för verktygsbyte, plock och återställning samt publicering för den granskade källrevisionen; ACCEPTANCE_REPORT.md redovisar evidens och slutstatus. En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag. Gamla körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.
 
 Systemet ska kunna köras utan externa modellkonton. Blender visar förändringen i världen, men ordern blir inte färdig bara för att animationen slutar. UI:t visar orderstatus, cellstatus, kommandostatus och verifieringsstatus var för sig.
 
@@ -432,4 +432,4 @@ Det finns risk för gemensamma modellfel mellan simulator och verifierare. Scena
 
 **Slutsatsen är att projektet är motiverat som ett avgränsat integrations- och återhämtningstest, inte som en kopia av SICS AI:s robotbrain.** En liten demo med ärlig osäkerhet, spårbara beslut och reproducerbara fel är vetenskapligt mer användbar än en större animation som ger sken av verifierad fysisk förmåga.
 
-Den fortsatta diskussionen bör pröva designens antaganden: var den verkliga plattformens gränser går, vilka fel som är vanligast och vilken evidens som krävs för att ett plock ska räknas som lyckat. Version 1.1 länkar lokal simulator-evidens via ACCEPTANCE_REPORT.md. Den redovisar inga experimentella resultat för fysisk robotprestanda eller generell intelligens.
+Den fortsatta diskussionen bör pröva designens antaganden: var den verkliga plattformens gränser går, vilka fel som är vanligast och vilken evidens som krävs för att ett plock ska räknas som lyckat. Den aktuella publikationsrevisionen länkar verifierad simulator-evidens via ACCEPTANCE_REPORT.md. Den redovisar inga experimentella resultat för fysisk robotprestanda eller generell intelligens.

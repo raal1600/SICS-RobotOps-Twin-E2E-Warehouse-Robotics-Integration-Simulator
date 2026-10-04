@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** The HKM-inspired cell and six-tool workflow are implemented. Clean-source acceptance at 0d8a8db found two failures among 619 tests (91.17% coverage). The planning-cost correction now passes 144 affected regression tests with unchanged decisions and trajectories; timing and safety limits remain unchanged. A new clean-source repeated acceptance run is required. Historical evidence remains archived. Status: NOT DONE.
+> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

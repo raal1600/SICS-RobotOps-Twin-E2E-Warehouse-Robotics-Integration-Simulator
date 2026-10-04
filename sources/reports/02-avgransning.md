@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** The HKM-inspired cell and six-tool workflow are implemented. Clean-source acceptance at 0d8a8db found two failures among 619 tests (91.17% coverage). The planning-cost correction now passes 144 affected regression tests with unchanged decisions and trajectories; timing and safety limits remain unchanged. A new clean-source repeated acceptance run is required. Historical evidence remains archived. Status: NOT DONE.
+> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -55,7 +55,7 @@ Ett lyckat plock kan också vara olika saker i olika affärsprocesser: flyttat o
 
 En animation kan vara begriplig utan att dess moment, kontaktkrafter eller ledhastigheter motsvarar en verklig robot. Det är tillåtet i en integrationsdemo om det är tydligt deklarerat. Problemet uppstår när visuellt övertygande rörelse används som underlag för påståenden om dynamisk noggrannhet.
 
-Tabellen beskriver den implementerade simulatoravgränsningen för revision 1.2. Riktade tester kör sex verktyg och produktfamiljer i faktisk Blender, men full upprepad acceptans och publicering för slutlig källrevision återstår; ACCEPTANCE_REPORT.md avgör slutstatus. Verktygsbyte under samma journalförda kommando ändrar inte innebörden av effect_count: endast produktförflyttningar räknas. Arbetsområde och konservativ geometrisk kollisionskontroll är egna simulatorregler, inte certifierad robotbanplanering. Små källpositionsfel kan centreras inom en uttrycklig syntetisk grepptolerans; det är ingen modell av riktiga gripkrafter eller uppmätt robotnoggrannhet.
+Tabellen beskriver den implementerade simulatoravgränsningen för revision 1.2. Sex verktyg och produktfamiljer har verifierats i faktisk Blender. ACCEPTANCE_REPORT.md redovisar full upprepad acceptans och publicering för den granskade källrevisionen samt vilka resultat som hör till äldre riktade körningar. Verktygsbyte under samma journalförda kommando ändrar inte innebörden av effect_count: endast produktförflyttningar räknas. Arbetsområde och konservativ geometrisk kollisionskontroll är egna simulatorregler, inte certifierad robotbanplanering. Små källpositionsfel kan centreras inom en uttrycklig syntetisk grepptolerans; det är ingen modell av riktiga gripkrafter eller uppmätt robotnoggrannhet.
 
 ### 2.3 PLC, beräkning och drift
 

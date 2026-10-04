@@ -1,0 +1,31 @@
+{
+  "scope": "Documentation-only synchronization after accepted ca779879; not an attestation of the future evidence/status successor. Original acceptance source and raw results remain unchanged.",
+  "audited_implementation_commit": "ca7798798f916c8130e1833cf16b4d4d3f10d546",
+  "checks": [
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/contract/test_governance.py tests/contract/test_robotics_documentation.py --basetemp=artifacts/hkm-final-doc-fixtures --junitxml=artifacts/hkm-final-doc-tests.xml",
+      "result": "PASS",
+      "tests": 8
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.dev lint",
+      "result": "PASS"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.drift_check",
+      "result": "PASS"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.dev docs",
+      "result": "PASS",
+      "pages": 61,
+      "internal_pdf_destinations": 200
+    }
+  ],
+  "source_changes": "Documentation/status/evidence and byte-preservation attributes only; no runtime or mandatory test change since audited implementation.",
+  "files_sha256": {
+    "publication-build.json": "f09b9484a57060c199014783ac8c7a19ca050574bd328cde58a13d5038de15b1",
+    "tests.xml": "8ec4b6b5cec53c607a28754addd99f8b50894e94575ead7e6a893efb7f5639ea"
+  },
+  "final_successor_verification": "Required exact-SHA full CI, Windows desktop and publication/public-link verification after commit, per ADR0002."
+}

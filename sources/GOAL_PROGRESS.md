@@ -2,7 +2,69 @@
 Last updated: 2026-10-04 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: HKM-P2 planning correction ready for repeated acceptance
+## Current phase: HKM-P3 acceptance complete at audited source
+
+Enhancement baseline: `eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98`.
+Audited implementation source: `ca7798798f916c8130e1833cf16b4d4d3f10d546`,
+clean at the start of acceptance; source hash
+`d52ed73663702ef2acac0be80989a400f53e88714163f30210dc0ea27f582513`.
+
+All **110 MUSTs PASS** (original 85 plus HKM-VIS-MUST-001 through -025).
+The [acceptance manifest](docs/evidence/acceptance/20261004T122253/manifest.json)
+retains commands, logs, versions, named tests, criterion mappings and exact-source
+remote attestations. Both Windows suites passed 622 tests, zero failures/skips,
+with identical 91.17558174675129% coverage. The 107 Node UI checks are included.
+Linux CI independently passed 622 tests twice with 91.11514052583863% coverage.
+Setup, lint, strict typing, dependency/security checks, drift and both publication
+builds passed. Eight actual Blender demos passed. Blender is 5.2.1 LTS; Python is
+3.13.15 and Node is 20.17.0.
+
+Lost acknowledgement after effect and restart each preserve one original command,
+one PICK_EFFECT and one transfer, and resolve through journal plus fresh observation.
+Ambiguous evidence remains REQUIRES_INTERVENTION without another pick. The full
+showcase completes six jobs, six original commands and six transfers, using
+VAC_SINGLE, VAC_ARRAY, ADAPTIVE_SOFT, PINCH_NARROW, PINCH_WIDE and SUPPORT_FORK
+for SKU-A through SKU-F respectively. Independent read-only persisted-evidence
+checks are retained in `docs/evidence/hkm-final-audit/`. Their first ad-hoc
+exact-float comparison and corrected review remain separate; the established
+1e-6 Blender transform tolerance and production assertions were not changed.
+
+Actual browser review covered six-product delivery replay, tool/camera controls,
+lost-ack uncertainty, contradictory intervention and fresh-observation resolution.
+Earlier tests and saved user data remain intact. Reopen the installed launcher
+and use Start new test to see the new profile; historical tests retain their
+original scenes. The snapshot remains collapsed in Technical details.
+
+Knowledge-base synchronization: README, plan, handoff, checklist, implementation
+guides, schemas, canonical catalogue/matrix, 11 diagrams, 30 research sources,
+reports and publication status agree with the implemented boundary. Final status
+synchronization also corrects the guide's mass wording to conservative catalogue
+maximum and the report's publication-version reference. The diagrams describe
+implemented behavior; manufacturer claims remain distinct from simulator design.
+No material drift remains after the final checks. ADR 0010 records the adaptation;
+ADR 0002 governs the separate source and evidence/status commit attestations.
+
+The exact ca77987 CI, Windows desktop and publication workflows passed. Public
+HTML/PDF hashes and source SHA were verified, with 360 HTML links/fragments,
+200 combined-PDF destinations and 36 compatibility cells checked. The publication
+review remains scoped to its recorded source; later Pages builds are verified
+again. Source CI artifact evidence is under `docs/evidence/hkm-ci-ca77987/`.
+
+SHOULD gap: SC-BRAIN-005 optional external-provider fallback remains unimplemented
+and non-blocking. Optional model APIs, hardware, dynamics and production ERP
+integration remain outside the mandatory deterministic implementation.
+
+Next release step: commit these evidence/status sources, rebuild/recheck affected
+documentation, and verify that successor's own full CI, Windows desktop and Pages
+workflows and exact deployed SHA. Per ADR 0002, this report does not pretend to
+contain its own future commit hash. The final successor is independently identified
+by its CI artifact and public build.json. No completion claim for an untested
+successor is inferred from this source audit.
+
+## Historical milestone: HKM-P2 planning correction before final acceptance
+
+The entries below retain their status at the time recorded; pending statements
+in this historical ledger do not replace the accepted current phase above.
 
 Enhancement baseline: `eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98`.
 Implemented and pushed milestone/current audited source:

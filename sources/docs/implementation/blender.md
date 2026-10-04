@@ -71,8 +71,9 @@ showcase, transform/attachment/rack assertions, lost-ack/restart/ambiguity,
 hash-corrupt checkpoints and malformed requests that must produce no effect.
 A fixed test-only probe inspects the actual saved hierarchy, labels and camera
 sensor/frame/calibration/model properties. Presentation cameras and rendered
-pixels never become verifier input. Targeted evidence and pending broader
-acceptance are recorded in GOAL_PROGRESS.md.
+pixels never become verifier input. Scoped development evidence is recorded in
+GOAL_PROGRESS.md; the complete accepted revision and audited source are recorded
+in ACCEPTANCE_REPORT.md.
 
 Run:
 

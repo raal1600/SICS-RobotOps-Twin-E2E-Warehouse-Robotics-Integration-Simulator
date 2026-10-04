@@ -5,7 +5,9 @@ its executable; missing Blender fails the real-runtime tests explicitly. It neve
 substitutes the headless adapter. CPU rendering is enforced, with no model API,
 GPU, MCP, plugin or proprietary robot code. The fixed checked-in script is invoked
 with `--background --factory-startup --disable-autoexec --python-exit-code 2`.
-JSON accepts only reset/query/capture/pick operations; no code/eval/exec endpoint.
+The schema-1 compatibility path accepts reset/query/capture/pick; schema 2 accepts
+reset/capture/pick. World and journal queries use the durable local checkpoint.
+Neither version offers a code/eval/exec endpoint.
 
 Each bounded exchange writes request.json, scene.blend, capture.png, runtime.log
 and an atomically renamed response.json. The scene has stable product identities.
@@ -14,10 +16,30 @@ snapshots for [live illustration and replay](playback.md). This separate display
 path never supplies verification evidence.
 The actual Blender object follows a baked gripper-relative carrying pose between
 attach and detach; its final Blender coordinates become the WorldState checkpoint.
-The .blend retains product, carriage, arm, spindle and gripper keyframes for a
-stylized Cartesian gantry. The API and Blender use the same cell mesh definitions.
-Every sampled carrying pose preserves the gripper offset. These are synthetic kinematics, not validated
-robot dynamics, safety evidence, or a Cognibotics/HKM1800 simulation.
+Schema-2 `.blend` files retain articulated link rotations, TCP-driven wrist/tool
+poses, tool exchange, product attachment/release and every sampled transform.
+The original procedural HKM1800-inspired hybrid-kinematic manipulator has six
+source boxes, six varied product families, six interchangeable tools and three
+camera viewpoints. The API and Blender consume the same semantic primitives;
+the canonical catalogue supplies dimensions, tool constraints and fixture poses.
+These are synthetic visual kinematics, not validated robot dynamics, certified
+safety or an exact Cognibotics/HKM1800 simulation. Historical schema-1 scenes keep
+their original Cartesian gantry and positional recording interpretation.
+
+`HKM_INSPIRED_VISUAL_KINEMATICS_V1` maps TCP pose to an original parallel-link
+configuration. Smooth segmented presentation motion is baked into actual Blender
+objects. The runtime exports evaluated matrices, not a second invented browser
+trajectory. Fixed semantic parents and parent-space residual correction keep
+tool-dock and carrying transforms within the tested 1e-6 m numeric tolerance;
+this tolerance describes numerical agreement, not real-world accuracy.
+Tool changes preserve command identity and never increment the product-transfer
+effect count. During a normal pick one tool is mounted and five remain in the
+rack; the empty-flange phase briefly places all six in their docks.
+
+The original synthetic tote layout has open access lips: 0.03 m at the front,
+0.05 m at the right, full configured height at the left/back. Products remain
+visible and accessible. Collision preflight uses these same procedural bounds.
+This is our fixture design, not an industrial customer layout or safety barrier.
 
 Before launching Blender, the adapter commits RUNNING and reserves the cell.
 Duplicate deliveries never re-launch it. A complete response and matching .blend
@@ -30,6 +52,12 @@ finish a pending checkpoint, including when viewing an archived test (ADR 0007).
 Fresh observation is still required for business completion. Neither a receipt
 nor a screenshot alone is accepted by Verifier.
 
+Schema-2 subprocess validation independently rechecks the durable payload hash,
+scene/cell identity, finite workspace poses, product source, available compatible
+tool, trajectory structure and conservative geometry preflight before animation.
+The host then checks the entire returned checkpoint and artifact hashes before
+committing the effect. Unknown or corrupt outcomes stay uncertain.
+
 `world()` reads the durable checkpoint exported from the bounded Blender process;
 there is no continuously running external Blender scene or live artist session.
 Capture reconstructs that checkpoint in a fresh process. This batch adapter is
@@ -37,6 +65,14 @@ documented in ADR 0001. Existing user Blender sessions are never touched.
 Interactive execution paces frame export for the live illustration. Older saved
 scenes support a fixed `--record-existing` export mode after hash validation;
 it never replays the pick or modifies the original scene/checkpoint.
+
+`tests/blender/test_hkm_runtime.py` invokes actual Blender for the six-tool
+showcase, transform/attachment/rack assertions, lost-ack/restart/ambiguity,
+hash-corrupt checkpoints and malformed requests that must produce no effect.
+A fixed test-only probe inspects the actual saved hierarchy, labels and camera
+sensor/frame/calibration/model properties. Presentation cameras and rendered
+pixels never become verifier input. Targeted evidence and pending broader
+acceptance are recorded in GOAL_PROGRESS.md.
 
 Run:
 

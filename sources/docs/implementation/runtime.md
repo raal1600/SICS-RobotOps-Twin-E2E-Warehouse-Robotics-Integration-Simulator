@@ -11,6 +11,20 @@ for this discrete synthetic adapter. Duplicate IDs with identical canonical
 payloads return the original receipt. Changed payloads conflict. These semantics
 are limited to this simulator and do not assert physical exactly-once behavior.
 
+Fresh worlds use the six-product HKM-inspired profile. The command includes its
+selected tool, candidate reasoning, calibrated grasp/target poses and segmented
+trajectory. The machine boundary independently checks current product/source,
+tool availability, workspace and conservative geometry before applying a transfer.
+Tools parked in the rack are obstacles except for the matching registered vertical
+engage/uncouple motion. Tool changes are deterministic preparation under the same
+command; their phases and final occupancy persist. `PICK_EFFECT` still means one
+product transfer. A tool change is never counted as another business effect.
+
+Configured small observation error uses a shared 5 mm synthetic source-contact
+centering bound at grasp, separate from observation/verifier pose tolerance.
+Frame/calibration/orientation and the final target remain strictly checked.
+This bounded contact abstraction does not model physical grip forces or accuracy.
+
 DROP_ACK_AFTER_EFFECT raises only after the committed move and SUCCEEDED journal.
 DROP_ACK_BEFORE_EFFECT commits a REJECTED/PROVEN_NOT_STARTED receipt without a
 move, then loses the acknowledgement. Communication timeout alone is never used

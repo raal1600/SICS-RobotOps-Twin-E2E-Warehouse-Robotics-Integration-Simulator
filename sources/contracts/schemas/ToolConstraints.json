@@ -1,0 +1,58 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "enum": [
+        "flat_top",
+        "grasp_width",
+        "soft_envelope",
+        "under_clearance"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "maximum_width_m": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Maximum Width M",
+      "type": "number"
+    },
+    "minimum_flat_top_m": {
+      "default": [
+        0,
+        0
+      ],
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "minimum": 0,
+          "type": "number"
+        }
+      ],
+      "title": "Minimum Flat Top M",
+      "type": "array"
+    },
+    "minimum_width_m": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Minimum Width M",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind"
+  ],
+  "title": "ToolConstraints",
+  "type": "object"
+}

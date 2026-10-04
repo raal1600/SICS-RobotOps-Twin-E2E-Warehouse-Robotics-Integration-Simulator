@@ -1,0 +1,73 @@
+{
+  "recorded_at": "2026-10-03T23:23:25.128433+00:00",
+  "scope": "Presentation-only local follow-up to release 5db9bf9; no new full-system or remote acceptance claim.",
+  "base_commit": "5db9bf973026fd111adc97885cfb1080060a25c5",
+  "ui_checks_passed": 101,
+  "ui_command": "node --test tests/ui/playback.test.cjs tests/ui/dashboard.test.cjs tests/ui/workflow-guide.test.cjs",
+  "ui_log": "docs/evidence/technical-details-checks/ui-tests.log",
+  "browser": {
+    "origin": "http://127.0.0.1:55153",
+    "runtime": "blender",
+    "isolated_data": "artifacts/technical-details/world",
+    "collapsed": {
+      "canvasVisible": true,
+      "heading": "Technical details Saved Blender snapshot",
+      "height": 87.6875,
+      "hidden": false,
+      "imageLoaded": true,
+      "imageWidth": 800,
+      "jobState": "COMPLETED",
+      "open": false,
+      "tag": "DETAILS"
+    },
+    "expanded": {
+      "height": 758.375,
+      "imageVisible": true,
+      "open": true
+    },
+    "mobile": {
+      "height": 79.6875,
+      "hidden": false,
+      "open": false,
+      "pageWidth": 375,
+      "viewportWidth": 390
+    },
+    "actions": [
+      "Create one happy-path order through the UI.",
+      "Verify the rendered snapshot finishes loading while Technical details remains collapsed.",
+      "Use Enter on the summary to reveal the saved image; use Enter again to collapse it.",
+      "Verify mobile layout without horizontal overflow.",
+      "Verify one completed order and exactly one effect; close isolated browser and backend."
+    ]
+  },
+  "evidence": "docs/evidence/technical-details-checks/evidence.json",
+  "screenshots": [
+    "docs/evidence/technical-details-checks/collapsed.png",
+    "docs/evidence/technical-details-checks/expanded.png",
+    "docs/evidence/technical-details-checks/mobile.png"
+  ],
+  "html_sha256": "742a62a095f0c55af6eff84d087f3e89b909e3062ec16d1f6fd1b8817332655b",
+  "unchanged": [
+    "snapshot API and generation",
+    "primary 3D replay",
+    "workflow/verification/command logic",
+    "user app and saved tests"
+  ],
+  "docs_synchronized": [
+    "README.md",
+    "docs/implementation/operations.md",
+    "docs/implementation/playback.md",
+    "GOAL_PROGRESS.md",
+    "ACCEPTANCE_REPORT.md"
+  ],
+  "drift": {
+    "passed": true,
+    "command": "python -m tools.drift_check",
+    "log": "docs/evidence/technical-details-checks/drift.log"
+  },
+  "docs": {
+    "passed": true,
+    "command": "python -m tools.dev docs",
+    "log": "docs/evidence/technical-details-checks/docs.log"
+  }
+}

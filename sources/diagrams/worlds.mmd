@@ -1,8 +1,8 @@
 flowchart TD
   goal["Önskat tillstånd g<br/>ERP anger vilket resultat som behövs"]
-  truth["Simulatortillstånd x<br/>Objekt • robot • effektjournal"]
-  brain["Modell / planering b<br/>Förslag utifrån mål och observation"]
-  obs["Observerat tillstånd y<br/>Sensor • brus • skymning • tid"]
+  truth["Private WorldState<br/>Objects / robot / mounted tool"]
+  brain["Deterministic planning<br/>Observed objects / catalogue / tools"]
+  obs["WorldObservation<br/>Synthetic sensors / labelled telemetry"]
   action["Validerad handling<br/>Endast typade operationer"]
   oracle["Test-orakel<br/>Facit jämförs med verifierarens dom"]
   verify["Verifier<br/>WorldObservation only"]

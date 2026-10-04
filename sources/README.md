@@ -3,11 +3,29 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** The deterministic simulator includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and explanations for every scenario and observation mode. Audited source 59ace31 passed all 85 MUST criteria: 389 tests twice, 101 UI checks, 89.22% coverage, seven Blender demos, security, types and documentation checks. GitHub CI, Windows lifecycle checks and Pages passed. The optional model-provider fallback remains a documented SHOULD limitation. Final evidence commits receive their own CI and Pages attestations. **DONE**.
+**Aktuell status:** The HKM-inspired six-product/six-tool cell, bounded Blender runtime, deterministic tool selection, geometric preflight and rotation-aware read-only replay are implemented. Targeted checks include real Blender integration and 107 UI checks, plus browser six-tool and uncertain-outcome workflows. The prior release and fresh eaf35b4 baseline remain archived; this enhancement awaits repeated full acceptance and exact-commit CI/publication evidence. **NOT DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
 [Agent handoff](HANDOFF.md) · [Checklist](CODEX_GOAL_CHECKLIST.md)
+
+The implemented cell contains an original **HKM1800-inspired hybrid-kinematic
+manipulator**, six distinct product families, six interchangeable tools, a tool
+rack, destination tote/conveyor, enclosure and three camera viewpoints. The
+deterministic Brain records why it selected a tool; validated segmented motion
+visibly changes tools, picks, transfers and releases the product. Shared scene
+geometry and recorded quaternion transforms drive Blender and read-only browser
+replay. [The adaptation guide](docs/implementation/hkm-inspired.md) describes the
+synthetic mechanics and conservative geometric checks.
+
+Fresh API/desktop data and **Start new test** use this six-SKU profile. Saved
+legacy tests retain their original Cartesian scene, command hashes and evidence.
+[Actual Blender evidence](docs/evidence/hkm-blender-local/result.json) covers the
+six-tool showcase, attachment/release, uncertainty, restart and read-only replay.
+[The baseline archive](docs/evidence/hkm-baseline-eaf35b4/provenance.json) preserves
+the earlier release and the fresh baseline failure. These scoped results do not
+establish final acceptance: clean repeated suites, final visual review and
+current-commit CI/publication checks remain required. **NOT DONE**.
 
 This is an independent simulator inspired by public sources and general practice.
 It does not reproduce SICS AI proprietary architecture or AGI. Blender supplies
@@ -72,6 +90,7 @@ uv run --locked python -m tools.dev demo --runtime blender --scenario happy_path
 uv run --locked python -m tools.dev demo --runtime blender --scenario lost_ack_after_effect
 uv run --locked python -m tools.dev demo --runtime blender --scenario ambiguous
 uv run --locked python -m tools.dev demo --runtime blender --scenario restart
+uv run --locked python -m tools.dev demo --runtime blender --scenario tool_showcase
 ```
 
 The lost-ack demo moves the product, loses the reply and persists UNKNOWN_OUTCOME.
@@ -80,6 +99,8 @@ It completes only with sufficient evidence and proves one pick effect. Ambiguous
 evidence produces REQUIRES_INTERVENTION. Further fixtures include
 `lost_ack_before_effect`, `logical_estop` and `cell_fault`. `--runtime headless`
 uses the same contracts with an atomic synthetic world for fast logic experiments.
+The `tool_showcase` demo picks SKU-A through SKU-F with all six preferred tools,
+verifies each job and records one product-transfer effect per original command.
 
 ```sh
 uv run --locked python -m apps.api --runtime blender --data-dir runs/my-demo --port 8000
@@ -101,6 +122,8 @@ observation** only selects the next capture mode; click the named review action 
 collect it. Repeated bad evidence keeps review available. Completed picks lead to
 the next setup, stopped cells to reset, and saved tests back to the current test.
 [Guided workflow and evidence boundary](docs/adr/0009-guided-simulation-workflow.md).
+The saved Blender snapshot is available in the collapsed **Technical details**
+section; the full 3D view and replay are the main visualization.
 Reusing the data directory preserves state across restart.
 Use **Start new test** at the top for any new execution/observation combination.
 It keeps both selections, restores all products in an independent world and saves
@@ -116,6 +139,8 @@ When all products are picked, the main button offers **Start new delivery and ru
 order**. **Full delivery (all products)** replays every execution in the selected
 scene; **Choose delivery or product replay** exposes current or saved deliveries, and individual
 product replay remains available.
+**Run six-tool showcase (happy path)** runs that same six-product sequence in the
+app. **Why this tool?** exposes persisted candidate scores and constraint reasons.
 
 After a lost acknowledgement, the **Next step** card names the unresolved product
 and opens **Review evidence**. Select **Normal observation** and use
@@ -134,10 +159,14 @@ uncertain/intervention outcome remains recorded and is never labelled resolved.
 Orbit, pan and zoom around the cell. Orders with an effect move the machine and
 product using recorded Blender poses; blocked orders replay their events with
 the saved starting scene held still. Play/pause, scrubbing and speed affect only
-the view. Replay sends no new pick. Software 3D remains available without WebGL.
+the view. Operator, Overhead, Side inspection and Follow TCP are presentation
+views; frame stepping and speeds from 0.25x to 4x never change execution evidence.
+Replay sends no new pick. Software 3D remains available without WebGL.
 For older orders, **Load saved animation** reads their original `.blend`.
 [Playback behavior and evidence boundary](docs/implementation/playback.md).
-`/metrics` exposes persisted counts and pipeline latency; `/docs` exposes OpenAPI.
+`/metrics` exposes persisted job, command, tool, observation, trajectory and
+reconciliation counts, with application latency separate from synthetic motion
+duration; `/docs` exposes OpenAPI.
 This local demo API has no production authentication and binds to loopback.
 
 ## Architecture
@@ -147,13 +176,15 @@ flowchart LR
     ERP[ERP/WMS UI] --> API[Integration API]
     API --> TEST[Test catalog: active world / read-only history]
     API --> WF[Durable workflow]
-    WF --> B[DeterministicBrain]
-    B --> V[Action validation]
+    WF --> O[ObservationModel]
+    WO[WorldObservation] --> B[DeterministicBrain]
+    B --> P[Tool selection and trajectory intent]
+    P --> V[Action validation]
     V --> G[RobotGateway]
     G --> C[Cell and command journal]
     C --> W[Blender WorldState]
-    W --> O[ObservationModel]
-    O --> WO[WorldObservation]
+    W --> O
+    O --> WO
     WO --> VERIFY[Verifier]
     VERIFY --> R[Reconciliation]
     R --> WF
@@ -170,6 +201,7 @@ uncertain. No natural-language MCP execution or generated code controls the runt
 |---|---|
 | `apps/api/`, `apps/erp_ui/` | [Operations, API and metrics](docs/implementation/operations.md) |
 | `robotops/domain/`, `contracts/` | [Versioned contracts](docs/implementation/contracts.md) |
+| `robotops/robotics/`, `robotops/hkm_geometry.py` | [HKM-inspired cell and tool catalogue](docs/implementation/hkm-inspired.md) |
 | `robotops/workflow/` | [Persistence and fenced claims](docs/implementation/persistence.md) |
 | `robotops/brain/`, `robotops/verification/`, `robotops/observation/` | [Validation and reconciliation](docs/implementation/reconciliation.md) |
 | `robotops/cell/`, `robotops/robot_gateway/` | [Journal and fault semantics](docs/implementation/runtime.md) |

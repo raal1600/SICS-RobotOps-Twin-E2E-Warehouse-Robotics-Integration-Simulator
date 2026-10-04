@@ -1,0 +1,933 @@
+{
+  "$defs": {
+    "CellLayout": {
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "$ref": "#/$defs/ContainerFixture"
+        },
+        "destination_slots": {
+          "additionalProperties": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "propertyNames": {
+            "enum": [
+              "SKU-A",
+              "SKU-B",
+              "SKU-C",
+              "SKU-D",
+              "SKU-E",
+              "SKU-F"
+            ]
+          },
+          "title": "Destination Slots",
+          "type": "object"
+        },
+        "floor_depth_m": {
+          "exclusiveMinimum": 0,
+          "title": "Floor Depth M",
+          "type": "number"
+        },
+        "floor_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Floor Width M",
+          "type": "number"
+        },
+        "home_tcp_pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sources": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ContainerFixture"
+          },
+          "propertyNames": {
+            "enum": [
+              "SKU-A",
+              "SKU-B",
+              "SKU-C",
+              "SKU-D",
+              "SKU-E",
+              "SKU-F"
+            ]
+          },
+          "title": "Sources",
+          "type": "object"
+        },
+        "tool_docks": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Pose"
+          },
+          "propertyNames": {
+            "enum": [
+              "EE_VAC_SINGLE",
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ]
+          },
+          "title": "Tool Docks",
+          "type": "object"
+        }
+      },
+      "required": [
+        "floor_width_m",
+        "floor_depth_m",
+        "home_tcp_pose",
+        "sources",
+        "destination",
+        "destination_slots",
+        "tool_docks"
+      ],
+      "title": "CellLayout",
+      "type": "object"
+    },
+    "ContainerFixture": {
+      "additionalProperties": false,
+      "properties": {
+        "interior_m": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Interior M",
+          "type": "array"
+        },
+        "location_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Location Id",
+          "type": "string"
+        },
+        "pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "product_support_offset_m": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Product Support Offset M",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "wall_height_m": {
+          "exclusiveMinimum": 0,
+          "title": "Wall Height M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "location_id",
+        "pose",
+        "interior_m",
+        "wall_height_m"
+      ],
+      "title": "ContainerFixture",
+      "type": "object"
+    },
+    "EndEffectorSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "collision_envelope_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Collision Envelope M",
+          "type": "array"
+        },
+        "collision_offset_m": {
+          "default": [
+            0,
+            0,
+            0.09
+          ],
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Collision Offset M",
+          "type": "array"
+        },
+        "constraints": {
+          "$ref": "#/$defs/ToolConstraints"
+        },
+        "display_name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Display Name",
+          "type": "string"
+        },
+        "family": {
+          "enum": [
+            "vacuum",
+            "pinch",
+            "soft",
+            "fork"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "max_simulated_mass_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Max Simulated Mass Kg",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tcp_transform": {
+          "$ref": "#/$defs/Pose"
+        },
+        "tool_id": {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "tool_spec_version": {
+          "const": "synthetic-tools-1",
+          "default": "synthetic-tools-1",
+          "title": "Tool Spec Version",
+          "type": "string"
+        },
+        "visual_asset_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Visual Asset Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool_id",
+        "family",
+        "display_name",
+        "max_simulated_mass_kg",
+        "tcp_transform",
+        "collision_envelope_m",
+        "constraints",
+        "visual_asset_id"
+      ],
+      "title": "EndEffectorSpec",
+      "type": "object"
+    },
+    "MotionTiming": {
+      "additionalProperties": false,
+      "properties": {
+        "approach_s": {
+          "exclusiveMinimum": 0,
+          "title": "Approach S",
+          "type": "number"
+        },
+        "classification": {
+          "const": "SIMULATOR_PRESENTATION_TIMING",
+          "title": "Classification",
+          "type": "string"
+        },
+        "grasp_dwell_s": {
+          "exclusiveMinimum": 0,
+          "title": "Grasp Dwell S",
+          "type": "number"
+        },
+        "lift_s": {
+          "exclusiveMinimum": 0,
+          "title": "Lift S",
+          "type": "number"
+        },
+        "place_s": {
+          "exclusiveMinimum": 0,
+          "title": "Place S",
+          "type": "number"
+        },
+        "release_dwell_s": {
+          "exclusiveMinimum": 0,
+          "title": "Release Dwell S",
+          "type": "number"
+        },
+        "retract_s": {
+          "exclusiveMinimum": 0,
+          "title": "Retract S",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tool_change_s": {
+          "exclusiveMinimum": 0,
+          "title": "Tool Change S",
+          "type": "number"
+        },
+        "transfer_max_s": {
+          "exclusiveMinimum": 0,
+          "title": "Transfer Max S",
+          "type": "number"
+        },
+        "transfer_min_s": {
+          "exclusiveMinimum": 0,
+          "title": "Transfer Min S",
+          "type": "number"
+        },
+        "transfer_speed_m_s": {
+          "exclusiveMinimum": 0,
+          "title": "Transfer Speed M S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "classification",
+        "approach_s",
+        "grasp_dwell_s",
+        "lift_s",
+        "transfer_speed_m_s",
+        "transfer_min_s",
+        "transfer_max_s",
+        "place_s",
+        "release_dwell_s",
+        "retract_s",
+        "tool_change_s"
+      ],
+      "title": "MotionTiming",
+      "type": "object"
+    },
+    "Pose": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "default": "cal-1",
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "default": "cell_world",
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "quaternion_xyzw": {
+          "default": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Quaternion Xyzw",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "position"
+      ],
+      "title": "Pose",
+      "type": "object"
+    },
+    "ProductGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "flat_top_m": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "minimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Flat Top M",
+          "type": "array"
+        },
+        "grasp_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Grasp Width M",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "soft_envelope_m": {
+          "exclusiveMinimum": 0,
+          "title": "Soft Envelope M",
+          "type": "number"
+        },
+        "under_clearance": {
+          "title": "Under Clearance",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "flat_top_m",
+        "grasp_width_m",
+        "soft_envelope_m",
+        "under_clearance"
+      ],
+      "title": "ProductGeometry",
+      "type": "object"
+    },
+    "ProductSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Catalog Id",
+          "type": "string"
+        },
+        "compatibility": {
+          "additionalProperties": {
+            "enum": [
+              "P",
+              "C",
+              "N"
+            ],
+            "type": "string"
+          },
+          "propertyNames": {
+            "enum": [
+              "EE_VAC_SINGLE",
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ]
+          },
+          "title": "Compatibility",
+          "type": "object"
+        },
+        "dimensions_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Dimensions M",
+          "type": "array"
+        },
+        "family": {
+          "enum": [
+            "small_carton",
+            "medium_carton",
+            "soft_pouch",
+            "bottle",
+            "can_jar",
+            "long_carton"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "geometry": {
+          "$ref": "#/$defs/ProductGeometry"
+        },
+        "mass_max_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Mass Max Kg",
+          "type": "number"
+        },
+        "mass_min_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Mass Min Kg",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sku": {
+          "enum": [
+            "SKU-A",
+            "SKU-B",
+            "SKU-C",
+            "SKU-D",
+            "SKU-E",
+            "SKU-F"
+          ],
+          "title": "Sku",
+          "type": "string"
+        },
+        "visual_variant_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Visual Variant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog_id",
+        "sku",
+        "family",
+        "dimensions_m",
+        "mass_min_kg",
+        "mass_max_kg",
+        "visual_variant_id",
+        "compatibility",
+        "geometry"
+      ],
+      "title": "ProductSpec",
+      "type": "object"
+    },
+    "PublicReference": {
+      "additionalProperties": false,
+      "properties": {
+        "approximate_z_stroke_m": {
+          "exclusiveMinimum": 0,
+          "title": "Approximate Z Stroke M",
+          "type": "number"
+        },
+        "classification": {
+          "const": "COMPANY_REPORTED_CLAIM",
+          "title": "Classification",
+          "type": "string"
+        },
+        "nominal_radial_reach_m": {
+          "exclusiveMinimum": 0,
+          "title": "Nominal Radial Reach M",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "classification",
+        "nominal_radial_reach_m",
+        "approximate_z_stroke_m"
+      ],
+      "title": "PublicReference",
+      "type": "object"
+    },
+    "SensorSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "const": "hkm-cal-1",
+          "default": "hkm-cal-1",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "camera_model_version": {
+          "const": "synthetic-orthographic-1",
+          "default": "synthetic-orthographic-1",
+          "title": "Camera Model Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "enum": [
+            "camera_operator",
+            "camera_overhead",
+            "camera_side"
+          ],
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "presentation_only": {
+          "title": "Presentation Only",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sensor_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Sensor Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sensor_id",
+        "frame_id",
+        "pose",
+        "presentation_only"
+      ],
+      "title": "SensorSpec",
+      "type": "object"
+    },
+    "ToolConstraints": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "flat_top",
+            "grasp_width",
+            "soft_envelope",
+            "under_clearance"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "maximum_width_m": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Maximum Width M",
+          "type": "number"
+        },
+        "minimum_flat_top_m": {
+          "default": [
+            0,
+            0
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "minimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Minimum Flat Top M",
+          "type": "array"
+        },
+        "minimum_width_m": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Minimum Width M",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ToolConstraints",
+      "type": "object"
+    },
+    "WorkspaceProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "const": "hkm-cal-1",
+          "default": "hkm-cal-1",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "const": "cell_world",
+          "default": "cell_world",
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "max_z_m": {
+          "default": 1.15,
+          "title": "Max Z M",
+          "type": "number"
+        },
+        "min_z_m": {
+          "default": 0.16,
+          "title": "Min Z M",
+          "type": "number"
+        },
+        "radial_limit_m": {
+          "default": 1.55,
+          "exclusiveMinimum": 0,
+          "title": "Radial Limit M",
+          "type": "number"
+        },
+        "safe_transfer_z_m": {
+          "default": 1.02,
+          "title": "Safe Transfer Z M",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "title": "WorkspaceProfile",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "cameras": {
+      "items": {
+        "$ref": "#/$defs/SensorSpec"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Cameras",
+      "type": "array"
+    },
+    "classification": {
+      "const": "SIMULATOR_DESIGN",
+      "title": "Classification",
+      "type": "string"
+    },
+    "empty_flange_collision_envelope_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      ],
+      "title": "Empty Flange Collision Envelope M",
+      "type": "array"
+    },
+    "empty_flange_collision_offset_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Empty Flange Collision Offset M",
+      "type": "array"
+    },
+    "frame_tree_version": {
+      "const": "hkm-frame-tree-1",
+      "title": "Frame Tree Version",
+      "type": "string"
+    },
+    "layout": {
+      "$ref": "#/$defs/CellLayout"
+    },
+    "product_catalog_version": {
+      "const": "synthetic-products-1",
+      "title": "Product Catalog Version",
+      "type": "string"
+    },
+    "products": {
+      "items": {
+        "$ref": "#/$defs/ProductSpec"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "title": "Products",
+      "type": "array"
+    },
+    "profile_version": {
+      "const": "hkm_inspired_v1",
+      "title": "Profile Version",
+      "type": "string"
+    },
+    "public_reference": {
+      "$ref": "#/$defs/PublicReference"
+    },
+    "robot_profile_version": {
+      "const": "hkm_inspired_v1",
+      "title": "Robot Profile Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "tool_catalog_version": {
+      "const": "synthetic-tools-1",
+      "title": "Tool Catalog Version",
+      "type": "string"
+    },
+    "tools": {
+      "items": {
+        "$ref": "#/$defs/EndEffectorSpec"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "title": "Tools",
+      "type": "array"
+    },
+    "visual_motion": {
+      "$ref": "#/$defs/MotionTiming"
+    },
+    "workspace": {
+      "$ref": "#/$defs/WorkspaceProfile"
+    }
+  },
+  "required": [
+    "classification",
+    "profile_version",
+    "robot_profile_version",
+    "product_catalog_version",
+    "tool_catalog_version",
+    "frame_tree_version",
+    "public_reference",
+    "workspace",
+    "visual_motion",
+    "empty_flange_collision_envelope_m",
+    "empty_flange_collision_offset_m",
+    "products",
+    "tools",
+    "layout",
+    "cameras"
+  ],
+  "title": "RoboticsCatalogue",
+  "type": "object"
+}

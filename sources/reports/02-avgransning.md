@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-03:** The deterministic simulator includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and explanations for every scenario and observation mode. Audited source 59ace31 passed all 85 MUST criteria: 389 tests twice, 101 UI checks, 89.22% coverage, seven Blender demos, security, types and documentation checks. GitHub CI, Windows lifecycle checks and Pages passed. The optional model-provider fallback remains a documented SHOULD limitation. Final evidence commits receive their own CI and Pages attestations. Status: DONE.
+> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell, bounded Blender runtime, deterministic tool selection, geometric preflight and rotation-aware read-only replay are implemented. Targeted checks include real Blender integration and 107 UI checks, plus browser six-tool and uncertain-outcome workflows. The prior release and fresh eaf35b4 baseline remain archived; this enhancement awaits repeated full acceptance and exact-commit CI/publication evidence. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -16,7 +16,7 @@ Simulatorn ska efterlikna informationsflödet från kundorder till verifierat pl
 
 Vi använder tre nivåer för att undvika att generella branschbegrepp tillskrivs ett enskilt bolag.
 
-**Nivå A: dokumenterad offentlig uppgift.** Exempelvis anger SICS rollannons kundintegration, medan Cognibotics beskriver en konkret Nowaste-cell. Uppgifterna citeras och attribueras. [S01][S07]
+**Nivå A: dokumenterad offentlig uppgift.** Exempelvis anger SICS rollannons kundintegration, medan Cognibotics rapporterar en första pilot och en beställning på ytterligare Nowaste-cell. Uppgifterna citeras och attribueras. Att ett företag offentligt framför ett påstående gör det inte till oberoende validerad prestanda. [S01][S07]
 
 **Nivå B: generell integrationsfråga.** Exempelvis måste ett system skilja mellan förlorad kommunikation och en känd utebliven sidoeffekt. Det är en fråga om distribuerad systemdesign, inte ett fynd om hur SICS har implementerat sin lösning. [S17]
 
@@ -32,7 +32,7 @@ Jämförelsen är alltså inte en omvänd konstruktion av SICS AI:s produkt. Den
 
 | Aspekt | Offentlig eller generell verklighetsbild | RobotOps Twins mål |
 |---|---|---|
-| Kundflöde | Rollen omfattar kundens API/WMS/ERP. [S01] | Syntetiska order, tre SKU:er och ett plock per orderrad. |
+| Kundflöde | Rollen omfattar kundens API/WMS/ERP. [S01] | Sex syntetiska SKU-familjer i revision 1.2; gamla tre-SKU-körningar bevaras. Ett plock per orderrad. |
 | Affärsregler | Exakta kundregler är inte offentliga. | En enkel regel: rätt exemplar till rätt orderlåda. |
 | Integration | Leverantörsmaterial beskriver lagerstyrning runt robotcellen. [S07] | Separat kundadapter och kvittenskontrakt. |
 | Inventering | Verklig redovisning, reservation och korrigering är inte kartlagda. | Förenklad reservations- och saldomodell utan bokföring. |
@@ -47,13 +47,15 @@ Ett lyckat plock kan också vara olika saker i olika affärsprocesser: flyttat o
 | Aspekt | Offentlig uppgift eller kunskapslucka | Simulatorns avgränsning |
 |---|---|---|
 | Robotbrain | HYPER beskriver en proprietär modell. [S03] | Ett gränssnitt, inte en återimplementation. |
-| Modellstyrning | Offentliga texter beskriver olika kontrollnivåer. [S03][S07] | Uppgiftsnivå i MVP; lednivå endast ett framtida adapterkontrakt. |
-| Robotmekanik | HKM1800 har hybridkinematik enligt tillverkaren. [S08] | Generisk arm; inga HKM-prestandapåståenden. |
-| Gripning | Verkliga objekt och verktyg påverkar resultatet. | Regelstyrd fästning/lossning av syntetiska objekt. |
-| Perception | Den exakta sensorkedjan är inte offentlig. | Syntetisk observation, med valfri rendering och bildmodell. |
+| Modellstyrning | Offentliga texter beskriver olika kontrollnivåer. [S03][S07] | Typat verktygs-/TCP-/trajektoriekontrakt; inga verkliga HKM-ledkommandon. |
+| Robotmekanik | Tillverkaren beskriver hybridkinematik. [S08][S23] | Original HKM-inspirerad visuell mekanism; inga exakta CAD-, dynamik- eller prestandapåståenden. |
+| Gripning | Tillverkaren beskriver automatisk verktygsväxling. [S24] | Sex egna syntetiska verktyg och regler för fästning/lossning; ingen kontaktfysik. |
+| Perception | Den exakta sensorkedjan är inte offentlig. | Deterministisk WorldObservation, separat märkt celltelemetri; rendering är inte bildanalys. |
 | Inlärning | Algoritm, data och vikter är inte tillgängliga för denna studie. | Ingen träning i baslinjen; versionshanterad planeringslogik. |
 
 En animation kan vara begriplig utan att dess moment, kontaktkrafter eller ledhastigheter motsvarar en verklig robot. Det är tillåtet i en integrationsdemo om det är tydligt deklarerat. Problemet uppstår när visuellt övertygande rörelse används som underlag för påståenden om dynamisk noggrannhet.
+
+Tabellen beskriver den implementerade simulatoravgränsningen för revision 1.2. Riktade tester kör sex verktyg och produktfamiljer i faktisk Blender, men full upprepad acceptans och publicering för slutlig källrevision återstår; ACCEPTANCE_REPORT.md avgör slutstatus. Verktygsbyte under samma journalförda kommando ändrar inte innebörden av effect_count: endast produktförflyttningar räknas. Arbetsområde och konservativ geometrisk kollisionskontroll är egna simulatorregler, inte certifierad robotbanplanering. Små källpositionsfel kan centreras inom en uttrycklig syntetisk grepptolerans; det är ingen modell av riktiga gripkrafter eller uppmätt robotnoggrannhet.
 
 ### 2.3 PLC, beräkning och drift
 
@@ -82,6 +84,8 @@ Vi modellerar dock inte hela felpopulationen i en riktig anläggning. Inga sluts
 ### 3.3 Fysikalisk och perceptuell realism
 
 Fysikalisk realism är låg i första versionen. Simulatorn kan kontrollera geometriska villkor men saknar exempelvis verklig kontaktfysik, deformation och materialvariation. Perceptuell realism är också begränsad om objektens identiteter kommer från metadata.
+
+HKM-inspirationen ändrar inte detta. Inga proprietära CAD-filer, verkliga styrparametrar eller annonserade cykeltider används för att legitimera vår visuella rörelse. Om artikulerad dynamik, IK eller sensorbaserad rörelseplanering blir ett faktiskt krav behöver verktygsvalet omprövas; officiell PyBullet- och Isaac Sim-dokumentation beskriver sådana funktioner. De är jämförelsekällor, inte installerade simulatorberoenden. [S28][S29][S30]
 
 En valfri bildmodell höjer inte automatiskt realismen till produktionsnivå. Bilder från Blender kan avvika systematiskt från verkliga kamerabilder. Dessutom kan modellens klassificering vara korrekt samtidigt som koordinater eller tidpunkter är fel.
 

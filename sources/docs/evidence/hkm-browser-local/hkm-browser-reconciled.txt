@@ -1,0 +1,210 @@
+ROBOTOPS TWIN
+Simulation workspace
+
+Local · deterministic · synthetic
+
+Your simulation tests
+Test 2 · Current · 1 orders · COMPLETED
+Test 1 · Saved · 1 orders · COMPLETED
+Start new test
+
+Test 2: current test. Start new test restores all products in a separate world and keeps your scenario and observation choices. Previous results stay in history.
+
+1 Prepare
+2 Run
+3 Review
+4 Continue
+
+Updated from persisted evidence. Replay only changes the view.
+
+NEXT STEP
+Pick verified — continue when ready
+
+Choose the next product and scenario below, then run the next order. Use Start new test above for an independent combination with fresh products.
+
+Set up next pick
+Set up a pick
+Product & scenario
+Review evidence
+Latest result
+
+SKU-A · COMPLETED · Job ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2
+
+CONTROLLER JOURNAL
+Original command: SUCCEEDED. Controller records 1 pick effect. This alone does not confirm the order.
+OBSERVATION
+Assessed capture: 2026-10-04T11:31:07.685503Z.
+DECISION
+The original journal and fresh observation agree: the product reached the destination.
+
+2 review attempts saved. Every assessment remains in the timeline.
+
+Inspect full evidence & timeline
+Observation for this review
+Normal observation
+Contradictory evidence
+Low confidence
+Stale evidence
+Missing evidence
+
+Applied when you Reconcile or Observe again. It changes only the new evidence for the original pick; it never sends another pick.
+
+Review capture · no injected sensing fault
+
+What this simulates
+
+Collects a new observation of this test world without deliberately altering its detections, confidence or capture time. The verifier compares it with the original command journal.
+
+Key difference
+
+Removes sensing degradation for this review only. It does not undo an execution fault or guarantee success: sufficient evidence can prove either completion or no effect.
+
+Collect a fresh observation without injected degradation. The verifier still needs consistent evidence for this original command.
+
+Compare all observation modes
+Reconcile selected job
+
+This checks the original pick without picking again. If evidence is still insufficient, you can change the observation and review again here. Viewing evidence alone does not resolve a pick.
+
+Cell & diagnostics
+Live cell & replay
+1/1 completed
+SELECTED ORDER
+order-1bd88194-6ad9-4237-bdb5-0514a75a714c
+SELECTED JOB
+COMPLETED / ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2
+ORIGINAL COMMAND
+f28af7d9-58bb-504c-a61e-8878cd74029b
+CELL STATE
+READY
+PRODUCT / SKU
+SKU-A / product-SKU-A-01
+ACTIVE TOOL TELEMETRY
+Single suction cup
+OBSERVATION
+100% confidence / JOURNAL_AND_FRESH_DESTINATION_AGREE / synthetic-observer-2
+CALIBRATION
+hkm-cal-1
+Choose delivery or product replay
+
+Delivery scenario: Acknowledgement lost after effect
+
+Full delivery replay · 1 product executions
+
+JOURNAL_AND_FRESH_DESTINATION_AGREE
+Operator
+Overhead
+Side inspection
+Follow TCP
+Rotate
++
+−
+Reset camera
+3D · orbit, pan and zoom
+
+Drag to orbit · scroll to zoom · right-drag or Shift-drag to pan.
+
+1/1 · product-SKU-A-01 · COMPLETED
+
+Replay tool: EE_VAC_SINGLE · 5 tools in rack
+
+Play
+Replay
+Previous frame
+Next frame
+Speed
+0.25×
+0.5×
+1×
+2×
+4×
+
+Original executions in this scene, in durable execution order. Replay sends no commands.
+
+Scene and recorded Blender poses are illustration, not sensor evidence. Events replay in order at a readable pace; their original timestamps remain in the causal timeline. Replay never sends a pick. A visible move does not resolve uncertainty.
+
+Why this tool?
+
+Single suction cup selected. Assessed mass 0.40 kg. Mounted tool already matches.
+
+Tool	Score / decision	Constraints and reasons
+Single suction cup	135 / selected	preferred for product family · mass within simulated limit · synthetic geometry compatible · already mounted
+Multi-cup suction plate	80 / lower ranked	compatible product family · mass within simulated limit · synthetic geometry compatible · tool change required
+Narrow parallel-jaw gripper	80 / lower ranked	compatible product family · mass within simulated limit · synthetic geometry compatible · tool change required
+Wide parallel-jaw gripper	80 / lower ranked	compatible product family · mass within simulated limit · synthetic geometry compatible · tool change required
+Adaptive soft-finger gripper	80 / lower ranked	compatible product family · mass within simulated limit · synthetic geometry compatible · tool change required
+Under-support fork	80 / lower ranked	compatible product family · mass within simulated limit · synthetic geometry compatible · tool change required
+
+Compatibility, mass and geometry rules are synthetic fixture constraints. Selection uses observed cell telemetry.
+
+Order and cell status
+ERP ORDER
+COMPLETED
+PICK JOB
+COMPLETED
+CELL
+READY
+
+Order order-1bd88194-6ad9-4237-bdb5-0514a75a714c / Job ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2
+
+Verification
+
+VERIFIED_SUCCESS · JOURNAL_AND_FRESH_DESTINATION_AGREE
+
+Original command: f28af7d9-58bb-504c-a61e-8878cd74029b · Journal: SUCCEEDED
+
+Causal timeline
+Time / component	Event / transition	Reason
+11:30:40.781 / api	ORDER_RECEIVED	ACCEPTED
+11:30:40.781 / workflow	JOB_RECEIVED → RECEIVED	ORDER_LINE_CREATED
+11:30:40.965 / faults	FAULT_INJECTED	DROP_ACK_AFTER_EFFECT
+11:30:40.977 / workflow	JOB_TRANSITION → VALIDATED	ORDER_SCHEMA_VALID
+11:30:40.991 / workflow	JOB_TRANSITION → PLANNING	BRAIN_REQUESTED
+11:30:41.048 / observation	OBSERVATION_CAPTURED	FRESH_SENSOR_MODEL
+11:30:41.315 / validator	PLAN_VALIDATED	SEMANTIC_CHECKS_PASSED
+11:30:41.335 / validator	COMMAND_INTENT	VALIDATED_DURABLE_COMMAND
+11:30:41.351 / brain	GRASP_SELECTION_EVALUATED	DETERMINISTIC_COMPATIBILITY_SCORE
+11:30:41.371 / planner	TRAJECTORY_PLANNED	CONSERVATIVE_SYNTHETIC_COLLISION_PREFLIGHT
+11:30:41.385 / workflow	JOB_TRANSITION → READY_TO_EXECUTE	PLAN_PERSISTED
+11:30:41.404 / workflow	JOB_TRANSITION → EXECUTING	DISPATCH_INTENT
+11:30:41.424 / gateway	COMMAND_DISPATCHED	ORIGINAL_COMMAND_IDENTITY
+11:30:57.343 / gateway	COMMAND_STATUS_UNKNOWN	CommunicationTimeout
+11:30:41.520 / runtime	COMMAND_CREATED	DURABLE_BLENDER_INTENT
+11:30:41.520 / runtime	COMMAND_DISPATCHED	BOUNDED_PROCESS
+11:30:41.520 / runtime	COMMAND_ACCEPTED	PRECONDITIONS_PASSED
+11:30:41.520 / runtime	COMMAND_RUNNING	BLENDER_PROCESS
+11:30:41.521 / runtime	FAULT_INJECTED	DROP_ACK_AFTER_EFFECT
+11:30:57.327 / runtime	HOME	SIM_TIME_S=0.000000000
+11:30:57.327 / runtime	TOOL_CHANGE_NOT_REQUIRED	SIM_TIME_S=0.050000000
+11:30:57.327 / runtime	PRE_GRASP	SIM_TIME_S=0.650000000
+11:30:57.327 / runtime	APPROACH	SIM_TIME_S=1.250000000
+11:30:57.327 / runtime	GRASP	SIM_TIME_S=1.450000000
+11:30:57.327 / runtime	GRASP_CONFIRM	SIM_TIME_S=1.550000000
+11:30:57.327 / runtime	LIFT	SIM_TIME_S=2.050000000
+11:30:57.327 / runtime	SAFE_TRANSFER	SIM_TIME_S=3.550000000
+11:30:57.327 / runtime	PRE_PLACE	SIM_TIME_S=3.650000000
+11:30:57.327 / runtime	PLACE	SIM_TIME_S=4.150000000
+11:30:57.327 / runtime	RELEASE	SIM_TIME_S=4.300000000
+11:30:57.327 / runtime	RELEASE_CONFIRM	SIM_TIME_S=4.400000000
+11:30:57.327 / runtime	RETRACT	SIM_TIME_S=4.900000000
+11:30:57.327 / runtime	HOME	SIM_TIME_S=5.500000000
+11:30:57.327 / runtime	PICK_EFFECT	BLENDER_ATTACH_TRANSFER_DETACH
+11:30:57.327 / runtime	COMMAND_SUCCEEDED	BLENDER_CHECKPOINT_COMMITTED
+11:30:57.674 / workflow	JOB_TRANSITION → UNKNOWN_OUTCOME	COMMUNICATION_UNCERTAIN
+11:30:57.693 / workflow	PIPELINE_LATENCY	RUN_FINISHED
+11:31:02.644 / faults	FAULT_INJECTED	CONTRADICTORY_OBSERVATION
+11:31:02.705 / gateway	JOURNAL_QUERIED	ORIGINAL_COMMAND_IDENTITY
+11:31:02.789 / observation	OBSERVATION_CAPTURED	CONTRADICTORY_OBSERVATION
+11:31:02.797 / workflow	JOB_TRANSITION → RECONCILING	EVIDENCE_COLLECTED
+11:31:02.811 / workflow	JOB_TRANSITION → REQUIRES_INTERVENTION	CONTRADICTORY_OBSERVATION
+11:31:02.840 / reconciliation	RECONCILIATION_RESULT	INCONCLUSIVE
+11:31:07.628 / gateway	JOURNAL_QUERIED	ORIGINAL_COMMAND_IDENTITY
+11:31:07.703 / observation	OBSERVATION_CAPTURED	FRESH_SENSOR_MODEL
+11:31:07.716 / workflow	JOB_TRANSITION → RECONCILING	OPERATOR_REOBSERVATION
+11:31:07.732 / workflow	JOB_TRANSITION → COMPLETED	JOURNAL_AND_FRESH_DESTINATION_AGREE
+11:31:07.752 / reconciliation	RECONCILIATION_RESULT	VERIFIED_SUCCESS
+Inspect command, observation and reconciliation evidence
+Simulation boundaries
+Technical details
+Saved Blender snapshot
+Local simulation only. No external model account, GPU or real industrial hardware required.

@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-03:** The deterministic simulator includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and explanations for every scenario and observation mode. Audited source 59ace31 passed all 85 MUST criteria: 389 tests twice, 101 UI checks, 89.22% coverage, seven Blender demos, security, types and documentation checks. GitHub CI, Windows lifecycle checks and Pages passed. The optional model-provider fallback remains a documented SHOULD limitation. Final evidence commits receive their own CI and Pages attestations. Status: DONE.
+> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell, bounded Blender runtime, deterministic tool selection, geometric preflight and rotation-aware read-only replay are implemented. Targeted checks include real Blender integration and 107 UI checks, plus browser six-tool and uncertain-outcome workflows. The prior release and fresh eaf35b4 baseline remain archived; this enhancement awaits repeated full acceptance and exact-commit CI/publication evidence. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -203,6 +203,16 @@ Fråga gärna vilket av dessa val de först skulle ändra. Ett bra svar från di
 ### ”Varför Blender och inte en full robotsimulator?”
 
 ”Jag optimerar första versionen för att synliggöra integrationsflödet och felvägarna. Jag gör inga påståenden om realistiska kontaktkrafter. Om frågan blir fysik, styrnoggrannhet eller sim-to-real behöver simulatorvalet och testmodellen omprövas.”
+
+För HKM-revisionen kan du lägga till: ”Länkarna följer en egen TCP-baserad visuell modell. Vi kontrollerar ett syntetiskt arbetsområde och geometriska marginaler; vi har inte validerat riktig HKM-kinematik. PyBullet och Isaac Sim är relevanta vid andra fysik- eller planeringskrav, men är inte beroenden i denna demo.” [S23][S28][S29]
+
+### ”Varför valde roboten just det verktyget?”
+
+Visa det ursprungliga jobbets sparade kandidater, filterorsaker och rangordning. Förklara skillnaden mellan katalogens P/C/N-kompatibilitet, mass-/geometrikrav och faktisk tillgänglighet. Visa därefter rack- och monteringshändelser under samma command_id. Ett verktygsbyte är ingen extra produktförflyttning. Säg endast att detta är demonstrerat när den aktuella revisionens tester och artefakter finns.
+
+### ”Är detta Nowastes cell?”
+
+”Nej. Nowaste beskriver en HKM1800/SICS-pilot i Tostarp, och Cognibotics rapporterade senare en beställning av en andra cell. Det ger användningskontext. Vår layout, produktkatalog, verktyg och rörelsemodell är egna simulatorval; vi kopierar inte kundens konstruktion eller interna programvara.” [S07][S25]
 
 ### ”Är detta verkligen AI?”
 

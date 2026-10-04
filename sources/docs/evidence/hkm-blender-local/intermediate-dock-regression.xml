@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.384" timestamp="2026-10-04T11:43:24.032935+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.blender.test_hkm_runtime" name="test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command" time="2.946"><failure message="AssertionError: assert 0 == 1&#10; +  where 0 = CommandReceipt(schema_version='2.0', run_id='e00c7bff-487f-46eb-b4dd-ea91a53a3be2', correlation_id='b3557e6d-3ca3-5380...rajectory-32f9ea9d7f2f858a8b1b618790c30eaa736790a165e635ee6f989ace850f6343', runtime_profile_version='hkm_inspired_v1').effect_count&#10; +    where CommandReceipt(schema_version='2.0', run_id='e00c7bff-487f-46eb-b4dd-ea91a53a3be2', correlation_id='b3557e6d-3ca3-5380...rajectory-32f9ea9d7f2f858a8b1b618790c30eaa736790a165e635ee6f989ace850f6343', runtime_profile_version='hkm_inspired_v1') = journal('1ca0575e-705a-5c33-b6de-ed640d5dcbed')&#10; +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000216CCCA1A90&gt;.journal&#10; +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000216CCCA1A90&gt; = &lt;robotops.workflow.engine.Engine object at 0x00000216CCCA1D30&gt;.runtime">tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/hkm-blender-reexport-temp/test_hkm_real_lost_ack_restart0')
+
+    def test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command(tmp_path):
+        engine = make_engine(tmp_path)
+        job = engine.run(intake(engine, 1), Fault.DROP_ACK_AFTER_EFFECT)
+        assert job.state == JobState.UNKNOWN_OUTCOME, failure_context(engine)
+        original_id = job.command_id
+        command = engine.store.load(RobotCommand, original_id)
+&gt;       assert engine.runtime.journal(original_id).effect_count == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CommandReceipt(schema_version='2.0', run_id='e00c7bff-487f-46eb-b4dd-ea91a53a3be2', correlation_id='b3557e6d-3ca3-5380...rajectory-32f9ea9d7f2f858a8b1b618790c30eaa736790a165e635ee6f989ace850f6343', runtime_profile_version='hkm_inspired_v1').effect_count
+E        +    where CommandReceipt(schema_version='2.0', run_id='e00c7bff-487f-46eb-b4dd-ea91a53a3be2', correlation_id='b3557e6d-3ca3-5380...rajectory-32f9ea9d7f2f858a8b1b618790c30eaa736790a165e635ee6f989ace850f6343', runtime_profile_version='hkm_inspired_v1') = journal('1ca0575e-705a-5c33-b6de-ed640d5dcbed')
+E        +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000216CCCA1A90&gt;.journal
+E        +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000216CCCA1A90&gt; = &lt;robotops.workflow.engine.Engine object at 0x00000216CCCA1D30&gt;.runtime
+
+tests\blender\test_hkm_runtime.py:255: AssertionError</failure></testcase></testsuite></testsuites>

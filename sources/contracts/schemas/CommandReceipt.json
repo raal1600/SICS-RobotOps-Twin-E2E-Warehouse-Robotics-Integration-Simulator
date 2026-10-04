@@ -17,6 +17,26 @@
   },
   "additionalProperties": false,
   "properties": {
+    "active_tool_id": {
+      "anyOf": [
+        {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Active Tool Id"
+    },
     "causation_id": {
       "maxLength": 160,
       "minLength": 1,
@@ -71,6 +91,19 @@
       "title": "Run Id",
       "type": "string"
     },
+    "runtime_profile_version": {
+      "anyOf": [
+        {
+          "const": "hkm_inspired_v1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Runtime Profile Version"
+    },
     "scene_epoch": {
       "maxLength": 160,
       "minLength": 1,
@@ -79,8 +112,11 @@
       "type": "string"
     },
     "schema_version": {
-      "const": "1.0",
       "default": "1.0",
+      "enum": [
+        "1.0",
+        "2.0"
+      ],
       "title": "Schema Version",
       "type": "string"
     },
@@ -91,6 +127,33 @@
       "format": "date-time",
       "title": "Timestamp",
       "type": "string"
+    },
+    "tool_change_performed": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tool Change Performed"
+    },
+    "trajectory_id": {
+      "anyOf": [
+        {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Trajectory Id"
     }
   },
   "required": [

@@ -1,0 +1,104 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "calibration_version": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Calibration Version",
+      "type": "string"
+    },
+    "camera_model_version": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Camera Model Version",
+      "type": "string"
+    },
+    "frame_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Frame Id",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "position": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Position",
+      "type": "array"
+    },
+    "role": {
+      "enum": [
+        "PRESENTATION",
+        "SYNTHETIC_SENSOR"
+      ],
+      "title": "Role",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sensor_id": {
+      "anyOf": [
+        {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sensor Id"
+    },
+    "target": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Target",
+      "type": "array"
+    }
+  },
+  "required": [
+    "name",
+    "position",
+    "target",
+    "role",
+    "frame_id",
+    "calibration_version",
+    "camera_model_version"
+  ],
+  "title": "VisualCamera",
+  "type": "object"
+}

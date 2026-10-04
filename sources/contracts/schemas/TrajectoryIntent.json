@@ -1,0 +1,285 @@
+{
+  "$defs": {
+    "Pose": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "default": "cal-1",
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "default": "cell_world",
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "quaternion_xyzw": {
+          "default": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Quaternion Xyzw",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "position"
+      ],
+      "title": "Pose",
+      "type": "object"
+    },
+    "TrajectoryWaypoint": {
+      "additionalProperties": false,
+      "properties": {
+        "active_tool_id": {
+          "anyOf": [
+            {
+              "enum": [
+                "EE_VAC_SINGLE",
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Active Tool Id"
+        },
+        "attached": {
+          "default": false,
+          "title": "Attached",
+          "type": "boolean"
+        },
+        "phase": {
+          "enum": [
+            "HOME",
+            "TOOL_CHANGE_REQUESTED",
+            "MOVE_TO_SAFE_POSE",
+            "MOVE_TO_TOOL_DOCK",
+            "RELEASE_CURRENT_TOOL",
+            "VERIFY_FLANGE_EMPTY",
+            "ENGAGE_REQUESTED_TOOL",
+            "VERIFY_TOOL_ID",
+            "RETREAT_FROM_TOOL_RACK",
+            "TOOL_CHANGE_COMPLETED",
+            "TOOL_CHANGE_NOT_REQUIRED",
+            "PRE_GRASP",
+            "APPROACH",
+            "GRASP",
+            "GRASP_CONFIRM",
+            "LIFT",
+            "SAFE_TRANSFER",
+            "PRE_PLACE",
+            "PLACE",
+            "RELEASE",
+            "RELEASE_CONFIRM",
+            "RETRACT",
+            "NEXT_SAFE_POSE"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sim_time_s": {
+          "minimum": 0,
+          "title": "Sim Time S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "phase",
+        "pose",
+        "sim_time_s",
+        "active_tool_id"
+      ],
+      "title": "TrajectoryWaypoint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "calibration_version": {
+      "const": "hkm-cal-1",
+      "default": "hkm-cal-1",
+      "title": "Calibration Version",
+      "type": "string"
+    },
+    "collision_check_version": {
+      "const": "synthetic-aabb-preflight-1",
+      "default": "synthetic-aabb-preflight-1",
+      "title": "Collision Check Version",
+      "type": "string"
+    },
+    "estimated_sim_duration_s": {
+      "exclusiveMinimum": 0,
+      "title": "Estimated Sim Duration S",
+      "type": "number"
+    },
+    "frame_tree_version": {
+      "const": "hkm-frame-tree-1",
+      "default": "hkm-frame-tree-1",
+      "title": "Frame Tree Version",
+      "type": "string"
+    },
+    "grasp_pose": {
+      "$ref": "#/$defs/Pose"
+    },
+    "product_attachment_offset_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Product Attachment Offset M",
+      "type": "array"
+    },
+    "profile": {
+      "const": "SAFE_PICK_PLACE_V1",
+      "default": "SAFE_PICK_PLACE_V1",
+      "title": "Profile",
+      "type": "string"
+    },
+    "required_tool_id": {
+      "enum": [
+        "EE_VAC_SINGLE",
+        "EE_VAC_ARRAY",
+        "EE_PINCH_NARROW",
+        "EE_PINCH_WIDE",
+        "EE_ADAPTIVE_SOFT",
+        "EE_SUPPORT_FORK"
+      ],
+      "title": "Required Tool Id",
+      "type": "string"
+    },
+    "route_index": {
+      "maximum": 6,
+      "minimum": 0,
+      "title": "Route Index",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "target_tcp_pose": {
+      "$ref": "#/$defs/Pose"
+    },
+    "timing_classification": {
+      "const": "SIMULATOR_PRESENTATION_TIMING",
+      "default": "SIMULATOR_PRESENTATION_TIMING",
+      "title": "Timing Classification",
+      "type": "string"
+    },
+    "trajectory_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Trajectory Id",
+      "type": "string"
+    },
+    "trajectory_planner_version": {
+      "const": "synthetic-trajectory-1",
+      "default": "synthetic-trajectory-1",
+      "title": "Trajectory Planner Version",
+      "type": "string"
+    },
+    "waypoints": {
+      "items": {
+        "$ref": "#/$defs/TrajectoryWaypoint"
+      },
+      "maxItems": 128,
+      "minItems": 14,
+      "title": "Waypoints",
+      "type": "array"
+    }
+  },
+  "required": [
+    "trajectory_id",
+    "required_tool_id",
+    "grasp_pose",
+    "target_tcp_pose",
+    "product_attachment_offset_m",
+    "waypoints",
+    "estimated_sim_duration_s",
+    "route_index"
+  ],
+  "title": "TrajectoryIntent",
+  "type": "object"
+}

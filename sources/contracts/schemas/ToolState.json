@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "active_tool_id": {
+      "anyOf": [
+        {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Active Tool Id"
+    },
+    "changer_state": {
+      "default": "READY",
+      "enum": [
+        "READY",
+        "CHANGING",
+        "FAULTED"
+      ],
+      "title": "Changer State",
+      "type": "string"
+    },
+    "rack_tool_ids": {
+      "items": {
+        "enum": [
+          "EE_VAC_SINGLE",
+          "EE_VAC_ARRAY",
+          "EE_PINCH_NARROW",
+          "EE_PINCH_WIDE",
+          "EE_ADAPTIVE_SOFT",
+          "EE_SUPPORT_FORK"
+        ],
+        "type": "string"
+      },
+      "title": "Rack Tool Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "tool_state_version": {
+      "const": "synthetic-tool-state-1",
+      "default": "synthetic-tool-state-1",
+      "title": "Tool State Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "active_tool_id",
+    "rack_tool_ids"
+  ],
+  "title": "ToolState",
+  "type": "object"
+}

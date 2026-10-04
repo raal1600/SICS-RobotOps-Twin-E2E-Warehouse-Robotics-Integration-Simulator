@@ -18,6 +18,18 @@
       "title": "Color",
       "type": "array"
     },
+    "label": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Label"
+    },
     "location_id": {
       "anyOf": [
         {
@@ -33,11 +45,49 @@
       "default": null,
       "title": "Location Id"
     },
+    "material_role": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Material Role"
+    },
     "name": {
       "maxLength": 200,
       "minLength": 1,
       "title": "Name",
       "type": "string"
+    },
+    "opacity": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Opacity"
+    },
+    "parent_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Name"
     },
     "position": {
       "maxItems": 3,
@@ -56,6 +106,22 @@
       "title": "Position",
       "type": "array"
     },
+    "primitive": {
+      "anyOf": [
+        {
+          "enum": [
+            "box",
+            "cylinder"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Primitive"
+    },
     "product_id": {
       "anyOf": [
         {
@@ -71,11 +137,82 @@
       "default": null,
       "title": "Product Id"
     },
+    "quaternion_xyzw": {
+      "anyOf": [
+        {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Quaternion Xyzw"
+    },
+    "scale": {
+      "anyOf": [
+        {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scale"
+    },
     "schema_version": {
-      "const": "1.0",
       "default": "1.0",
+      "enum": [
+        "1.0",
+        "2.0"
+      ],
       "title": "Schema Version",
       "type": "string"
+    },
+    "semantic_tags": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Semantic Tags"
     },
     "size": {
       "maxItems": 3,
@@ -93,6 +230,38 @@
       ],
       "title": "Size",
       "type": "array"
+    },
+    "tool_id": {
+      "anyOf": [
+        {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tool Id"
+    },
+    "visible": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visible"
     }
   },
   "required": [

@@ -2,7 +2,9 @@
 
 `Store` opens short SQLite BEGIN IMMEDIATE transactions, with WAL and FULL
 synchronization. Atomic intake writes an order, its jobs, idempotency mapping and
-causal audit events. Canonical JSON (sorted keys, including defaults) is hashed;
+causal audit events. Canonical JSON (sorted keys and schema-specific serialized
+defaults) is hashed; schema-1 records omit schema-2 extensions so original command
+digests remain valid. Strict golden fixtures verify the historical wire bytes;
 an order ID or key cannot be reused with changed content. Identical requests
 return the existing current semantic result, including after restart.
 
@@ -23,6 +25,14 @@ executes, under the cell claim. It supports historical no-motion replay and is
 never verification evidence. Legacy jobs without this record are labelled as
 current references instead of inventing their historical layout. See ADRs 0001
 and 0004.
+
+New schema-2 worlds persist runtime settings, robot TCP/profile and mounted/rack
+tool state. Reopening resolves those saved settings; a new application default
+cannot reinterpret an existing world. Old schema-1 worlds are resolved in memory
+without writing migration metadata merely because history was viewed. Tool
+selection and trajectory intent remain immutable command/plan evidence. Tool
+preparation events retain the original pick identity and do not increment the
+product-transfer effect count.
 
 Only COMPLETED and FAILED are terminal. Explicit re-observation may claim an
 intervention job and enter RECONCILING with identity-matched evidence; normal

@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-03:** The deterministic simulator includes full delivery replay, independent reusable tests, repeated evidence review, a dark guided workspace and explanations for every scenario and observation mode. Audited source 59ace31 passed all 85 MUST criteria: 389 tests twice, 101 UI checks, 89.22% coverage, seven Blender demos, security, types and documentation checks. GitHub CI, Windows lifecycle checks and Pages passed. The optional model-provider fallback remains a documented SHOULD limitation. Final evidence commits receive their own CI and Pages attestations. Status: DONE.
+> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell, bounded Blender runtime, deterministic tool selection, geometric preflight and rotation-aware read-only replay are implemented. Targeted checks include real Blender integration and 107 UI checks, plus browser six-tool and uncertain-outcome workflows. The prior release and fresh eaf35b4 baseline remain archived; this enhancement awaits repeated full acceptance and exact-commit CI/publication evidence. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -85,9 +85,11 @@ För projektet följer ett designkrav: AI-funktionen ska vara en utbytbar kompon
 
 ### 3.3 Produktionsbeskrivningen från Cognibotics
 
-Cognibotics beskriver den 5 januari 2026 en andra robotcell för Nowaste med AutoStore, SICS AI:s vision och integration mot lagerstyrningen. Juliet & Romeo tillskrivs realtidsrörelse, gripning och överlämning till transportband. Det är en leverantörsbeskrivning av en konkret installation, inte en publicerad intern gränssnittsspecifikation. [S07]
+Cognibotics meddelade den 5 januari 2026 att Nowaste hade **beställt en andra cell** efter den första piloten. Texten tillskriver den befintliga AutoStore-tillämpningen SICS AI-vision samt Juliet & Romeo för rörelse, gripning och transportbandsöverlämning. Källan belägger inte att den andra installationen redan var färdig. Det är leverantörens beskrivning, inte en oberoende driftsrevision eller intern API-specifikation. [S07]
 
-Tillverkaren beskriver HKM1800 som hybridkinematisk. RobotOps Twin ska därför inte märka en generisk sexaxlig Blender-arm som en mekaniskt korrekt HKM1800. Robotens utseende används för förståelse av flödet, inte för att härleda dess faktiska arbetsområde eller cykeltid. [S08]
+Nowastes eget pressmeddelande från den 26 januari 2024 beskriver en HKM1800 med SICS-programvara i en pilot i produktionsmiljö på Tostarp. Det ger lagerplockning som användningskontext, men ingen rätt att rekonstruera kundens exakta layout eller interna system. Även detta är COMPANY_REPORTED_CLAIM. [S25]
+
+Tillverkaren anger 1,8 m radiell räckvidd över 360 grader, ungefär 10 m² täckning, nära 1 m vertikalt slag och 2 kg nominell respektive 7,5 kg maximal last. Uppgifterna är offentliga tillverkarpåståenden, inte testresultat från RobotOps. [S08] Beskrivningen av basplacerade drivningar och kombinerade serie-/parallelllänkar ger visuell inspiration; vi härleder inga verkliga ledmått eller styrparametrar. [S23] Verktygsväxling för varierande gods är också tillverkarbeskriven, medan våra sex verktyg och deras begränsningar är egna simulatorval. [S24]
 
 HYPER- och produktionsbeskrivningarna behöver inte motsäga varandra. De kan avse olika nivåer, versioner eller tillämpningar. Vårt svar är att skilja mellan uppgiftsnivå och rörelsenivå i designen och be SICS förklara den verkliga ansvarsfördelningen. Två fullständiga styrimplementationer behövs inte i första versionen.
 
@@ -97,7 +99,7 @@ CloudGripper/AutoGrasper beskriver ett arbetsflöde där uppgift, återställnin
 
 R900, med Axel Kaliff som medförfattare, undersöker kostnadseffektiviteten hos autonom datainsamling för robotinlärning. Den granskade arXiv-posten har en reviderad version från 17 september 2025. Studiens automatisering av försök, märkning och återställning motiverar att också vår simulator gör episoder och återhämtning till förstklassiga begrepp. Vi reproducerar inte dess dataset eller modellresultat. [S06]
 
-Axels examensarbetstitel anknyter till verifiering av robotaktioner med en digital tvilling. Denna tematiska koppling är relevant, men innebär inte att en efterhandskontroll av objektposition i Blender reproducerar hans forskningsmetod. [S04]
+Axels examensarbetstitel anknyter till verifiering av robotaktioner med en digital tvilling. Examinatorns aktuella akademiska lista anger även hans författarskap i CloudGripper-AutoGrasper. DiVA-fulltexten har fortfarande inte kunnat granskas; endast bibliografisk koppling och öppet repositoryunderlag används. RobotOps gör därför inget anspråk på att reproducera examensarbetets metod eller resultat. [S04][S26]
 
 ### 3.5 GPU-resurser och deras roll
 
@@ -113,7 +115,7 @@ Simulatorn behöver ingen B200. Den ska i stället kunna beskriva modellversion,
 | HYPER [S03] | Världsrepresentation och robotgränssnitt. | Ett typat Brain-gränssnitt. | Proprietär modell eller AGI. |
 | AutoGrasper [S05] | Uppgift, reset och recovery skiljs åt. | Episodmodell och explicita felvägar. | Deras implementation eller data. |
 | R900 [S06] | Automatiserade robotförsök. | Reproducerbara scenarier och loggning. | Studiens resultat. |
-| Cognibotics [S07] | Motion, vision och lagerstyrning samverkar. | Separat cell- och robotadapter. | Den installerade cellens interna API. |
+| Cognibotics / Nowaste [S07][S25] | Rapporterad pilot och beställning av ytterligare cell. | Separat cell- och robotadapter. | Kundens interna API eller exakta cell. |
 | Blender [S12–S14] | Scen-API, timers och MCP-verktyg. | Kontrollerad runtime, separat scenförfattande. | Industriell realtidsstyrning. |
 | AWS [S17] | Återförsök kräver tydlig identitet och semantik. | Beständig avsikt och avstämning av okänt utfall. | En allmän exactly-once-garanti. |
 
@@ -121,7 +123,7 @@ Simulatorn behöver ingen B200. Den ska i stället kunna beskriva modellversion,
 
 ### 4.1 Ett litet system med verkliga ansvarsskillnader
 
-Första versionen ska ha en kund, en robotcell, tre syntetiska artikeltyper och ett aktivt plock åt gången. En orderrad omfattar ett exemplar; större kvantiteter delas senare upp i spårbara deluppdrag. Källåda, destinationslåda och produktidentiteter är explicit modellerade.
+Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en HKM-inspirerad manipulator. Den implementerade utökningen har riktad Blender-evidens för verktygsbyte, plock och återställning, men full upprepad acceptans och publicering för slutlig källrevision återstår. En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag. Gamla körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.
 
 Systemet ska kunna köras utan externa modellkonton. Blender visar förändringen i världen, men ordern blir inte färdig bara för att animationen slutar. UI:t visar orderstatus, cellstatus, kommandostatus och verifieringsstatus var för sig.
 
@@ -290,9 +292,31 @@ Implementerade felvägar är timeout, okänd objektidentitet, felaktig destinati
 
 ### 9.1 Scen och rörelse
 
-Scenen innehåller en generisk arm, gripare, två lådor, tre objekt, enkel transportyta, kamera och synlig cellgräns. Alla objekt har stabila identiteter. Gripning modelleras först med en kontrollerad fästning och lossning när geometriska förvillkor är uppfyllda. Ingen realistisk friktion, deformation eller sugkoppskraft antas.
+Den arkiverade baslinjen använder en stiliserad kartesisk maskin, två lådor och tre produktkuber. Nya världar i revision 1.2 använder en originalbyggd HKM-inspirerad hybridmanipulator och en rikare lagercell: sex källådor, varierande produktgeometri, sex verktygsdockor, transportband, inhägnad och tre kameror. Baslinjens gamla scener och inspelningar behåller sin ursprungliga form; en ny standardprofil ändrar inte sparad historik.
 
-Rörelsen följer definierade delsteg: närma sig, kontrollera greppvillkor, fästa objekt, lyfta, förflytta, lossa och observera igen. Systemet ändrar faktiskt scenens objektläge; det är inte en förinspelad film. En framtida IK-lösare eller fysikmotor får införas som en separat, testad utökning.
+{{figure:hkm-cell}}
+
+`HKM_INSPIRED_VISUAL_KINEMATICS_V1` är vårt namn på en deterministisk avbildning från TCP-pose till sammankopplade visuella länkar. Matematiken finns i `robotops/hkm_geometry.py`; den gör inga anspråk på verklig HKM-IK. Version-2-inspelningar innehåller utvärderad position, quaternion, skala, fas, synlighet och verktygs-/objektanknytning. Blender- och webbläsarvyn använder samma semantiska objektidentiteter. Replay är läsning av inspelad evidens, aldrig en väg tillbaka till robotkommandon.
+
+Blenders Python-API stöder programmatisk åtkomst till objekt, scen och animation, vilket passar denna avgränsade syntetiska värld. [S27] Kontaktkrafter, deformation och riktiga sugkoppskrafter simuleras inte. PyBullet dokumenterar fysik, ledkroppar, IK och kollisionsfunktioner; Isaac Sim dokumenterar robotrörelse och sensormodeller. De är relevanta jämförelser om sådan validering senare blir ett krav, men införs inte som nya beroenden här. [S28][S29][S30]
+
+### 9.1.1 Verktygsval och synlig förberedelse
+
+Den kanoniska katalogen `robotops/robotics/catalogue-v1.json` beskriver våra sex produktfamiljer, massa/geometri och sex gripverktyg. Tabellen nedan genereras direkt från samma data. P/C är kandidater; separat kontroll av produktens konservativa maximala fixturmassa, geometri och tillgänglighet kan ändå utesluta ett verktyg. Poäng, avvisningsskäl och stabil rangordning sparas i planen och visas under ”Why this tool?”. Integrerad köracceptans redovisas separat från att katalogen existerar.
+
+{{figure:product-tool-compatibility}}
+
+Verktygsväxling är en förberedelse inom det ursprungliga PICK_AND_PLACE-kommandot. Rackplats, monterat verktyg och kontrollsteg sparas beständigt. Ett verktygsbyte ökar inte antalet produktförflyttningar. Saknat begärt verktyg stoppar före produktens effekt; redan korrekt verktyg ger ett explicit no-change-beslut. `tool_showcase` kör alla sex produktfamiljer med deras föredragna verktyg och verifierar varje jobb innan nästa börjar.
+
+{{figure:tool-preparation}}
+
+### 9.1.2 Trajektoria, arbetsområde och ramar
+
+Planeringen innehåller förberedelse, lodrät ansats, grepp/kvittens, lyft, hög syntetisk överföringsnivå, placering, lossning/kvittens och reträtt. Deterministisk smoothstep ger läsbar acceleration utan att imitera tillverkarens cykeltid. Simuleringstid och presentationshastighet hålls skilda från faktisk pipeline-latens och UTC-händelser.
+
+Den egna konservativa geometrikontrollen samplar arbetsområdet och testar segment mot expanderade hindergränser, provar ett ändligt antal alternativa vägar och avvisar om ingen väg fungerar. Synliga statiska objekt och hindergränser kommer från samma geometri; även observerade produkter, last och parkerade verktyg kontrolleras. Endast registrerad lodrät dockning till rätt verktyg får undantag för avsiktlig kontakt. Rotationsrörelser får en konservativ svept volym. Kontrollen validerar inte verklig robotkollision, länkarnas kontaktfysik eller säkerhet. Runtime kontrollerar oberoende identitet, scenepok, källa, verktyg, kalibrering och begränsad trajektoria före effekt. Sensorramar och celltelemetri märks uttryckligen; en renderad kamerabild bevisar inte att datorseende har körts.
+
+{{figure:frames}}
 
 ### 9.2 Blender-runtime och trådar
 

@@ -1523,5 +1523,470 @@
       "docs/implementation/acceptance.md"
     ],
     "explanation": "Generator maps all MUST/SHOULD criteria to actual gate exits, named collected tests, logs, files, commit and environment. Missing/skipped evidence cannot pass."
+  },
+  "HKM-VIS-MUST-001": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_scene_is_deterministic_typed_and_has_complete_hierarchy",
+      "test_hkm_blender_capture_has_real_hierarchy_and_calibrated_synthetic_cameras"
+    ],
+    "files": [
+      "robotops/hkm_geometry.py",
+      "blender/scripts/hkm_scene.py",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "Original procedural base, rotary assembly, four connected links, wrist and changer have stable names in actual Blender; assets are generated from checked-in code without CAD import."
+  },
+  "HKM-VIS-MUST-002": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_catalogue_has_exact_six_specs_and_canonical_compatibility_matrix",
+      "test_hkm_six_sources_products_and_tools_derive_from_catalogue",
+      "test_hkm_real_blender_six_tool_showcase_articulates_attaches_and_releases"
+    ],
+    "files": [
+      "robotops/robotics/catalogue-v1.json",
+      "robotops/hkm_geometry.py",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "Six canonical SKU dimensions, masses, distinct procedural geometries and separate source fixtures are exercised through the actual six-product Blender run."
+  },
+  "HKM-VIS-MUST-003": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_catalogue_has_exact_six_specs_and_canonical_compatibility_matrix",
+      "test_hkm_mounted_tool_and_rack_occupancy_are_explicit_and_unique",
+      "test_hkm_tool_switch_preserves_identity_and_rack_occupancy"
+    ],
+    "files": [
+      "robotops/robotics/models.py",
+      "robotops/robotics/catalogue-v1.json",
+      "robotops/hkm_geometry.py"
+    ],
+    "explanation": "Exactly six typed tool definitions share one compatibility source; unique persistent mounted/rack occupancy is reflected in stable visual objects."
+  },
+  "HKM-VIS-MUST-004": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "demo_tool_showcase"
+    ],
+    "tests": [
+      "test_hkm_preferred_tools_and_reasoning_are_deterministic",
+      "test_hkm_full_tool_showcase_persists_decisions_tools_and_six_distinct_effects",
+      "test_hkm_real_blender_six_tool_showcase_articulates_attaches_and_releases"
+    ],
+    "files": [
+      "robotops/demo.py",
+      "robotops/robotics/selector.py",
+      "tests/e2e/test_hkm_scenarios.py",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "The six-product showcase selects all six preferred tools, persists changes and produces one transfer per original command, in deterministic host and actual Blender execution."
+  },
+  "HKM-VIS-MUST-005": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_full_tool_showcase_persists_decisions_tools_and_six_distinct_effects",
+      "test_hkm_validator_recomputes_selection_explanation_and_trajectory"
+    ],
+    "files": [
+      "robotops/robotics/selector.py",
+      "robotops/brain/validation.py",
+      "robotops/workflow/engine.py",
+      "apps/erp_ui/app.js"
+    ],
+    "explanation": "Every persisted ActionPlan contains six scored candidates, eligibility reasons, assessed mass, selected tool and change requirement; the validator recomputes the explanation from observation."
+  },
+  "HKM-VIS-MUST-006": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_workspace_rejects_outside_radius_or_height",
+      "test_hkm_workspace_accepts_boundary_and_blocks_frame_calibration_tilt",
+      "test_hkm_defensive_machine_boundary_blocks_invalid_execution_before_transfer",
+      "test_hkm_fixed_blender_process_rejects_broken_request_before_effect"
+    ],
+    "files": [
+      "robotops/robotics/trajectory.py",
+      "robotops/cell/hkm_execution.py",
+      "blender/scripts/hkm_runtime.py"
+    ],
+    "explanation": "Radial, height, frame, calibration and trajectory guards reject invalid plans before transfer, with independently checked fixed-Blender request rejection."
+  },
+  "HKM-VIS-MUST-007": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_collision_alternative_is_finite_and_deterministic",
+      "test_hkm_thin_obstacles_cannot_fall_between_collision_samples",
+      "test_hkm_rotating_tool_sweep_cannot_hide_between_endpoint_bounds",
+      "test_hkm_idle_tool_obstacles_follow_observed_rack_occupancy",
+      "test_hkm_only_registered_vertical_docking_contact_is_exempt"
+    ],
+    "files": [
+      "robotops/robotics/trajectory.py",
+      "robotops/hkm_geometry.py",
+      "blender/scripts/hkm_runtime.py",
+      "tests/unit/test_hkm_runtime_defenses.py"
+    ],
+    "explanation": "Shared static mesh bounds, observed products and occupied tools undergo conservative swept-envelope preflight; finite alternatives are deterministic, thin barriers and yaw sweeps cannot be skipped, and only registered vertical tool contact is exempt."
+  },
+  "HKM-VIS-MUST-008": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_real_blender_six_tool_showcase_articulates_attaches_and_releases",
+      "test_hkm_link_endpoints_remain_connected_and_lengths_constant",
+      "test_motion_sampling_is_read_only_smooth_and_preserves_attach_release"
+    ],
+    "files": [
+      "robotops/hkm_geometry.py",
+      "blender/scripts/hkm_runtime.py",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "Actual evaluated Blender link transforms articulate through complete smooth pick/place and tool-change phases, preserving attachment until release and the committed final product pose."
+  },
+  "HKM-VIS-MUST-009": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_real_blender_six_tool_showcase_articulates_attaches_and_releases",
+      "test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command",
+      "test_live_recording_replay_restart_and_legacy_import_are_read_only",
+      "test_hkm_does_not_replace_legacy_cartesian_geometry"
+    ],
+    "files": [
+      "robotops/blender/visualization.py",
+      "apps/erp_ui/scene-view.js",
+      "apps/erp_ui/playback.js",
+      "tests/ui/playback.test.cjs"
+    ],
+    "explanation": "Version-2 recordings retain positions, quaternion rotations, scale, visibility, phases and tool identity; evaluated saved-scene transforms are read-only and version-1 Cartesian evidence retains its historical interpretation."
+  },
+  "HKM-VIS-MUST-010": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "security"
+    ],
+    "tests": [
+      "test_hkm_validator_rejects_legacy_plan_and_injected_code",
+      "test_fixed_runtime_rejects_unsafe_or_untyped_request_before_effect",
+      "test_fixed_runtime_capture_and_reset_cannot_smuggle_a_pick_command",
+      "test_hkm_fixed_blender_process_rejects_broken_request_before_effect"
+    ],
+    "files": [
+      "robotops/domain/models.py",
+      "robotops/blender/adapter.py",
+      "blender/scripts/runtime.py",
+      "blender/scripts/hkm_runtime.py"
+    ],
+    "explanation": "Strict versioned JSON requests, durable payload hash and fixed checked-in Blender Python form the only execution boundary; unknown code fields and mismatched capture/reset operations fail closed."
+  },
+  "HKM-VIS-MUST-011": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_verifier_signature_and_import_graph_exclude_private_world_access",
+      "test_hkm_private_destination_truth_cannot_resolve_contradictory_observation",
+      "test_truth_cannot_be_substituted_for_observation"
+    ],
+    "files": [
+      "robotops/verification/verifier.py",
+      "tests/contract/test_hkm_boundaries.py"
+    ],
+    "explanation": "Structural import/signature guards and deliberately contradictory observations prove that private destination truth cannot become verifier evidence or fabricated success."
+  },
+  "HKM-VIS-MUST-012": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_observation_noise_is_deterministic_and_telemetry_is_not_camera_perception",
+      "test_hkm_ambiguous_evidence_remains_intervention_until_fresh_same_command_review"
+    ],
+    "files": [
+      "robotops/observation/model.py",
+      "robotops/domain/models.py",
+      "tests/contract/test_hkm_boundaries.py"
+    ],
+    "explanation": "Normal, missing, low-confidence, stale, contradictory and pose-uncertainty observations have repeatable configured output, calibrated sensor metadata and separately identified machine telemetry."
+  },
+  "HKM-VIS-MUST-013": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "demo_lost_ack_after_effect"
+    ],
+    "tests": [
+      "test_hkm_lost_ack_after_effect_reconciles_original_command_exactly_once",
+      "test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command"
+    ],
+    "files": [
+      "robotops/cell/runtime.py",
+      "robotops/blender/adapter.py",
+      "robotops/workflow/engine.py",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "A durable transfer followed by deliberately dropped acknowledgement records UNKNOWN_OUTCOME under the original command identity before reconciliation."
+  },
+  "HKM-VIS-MUST-014": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "demo_lost_ack_after_effect"
+    ],
+    "tests": [
+      "test_hkm_lost_ack_after_effect_reconciles_original_command_exactly_once",
+      "test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command"
+    ],
+    "files": [
+      "robotops/workflow/engine.py",
+      "tests/e2e/test_hkm_scenarios.py",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "Original controller journal plus fresh observation resolve the uncertain command, with exactly one order/job/command/PICK_EFFECT and no replacement pick."
+  },
+  "HKM-VIS-MUST-015": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "demo_ambiguous"
+    ],
+    "tests": [
+      "test_hkm_ambiguous_evidence_remains_intervention_until_fresh_same_command_review",
+      "test_hkm_private_destination_truth_cannot_resolve_contradictory_observation",
+      "test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command"
+    ],
+    "files": [
+      "robotops/verification/verifier.py",
+      "robotops/workflow/engine.py",
+      "tests/e2e/test_hkm_scenarios.py"
+    ],
+    "explanation": "Insufficient or contradictory evidence stays INCONCLUSIVE and REQUIRES_INTERVENTION; later fresh evidence can resolve the same command without erasing prior attempts or adding a transfer."
+  },
+  "HKM-VIS-MUST-016": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_duplicate_order_and_payload_conflict_do_not_add_robot_effects",
+      "test_api_fixture_validation_preserves_duplicate_and_conflict_semantics"
+    ],
+    "files": [
+      "robotops/workflow/store.py",
+      "apps/api/app.py",
+      "tests/e2e/test_hkm_scenarios.py"
+    ],
+    "explanation": "Identical order replay returns the original semantic result; changed payload conflicts without an additional job, command or physical effect. Duplicate command identity/payload handling is independently asserted."
+  },
+  "HKM-VIS-MUST-017": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "demo_restart"
+    ],
+    "tests": [
+      "test_hkm_lost_ack_after_effect_reconciles_original_command_exactly_once",
+      "test_hkm_full_tool_showcase_persists_decisions_tools_and_six_distinct_effects",
+      "test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command",
+      "test_pre_upgrade_unknown_command_recovers_with_original_hash_and_one_effect"
+    ],
+    "files": [
+      "robotops/cell/runtime.py",
+      "robotops/workflow/engine.py",
+      "tests/fixtures/legacy_v1/manifest.json",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "Restart reconstructs profile/tool state and uncertain original command; fresh reconciliation and replay preserve one effect. Archived pre-upgrade commands retain their original payload digest."
+  },
+  "HKM-VIS-MUST-018": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_fresh_api_fixture_and_six_product_orders_use_catalogued_sources_and_tools",
+      "test_hkm_full_tool_showcase_persists_decisions_tools_and_six_distinct_effects",
+      "test_metrics_timeline_and_dashboard_survive_restart"
+    ],
+    "files": [
+      "apps/erp_ui/app.js",
+      "apps/erp_ui/index.html",
+      "tests/ui/dashboard.test.cjs",
+      "robotops/observability/metrics.py",
+      "tests/e2e/test_hkm_scenarios.py"
+    ],
+    "explanation": "Dashboard/API expose original IDs, job and cell state, active tool, motion phase and selection evidence; persisted metrics distinguish processing latency from synthetic presentation duration. Both mandatory suite gates include JavaScript dashboard tests."
+  },
+  "HKM-VIS-MUST-019": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_ambiguous_evidence_remains_intervention_until_fresh_same_command_review",
+      "test_hkm_private_destination_truth_cannot_resolve_contradictory_observation",
+      "test_reobserve_intervention_and_continue_same_delivery"
+    ],
+    "files": [
+      "apps/erp_ui/app.js",
+      "apps/erp_ui/workflow-guide.js",
+      "tests/ui/dashboard.test.cjs",
+      "tests/ui/workflow-guide.test.cjs",
+      "robotops/workflow/engine.py"
+    ],
+    "explanation": "Evidence retains the exact assessed observation, confidence, provenance/version and immutable reconciliation attempts; UI tests distinguish journal-reported effect, acknowledgement delivery and workflow knowledge without substituting truth."
+  },
+  "HKM-VIS-MUST-020": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command",
+      "test_playback_controls_never_dispatch_and_preserve_partial_recording_limits",
+      "test_live_recording_replay_restart_and_legacy_import_are_read_only"
+    ],
+    "files": [
+      "apps/erp_ui/playback.js",
+      "apps/erp_ui/scene-view.js",
+      "tests/ui/playback.test.cjs",
+      "tests/blender/test_hkm_runtime.py"
+    ],
+    "explanation": "Replay/camera/speed/frame controls only change presentation, while actual Blender recording re-export and history leave original command, journal, effect count and workflow state unchanged."
+  },
+  "HKM-VIS-MUST-021": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_hkm_camera_views_are_distinct_and_sensor_metadata_is_preserved",
+      "test_hkm_camera_calibration_orientation_matches_actual_blender_view_direction",
+      "test_hkm_blender_capture_has_real_hierarchy_and_calibrated_synthetic_cameras"
+    ],
+    "files": [
+      "robotops/robotics/catalogue-v1.json",
+      "robotops/hkm_geometry.py",
+      "blender/scripts/hkm_scene.py",
+      "apps/erp_ui/scene-view.js",
+      "tests/ui/playback.test.cjs"
+    ],
+    "explanation": "Operator, overhead and side cameras have distinct calibrated poses matching actual Blender orientation; Follow TCP and camera changes are presentation controls only."
+  },
+  "HKM-VIS-MUST-022": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift"
+    ],
+    "tests": [
+      "test_knowledge_base_links_ids_sources_and_status",
+      "test_domain_boundary_has_no_blender_or_network_dependency"
+    ],
+    "files": [
+      "docs/implementation/hkm-inspired.md",
+      "docs/generated/product-tool-catalogue.md",
+      "docs/adr/0010-hkm-inspired-versioned-cell.md",
+      "publication/references.json",
+      "apps/erp_ui/index.html"
+    ],
+    "explanation": "Public documentation, provenance registry and app disclose original HKM-inspired geometry, synthetic observations and motion/collision limits, with no proprietary CAD/software, validated dynamics, safety or real-throughput claims."
+  },
+  "HKM-VIS-MUST-023": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "repeatability",
+      "lint",
+      "typecheck",
+      "security"
+    ],
+    "tests": [
+      "test_pre_upgrade_evidence_bytes_and_command_digest_are_preserved",
+      "test_pre_upgrade_unknown_command_recovers_with_original_hash_and_one_effect",
+      "test_criterion_registry_accepts_both_revisions_without_dropping_legacy_ids",
+      "test_completion_requires_every_must_and_all_remote_gates"
+    ],
+    "files": [
+      "tests/fixtures/legacy_v1/manifest.json",
+      "tests/contract/test_legacy_revision.py",
+      "SUCCESS_CRITERIA.md",
+      "docs/acceptance-map.json"
+    ],
+    "explanation": "All original criterion entries remain intact; complete mandatory suites execute twice, enforce unchanged coverage and quality gates, and preserve golden pre-upgrade wire/evidence bytes with conservative recovery."
+  },
+  "HKM-VIS-MUST-024": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift",
+      "publication"
+    ],
+    "tests": [
+      "test_checked_in_catalogue_documentation_matches_runtime_source",
+      "test_canonical_catalogue_documentation_detects_changed_compatibility",
+      "test_versioned_schema_matches_source",
+      "test_knowledge_base_links_ids_sources_and_status"
+    ],
+    "files": [
+      "PROJECT_PLAN.md",
+      "HANDOFF.md",
+      "SUCCESS_CRITERIA.md",
+      "docs/implementation/hkm-inspired.md",
+      "docs/generated/product-tool-catalogue.md",
+      "docs/adr/0010-hkm-inspired-versioned-cell.md",
+      "publication/diagrams.json"
+    ],
+    "explanation": "Generated canonical catalogue documentation, versioned contracts, normative documents and diagram sources are checked for synchronized implementation and provenance."
+  },
+  "HKM-VIS-MUST-025": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "publication",
+      "ci",
+      "publication_remote",
+      "pages"
+    ],
+    "tests": [
+      "test_knowledge_base_links_ids_sources_and_status",
+      "test_pdf_package_preserves_colliding_report_section_names",
+      "test_completion_requires_every_must_and_all_remote_gates"
+    ],
+    "files": [
+      "PUBLICATION.md",
+      "tools/build_publication.py",
+      "publication/status.json",
+      "publication/references.json",
+      "docs/implementation/acceptance.md"
+    ],
+    "explanation": "Source-generated Pages/PDF builds and exact-commit CI/publication/public-link attestations are mandatory; absent or failed remote evidence cannot pass completion."
   }
 }

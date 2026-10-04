@@ -1,0 +1,71 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "compatibility": {
+      "enum": [
+        "P",
+        "C",
+        "N"
+      ],
+      "title": "Compatibility",
+      "type": "string"
+    },
+    "compatible": {
+      "title": "Compatible",
+      "type": "boolean"
+    },
+    "eligible": {
+      "title": "Eligible",
+      "type": "boolean"
+    },
+    "reasons": {
+      "items": {
+        "maxLength": 160,
+        "minLength": 1,
+        "pattern": "^[\\w.:-]+$",
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Score"
+    },
+    "tool_id": {
+      "enum": [
+        "EE_VAC_SINGLE",
+        "EE_VAC_ARRAY",
+        "EE_PINCH_NARROW",
+        "EE_PINCH_WIDE",
+        "EE_ADAPTIVE_SOFT",
+        "EE_SUPPORT_FORK"
+      ],
+      "title": "Tool Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "tool_id",
+    "compatibility",
+    "compatible",
+    "eligible",
+    "score",
+    "reasons"
+  ],
+  "title": "ToolCandidate",
+  "type": "object"
+}

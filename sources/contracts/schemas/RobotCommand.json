@@ -65,6 +65,7 @@
         "schema_version": {
           "const": "1.0",
           "default": "1.0",
+          "pattern": "^1\\.0$",
           "title": "Schema Version",
           "type": "string"
         },
@@ -79,6 +80,366 @@
         "position"
       ],
       "title": "Pose",
+      "type": "object"
+    },
+    "ToolCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "compatibility": {
+          "enum": [
+            "P",
+            "C",
+            "N"
+          ],
+          "title": "Compatibility",
+          "type": "string"
+        },
+        "compatible": {
+          "title": "Compatible",
+          "type": "boolean"
+        },
+        "eligible": {
+          "title": "Eligible",
+          "type": "boolean"
+        },
+        "reasons": {
+          "items": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
+        },
+        "tool_id": {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "title": "Tool Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool_id",
+        "compatibility",
+        "compatible",
+        "eligible",
+        "score",
+        "reasons"
+      ],
+      "title": "ToolCandidate",
+      "type": "object"
+    },
+    "ToolSelectionDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "assessed_mass_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Assessed Mass Kg",
+          "type": "number"
+        },
+        "candidate_tools": {
+          "items": {
+            "$ref": "#/$defs/ToolCandidate"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Candidate Tools",
+          "type": "array"
+        },
+        "product_catalog_version": {
+          "const": "synthetic-products-1",
+          "default": "synthetic-products-1",
+          "title": "Product Catalog Version",
+          "type": "string"
+        },
+        "product_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "selected_tool_id": {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "title": "Selected Tool Id",
+          "type": "string"
+        },
+        "selection_version": {
+          "const": "deterministic-tool-selector-1",
+          "default": "deterministic-tool-selector-1",
+          "title": "Selection Version",
+          "type": "string"
+        },
+        "sku": {
+          "enum": [
+            "SKU-A",
+            "SKU-B",
+            "SKU-C",
+            "SKU-D",
+            "SKU-E",
+            "SKU-F"
+          ],
+          "title": "Sku",
+          "type": "string"
+        },
+        "tool_change_required": {
+          "title": "Tool Change Required",
+          "type": "boolean"
+        },
+        "tool_spec_version": {
+          "const": "synthetic-tools-1",
+          "default": "synthetic-tools-1",
+          "title": "Tool Spec Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "product_id",
+        "sku",
+        "selected_tool_id",
+        "candidate_tools",
+        "assessed_mass_kg",
+        "tool_change_required"
+      ],
+      "title": "ToolSelectionDecision",
+      "type": "object"
+    },
+    "TrajectoryIntent": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "const": "hkm-cal-1",
+          "default": "hkm-cal-1",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "collision_check_version": {
+          "const": "synthetic-aabb-preflight-1",
+          "default": "synthetic-aabb-preflight-1",
+          "title": "Collision Check Version",
+          "type": "string"
+        },
+        "estimated_sim_duration_s": {
+          "exclusiveMinimum": 0,
+          "title": "Estimated Sim Duration S",
+          "type": "number"
+        },
+        "frame_tree_version": {
+          "const": "hkm-frame-tree-1",
+          "default": "hkm-frame-tree-1",
+          "title": "Frame Tree Version",
+          "type": "string"
+        },
+        "grasp_pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "product_attachment_offset_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Product Attachment Offset M",
+          "type": "array"
+        },
+        "profile": {
+          "const": "SAFE_PICK_PLACE_V1",
+          "default": "SAFE_PICK_PLACE_V1",
+          "title": "Profile",
+          "type": "string"
+        },
+        "required_tool_id": {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "title": "Required Tool Id",
+          "type": "string"
+        },
+        "route_index": {
+          "maximum": 6,
+          "minimum": 0,
+          "title": "Route Index",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "target_tcp_pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "timing_classification": {
+          "const": "SIMULATOR_PRESENTATION_TIMING",
+          "default": "SIMULATOR_PRESENTATION_TIMING",
+          "title": "Timing Classification",
+          "type": "string"
+        },
+        "trajectory_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Trajectory Id",
+          "type": "string"
+        },
+        "trajectory_planner_version": {
+          "const": "synthetic-trajectory-1",
+          "default": "synthetic-trajectory-1",
+          "title": "Trajectory Planner Version",
+          "type": "string"
+        },
+        "waypoints": {
+          "items": {
+            "$ref": "#/$defs/TrajectoryWaypoint"
+          },
+          "maxItems": 128,
+          "minItems": 14,
+          "title": "Waypoints",
+          "type": "array"
+        }
+      },
+      "required": [
+        "trajectory_id",
+        "required_tool_id",
+        "grasp_pose",
+        "target_tcp_pose",
+        "product_attachment_offset_m",
+        "waypoints",
+        "estimated_sim_duration_s",
+        "route_index"
+      ],
+      "title": "TrajectoryIntent",
+      "type": "object"
+    },
+    "TrajectoryWaypoint": {
+      "additionalProperties": false,
+      "properties": {
+        "active_tool_id": {
+          "anyOf": [
+            {
+              "enum": [
+                "EE_VAC_SINGLE",
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Active Tool Id"
+        },
+        "attached": {
+          "default": false,
+          "title": "Attached",
+          "type": "boolean"
+        },
+        "phase": {
+          "enum": [
+            "HOME",
+            "TOOL_CHANGE_REQUESTED",
+            "MOVE_TO_SAFE_POSE",
+            "MOVE_TO_TOOL_DOCK",
+            "RELEASE_CURRENT_TOOL",
+            "VERIFY_FLANGE_EMPTY",
+            "ENGAGE_REQUESTED_TOOL",
+            "VERIFY_TOOL_ID",
+            "RETREAT_FROM_TOOL_RACK",
+            "TOOL_CHANGE_COMPLETED",
+            "TOOL_CHANGE_NOT_REQUIRED",
+            "PRE_GRASP",
+            "APPROACH",
+            "GRASP",
+            "GRASP_CONFIRM",
+            "LIFT",
+            "SAFE_TRANSFER",
+            "PRE_PLACE",
+            "PLACE",
+            "RELEASE",
+            "RELEASE_CONFIRM",
+            "RETRACT",
+            "NEXT_SAFE_POSE"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sim_time_s": {
+          "minimum": 0,
+          "title": "Sim Time S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "phase",
+        "pose",
+        "sim_time_s",
+        "active_tool_id"
+      ],
+      "title": "TrajectoryWaypoint",
       "type": "object"
     }
   },
@@ -95,7 +456,8 @@
       "default": "deterministic-1",
       "enum": [
         "deterministic-1",
-        "structured-1"
+        "structured-1",
+        "deterministic-hkm-1"
       ],
       "title": "Brain Version",
       "type": "string"
@@ -133,6 +495,30 @@
       "title": "Destination Id",
       "type": "string"
     },
+    "frame_tree_version": {
+      "anyOf": [
+        {
+          "const": "hkm-frame-tree-1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Frame Tree Version"
+    },
+    "grasp_pose": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Pose"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "job_id": {
       "maxLength": 160,
       "minLength": 1,
@@ -167,12 +553,58 @@
       "title": "Order Line Id",
       "type": "string"
     },
+    "product_catalog_version": {
+      "anyOf": [
+        {
+          "const": "synthetic-products-1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Product Catalog Version"
+    },
     "product_id": {
       "maxLength": 160,
       "minLength": 1,
       "pattern": "^[\\w.:-]+$",
       "title": "Product Id",
       "type": "string"
+    },
+    "required_tool_id": {
+      "anyOf": [
+        {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Required Tool Id"
+    },
+    "robot_profile_version": {
+      "anyOf": [
+        {
+          "const": "hkm_inspired_v1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Robot Profile Version"
     },
     "run_id": {
       "maxLength": 160,
@@ -189,10 +621,33 @@
       "type": "string"
     },
     "schema_version": {
-      "const": "1.0",
       "default": "1.0",
+      "enum": [
+        "1.0",
+        "2.0"
+      ],
       "title": "Schema Version",
       "type": "string"
+    },
+    "selected_tool_id": {
+      "anyOf": [
+        {
+          "enum": [
+            "EE_VAC_SINGLE",
+            "EE_VAC_ARRAY",
+            "EE_PINCH_NARROW",
+            "EE_PINCH_WIDE",
+            "EE_ADAPTIVE_SOFT",
+            "EE_SUPPORT_FORK"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Selected Tool Id"
     },
     "source_id": {
       "maxLength": 160,
@@ -208,6 +663,41 @@
       "format": "date-time",
       "title": "Timestamp",
       "type": "string"
+    },
+    "tool_selection": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ToolSelectionDecision"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "tool_spec_version": {
+      "anyOf": [
+        {
+          "const": "synthetic-tools-1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tool Spec Version"
+    },
+    "trajectory": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TrajectoryIntent"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     }
   },
   "required": [

@@ -1,15 +1,15 @@
 flowchart TD
   erp["ERP / WMS<br/>Current test / preserved history"]
-  core["Integration API / test scope<br/>Active writes / read-only history"]
+  core["API / durable workflow<br/>Typed plan validation / test scope"]
   gateway["RobotGateway<br/>Typade kommandon och status"]
-  brain["Brain-adapter<br/>Planförslag • ingen exekvering"]
+  brain["Deterministic Brain<br/>Catalogue / tool / trajectory"]
   db["Beständig lagring<br/>Test catalog / per-test evidence"]
-  world["Blender-runtime<br/>World • separate controller journal"]
+  world["Bounded Blender runtime<br/>Private world / tool checkpoints"]
   monitor["Operationsvy<br/>Order- och feltidslinje"]
   verify["Verifierare<br/>Observation → bedömning"]
-  cell["CellController<br/>READY • ESTOP_LOGICAL • FAULTED"]
-  observation["ObservationModel<br/>WorldState → WorldObservation"]
-  replay["3D scenario replay<br/>Start scene / events / Blender poses"]
+  cell["Cell / command journal<br/>Logical interlocks / tool state"]
+  observation["ObservationModel<br/>Sensors / labelled telemetry"]
+  replay["Read-only 3D replay<br/>Versioned transforms / phase / tool"]
   erp <--> core
   core <--> gateway
   core <--> db

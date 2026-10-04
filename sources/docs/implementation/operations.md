@@ -13,7 +13,10 @@ uv run --locked python -m apps.api --runtime blender --port 8000 --data-dir runs
 
 Open http://127.0.0.1:8000. Use **Start new test** for every new combination:
 it retains scenario/observation selections and creates an independent world with
-all products at source. The previous test remains unchanged in **Test history**,
+six catalogued products, each at its own source box in the HKM-inspired cell.
+Fresh API data directories also use this profile. Existing saved worlds keep
+their own profile; opening a historical three-product test does not upgrade it.
+The previous test remains unchanged in **Test history**,
 including uncertain/intervention outcomes. Review its evidence and full replay
 in the same window; **Return to current test** resumes the active world.
 Startup recovers only that active world, without replaying uncertain commands.
@@ -68,13 +71,22 @@ it is distinct from creating another test (ADR 0007).
 The dashboard exposes ERP order, job and logical cell status separately, plus
 original command identity, journal status, verifier reason, causal timeline,
 observation/reconciliation JSON, an always-visible 3D cell, scenario events, live
-machine/product motion and the selected order's Blender
-artifact. [Replay controls](playback.md) read evaluated Blender frames, preserve
+machine/product motion. The selected order's saved Blender snapshot is available
+under **Technical details**, collapsed by default. The full 3D view and replay
+remain the main visualization. [Replay controls](playback.md) read evaluated Blender frames, preserve
 uncertainty and never send another pick. Neither images nor animation establish
 business success. Fault controls are synthetic local fixtures.
 The default Full delivery scope replays all product runs in the selected scene.
 Saved deliveries remain selectable after scenario changes. Individual product
 details and replay remain available; their business identities are unchanged.
+
+The status strip adds the observed tool and observation confidence/model/calibration.
+The replay phase/tool display identifies the currently viewed frame, which may
+belong to an earlier delivery item. **Why this tool?** reads the persisted six
+candidate scores and mass/geometry/availability reasons. **Run six-tool showcase
+(happy path)** explicitly picks and verifies all six SKUs in order; it cannot
+bypass unresolved work. Operator, Overhead, Side inspection and Follow TCP are
+presentation cameras, not evidence-capture actions.
 
 `GET /metrics` derives counters from persisted events. Received/completed/failed/
 unknown/intervention totals count entries into those states; current-state gauges
@@ -83,6 +95,12 @@ durable intents, duplicates count journal suppression, injected failures count
 explicit workflow injections once (not their mirrored controller event).
 Pipeline latency is wall duration measured monotonically for each run attempt,
 reported as histogram/count/sum in seconds; it is not physical cycle-time evidence.
+Additional counters expose orders, product effects, completed tool changes,
+selection failures, trajectory plans/rejections, collision-preflight failures,
+observation degradations and reconciliation outcomes. The application also exposes
+`robotops_pipeline_latency_ms` and `robotops_simulated_motion_duration_s` separately.
+Synthetic duration is summed once for each effect-bearing original command;
+duplicate delivery and playback speed do not inflate it.
 
 Structured AuditEvent records carry UTC timestamps, component/type, causal IDs,
 order/job/command IDs, transition states, reason, duration and evidence references.

@@ -1,5 +1,46 @@
 {
   "$defs": {
+    "ObservedMachineState": {
+      "additionalProperties": false,
+      "properties": {
+        "captured_at": {
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "cell_generation": {
+          "minimum": 0,
+          "title": "Cell Generation",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "const": "SIMULATED_CELL_TELEMETRY",
+          "default": "SIMULATED_CELL_TELEMETRY",
+          "title": "Source",
+          "type": "string"
+        },
+        "tcp_pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "tool_state": {
+          "$ref": "#/$defs/ToolState"
+        }
+      },
+      "required": [
+        "tool_state",
+        "tcp_pose",
+        "captured_at",
+        "cell_generation"
+      ],
+      "title": "ObservedMachineState",
+      "type": "object"
+    },
     "ObservedObject": {
       "additionalProperties": false,
       "properties": {
@@ -8,6 +49,19 @@
           "minimum": 0,
           "title": "Confidence",
           "type": "number"
+        },
+        "evidence_source": {
+          "anyOf": [
+            {
+              "const": "SYNTHETIC_OBSERVATION_MODEL",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Source"
         },
         "location_id": {
           "maxLength": 160,
@@ -27,10 +81,28 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "1.0",
           "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0"
+          ],
           "title": "Schema Version",
           "type": "string"
+        },
+        "sensor_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sensor Id"
         },
         "uncertainty_m": {
           "default": 0,
@@ -113,6 +185,7 @@
         "schema_version": {
           "const": "1.0",
           "default": "1.0",
+          "pattern": "^1\\.0$",
           "title": "Schema Version",
           "type": "string"
         },
@@ -127,6 +200,127 @@
         "position"
       ],
       "title": "Pose",
+      "type": "object"
+    },
+    "SensorSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "const": "hkm-cal-1",
+          "default": "hkm-cal-1",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "camera_model_version": {
+          "const": "synthetic-orthographic-1",
+          "default": "synthetic-orthographic-1",
+          "title": "Camera Model Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "enum": [
+            "camera_operator",
+            "camera_overhead",
+            "camera_side"
+          ],
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "presentation_only": {
+          "title": "Presentation Only",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sensor_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Sensor Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sensor_id",
+        "frame_id",
+        "pose",
+        "presentation_only"
+      ],
+      "title": "SensorSpec",
+      "type": "object"
+    },
+    "ToolState": {
+      "additionalProperties": false,
+      "properties": {
+        "active_tool_id": {
+          "anyOf": [
+            {
+              "enum": [
+                "EE_VAC_SINGLE",
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Active Tool Id"
+        },
+        "changer_state": {
+          "default": "READY",
+          "enum": [
+            "READY",
+            "CHANGING",
+            "FAULTED"
+          ],
+          "title": "Changer State",
+          "type": "string"
+        },
+        "rack_tool_ids": {
+          "items": {
+            "enum": [
+              "EE_VAC_SINGLE",
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ],
+            "type": "string"
+          },
+          "title": "Rack Tool Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tool_state_version": {
+          "const": "synthetic-tool-state-1",
+          "default": "synthetic-tool-state-1",
+          "title": "Tool State Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "active_tool_id",
+        "rack_tool_ids"
+      ],
+      "title": "ToolState",
       "type": "object"
     }
   },
@@ -174,6 +368,30 @@
       "title": "Covered Locations",
       "type": "array"
     },
+    "frame_tree_version": {
+      "anyOf": [
+        {
+          "const": "hkm-frame-tree-1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Frame Tree Version"
+    },
+    "machine_telemetry": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ObservedMachineState"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "model_version": {
       "default": "synthetic-observer-1",
       "maxLength": 160,
@@ -196,6 +414,19 @@
       "title": "Observation Id",
       "type": "string"
     },
+    "robot_profile_version": {
+      "anyOf": [
+        {
+          "const": "hkm_inspired_v1",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Robot Profile Version"
+    },
     "run_id": {
       "maxLength": 160,
       "minLength": 1,
@@ -211,10 +442,28 @@
       "type": "string"
     },
     "schema_version": {
-      "const": "1.0",
       "default": "1.0",
+      "enum": [
+        "1.0",
+        "2.0"
+      ],
       "title": "Schema Version",
       "type": "string"
+    },
+    "sensors": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SensorSpec"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sensors"
     },
     "step": {
       "minimum": 0,

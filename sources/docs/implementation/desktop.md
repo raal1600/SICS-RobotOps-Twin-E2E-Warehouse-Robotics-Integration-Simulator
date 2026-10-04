@@ -14,7 +14,10 @@ Saved orders remain intact. Older runs expose **Load saved animation**, which
 exports their original `.blend` without executing another pick.
 Use the permanent **Start new test** control for any new execution/observation
 combination. It keeps selections and creates a fresh independent world in the
-same window. **Test history** retains all earlier outcomes, evidence and replay
+same window with the six-SKU HKM-inspired profile. A fresh desktop data directory
+uses that profile too. Reopening existing data retains its saved profile, including
+the original three-product scene; choose Start new test to use the new cell without
+changing historical evidence. **Test history** retains all earlier outcomes, evidence and replay
 read-only, including unknown and intervention states. Only running work blocks
 creation; **Return to current test** resumes the active world. Changing a scenario
 only configures the next order. Restock this test remains a separate guarded

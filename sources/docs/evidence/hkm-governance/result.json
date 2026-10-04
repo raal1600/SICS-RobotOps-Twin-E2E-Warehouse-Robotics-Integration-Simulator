@@ -1,0 +1,34 @@
+{
+  "scope": "Governance tooling and normative revision only; no HKM runtime acceptance claim.",
+  "base_commit": "eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98",
+  "working_tree": true,
+  "recorded_at": "2026-10-04T00:27:46.315496+00:00",
+  "original_must_criteria": 85,
+  "original_must_definitions_unchanged": true,
+  "new_hkm_must_criteria": 25,
+  "checks": [
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/contract/test_governance.py tests/contract/test_completion.py --junitxml=artifacts/hkm-governance-tests.xml",
+      "passed": true,
+      "tests": 9,
+      "artifact": "docs/evidence/hkm-governance/tests.xml"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m ruff check tools/drift_check.py tools/sync_status.py tests/contract/test_governance.py tests/contract/test_completion.py",
+      "passed": true
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m ruff format --check tools/drift_check.py tools/sync_status.py tests/contract/test_governance.py tests/contract/test_completion.py",
+      "passed": true
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.drift_check",
+      "passed": true,
+      "artifact": "docs/evidence/hkm-governance/drift.json"
+    }
+  ],
+  "limitations": [
+    "New runtime evidence mappings are explicitly pending and require real named tests/artifacts.",
+    "No full suite, new publication, remote workflow or HKM implementation completion is attested by these targeted checks."
+  ]
+}

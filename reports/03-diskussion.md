@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell, bounded Blender runtime, deterministic tool selection, geometric preflight and rotation-aware read-only replay are implemented. Targeted checks include real Blender integration and 107 UI checks, plus browser six-tool and uncertain-outcome workflows. The prior release and fresh eaf35b4 baseline remain archived; this enhancement awaits repeated full acceptance and exact-commit CI/publication evidence. Status: NOT DONE.
+> **Implementation status, 2026-10-04:** The HKM-inspired cell and six-tool workflow are implemented. Clean-source acceptance at 0d8a8db found two failures among 619 tests (91.17% coverage). The planning-cost correction now passes 144 affected regression tests with unchanged decisions and trajectories; timing and safety limits remain unchanged. A new clean-source repeated acceptance run is required. Historical evidence remains archived. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

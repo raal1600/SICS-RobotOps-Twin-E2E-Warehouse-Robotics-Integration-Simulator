@@ -154,3 +154,25 @@ def test_hkm_catalogue_mutation_cannot_change_another_experiment():
     raw = raw_catalogue()
     raw["products"][0]["sku"] = "BROKEN"
     assert raw_catalogue()["products"][0]["sku"] == "SKU-A"
+
+
+def test_hkm_individual_spec_lookups_preserve_nested_mutation_isolation():
+    first = product_spec("SKU-A")
+    first.compatibility["EE_VAC_SINGLE"] = "N"
+    fresh = product_spec("SKU-A")
+    assert fresh.compatibility["EE_VAC_SINGLE"] == "P"
+    assert load_catalogue().products[0].compatibility["EE_VAC_SINGLE"] == "P"
+    first_tool = tool_spec("EE_VAC_SINGLE")
+    fresh_tool = tool_spec("EE_VAC_SINGLE")
+    assert first_tool == fresh_tool and first_tool is not fresh_tool
+    assert first_tool.constraints is not fresh_tool.constraints
+    assert first_tool.tcp_transform is not fresh_tool.tcp_transform
+
+
+def test_hkm_individual_spec_lookup_does_not_clone_unrelated_catalogue(monkeypatch):
+    def unrelated_copy(*args, **kwargs):
+        raise AssertionError("Single-spec lookups must not clone all six tools and the cell")
+
+    monkeypatch.setattr(RoboticsCatalogue, "model_copy", unrelated_copy)
+    assert product_spec("SKU-A").preferred_tool_id == "EE_VAC_SINGLE"
+    assert tool_spec("EE_SUPPORT_FORK").tool_id == "EE_SUPPORT_FORK"

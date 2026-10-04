@@ -16,7 +16,6 @@ from robotops.hkm_geometry import static_obstacle_bounds
 from robotops.robotics.catalogue import (
     initial_tool_state,
     load_catalogue,
-    tool_spec,
 )
 from robotops.robotics.models import (
     CollisionObstacle,
@@ -128,6 +127,7 @@ def _bounds(
     attached: bool,
     offset: Vector3,
     pose: Pose,
+    empty_flange: tuple[Vector3, Vector3],
 ) -> tuple[Vector3, Vector3]:
     """Axis-wise conservative bounds preserve long-carton clearance in its tote.
 
@@ -137,9 +137,7 @@ def _bounds(
     qz, qw = pose.quaternion_xyzw[2:]
     cosine, sine = abs(1 - 2 * qz * qz), abs(2 * qz * qw)
     if tool is None:
-        catalogue = load_catalogue()
-        dimensions = catalogue.empty_flange_collision_envelope_m
-        centre = catalogue.empty_flange_collision_offset_m
+        dimensions, centre = empty_flange
     else:
         dimensions, centre = tool.collision_envelope_m, tool.collision_offset_m
     tx, ty, tz = dimensions
@@ -171,7 +169,15 @@ def collision_free(
     tool_state: ToolState | None = None,
     tool_docks: Mapping[ToolId, Pose] | None = None,
 ) -> bool:
+    # One isolated catalogue per preflight. Fixed rack geometry can be reused;
+    # occupancy and intentional contact are still evaluated for every segment.
     catalogue = load_catalogue()
+    specifications = {item.tool_id: item for item in catalogue.tools}
+    empty_flange = (
+        catalogue.empty_flange_collision_envelope_m,
+        catalogue.empty_flange_collision_offset_m,
+    )
+    cached_rack_bounds: dict[ToolId, CollisionObstacle] = {}
     docks = tool_docks if tool_docks is not None else catalogue.layout.tool_docks
     initial_tool = trajectory.waypoints[0].active_tool_id
     state = tool_state or ToolState(
@@ -189,10 +195,11 @@ def collision_free(
         endpoint_bounds = [
             _bounds(
                 product,
-                tool_spec(point.active_tool_id) if point.active_tool_id else None,
+                specifications[point.active_tool_id] if point.active_tool_id else None,
                 point.attached,
                 trajectory.product_attachment_offset_m,
                 point.pose,
+                empty_flange,
             )
             for point in (start, end)
         ]
@@ -212,15 +219,16 @@ def collision_free(
             dock = docks[tool_id]
             if _intentional_dock_contact(start, end, tool_id, dock, released):
                 continue
-            spec = tool_spec(tool_id)
-            rack_low, rack_high = _bounds(product, spec, False, (0, 0, 0), dock)
-            rack_obstacles.append(
-                CollisionObstacle(
+            if tool_id not in cached_rack_bounds:
+                rack_low, rack_high = _bounds(
+                    product, specifications[tool_id], False, (0, 0, 0), dock, empty_flange
+                )
+                cached_rack_bounds[tool_id] = CollisionObstacle(
                     obstacle_id="racked-" + tool_id,
                     minimum=tuple(a + b for a, b in zip(dock.position, rack_low, strict=True)),
                     maximum=tuple(a + b for a, b in zip(dock.position, rack_high, strict=True)),
                 )
-            )
+            rack_obstacles.append(cached_rack_bounds[tool_id])
         for obstacle in (*obstacles, *rack_obstacles):
             minimum = cast(Vector3, tuple(obstacle.minimum[axis] - high[axis] for axis in range(3)))
             maximum = cast(Vector3, tuple(obstacle.maximum[axis] - low[axis] for axis in range(3)))

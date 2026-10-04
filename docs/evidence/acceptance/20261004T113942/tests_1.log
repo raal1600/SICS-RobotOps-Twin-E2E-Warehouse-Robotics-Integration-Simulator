@@ -1,0 +1,269 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\ramis\source\repos\robotops-twin
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.2, cov-7.1.0
+collected 619 items
+
+tests\blender\test_blender_runtime.py .....                              [  0%]
+tests\blender\test_hkm_runtime.py .............                          [  2%]
+tests\blender\test_playback.py ..............                            [  5%]
+tests\contract\test_api.py ..                                            [  5%]
+tests\contract\test_completion.py ...                                    [  5%]
+tests\contract\test_governance.py ......                                 [  6%]
+tests\contract\test_hkm_boundaries.py ........                           [  8%]
+tests\contract\test_hkm_catalogue.py ..............................      [ 13%]
+tests\contract\test_legacy_revision.py ..                                [ 13%]
+tests\contract\test_pdf_package.py .                                     [ 13%]
+tests\contract\test_robotics_documentation.py ..                         [ 13%]
+tests\contract\test_schemas.py ......................................... [ 20%]
+.................                                                        [ 23%]
+tests\e2e\test_hkm_scenarios.py ..................                       [ 26%]
+tests\e2e\test_observability.py .                                        [ 26%]
+tests\e2e\test_reobservation.py .......                                  [ 27%]
+tests\e2e\test_workflow.py ......................                        [ 31%]
+tests\integration\test_delivery_replay.py .........                      [ 32%]
+tests\integration\test_desktop_backend.py ...                            [ 32%]
+tests\integration\test_fresh_scene.py ...........                        [ 34%]
+tests\integration\test_hkm_api.py F.........                             [ 36%]
+tests\integration\test_process_restart.py .                              [ 36%]
+tests\integration\test_runtime.py .............                          [ 38%]
+tests\integration\test_simulation_tests.py ............................. [ 43%]
+........................................................................ [ 54%]
+.                                                                        [ 55%]
+tests\integration\test_store.py .....                                    [ 55%]
+tests\unit\test_action_validation.py ................                    [ 58%]
+tests\unit\test_blender_adapter.py ......                                [ 59%]
+tests\unit\test_hkm_brain.py .F.........                                 [ 61%]
+tests\unit\test_hkm_geometry.py ........................................ [ 67%]
+.                                                                        [ 67%]
+tests\unit\test_hkm_robotics.py ..........................               [ 72%]
+tests\unit\test_hkm_runtime_defenses.py ................................ [ 77%]
+......                                                                   [ 78%]
+tests\unit\test_observation_verifier.py ...                              [ 78%]
+tests\unit\test_states.py .............................................. [ 86%]
+........................................................................ [ 97%]
+...                                                                      [ 98%]
+tests\unit\test_visualization.py ...........                             [100%]
+
+================================== FAILURES ===================================
+_ test_fresh_api_fixture_and_six_product_orders_use_catalogued_sources_and_tools _
+
+tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/robotops-acceptance-1-145mvnco/fixtures/test_fresh_api_fixture_and_six0')
+
+    def test_fresh_api_fixture_and_six_product_orders_use_catalogued_sources_and_tools(tmp_path):
+        app = create_app(Store(tmp_path / "workflow.db"))
+        client = TestClient(app)
+        fixture = client.get("/fixtures").json()
+        catalogue = load_catalogue()
+        assert fixture["robot_profile_version"] == catalogue.profile_version
+        assert fixture["catalogue"] == catalogue.model_dump(mode="json")
+        assert len(fixture["products"]) == len(fixture["product_sources"]) == 6
+        assert len(set(fixture["product_sources"].values())) == 6
+        assert fixture["destination_id"] == catalogue.layout.destination.location_id
+        assert fixture["destination_id"] not in fixture["product_sources"].values()
+        assert fixture["source_id"] == fixture["product_sources"][fixture["products"][0]["product_id"]]
+        engine = app.state.test_registry.original
+        for index, spec in enumerate(catalogue.products):
+            payload = order_payload(fixture, index, f"order-{spec.sku}")
+            response = client.post("/orders", json=payload, headers={"Idempotency-Key": spec.sku})
+            assert response.status_code == 201, response.text
+            job_id = response.json()["job_ids"][0]
+            response = client.post(f"/jobs/{job_id}/run", json={})
+            assert response.status_code == 200, response.text
+            job = response.json()
+>           assert job["state"] == "COMPLETED", job
+E           AssertionError: {'schema_version': '1.0', 'run_id': '6ea387b8-8a41-4923-982b-25b8fa3411ba', 'correlation_id': 'aba8d914-9211-5dd9-a83d-38221f655aba', 'causation_id': '1c22d1c8-5f69-4e43-b8ee-0eff78853997', ...}
+E           assert 'FAILED' == 'COMPLETED'
+E             
+E             - COMPLETED
+E             + FAILED
+
+tests\integration\test_hkm_api.py:50: AssertionError
+_ test_hkm_brain_builds_valid_explainable_observation_only_plan[SKU-B-EE_VAC_ARRAY] _
+
+tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/robotops-acceptance-1-145mvnco/fixtures/test_hkm_brain_builds_valid_ex1')
+sku = 'SKU-B', tool = 'EE_VAC_ARRAY'
+
+    @pytest.mark.parametrize(
+        "sku,tool",
+        [
+            ("SKU-A", "EE_VAC_SINGLE"),
+            ("SKU-B", "EE_VAC_ARRAY"),
+            ("SKU-C", "EE_ADAPTIVE_SOFT"),
+            ("SKU-D", "EE_PINCH_NARROW"),
+            ("SKU-E", "EE_PINCH_WIDE"),
+            ("SKU-F", "EE_SUPPORT_FORK"),
+        ],
+    )
+    def test_hkm_brain_builds_valid_explainable_observation_only_plan(tmp_path, sku, tool):
+        settings, job, observation, destination, cell = planning_context(tmp_path, sku)
+        brain = DeterministicBrain(settings)
+        first = brain.plan(job, observation, destination)
+        assert first == brain.plan(job, observation, destination)
+        assert first.schema_version == "2.0" and first.brain_version == "deterministic-hkm-1"
+        assert first.selected_tool_id == tool
+        assert first.tool_selection.product_id == job.line.product_id
+        assert first.tool_selection.sku == sku
+        assert first.target_pose == settings.target_pose(job.line.product_id, destination)
+        assert first.grasp_pose == first.trajectory.grasp_pose
+        assert parse_structured_output(first.model_dump_json()) == first
+>       assert ActionValidator(settings).validate(first, job, observation, cell, destination) == first
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\unit\test_hkm_brain.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <robotops.brain.validation.ActionValidator object at 0x0000028A5FEB8910>
+plan = ActionPlan(schema_version='2.0', run_id='fc86b933-16c5-489b-aa50-a08929b50452', correlation_id='c5a6d01e-43f5-5964-bb6...t_catalog_version='synthetic-products-1', tool_spec_version='synthetic-tools-1', frame_tree_version='hkm-frame-tree-1')
+job = PickJob(schema_version='1.0', run_id='fc86b933-16c5-489b-aa50-a08929b50452', correlation_id='c5a6d01e-43f5-5964-bb67-4...id='DESTINATION', quantity=1), state=<JobState.RECEIVED: 'RECEIVED'>, revision=0, command_id=None, action_plan_id=None)
+observation = WorldObservation(schema_version='2.0', run_id='fc86b933-16c5-489b-aa50-a08929b50452', correlation_id='c5a6d01e-43f5-59...cal-1'), captured_at=datetime.datetime(2026, 10, 4, 12, 1, 8, 93029, tzinfo=datetime.timezone.utc), cell_generation=0))
+cell = CellState(schema_version='1.0', run_id='fc86b933-16c5-489b-aa50-a08929b50452', correlation_id='c5a6d01e-43f5-5964-bb67...9, tzinfo=datetime.timezone.utc), cell_id='cell-1', mode=<CellMode.READY: 'READY'>, generation=0, reason='INITIALIZED')
+destination = InventoryLocation(schema_version='1.0', location_id='DESTINATION', pose=Pose(schema_version='1.0', position=(0.0, 1.12, 0.18), quaternion_xyzw=(0.0, 0.0, 0.0, 1.0), unit='m', frame_id='cell_world', calibration_version='hkm-cal-1'))
+now = None
+
+    def validate(
+        self,
+        plan: ActionPlan,
+        job: PickJob,
+        observation: WorldObservation,
+        cell: CellState,
+        destination: InventoryLocation,
+        *,
+        now: datetime | None = None,
+    ) -> ActionPlan:
+        plan = ActionPlan.model_validate_json(plan.model_dump_json())
+        expected = (
+            job.job_id,
+            job.order_id,
+            job.line.order_line_id,
+            job.line.product_id,
+            job.line.source_id,
+            job.line.destination_id,
+            job.run_id,
+            job.correlation_id,
+        )
+        actual = (
+            plan.job_id,
+            plan.order_id,
+            plan.order_line_id,
+            plan.product_id,
+            plan.source_id,
+            plan.destination_id,
+            plan.run_id,
+            plan.correlation_id,
+        )
+        if expected != actual:
+            raise ValueError("PLAN_OWNERSHIP_MISMATCH")
+        if cell.mode != CellMode.READY:
+            raise ValueError("CELL_NOT_READY")
+        if (
+            plan.cell_generation != cell.generation
+            or observation.cell_generation != cell.generation
+        ):
+            raise ValueError("CELL_GENERATION_MISMATCH")
+        if (
+            plan.scene_epoch != observation.scene_epoch
+            or plan.observation_id != observation.observation_id
+        ):
+            raise ValueError("OBSERVATION_IDENTITY_MISMATCH")
+        reason = quality(observation, plan.product_id, self.settings, now or utc_now())
+        if reason:
+>           raise ValueError(reason)
+E           ValueError: STALE_OR_FUTURE_OBSERVATION
+
+robotops\brain\validation.py:71: ValueError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path C:\Users\ramis\source\repos\robotops-twin\.pytest_cache\v\cache\nodeids: [WinError 5] Access is denied: 'C:\\Users\\ramis\\source\\repos\\robotops-twin\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:423
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\_pytest\cacheprovider.py:423: PytestCacheWarning: could not create cache path C:\Users\ramis\source\repos\robotops-twin\.pytest_cache\v\cache\lastfailed: [WinError 5] Access is denied: 'C:\\Users\\ramis\\source\\repos\\robotops-twin\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261004T113942\tests-1.xml -
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.13.15-final-0 _______________
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+apps\__init__.py                          0      0   100%
+apps\api\__init__.py                      0      0   100%
+apps\api\__main__.py                     23      1    96%   35
+apps\api\app.py                         152      1    99%   240
+apps\api\playback.py                     62      6    90%   27-31, 62
+apps\api\test_sessions.py               142      2    99%   184-185
+apps\desktop\__init__.py                  0      0   100%
+apps\desktop\backend.py                  52     52     0%   3-83
+robotops\__init__.py                      0      0   100%
+robotops\blender\__init__.py              0      0   100%
+robotops\blender\adapter.py             214     20    91%   33, 37, 109, 133, 176, 179, 186, 189, 191, 194, 387-394, 419, 445
+robotops\blender\visualization.py       180     19    89%   50, 53, 55, 57, 70, 72, 133, 136, 141, 183, 187, 190, 192, 199, 207, 211, 230, 233, 235
+robotops\brain\__init__.py                0      0   100%
+robotops\brain\deterministic.py          45      1    98%   65
+robotops\brain\validation.py             71     10    86%   58, 82, 92, 96, 105, 108, 115, 117, 123, 128
+robotops\cell\__init__.py                 0      0   100%
+robotops\cell\controller.py              12      0   100%
+robotops\cell\hkm_execution.py           48      5    90%   25, 32, 43, 81, 106
+robotops\cell\runtime.py                177      9    95%   67, 165, 267, 269, 271, 278, 390-394
+robotops\config.py                       67      7    90%   87, 94, 96, 100, 105, 110, 117
+robotops\demo.py                         74     74     0%   3-196
+robotops\domain\__init__.py               0      0   100%
+robotops\domain\base.py                  57      1    98%   59
+robotops\domain\models.py               317     24    92%   60, 145, 147, 149, 153, 156, 164, 169, 188, 237, 239, 244, 247, 249, 253, 255, 302, 304, 317, 329, 374, 379, 381, 385
+robotops\domain\ports.py                  6      0   100%
+robotops\faults\__init__.py               0      0   100%
+robotops\faults\injection.py              3      0   100%
+robotops\hkm_geometry.py                317     18    94%   81, 104, 107, 116, 119, 141, 367, 369, 608, 623-631
+robotops\observability\__init__.py        0      0   100%
+robotops\observability\metrics.py        35      0   100%
+robotops\observation\__init__.py          0      0   100%
+robotops\observation\model.py            36      1    97%   88
+robotops\observation\quality.py          22      2    91%   16, 31
+robotops\presentation_io.py              14      0   100%
+robotops\robot_gateway\__init__.py        0      0   100%
+robotops\robot_gateway\gateway.py        32      1    97%   16
+robotops\robotics\__init__.py             0      0   100%
+robotops\robotics\catalogue.py          106      1    99%   138
+robotops\robotics\catalogue_data.py       8      0   100%
+robotops\robotics\models.py             184      7    96%   59, 177, 182, 211, 272, 274, 284
+robotops\robotics\selector.py            59      0   100%
+robotops\robotics\trajectory.py         278     12    96%   184, 247, 478, 501, 504, 509, 511, 522, 533, 546, 555, 630
+robotops\scene_geometry.py               30      0   100%
+robotops\verification\__init__.py         0      0   100%
+robotops\verification\verifier.py        35      3    91%   39, 43, 54
+robotops\workflow\__init__.py             0      0   100%
+robotops\workflow\engine.py             148      3    98%   179, 208, 239
+robotops\workflow\states.py              25      2    92%   49, 53
+robotops\workflow\store.py              276     10    96%   129, 215, 228, 244-247, 428, 484, 521, 570, 572
+-------------------------------------------------------------------
+TOTAL                                  3307    292    91%
+Coverage JSON written to file C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261004T113942\coverage-1.json
+Required test coverage of 85.0% reached. Total coverage: 91.17%
+=========================== short test summary info ===========================
+FAILED tests/integration/test_hkm_api.py::test_fresh_api_fixture_and_six_product_orders_use_catalogued_sources_and_tools
+FAILED tests/unit/test_hkm_brain.py::test_hkm_brain_builds_valid_explainable_observation_only_plan[SKU-B-EE_VAC_ARRAY]
+=========== 2 failed, 617 passed, 3 warnings in 1442.50s (0:24:02) ============
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\ramis\source\repos\robotops-twin\tools\dev.py", line 49, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\ramis\source\repos\robotops-twin\tools\dev.py", line 30, in main
+    run("-m", "pytest", *rest)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramis\source\repos\robotops-twin\tools\dev.py", line 9, in run
+    subprocess.run([sys.executable, *args], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramis\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe', '-m', 'pytest', '--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-145mvnco/fixtures', '--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261004T113942\\tests-1.xml', '--cov=robotops', '--cov=apps', '--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261004T113942\\coverage-1.json', '--cov-report=term']' returned non-zero exit status 1.

@@ -2,13 +2,40 @@
 Last updated: 2026-10-04 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: HKM-P2/P3 final verification and knowledge-base synchronization
+## Current phase: HKM-P2 planning correction ready for repeated acceptance
 
-Enhancement base/current HEAD:
-`eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98` (clean before baseline execution;
-current enhancement worktree is uncommitted).
+Enhancement baseline: `eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98`.
+Implemented and pushed milestone/current audited source:
+`0d8a8dbf72b063f43f7ca80460a7b67c577172e9` (clean when acceptance started).
 The HKM-inspired six-tool/six-SKU adaptation is **NOT DONE**. It is a new
 implementation/acceptance revision, not a reinterpretation of the prior release.
+
+Full acceptance attempt `20261004T113942` is **FAIL**: the first mandatory run
+completed 619 tests, with 617 passing and two failing; coverage was 91.17%.
+The SKU-B repeated-planning test exceeded observation freshness under coverage;
+the six-product API test also returned FAILED rather than COMPLETED. Investigation
+identified repeated whole-catalogue deep copies inside rack collision preflight.
+The unchanged second run was interrupted to fix that production cost. Original
+JUnit, coverage, gate log and manifest remain intact; `interrupted.json` records
+which gates were not completed. No timeout, freshness or coverage threshold is
+being relaxed. The correction must pass a new clean-commit acceptance twice.
+Windows desktop and publication workflows passed for `0d8a8db`; these do not
+override the local test failure. Public PDFs and 200 internal destinations were
+verified against that exact deployed source. A separate evidence-byte audit found
+Git line-ending normalization in hashed audit JSON; the original bytes will be
+preserved through scoped Git attributes, without rewriting recorded hashes. All
+39 archived files match their original bytes; all 15 browser-manifest hashes
+match the staged Git blobs.
+
+The production correction now copies only requested catalogue specifications and
+reuses fixed rack bounds within one collision preflight. Occupancy and intentional
+dock contact are still checked per segment. In the instrumented six-SKU benchmark,
+catalogue copies fell from 5,062 to 258; SKU-B planning took 0.150 seconds. Every
+selected-tool explanation and full trajectory JSON matches the original run.
+The 144 affected regression tests pass, including the previously failing areas;
+three new regressions protect copy cost and nested mutation isolation. These are
+scoped checks, not a replacement for repeated full acceptance. Evidence is under
+`docs/evidence/hkm-planning-performance/`. No deadlines or safety bounds changed.
 
 Implemented: canonical typed six-product/tool catalogue, deterministic selection
 with persisted candidate reasons, segmented workspace/collision preflight,

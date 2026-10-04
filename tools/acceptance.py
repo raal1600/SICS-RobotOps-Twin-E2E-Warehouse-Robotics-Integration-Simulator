@@ -85,6 +85,7 @@ SYNC_FILES = [
     "docs/evidence/hkm-baseline-eaf35b4/provenance.json",
     "docs/evidence/hkm-api/result.json",
     "docs/evidence/hkm-blender-local/result.json",
+    "docs/evidence/hkm-browser-local/manifest.json",
 ]
 
 
@@ -331,7 +332,7 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
         "",
         "Happy-path correction: the fixture selector previously offered products already at the destination and hid SOURCE_NOT_OBSERVED behind a generic error. Explicit fresh-scene preparation now restores fixtures under a durable maintenance guard while preserving old orders/replays. Availability, rejection explanations, OpenAPI, runtime recovery, architecture captions and guides are synchronized (ADR 0005).",
         "",
-        "Drift detected: yes. Earlier motion-only and dependency-free viewer descriptions lagged the full 3D scenario extension. Documentation now covers persisted starting scenes, audit-event replay for stationary scenarios, shared gantry geometry, offline Three.js with software fallback, bounded Windows file-publication retry and dependency audits. A stale future-tense persistence paragraph and damaged Swedish characters were corrected. Architecture sources, schemas, guides, research, provenance and acceptance evidence were synchronized. External company claims were not promoted to independently verified facts.",
+        "Drift detected and synchronized: the earlier scenario-replay revision introduced persisted starting scenes, stationary-event replay, offline Three.js/software rendering and bounded file-publication retries. The HKM revision replaces new-world gantry geometry with shared articulated primitives, six tools/products, versioned observations/trajectories/recordings and calibrated camera metadata; schema-1 histories retain their original geometry. Canonical catalogue diagrams/tables, architecture, schemas, guides, reports, current status and publication captions/footers are synchronized. External company claims remain explicitly distinguished from independently verified facts and simulator design.",
         "",
         "Synchronized source files:",
         "",

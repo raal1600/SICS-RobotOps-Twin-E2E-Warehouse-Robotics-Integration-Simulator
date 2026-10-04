@@ -6,6 +6,7 @@ import pytest
 
 from robotops.domain.base import Pose
 from robotops.robotics.catalogue import (
+    RoboticsCatalogue,
     fixture_source_pose,
     fixture_target_pose,
     initial_tool_state,
@@ -208,6 +209,33 @@ def test_hkm_collision_alternative_is_finite_and_deterministic():
     )
     with pytest.raises(ValueError, match="^NO_COLLISION_FREE_SYNTHETIC_TRAJECTORY$"):
         plan_trajectory(*arguments, obstacles=(impossible,))
+
+
+def test_hkm_collision_preflight_catalogue_copy_cost_is_independent_of_segments(monkeypatch):
+    product = product_spec("SKU-B")
+    tool = tool_spec(product.preferred_tool_id)
+    obstacles = default_obstacles()
+    trajectory = plan_trajectory(
+        product,
+        tool,
+        fixture_source_pose(product.sku),
+        fixture_target_pose(product.sku),
+        obstacles=obstacles,
+    )
+    assert len(trajectory.waypoints) > 20  # Includes release, empty flange and a new tool.
+    state = initial_tool_state()
+    original_copy = RoboticsCatalogue.model_copy
+    copies = []
+
+    def counted_copy(self, *args, **kwargs):
+        copies.append(self)
+        return original_copy(self, *args, **kwargs)
+
+    monkeypatch.setattr(RoboticsCatalogue, "model_copy", counted_copy)
+    assert collision_free(trajectory, product, tool, obstacles, tool_state=state)
+    # One independent preflight catalogue retains caller mutation isolation.
+    # Copy cost cannot multiply by segments or occupied rack positions.
+    assert len(copies) == 1
 
 
 def test_hkm_thin_obstacles_cannot_fall_between_collision_samples():

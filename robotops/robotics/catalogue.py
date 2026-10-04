@@ -121,16 +121,18 @@ def load_catalogue() -> RoboticsCatalogue:
 
 
 def product_spec(sku: str) -> ProductSpec:
-    for item in load_catalogue().products:
+    # Isolate the requested specification without copying unrelated cell assets.
+    for item in _canonical_catalogue().products:
         if item.sku == sku:
-            return item
+            return item.model_copy(deep=True)
     raise ValueError("UNKNOWN_SKU")
 
 
 def tool_spec(tool_id: str) -> EndEffectorSpec:
-    for item in load_catalogue().tools:
+    # Collision planning resolves tools frequently; retain the same copy boundary.
+    for item in _canonical_catalogue().tools:
         if item.tool_id == tool_id:
-            return item
+            return item.model_copy(deep=True)
     raise ValueError("UNKNOWN_TOOL")
 
 

@@ -1,0 +1,60 @@
+{
+  "scope": "Post-b1c documentation/status synchronization and migration test connection cleanup; no application source changes. Full acceptance remains attributed to b1c; successor requires its own CI/publication attestation.",
+  "base_commit": "b1c374ae76144309cc4476392dec681292f0e3a7",
+  "recorded_at": "2026-10-04T21:25:31.960962+00:00",
+  "commands": [
+    {
+      "command": ".venv/Scripts/python.exe -m tools.dev acceptance --report-only docs/evidence/acceptance/20261004T204452/manifest.json",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.dev lint",
+      "exit_code": 0,
+      "note": "Initial mixed-line-ending format finding corrected with ruff format; final check passed all 141 files."
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.dev typecheck",
+      "exit_code": 0,
+      "source_files": 50
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.drift_check",
+      "exit_code": 0,
+      "must_count": 110
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/contract -q --basetemp=artifacts/test-management-final-contract-fixtures --junitxml=docs/evidence/test-management-final/status-contracts.xml",
+      "exit_code": 0,
+      "tests": 119,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "warnings": [
+        "Existing third-party Starlette TestClient/httpx deprecation",
+        "Pytest cache directory ACL warning; test execution completed normally"
+      ]
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.dev docs",
+      "exit_code": 0,
+      "pdf_pages": 61,
+      "pdf_destinations": 200
+    }
+  ],
+  "changed_source_normalized_lf_sha256": {
+    "tools/acceptance.py": "774632a47fb233e5d1d652fd094f3ba3c45804d24539b31c10b41aa1f225590e",
+    "tests/integration/test_test_management.py": "5bf04d842d447ee9d4c37e07f59ca9e0dbc39db732df31ef571c78ff06bb01b4",
+    "README.md": "71a6d3f1602c5484d61a822e9e1c3fc8f0bf9677e0dc0d274507b0b00e86e849",
+    "GOAL_PROGRESS.md": "7fcc8c6361f787085c2b64e8b43dafb6c9fac39ddb9c0af756f82e7556cc87b5",
+    "HANDOFF.md": "f931a3fdb2aea27caef2df1d737e4a92d21678f89d73d8af951ff9c4a860e40e",
+    "CODEX_GOAL_CHECKLIST.md": "b73cebb9f4ae760ceea43165ab7fae8a435600d879d861174b8fddba30840475",
+    "PUBLICATION.md": "62372784d084ed91e8066bfbb97a74240f1249ad0e860ee12177464cae01bc4c",
+    "docs/implementation/acceptance.md": "a80d5c63d24591ca2a516ab6787db4cd36186cda3f42d5b316c962f5dc569a97",
+    "publication/status.json": "f338a68c26caf088541aea15aa8c4dc7b7dec6c47684c937b8969d85e8d1bbf3"
+  },
+  "artifacts": {
+    "status-contracts.xml": "8456909ed34d7cdd2c23b3ed7781fb62b77c5105e9a67427e5e9d5ad082970a1",
+    "status-publication-build.json": "2ed36f7c2c5aa7d4f9873e15329a7783683a07e02518571c38a6bccd9bafbc7a",
+    "fixture-cleanup/manifest.json": "51fb9b1f3f49d49aee9f41760ada50fb828e9c1d747df894d1db5c3c6c877e7f"
+  }
+}

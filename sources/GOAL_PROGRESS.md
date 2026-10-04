@@ -2,12 +2,13 @@
 Last updated: 2026-10-04 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: test lifecycle and robot-cell selection
+## Current phase: test lifecycle and robot-cell selection accepted at audited source
 
 Implementation baseline: `ae6d5d85c813e47aea042aea2a87236b5a8bc204`.
-This new revision is in progress; the prior 110-MUST acceptance below remains
-historical evidence and does not attest these changes. No user test data has
-been deleted during development.
+Audited source: `b1c374ae76144309cc4476392dec681292f0e3a7`, clean at the
+start of acceptance. All 110 MUSTs pass for this source. The prior acceptance
+below remains historical evidence. No user test data has been deleted during
+development.
 
 Milestone: introduce a registered robot-cell selector for new tests, explicit
 selected-test deletion and clear-all confirmation, durable deletion identity,
@@ -31,9 +32,27 @@ pass. Actual isolated browser review covered creation, a completed pick,
 confirmed deletion, clear-all, empty restart and creation of six fresh HKM
 products, including a narrow-screen dialog check. Development artifacts are in
 `docs/evidence/test-management-local/`; the independent review retains initial
-findings and corrected source hashes. Full acceptance is pending for this
-revision. Existing MUST thresholds and uncertainty/idempotency semantics are
-unchanged.
+findings and corrected source hashes. Existing MUST thresholds and
+uncertainty/idempotency semantics are unchanged.
+
+Complete Windows acceptance passed 659 tests twice, zero failures/errors/skips,
+with identical test identities and 91.57509157509158% coverage. The 119 Node UI
+checks pass. All 19 local gates pass, including setup, security, lint, strict
+typing, eight actual Blender demos, drift and two publication builds. Exact-source
+Linux CI independently passed 659 tests twice with 91.51873767258382% coverage.
+CI run 37233307538, Windows desktop run 37233307474 and publication run
+37233307475 all succeeded. The [refreshed acceptance manifest](docs/evidence/acceptance/20261004T204452/manifest.json)
+records every MUST, command, log and exact-source remote gate; its original local
+manifest remains unchanged. [Remote evidence](docs/evidence/test-management-final/README.md)
+preserves the verified artifact digest, original CI results and public review.
+
+Lost acknowledgement after effect and restart each produce one original command,
+one transfer and no replacement pick, resolving UNKNOWN_OUTCOME through fresh
+observation and the original journal. Ambiguous evidence remains
+REQUIRES_INTERVENTION with the same one effect. The showcase completes six
+transfers with all six preferred tools. Public review checks 49 resources,
+360 relative links/fragments, 63 PDF pages, 200 PDF destinations and the
+36-cell compatibility matrix against b1c source.
 
 Knowledge-base review: ADR 0011, plan, handoff, checklist, implementation/API
 documentation, reports and diagrams are synchronized in this milestone. The
@@ -45,8 +64,15 @@ EXE lifecycle and clear-all/reopen checks also pass in isolated data roots;
 closing the test window releases its backend and empty restart keeps databases
 deleted. Hidden native-window text inspection was unavailable; the separate
 browser review verifies the rendered empty panel.
-Next: commit the coherent milestone, then run complete acceptance and verify
-the corresponding CI/publication revision.
+Final synchronization also records this acceptance and closes a SQLite connection
+in a migration test fixture; application and robot semantics are unchanged.
+The warning and targeted cleanup verification are retained separately from the
+frozen b1c results. SHOULD SC-BRAIN-005 (optional external-provider fallback)
+remains non-blocking. Optional model/hardware work is unchanged.
+
+Next: commit the evidence/status successor, then independently verify its full
+CI, desktop build and published source SHA under ADR 0002. This report identifies
+the audited source; the successor's own CI artifacts attest its exact revision.
 
 ## Historical milestone: HKM-P3 acceptance complete at audited source
 

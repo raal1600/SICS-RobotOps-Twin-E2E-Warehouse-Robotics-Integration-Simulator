@@ -12,6 +12,15 @@ rebuilding. Current verification status belongs to GOAL_PROGRESS.md,
 ACCEPTANCE_REPORT.md and the generated shared status block; do not infer a new
 PASS from the earlier accepted HKM publication.
 
+The lifecycle revision is accepted for clean source
+`b1c374ae76144309cc4476392dec681292f0e3a7`: all 110 MUSTs pass in the
+[refreshed acceptance manifest](docs/evidence/acceptance/20261004T204452/manifest.json).
+[The exact-source remote archive](docs/evidence/test-management-final/README.md)
+preserves successful CI/desktop/publication workflows, public build attribution,
+PDF hashes and link/layout checks. Its original public status predates completed
+acceptance and is retained unchanged. Rebuild synchronized status sources and
+verify the final evidence/status successor's own CI and deployed SHA (ADR 0002).
+
 ### Historical HKM-inspired accepted revision (2026-10-04)
 
 The HKM-inspired adaptation was accepted at audited source `ca779879`, with

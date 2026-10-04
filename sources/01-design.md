@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** Robot-cell selection and explicit test-data deletion are being implemented against baseline ae6d5d85c813e47aea042aea2a87236b5a8bc204. Previous 110-MUST HKM acceptance is preserved as historical evidence; this new revision is awaiting verification. Status: NOT DONE.
+> **Implementation status, 2026-10-04:** Test deletion, clear-all, empty restart and registered robot-cell selection accepted at b1c374ae76144309cc4476392dec681292f0e3a7: all 110 MUSTs pass; 659 tests twice, 119 UI checks, eight Blender demos and exact-source CI/publication verified. Only the HKM-inspired profile is currently selectable. Evidence/status successors receive their own workflow attestation. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

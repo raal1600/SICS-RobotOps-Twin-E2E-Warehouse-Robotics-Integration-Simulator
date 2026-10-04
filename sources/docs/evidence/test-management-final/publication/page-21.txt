@@ -1,0 +1,73 @@
+9.1.1 Verktygsval och synlig förberedelse
+Den kanoniska katalogen robotops/robotics/catalogue-v1.json beskriver våra sex produktfamiljer,
+massa/geometri och sex gripverktyg. Tabellen nedan genereras direkt från samma data. P/C är
+kandidater; separat kontroll av produktens konservativa maximala fixturmassa, geometri och
+tillgänglighet kan ändå utesluta ett verktyg. Poäng, avvisningsskäl och stabil rangordning
+sparas i planen och visas under ”Why this tool?”. Integrerad köracceptans redovisas separat
+från att katalogen existerar.
+Figure 11. SIMULATOR_DESIGN compatibility matrix generated from robotops/robotics/catalogue-v1.json. P/C eligibility
+remains subject to actual fixture mass, geometry and tool availability. These are not manufacturer gripper
+specifications. The selected tool and candidate rejection reasons must be persisted separately as execution evidence.
+Verktygsväxling är en förberedelse inom det ursprungliga PICK_AND_PLACE-kommandot.
+Rackplats, monterat verktyg och kontrollsteg sparas beständigt. Ett verktygsbyte ökar inte
+antalet produktförflyttningar. Saknat begärt verktyg stoppar före produktens effekt; redan
+korrekt verktyg ger ett explicit no-change-beslut. tool_showcase kör alla sex produktfamiljer
+med deras föredragna verktyg och verifierar varje jobb innan nästa börjar.
+Synthetic product-tool compatibility
+Generated from the same versioned catalogue used by runtime selection
+Product
+VAC SINGLE
+VAC ARRAY
+PINCH
+NARROW
+PINCH WIDE
+ADAPTIVE
+SOFT
+SUPPORT
+FORK
+SKU-A / small carton
+P
+C
+C
+C
+C
+C
+SKU-B / medium carton
+C
+P
+N
+C
+C
+C
+SKU-C / soft pouch
+C
+N
+C
+N
+P
+C
+SKU-D / bottle
+N
+N
+P
+C
+C
+N
+SKU-E / can jar
+C
+C
+C
+P
+C
+N
+SKU-F / long carton
+N
+C
+N
+C
+N
+P
+P: preferred C: candidate-compatible N: disallowed
+Mass, geometry and availability checks still apply. SIMULATOR_DESIGN.
+ROBOTOPS TWIN / TEKNISKT RAPPORTPAKET
+Rami Halabi · Oberoende simulatorstudie · 4 oktober 2026 21 / 33

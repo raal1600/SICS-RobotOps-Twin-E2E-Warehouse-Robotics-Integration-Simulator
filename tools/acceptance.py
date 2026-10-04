@@ -86,6 +86,14 @@ SYNC_FILES = [
     "docs/evidence/hkm-api/result.json",
     "docs/evidence/hkm-blender-local/result.json",
     "docs/evidence/hkm-browser-local/manifest.json",
+    "apps/api/cell_profiles.py",
+    "docs/adr/0011-cell-selection-and-test-data-lifecycle.md",
+    "contracts/schemas/CellProfile.json",
+    "contracts/schemas/CellProfiles.json",
+    "contracts/schemas/DeleteTestRequest.json",
+    "contracts/schemas/ClearTestsRequest.json",
+    "contracts/schemas/TestDeletion.json",
+    "docs/evidence/test-lifecycle-baseline/README.md",
 ]
 
 

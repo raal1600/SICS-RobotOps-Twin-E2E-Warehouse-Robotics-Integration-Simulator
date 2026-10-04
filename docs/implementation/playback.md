@@ -27,7 +27,11 @@ chosen item in **Product execution details**. Six picks therefore appear as
 one delivery with six segments; each retains its own command and outcome.
 Earlier delivered products use their saved positions in later clips. Preparing
 a fresh scene preserves the earlier delivery; starting a new test retains that
-world's deliveries under Test history.
+world's deliveries under Test history. Explicit **Delete selected test** or
+**Clear all test data** can remove that evidence after confirmation (ADR 0011).
+Those catalog actions are separate from playback; replay, camera selection,
+scrubbing and opening history remain read-only. Deleting the active test leaves
+no active world and clears its displayed replay instead of promoting an archive.
 
 An uncertain pick pauses the entire cell, including picks of different products.
 The Run button says **Next pick paused — reconcile first**, with a named-product

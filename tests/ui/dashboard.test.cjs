@@ -3,41 +3,66 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 
-async function dashboard({hkm=false}={}){
-  const catalogue=hkm?JSON.parse(fs.readFileSync('robotops/robotics/catalogue-v1.json','utf8')):null;
-  const sources=catalogue?Object.fromEntries(catalogue.products.map(p=>['product-'+p.sku+'-01',catalogue.layout.sources[p.sku].location_id])):{};
-  const elements=new Map(),posts=[],worlds=new Map();
-  let active='original',sequence=0;
-  const makeWorld=id=>({id,number:worlds.size+1,orders:[],groups:[{delivery_id:id+'-scene-1',started_at:'2026-10-03T14:00:00Z',current:true,executions:[]}],epoch:1,cellMode:'READY',blocked:null,
-    inventory:hkm?catalogue.products.map(p=>({product_id:'product-'+p.sku+'-01',location_id:sources['product-'+p.sku+'-01']})):['red','blue','green'].map(color=>({product_id:'product-'+color,location_id:'source'}))});
-  worlds.set(active,makeWorld(active));
-  const initial=worlds.get(active);
-  const el=id=>{
-    if(!elements.has(id))elements.set(id,{value:id==='replay-scope'?'delivery':'',textContent:'',disabled:false,options:[],children:[],
-      add(option){this.options.push(option);if(this.options.length===1)this.value=option.value;},
-      replaceChildren(){this.options=[];this.value='';},addEventListener(event,fn){this['on'+event]=fn;},
-      attributes:{},classList:{toggle(){}},focus(){this.focusCount=(this.focusCount||0)+1;},
-      append(...nodes){this.children.push(...nodes);},setAttribute(key,value){this.attributes[key]=value;},getAttribute(key){return this.attributes[key]||'';},removeAttribute(key){delete this.attributes[key];},closest(){return this;},scrollIntoView(){this.scrolled=true;}});
-    return elements.get(id);
+async function dashboard({hkm=false,empty=false,profiles=null}={}){
+  const hkmCatalogue=JSON.parse(fs.readFileSync('robotops/robotics/catalogue-v1.json','utf8'));
+  const registeredProfiles=profiles||[{cell_profile_id:'hkm_inspired_v1',display_name:'HKM1800-inspired warehouse cell',description:'Six product families and six interchangeable tools.',selectable:true,product_count:6,tool_count:6},{cell_profile_id:'legacy_cartesian_v1',display_name:'Legacy Cartesian cell',description:'Saved historical tests only.',selectable:false,product_count:3,tool_count:1}];
+  const elements=new Map(),posts=[],requests=[],worlds=new Map(),failures=[],managementResults=new Map();
+  let active=empty?null:'original',sequence=0,worldNumber=0;
+  const makeWorld=(id,profile=hkm?'hkm_inspired_v1':'legacy_cartesian_v1')=>{
+    const catalogue=profile==='legacy_cartesian_v1'?null:hkmCatalogue;
+    const sources=catalogue?Object.fromEntries(catalogue.products.map(p=>['product-'+p.sku+'-01',catalogue.layout.sources[p.sku].location_id])):{};
+    return {id,number:++worldNumber,cell_profile_id:profile,cell_display_name:profile==='legacy_cartesian_v1'?'Legacy Cartesian cell':registeredProfiles.find(p=>p.cell_profile_id===profile)?.display_name,
+      catalogue,sources,destination:catalogue?.layout.destination.location_id||'destination',orders:[],groups:[{delivery_id:id+'-scene-1',started_at:'2026-10-03T14:00:00Z',current:true,executions:[]}],epoch:1,cellMode:'READY',blocked:null,
+      inventory:catalogue?catalogue.products.map(p=>({product_id:'product-'+p.sku+'-01',location_id:sources['product-'+p.sku+'-01']})):['red','blue','green'].map(color=>({product_id:'product-'+color,location_id:'source'}))};
   };
-  const player={select(id){this.selected=id;},previewScene(){},update(data){this.data=data;},updateDelivery(data){this.data=data;}};
+  if(active)worlds.set(active,makeWorld(active));
+  const initial=active?worlds.get(active):{orders:[],groups:[],inventory:[]};
+  const history=()=>({active_test_id:active,tests:[...worlds.values()].map(w=>({test_id:w.id,number:w.number,active:w.id===active,order_count:w.orders.length,outcomes:w.orders.map(o=>o.status),cell_profile_id:w.cell_profile_id,cell_display_name:w.cell_display_name}))});
+  const makeElement=id=>({value:id==='replay-scope'?'delivery':'',textContent:'',disabled:false,hidden:false,open:false,options:[],children:[],
+    add(option){this.options.push(option);if(this.options.length===1)this.value=option.value;},
+    replaceChildren(...nodes){this.options=[];this.children=[];this.value='';for(const node of nodes){if('value' in node&&'text' in node)this.add(node);else this.children.push(node);}},
+    addEventListener(event,fn){this['on'+event]=fn;},showModal(){this.open=true;this.hidden=false;},close(){this.open=false;this.onclose?.();},
+    attributes:{},classList:{toggle(){}},focus(){this.focusCount=(this.focusCount||0)+1;},
+    append(...nodes){this.children.push(...nodes);},setAttribute(key,value){this.attributes[key]=value;},getAttribute(key){return this.attributes[key]||'';},removeAttribute(key){delete this.attributes[key];},closest(){return this;},scrollIntoView(){this.scrolled=true;}});
+  const el=id=>{if(!elements.has(id))elements.set(id,makeElement(id));return elements.get(id);};
+  const player={select(id){this.selected=id;},previewScene(scene){this.scene=scene;},update(data){this.data=data;},updateDelivery(data){this.data=data;}};
+  const reply=(data,status=200)=>({ok:status<400,status,json:async()=>JSON.parse(JSON.stringify(data))});
   async function fetch(path,options={}){
-    const body=options.body?JSON.parse(options.body):null;
+    const body=options.body?JSON.parse(options.body):null,originalPath=path;
+    requests.push({path,method:options.method||'GET',body});
     if(options.method==='POST')posts.push({path,body});
+    const failIndex=failures.findIndex(f=>f.path===path),failure=failIndex<0?null:failures.splice(failIndex,1)[0];
+    if(failure&&!failure.afterCommit)return reply({reason:failure.reason},failure.status);
+    const respond=data=>failure?reply({reason:failure.reason},failure.status):reply(data);
+    if(path==='/cell-profiles')return reply({default_cell_profile_id:'hkm_inspired_v1',profiles:registeredProfiles});
+    if(path==='/simulation-tests'){
+      if(!body)return reply(history());
+      const key=path+':'+body.request_id;
+      if(managementResults.has(key))return respond(managementResults.get(key));
+      if(!registeredProfiles.some(p=>p.cell_profile_id===body.cell_profile_id&&p.selectable))return reply({reason:'CELL_PROFILE_NOT_AVAILABLE'},422);
+      active=body.request_id;worlds.set(active,makeWorld(active,body.cell_profile_id));
+      const result=history().tests.find(t=>t.test_id===active);managementResults.set(key,result);return respond(result);
+    }
+    const deletion=path.match(/^\/simulation-tests\/([^/]+)\/delete$/);
+    if(path==='/simulation-tests/clear'||deletion){
+      const key=path+':'+body.request_id;
+      if(managementResults.has(key))return respond(managementResults.get(key));
+      const ids=deletion?[deletion[1]]:[...worlds.keys()];
+      if(!deletion&&JSON.stringify([...body.expected_test_ids].sort())!==JSON.stringify([...worlds.keys()].sort()))return reply({reason:'TEST_HISTORY_CHANGED'},409);
+      if(ids.some(id=>!worlds.has(id)))return reply({reason:'TEST_NOT_FOUND'},404);
+      ids.forEach(id=>worlds.delete(id));if(ids.includes(active))active=null;
+      const result={deleted_test_ids:ids,cleanup_pending:false,history:history()};managementResults.set(key,result);return respond(result);
+    }
     let data,status=200;
     const match=path.match(/^\/simulation-tests\/([^/]+)(\/.*)$/),id=match?match[1]:'original';
     if(match)path=match[2];
-    if(path==='/simulation-tests'){
-      if(body){active=body.request_id;worlds.set(active,makeWorld(active));}
-      const tests=[...worlds.values()].map(w=>({test_id:w.id,number:w.number,active:w.id===active,order_count:w.orders.length,outcomes:w.orders.map(o=>o.status)}));
-      data=body?tests.at(-1):{active_test_id:active,tests};
-      return {ok:true,json:async()=>data};
-    }
-    const world=worlds.get(id),{orders,groups,inventory}=world;
-    if(body&&id!==active)return {ok:false,json:async()=>({reason:'TEST_ARCHIVED_READ_ONLY'})};
+    const world=worlds.get(id);
+    if(!world)return reply({reason:'TEST_NOT_FOUND'},404);
+    const {orders,groups,inventory,catalogue,sources}=world;
+    if(body&&id!==active)return reply({reason:'TEST_ARCHIVED_READ_ONLY'},409);
     const scene=()=>({scene_epoch:id+'-scene-'+world.epoch,source:'CURRENT_WORLD_REFERENCE',objects:[]});
-    const fixture=()=>({runtime:'headless',scene_epoch:scene().scene_epoch,source_id:'source',destination_id:'destination',
-      products:inventory.map(item=>({product_id:item.product_id,sku:hkm?item.product_id.slice(8,-3):item.product_id})),catalogue,product_sources:sources,inventory,scene_reset_blocked_reason:world.blocked});
+    const fixture=()=>({runtime:'headless',scene_epoch:scene().scene_epoch,source_id:catalogue?sources[inventory[0].product_id]:'source',destination_id:world.destination,
+      robot_profile_version:catalogue?world.cell_profile_id:null,products:inventory.map(item=>({product_id:item.product_id,sku:catalogue?item.product_id.slice(8,-3):item.product_id})),catalogue,product_sources:sources,inventory,scene_reset_blocked_reason:world.blocked});
     if(path==='/orders'&&body){
       data={...body,job_ids:['job-'+orders.length],status:'RECEIVED'};orders.push(data);
     }else if(path==='/orders')data=orders;
@@ -59,7 +84,7 @@ async function dashboard({hkm=false}={}){
         order.status=body.fault?.startsWith('DROP_ACK_')||body.fault?.includes('OBSERVATION')?'UNKNOWN_OUTCOME':['LOGICAL_ESTOP','CELL_FAULT','BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'].includes(body.fault)?'FAILED':'COMPLETED';
         if(body.fault==='LOGICAL_ESTOP')world.cellMode='ESTOP_LOGICAL';
         else if(body.fault==='CELL_FAULT')world.cellMode='FAULT';
-        else if(order.status!=='FAILED'&&body.fault!=='DROP_ACK_BEFORE_EFFECT')inventory.find(item=>item.product_id===order.lines[0].product_id).location_id='destination';
+        else if(order.status!=='FAILED'&&body.fault!=='DROP_ACK_BEFORE_EFFECT')inventory.find(item=>item.product_id===order.lines[0].product_id).location_id=world.destination;
         if(order.status==='UNKNOWN_OUTCOME')world.blocked='SCENE_RESET_BLOCKED_UNRESOLVED_JOBS';
         groups.at(-1).executions.push({job_id:order.job_ids[0],order_id:order.order_id,product_id:order.lines[0].product_id,state:order.status});
         data={state:order.status};
@@ -76,16 +101,23 @@ async function dashboard({hkm=false}={}){
       }
       else if(path.endsWith('/playback'))data={job_id:order.job_ids[0],status:'UNAVAILABLE'};
     }else if(path.endsWith('/timeline'))data=[];
-    if(data===undefined)throw Error('Unexpected request '+path);
-    return {ok:status<400,status,json:async()=>JSON.parse(JSON.stringify(data))};
+    if(data===undefined)throw Error('Unexpected request '+originalPath);
+    return reply(data,status);
   }
-  const context=vm.createContext({document:{getElementById:el,createElement:()=>({children:[],append(...nodes){this.children.push(...nodes);}})},
+  const context=vm.createContext({document:{getElementById:el,createElement:tag=>makeElement(tag)},
     Option:class{constructor(text,value){this.text=text;this.value=value;}},MotionPlayer:class{constructor(){return player;}},
     fetch,crypto:{randomUUID:()=>String(++sequence)},setInterval(){},console});
   vm.runInContext(fs.readFileSync('apps/erp_ui/workflow-guide.js','utf8'),context);
   vm.runInContext(fs.readFileSync('apps/erp_ui/app.js','utf8'),context);
   await new Promise(setImmediate);
-  return {el,posts,...initial,player,worlds,evidence:data=>{context.evidence=data;vm.runInContext('roboticsEvidence(evidence)',context);},current:()=>worlds.get(active),refresh:()=>vm.runInContext('refresh()',context),block:reason=>{worlds.get(active).blocked=reason;}};
+  return {el,posts,requests,...initial,player,worlds,profiles:registeredProfiles,
+    evidence:data=>{context.evidence=data;vm.runInContext('roboticsEvidence(evidence)',context);},
+    current:()=>worlds.get(active),activeId:()=>active,refresh:()=>vm.runInContext('refresh()',context),
+    poll:()=>vm.runInContext('(async()=>{await refreshHistory();await refresh();})()',context),
+    block:reason=>{worlds.get(active).blocked=reason;},
+    failNext:(path,{afterCommit=false,status=503,reason='SIMULATED_RESPONSE_FAILURE'}={})=>failures.push({path,afterCommit,status,reason}),
+    serverDelete:id=>{worlds.delete(id);if(active===id)active=null;},
+    serverStart:()=>{active='external-'+(++sequence);worlds.set(active,makeWorld(active,'hkm_inspired_v1'));return active;}};
 }
 
 test('three product clicks build one delivery; scenario selection is pure configuration and explicit restock preserves playback',async()=>{
@@ -208,11 +240,11 @@ for(const execution of executions)for(const observation of observations)test(`in
   if(orders[0].status==='UNKNOWN_OUTCOME')await el('reconcile').onclick();
   const saved=JSON.stringify({orders,inventory});
   assert.equal(el('new-test').disabled,false);
-  const start=posts.length;await el('new-test').onclick();
+  const start=posts.length;await el('new-test').onclick();await el('create-test').onclick();
   assert.deepEqual(posts.slice(start).map(p=>p.path),['/simulation-tests']);
   assert.equal(el('scenario').value,execution);assert.equal(el('observation').value,observation);
-  assert.equal(app.current().orders.length,0);assert.equal(app.current().inventory.length,3);
-  assert.ok(app.current().inventory.every(p=>p.location_id==='source'));
+  assert.equal(app.current().orders.length,0);assert.equal(app.current().inventory.length,6);
+  assert.ok(app.current().inventory.every(p=>p.location_id===app.current().sources[p.product_id]));
   assert.equal(el('create').disabled,false);assert.equal(el('new-test').disabled,false);
   assert.equal(JSON.stringify({orders,inventory}),saved);
   await el('create').onclick();
@@ -232,7 +264,7 @@ for(const execution of executions)for(const observation of observations)test(`in
 test('unreconciled test can be archived without reconciliation, then reviewed unchanged',async()=>{
   const {el,orders,posts}=await dashboard();
   el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('create').onclick();
-  await el('new-test').onclick();
+  await el('new-test').onclick();await el('create-test').onclick();
   assert.equal(orders[0].status,'UNKNOWN_OUTCOME');
   assert.equal(posts.filter(p=>p.path.endsWith('/reconcile')).length,0);
   el('test-history').value='original';await el('test-history').onchange();
@@ -309,7 +341,7 @@ for(const fault of ['BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'])test(fault+': guide 
 test('depleted delivery and saved test both have an explicit next action with history intact',async()=>{
   const {el,posts,orders}=await dashboard();for(let i=0;i<3;i++)await el('create').onclick();
   assert.match(el('guide-title').textContent,/Delivery finished/);
-  const saved=JSON.stringify(orders),start=posts.length;await el('guide-action').onclick();
+  const saved=JSON.stringify(orders),start=posts.length;await el('guide-action').onclick();await el('create-test').onclick();
   assert.deepEqual(posts.slice(start).map(p=>p.path),['/simulation-tests']);
   el('test-history').value='original';await el('test-history').onchange();
   assert.match(el('guide-title').textContent,/saved test/);
@@ -391,4 +423,165 @@ test('tool and uncertainty inspector reads persisted decision and observation wi
   assert.equal(rows.length,2);assert.equal(rows[1].children[1].textContent,'Rejected');
   const html=fs.readFileSync('apps/erp_ui/index.html','utf8');
   for(const text of ['Simulation boundaries','Not Cognibotics CAD','Not validated robot dynamics','Not SICS AI proprietary software','camera images are not analyzed'])assert.ok(html.includes(text));
+});
+
+
+const worldRequests=items=>items.filter(({path})=>!['/cell-profiles','/simulation-tests','/simulation-tests/clear'].includes(path)&&!/^\/simulation-tests\/[^/]+\/delete$/.test(path));
+async function createSelectedTest(ui,profile){
+  await ui.el('new-test').onclick();
+  if(profile){ui.el('cell-profile').value=profile;await ui.el('cell-profile').onchange();}
+  await ui.el('create-test').onclick();
+}
+
+test('new-test dialog shows selectable registered cells and cancel preserves the current legacy test',async()=>{
+  const ui=await dashboard(),before=JSON.stringify([...ui.worlds.values()]);
+  assert.match(ui.el('test-history').options.find(option=>option.value==='original').text,/Legacy Cartesian cell/);
+  await ui.el('new-test').onclick();
+  assert.equal(ui.el('new-test-dialog').open,true);
+  assert.deepEqual(ui.el('cell-profile').options.map(option=>option.value),['hkm_inspired_v1']);
+  assert.equal(ui.el('cell-profile').value,'hkm_inspired_v1');
+  assert.match(ui.el('cell-profile-description').textContent,/six|6/i);
+  assert.deepEqual(ui.posts,[]);
+  await ui.el('cancel-new-test').onclick();
+  assert.equal(ui.el('new-test-dialog').open,false);
+  assert.deepEqual(ui.posts,[]);assert.equal(JSON.stringify([...ui.worlds.values()]),before);
+  assert.equal(ui.el('test-history').value,'original');
+});
+
+test('confirming a new test sends the selected cell explicitly and creates six products without changing legacy history',async()=>{
+  const ui=await dashboard(),before=JSON.stringify(ui.worlds.get('original'));
+  await createSelectedTest(ui);
+  assert.equal(ui.posts.length,1);assert.equal(ui.posts[0].path,'/simulation-tests');
+  assert.deepEqual(Object.keys(ui.posts[0].body).sort(),['cell_profile_id','request_id']);
+  assert.equal(ui.posts[0].body.cell_profile_id,'hkm_inspired_v1');assert.ok(ui.posts[0].body.request_id);
+  assert.equal(ui.current().cell_profile_id,'hkm_inspired_v1');assert.equal(ui.current().inventory.length,6);
+  assert.equal(ui.el('product').options.length,6);assert.equal(ui.el('new-test-dialog').open,false);
+  assert.equal(JSON.stringify(ui.worlds.get('original')),before);
+  assert.match(ui.el('test-history').options.find(option=>option.value==='original').text,/Legacy Cartesian cell/);
+});
+
+test('a future available registry cell is selectable without hardcoded UI choices',async()=>{
+  const profiles=[
+    {cell_profile_id:'hkm_inspired_v1',display_name:'HKM cell',description:'Current six-tool cell.',selectable:true,product_count:6,tool_count:6},
+    {cell_profile_id:'future_registered_cell',display_name:'Future registered cell',description:'Distinct future fixture description.',selectable:true,product_count:6,tool_count:2},
+    {cell_profile_id:'legacy_cartesian_v1',display_name:'Legacy Cartesian cell',description:'History only.',selectable:false,product_count:3,tool_count:1}
+  ];
+  const ui=await dashboard({profiles});await ui.el('new-test').onclick();
+  assert.deepEqual(ui.el('cell-profile').options.map(option=>option.value),['hkm_inspired_v1','future_registered_cell']);
+  ui.el('cell-profile').value='future_registered_cell';await ui.el('cell-profile').onchange();
+  assert.match(ui.el('cell-profile-description').textContent,/Distinct future fixture description/);
+  assert.deepEqual(ui.posts,[]);await ui.el('create-test').onclick();
+  assert.equal(ui.posts[0].body.cell_profile_id,'future_registered_cell');
+  assert.equal(ui.current().cell_profile_id,'future_registered_cell');
+  assert.match(ui.el('test-history').options.find(option=>option.value===ui.activeId()).text,/Future registered cell/);
+});
+
+test('deleting the current uncertain test requires confirmation and leaves an empty workspace without issuing a pick',async()=>{
+  const ui=await dashboard();ui.el('scenario').value='DROP_ACK_AFTER_EFFECT';await ui.el('create').onclick();
+  const before=JSON.stringify(ui.orders),start=ui.posts.length;
+  await ui.el('delete-test').onclick();assert.equal(ui.el('delete-test-dialog').open,true);
+  assert.match(ui.el('delete-test-detail').textContent,/Test 1/i);assert.equal(ui.posts.length,start);
+  await ui.el('cancel-delete-test').onclick();assert.equal(ui.el('delete-test-dialog').open,false);
+  assert.equal(JSON.stringify(ui.orders),before);assert.equal(ui.posts.length,start);
+  await ui.el('delete-test').onclick();const reads=ui.requests.length;await ui.el('confirm-delete-test').onclick();
+  assert.deepEqual(ui.posts.slice(start).map(item=>item.path),['/simulation-tests/original/delete']);
+  assert.deepEqual(Object.keys(ui.posts.at(-1).body),['request_id']);
+  assert.equal(ui.worlds.size,0);assert.equal(ui.activeId(),null);assert.equal(ui.el('delete-test-dialog').open,false);
+  assert.equal(ui.el('empty-workspace').hidden,false);assert.equal(ui.el('test-workspace').hidden,true);
+  assert.equal(ui.el('create').disabled,true);assert.equal(ui.player.selected,null);
+  assert.deepEqual(worldRequests(ui.requests.slice(reads)),[]);
+  assert.equal(ui.posts.filter(item=>item.path.endsWith('/run')).length,1);
+  assert.equal(ui.posts.filter(item=>item.path.endsWith('/reconcile')).length,0);
+});
+
+test('deleting a selected archive preserves the active test and never silently selects another world',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();await createSelectedTest(ui);
+  const active=ui.activeId(),saved=JSON.stringify(ui.current());
+  ui.el('test-history').value='original';await ui.el('test-history').onchange();
+  assert.equal(ui.el('delete-test').disabled,false);await ui.el('delete-test').onclick();
+  const reads=ui.requests.length;await ui.el('confirm-delete-test').onclick();
+  assert.equal(ui.posts.at(-1).path,'/simulation-tests/original/delete');assert.equal(ui.activeId(),active);
+  assert.equal(ui.worlds.size,1);assert.equal(JSON.stringify(ui.current()),saved);
+  assert.equal(ui.el('test-workspace').hidden,true);assert.deepEqual(worldRequests(ui.requests.slice(reads)),[]);
+  await ui.el('return-current').onclick();assert.equal(ui.el('test-history').value,active);
+  assert.equal(ui.el('test-workspace').hidden,false);assert.equal(ui.el('create').disabled,false);
+});
+
+test('clear-all confirmation submits exactly the displayed test IDs and cancellation changes no data',async()=>{
+  const ui=await dashboard();await createSelectedTest(ui);
+  const ids=[...ui.worlds.keys()],saved=JSON.stringify([...ui.worlds.values()]),start=ui.posts.length;
+  await ui.el('clear-tests').onclick();assert.equal(ui.el('delete-test-dialog').open,true);
+  assert.match(ui.el('delete-test-detail').textContent,/2/);assert.equal(ui.posts.length,start);
+  await ui.el('cancel-delete-test').onclick();assert.equal(JSON.stringify([...ui.worlds.values()]),saved);
+  await ui.el('clear-tests').onclick();const reads=ui.requests.length;await ui.el('confirm-delete-test').onclick();
+  assert.equal(ui.posts.at(-1).path,'/simulation-tests/clear');
+  assert.deepEqual(ui.posts.at(-1).body.expected_test_ids,ids);assert.ok(ui.posts.at(-1).body.request_id);
+  assert.equal(ui.posts.length,start+1);assert.equal(ui.worlds.size,0);assert.equal(ui.activeId(),null);
+  assert.deepEqual(worldRequests(ui.requests.slice(reads)),[]);assert.equal(ui.el('empty-workspace').hidden,false);
+});
+
+test('empty startup performs no world reads or writes and only explicit cell confirmation creates a world',async()=>{
+  const ui=await dashboard({empty:true});
+  assert.equal(ui.el('empty-workspace').hidden,false);assert.equal(ui.el('test-workspace').hidden,true);
+  assert.equal(ui.el('create').disabled,true);assert.equal(ui.el('delete-test').disabled,true);assert.equal(ui.el('clear-tests').disabled,true);
+  assert.deepEqual(worldRequests(ui.requests),[]);assert.deepEqual(ui.posts,[]);
+  await ui.poll();await ui.el('create').onclick();await ui.el('reconcile').onclick();await ui.el('reset').onclick();
+  assert.deepEqual(worldRequests(ui.requests),[]);assert.deepEqual(ui.posts,[]);
+  await ui.el('empty-new-test').onclick();assert.equal(ui.el('new-test-dialog').open,true);assert.deepEqual(ui.posts,[]);
+  await ui.el('create-test').onclick();assert.equal(ui.current().inventory.length,6);
+  assert.equal(ui.el('empty-workspace').hidden,true);assert.equal(ui.el('test-workspace').hidden,false);
+  assert.equal(ui.posts.length,1);assert.equal(ui.posts[0].path,'/simulation-tests');
+});
+
+test('creation response loss keeps the dialog and freezes the original request identity for retry',async()=>{
+  const ui=await dashboard();await ui.el('new-test').onclick();
+  ui.failNext('/simulation-tests',{afterCommit:true});await ui.el('create-test').onclick();
+  assert.equal(ui.el('new-test-dialog').open,true);assert.match(ui.el('new-test-error').textContent,/SIMULATED_RESPONSE_FAILURE/);
+  assert.equal(ui.el('cell-profile').disabled,true);assert.equal(ui.worlds.size,2);
+  const first=structuredClone(ui.posts.at(-1));await ui.el('create-test').onclick();
+  assert.deepEqual(ui.posts.at(-1),first);assert.equal(ui.posts.length,2);assert.equal(ui.worlds.size,2);
+  assert.equal(ui.el('new-test-dialog').open,false);assert.equal(ui.el('test-history').value,first.body.request_id);
+});
+
+test('deletion response loss retries the same original test identity after history becomes empty',async()=>{
+  const ui=await dashboard();await ui.el('delete-test').onclick();
+  ui.failNext('/simulation-tests/original/delete',{afterCommit:true});await ui.el('confirm-delete-test').onclick();
+  assert.equal(ui.el('delete-test-dialog').open,true);assert.match(ui.el('delete-test-error').textContent,/SIMULATED_RESPONSE_FAILURE/);
+  assert.equal(ui.worlds.size,0);const first=structuredClone(ui.posts.at(-1));
+  await ui.el('confirm-delete-test').onclick();assert.deepEqual(ui.posts.at(-1),first);
+  assert.equal(ui.posts.length,2);assert.equal(ui.el('delete-test-dialog').open,false);assert.equal(ui.activeId(),null);
+  assert.deepEqual(worldRequests(ui.requests.slice(ui.requests.findIndex(r=>r.path===first.path))),[]);
+});
+
+test('retrying clear after a lost reply retains its request and expected IDs and cannot delete a later test',async()=>{
+  const ui=await dashboard();await createSelectedTest(ui);await ui.el('clear-tests').onclick();
+  ui.failNext('/simulation-tests/clear',{afterCommit:true});await ui.el('confirm-delete-test').onclick();
+  assert.equal(ui.el('delete-test-dialog').open,true);assert.equal(ui.worlds.size,0);
+  const first=structuredClone(ui.posts.at(-1)),later=ui.serverStart();await ui.poll();
+  await ui.el('confirm-delete-test').onclick();assert.deepEqual(ui.posts.at(-1),first);
+  assert.equal(ui.worlds.size,1);assert.equal(ui.activeId(),later);assert.ok(ui.worlds.has(later));
+  assert.equal(ui.el('delete-test-dialog').open,false);
+});
+
+test('changed test history rejects stale clear confirmation until the user reviews the new scope',async()=>{
+  const ui=await dashboard();await ui.el('clear-tests').onclick();const later=ui.serverStart();
+  await ui.el('confirm-delete-test').onclick();assert.equal(ui.el('delete-test-dialog').open,true);
+  assert.match(ui.el('delete-test-error').textContent,/test list changed.*Cancel and review/i);assert.equal(ui.worlds.size,2);
+  const failed=structuredClone(ui.posts.at(-1));assert.deepEqual(failed.body.expected_test_ids,['original']);
+  await ui.el('confirm-delete-test').onclick();assert.deepEqual(ui.posts.at(-1),failed);assert.equal(ui.worlds.size,2);
+  await ui.el('cancel-delete-test').onclick();await ui.el('clear-tests').onclick();await ui.el('confirm-delete-test').onclick();
+  assert.deepEqual(ui.posts.at(-1).body.expected_test_ids,['original',later]);
+  assert.notEqual(ui.posts.at(-1).body.request_id,failed.body.request_id);assert.equal(ui.worlds.size,0);
+});
+
+test('polling after external deletion clears stale selection without activating an archived test',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();await createSelectedTest(ui);
+  const removed=ui.activeId();ui.serverDelete(removed);const reads=ui.requests.length,posts=ui.posts.length;
+  await ui.poll();assert.equal(ui.activeId(),null);assert.equal(ui.worlds.size,1);assert.ok(ui.worlds.has('original'));
+  assert.equal(ui.el('test-workspace').hidden,true);assert.equal(ui.el('empty-workspace').hidden,false);
+  assert.equal(ui.el('create').disabled,true);assert.equal(ui.player.selected,null);assert.equal(ui.posts.length,posts);
+  assert.deepEqual(worldRequests(ui.requests.slice(reads)),[]);
+  ui.el('test-history').value='original';await ui.el('test-history').onchange();
+  assert.equal(ui.el('test-workspace').hidden,false);assert.equal(ui.el('create').disabled,true);
+  assert.match(ui.el('test-status').textContent,/read-only/);assert.equal(ui.activeId(),null);
 });

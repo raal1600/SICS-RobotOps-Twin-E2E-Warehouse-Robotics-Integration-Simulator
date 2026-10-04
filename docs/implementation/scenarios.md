@@ -11,6 +11,19 @@ Observe again captures new evidence for the original command. It does not repeat
 the pick, rewind the scene, or change an earlier assessment. Selecting either
 option alone does not execute anything.
 
+**Robot cell** in the **New simulation test** dialog is a separate choice: it
+selects the fixture/profile for a new independent world, not a fault injection.
+Only the HKM-inspired cell is selectable today. Selecting it does not alter a
+saved test, and legacy Cartesian history remains readable under its own label.
+The same execution/observation combinations apply to the selected supported cell.
+
+**Delete selected test** and **Clear all test data** manage retained experiment
+data after confirmation. They are not execution scenarios or observation modes,
+never send a pick, and never turn uncertainty into success or failure. Cancel
+preserves the data. If the active test is removed, explicitly create a new test
+before running another combination. Retained archives are not promoted. See
+[operator workflow](operations.md) for scope and retry behavior.
+
 Both selectors show the stage, **What this simulates**, **Key difference**, and the
 expected behavior. **Compare all execution scenarios** and **Compare all
 observation modes** let the operator read every option without running it.

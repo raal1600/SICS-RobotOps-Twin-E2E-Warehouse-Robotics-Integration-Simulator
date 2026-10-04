@@ -8,14 +8,36 @@
   <div class="test-picker"><label for="test-history">Your simulation tests</label><select id="test-history"></select></div>
   <button id="return-current" class="secondary" hidden>Return to current test</button>
   <button id="new-test" class="secondary" disabled>Start new test</button>
+  <button id="delete-test" class="secondary danger" disabled>Delete selected test</button>
+  <button id="clear-tests" class="secondary danger" disabled>Clear all test data</button>
   <p id="test-status" class="muted" role="status">Loading test history.</p>
 </section>
-<ol class="workflow-steps" aria-label="Test workflow">
+<dialog id="new-test-dialog" aria-labelledby="new-test-title">
+  <h2 id="new-test-title">New simulation test</h2>
+  <p>Choose a robot cell. This creates a separate world with fresh products and keeps your scenario and observation choices.</p>
+  <label for="cell-profile">Robot cell</label><select id="cell-profile" aria-describedby="cell-profile-description"></select>
+  <p id="cell-profile-description" class="muted"></p>
+  <p class="muted">Existing tests stay in history. Only the current test can execute; saved tests remain available for replay.</p>
+  <p id="new-test-error" class="dialog-error" role="alert"></p>
+  <div class="dialog-actions"><button id="cancel-new-test" class="secondary">Cancel</button><button id="create-test">Create test</button></div>
+</dialog>
+<dialog id="delete-test-dialog" aria-labelledby="delete-test-title">
+  <h2 id="delete-test-title">Delete simulation test?</h2>
+  <p id="delete-test-detail"></p>
+  <p class="muted">Orders, evidence, recordings and rendered artifacts in this selection will be permanently removed. This does not run the robot or resolve uncertain outcomes. Saved tests are never activated automatically.</p>
+  <p id="delete-test-error" class="dialog-error" role="alert"></p>
+  <div class="dialog-actions"><button id="cancel-delete-test" class="secondary">Cancel</button><button id="confirm-delete-test" class="danger">Delete test</button></div>
+</dialog>
+<section id="empty-workspace" class="panel empty-workspace" hidden>
+  <h2>No test selected</h2><p>Create a test and choose its robot cell, or select a saved test above to review its evidence.</p>
+  <button id="empty-new-test">Start new test</button>
+</section>
+<ol class="workflow-steps" id="test-workflow-steps" aria-label="Test workflow">
   <li id="stage-0" aria-current="step"><span>1</span> Prepare</li><li id="stage-1"><span>2</span> Run</li>
   <li id="stage-2"><span>3</span> Review</li><li id="stage-3"><span>4</span> Continue</li>
 </ol>
 <p id="message" role="status" aria-live="polite"></p>
-<div class="grid"><aside aria-label="Guided test controls">
+<div class="grid" id="test-workspace"><aside aria-label="Guided test controls">
 <section class="panel guide" id="workflow-guide" data-tone="neutral" aria-labelledby="guide-title">
   <div class="eyebrow" id="guide-label">NEXT STEP</div>
   <div aria-live="polite" aria-atomic="true"><h2 id="guide-title">Loading your test</h2><p id="guide-detail">Reading the saved workflow state.</p></div>

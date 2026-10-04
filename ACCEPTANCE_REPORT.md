@@ -1,6 +1,13 @@
 # Acceptance Report
 
-**DONE** — generated from executed gates; missing evidence is FAIL.
+**Current revision: NOT DONE.** Robot-cell selection and explicit test-data
+deletion are in progress against baseline
+`ae6d5d85c813e47aea042aea2a87236b5a8bc204`. New regression evidence and affected
+gates are pending. The unchanged prior report is archived at
+[lifecycle baseline](docs/evidence/test-lifecycle-baseline/README.md).
+The historical results below do not attest the new implementation.
+
+**Historical HKM source: DONE** — generated from executed gates; missing evidence is FAIL.
 
 Source commit: `ca7798798f916c8130e1833cf16b4d4d3f10d546`. Dirty at start: `False`.
 Inspected source hash: `d52ed73663702ef2acac0be80989a400f53e88714163f30210dc0ea27f582513` (excludes generated acceptance/evidence).

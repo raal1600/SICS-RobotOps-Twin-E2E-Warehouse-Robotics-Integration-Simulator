@@ -9,26 +9,22 @@ from pathlib import Path
 
 import uvicorn
 
-from apps.api.app import create_app
+from apps.api.app import create_workspace_app
 from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.config import Settings
-from robotops.workflow.engine import Engine
-from robotops.workflow.store import Store
 
 
 async def serve(data: Path, session: Path, identity: str, runtime_name: str) -> None:
     session.mkdir(parents=True, exist_ok=True)
-    store = Store(data / "workflow.db")
-    runtime = (BlenderRuntime if runtime_name == "blender" else SyntheticRuntime)(
-        data / "runtime.db", Settings.hkm(visual_frame_seconds=1 / 24)
+    app = create_workspace_app(
+        data,
+        runtime_type=BlenderRuntime if runtime_name == "blender" else SyntheticRuntime,
+        settings=Settings.hkm(visual_frame_seconds=1 / 24),
     )
-    engine = Engine(store, runtime, runtime.settings)
     server = uvicorn.Server(
         # Runtime deadline is 60 s, plus 2 s planning and 3 s to persist/reply.
-        uvicorn.Config(
-            create_app(store, engine, recover=True), log_level="info", timeout_graceful_shutdown=65
-        )
+        uvicorn.Config(app, log_level="info", timeout_graceful_shutdown=65)
     )
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))

@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. Status: DONE.
+> **Implementation status, 2026-10-04:** Robot-cell selection and explicit test-data deletion are being implemented against baseline ae6d5d85c813e47aea042aea2a87236b5a8bc204. Previous 110-MUST HKM acceptance is preserved as historical evidence; this new revision is awaiting verification. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -123,7 +123,9 @@ Simulatorn behöver ingen B200. Den ska i stället kunna beskriva modellversion,
 
 ### 4.1 Ett litet system med verkliga ansvarsskillnader
 
-Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en HKM-inspirerad manipulator. Den implementerade utökningen har verifierats med upprepad full acceptans, Blender-tester för verktygsbyte, plock och återställning samt publicering för den granskade källrevisionen; ACCEPTANCE_REPORT.md redovisar evidens och slutstatus. En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag. Gamla körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.
+Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en HKM-inspirerad manipulator. HKM-utökningen verifierades med upprepad full acceptans, Blender-tester och publicering vid källrevision ca7798798f916c8130e1833cf16b4d4d3f10d546. Den historiska evidensen ligger under docs/evidence/test-lifecycle-baseline; ACCEPTANCE_REPORT.md redovisar aktuell revisionsstatus. En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag. Sparade körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.
+
+Den efterföljande livscykeländringen skiljer val av robotcell från fel- och observationsscenario. ”Start new test” öppnar ett cellval; endast den HKM-inspirerade cellen kan väljas för nya försök. Äldre kartesiska körningar är fortfarande läsbara. ”Delete selected test” och ”Clear all test data” kräver uttrycklig bekräftelse av vilken evidens som tas bort. Radering är varken avstämning eller ett lyckat/misslyckat plock. Om det aktiva försöket raderas skapas ingen ersättningsvärld och inget arkiv blir automatiskt aktivt. ADR 0011 beskriver beständiga raderingskvitton, avgränsad filhantering och verifiering i isolerade testdata.
 
 Systemet ska kunna köras utan externa modellkonton. Blender visar förändringen i världen, men ordern blir inte färdig bara för att animationen slutar. UI:t visar orderstatus, cellstatus, kommandostatus och verifieringsstatus var för sig.
 

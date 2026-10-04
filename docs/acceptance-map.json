@@ -661,7 +661,12 @@
       "test_process_dies_after_effect_before_orchestrator_receipt",
       "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick",
       "test_restart_recovers_only_active_world_and_keeps_uncertain_archive",
-      "test_creation_is_idempotent_even_after_a_later_test_has_started"
+      "test_creation_is_idempotent_even_after_a_later_test_has_started",
+      "test_delete_original_preserves_catalog_siblings_and_does_not_recreate_it_on_restart",
+      "test_deleting_active_does_not_activate_or_recover_uncertain_archive",
+      "test_restart_finishes_committed_tombstone_after_crash_before_cleanup",
+      "test_clear_requires_confirmed_snapshot_and_retry_never_deletes_later_test",
+      "test_empty_workspace_bootstrap_never_initializes_or_recovers_any_runtime"
     ],
     "files": [
       "robotops/workflow/engine.py",
@@ -673,7 +678,9 @@
       "apps/api/test_sessions.py",
       "tests/integration/test_simulation_tests.py",
       "docs/adr/0007-independent-simulation-tests.md",
-      "docs/evidence/test-lifecycle-local.json"
+      "docs/evidence/test-lifecycle-local.json",
+      "tests/integration/test_test_management.py",
+      "docs/adr/0011-cell-selection-and-test-data-lifecycle.md"
     ],
     "explanation": "Abrupt process death after runtime commit recovers original command and persisted causal evidence without replay. Desktop close/reopen preserves the original command and reconciles with exactly one pick. Independent test history preserves original outcomes and recordings; only the active world can recover or reconcile. Evidence views use pure persisted journal reads."
   },
@@ -1159,6 +1166,13 @@
       "test_scene_is_visible_before_execution_and_historical_snapshot_survives_later_orders",
       "test_snapshot_publication_retries_only_sharing_lock_and_retains_old_data",
       "test_every_combination_can_start_an_independent_test_without_changing_old_evidence",
+      "test_cell_selection_is_explicit_persisted_and_legacy_history_is_unchanged",
+      "test_delete_archived_world_purges_only_its_evidence_and_blocks_cached_hosts",
+      "test_delete_last_test_leaves_empty_usable_workspace_and_monotonic_test_numbers",
+      "test_deletion_refuses_active_work_and_clear_is_atomic",
+      "test_two_hosts_refuse_deletion_during_motion_but_keep_live_reads",
+      "test_deletion_barrier_covers_deferred_file_response_until_all_bytes_are_sent",
+      "test_openapi_remains_stable_after_clear_and_empty_workspace_restart",
       "test_archived_api_is_read_only_for_every_mutation_and_request_is_pinned",
       "test_blender_history_keeps_exact_recording_after_new_test_and_restart",
       "test_playback_controls_never_dispatch_and_preserve_partial_recording_limits",

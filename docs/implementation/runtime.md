@@ -20,6 +20,12 @@ engage/uncouple motion. Tool changes are deterministic preparation under the sam
 command; their phases and final occupancy persist. `PICK_EFFECT` still means one
 product transfer. A tool change is never counted as another business effect.
 
+The application cell registry selects the profile before a new independent world
+is initialized; currently only the HKM profile is selectable. Saved worlds retain
+their persisted profile. Explicit test deletion operates at the workspace/catalog
+boundary, never through Runtime.apply or reset; with no active test, startup
+does not initialize a replacement world. See ADR 0011.
+
 Planning retains one isolated catalogue snapshot for each collision preflight.
 Individual product/tool lookups copy only the requested specification; fixed rack
 bounds are reused within that preflight while occupancy and dock-contact policy

@@ -1,0 +1,49 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "cell_profile_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Cell Profile Id",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "display_name": {
+      "title": "Display Name",
+      "type": "string"
+    },
+    "product_count": {
+      "title": "Product Count",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "pattern": "^1\\.0$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "selectable": {
+      "title": "Selectable",
+      "type": "boolean"
+    },
+    "tool_count": {
+      "title": "Tool Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "cell_profile_id",
+    "display_name",
+    "description",
+    "selectable",
+    "product_count",
+    "tool_count"
+  ],
+  "title": "CellProfile",
+  "type": "object"
+}

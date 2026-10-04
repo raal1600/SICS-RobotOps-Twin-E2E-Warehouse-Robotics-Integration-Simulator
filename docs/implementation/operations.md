@@ -12,15 +12,27 @@ uv run --locked python -m apps.api --runtime blender --port 8000 --data-dir runs
 ```
 
 Open http://127.0.0.1:8000. Use **Start new test** for every new combination:
-it retains scenario/observation selections and creates an independent world with
-six catalogued products, each at its own source box in the HKM-inspired cell.
+choose **Robot cell** in **New simulation test**, then **Create test**. It retains
+scenario/observation selections and creates an independent world. The registry
+currently offers only the HKM-inspired cell, with six catalogued products at
+their own source boxes; legacy cell metadata labels history but is not selectable.
 Fresh API data directories also use this profile. Existing saved worlds keep
 their own profile; opening a historical three-product test does not upgrade it.
 The previous test remains unchanged in **Test history**,
 including uncertain/intervention outcomes. Review its evidence and full replay
 in the same window; **Return to current test** resumes the active world.
 Startup recovers only that active world, without replaying uncertain commands.
-Archives remain read-only. This local demo has no
+Retained archives remain read-only. Explicit **Delete selected test** and
+**Clear all test data** are separate data-management actions. Each confirmation
+names its scope and the evidence that will be removed; cancel changes nothing.
+Deleting the active test leaves no active world. The app offers new-test creation
+without promoting an archive or running a pick. Clear-all confirms the exact
+displayed test set; if it changed, review again. Retrying an accepted clear only
+targets its original set, preserving later tests. Running work blocks deletion,
+and interrupted cleanup remains reported as pending until a safe retry completes.
+[ADR 0011](../adr/0011-cell-selection-and-test-data-lifecycle.md) defines the
+registered-file boundary and retained lifecycle metadata.
+This local demo has no
 production authentication/authorization boundary and binds to loopback only.
 
 The dark workspace has a persistent Next step card and Prepare / Run / Review /

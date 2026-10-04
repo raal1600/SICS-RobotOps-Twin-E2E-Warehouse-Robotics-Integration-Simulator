@@ -1,13 +1,17 @@
 # HKM-inspired warehouse cell adaptation
 
-Status: accepted for the audited source recorded in [ACCEPTANCE_REPORT.md](../../ACCEPTANCE_REPORT.md); all 110 MUST criteria pass.
+Historical HKM acceptance: all 110 MUST criteria passed at source
+`ca7798798f916c8130e1833cf16b4d4d3f10d546`, published through
+`ae6d5d85c813e47aea042aea2a87236b5a8bc204`. The subsequent cell-selection and
+test-data lifecycle change has its own status in
+[ACCEPTANCE_REPORT.md](../../ACCEPTANCE_REPORT.md).
 Base: `eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98`.
 All values and mechanics below are SIMULATOR_DESIGN unless explicitly identified
 as attributed manufacturer information in the source registry. This document
 describes the new implementation and its required boundaries; the archived
 baseline did not implement six tools. Targeted development evidence retains its
-original scope; the full enhancement acceptance is recorded separately in
-[ACCEPTANCE_REPORT.md](../../ACCEPTANCE_REPORT.md).
+original scope; the accepted enhancement report is preserved in
+[the lifecycle baseline archive](../evidence/test-lifecycle-baseline/README.md).
 
 ## Boundary and versioning
 
@@ -28,15 +32,18 @@ saved user tests retain their original interpretation. Unsupported historical
 formats must be identified honestly, never silently drawn as the new machine.
 No destructive migration or re-execution of historical commands is authorized.
 
-Implemented entry-point compatibility: fresh API/desktop worlds and Start new
-test now use `Settings.hkm()`. A reopened world's persisted execution settings
+Implemented entry-point compatibility: fresh API/desktop worlds use `Settings.hkm()`.
+Start new test opens a Robot cell selector backed by `/cell-profiles`; the
+HKM-inspired cell is currently its only selectable entry. Creation uses the
+registered profile, while a reopened world's persisted execution settings
 remain authoritative, including legacy three-product history. `/fixtures` gives
 per-product source IDs, the actual destination and the typed canonical catalogue;
 legacy worlds return null catalogue/profile metadata. API intake validates new
 orders against that fixture after resolving existing idempotency identities.
 `tests/integration/test_hkm_api.py` exercises these paths and six deterministic
-tool selections through actual HTTP routes; this targeted evidence is not a
-claim that the whole enhancement has passed acceptance.
+tool selections through actual HTTP routes. Explicit test-data deletion is
+separate from runtime reset or reconciliation; it does not promote historical
+worlds or reinterpret their original recordings (ADR 0011).
 
 ## Cell and fixtures
 

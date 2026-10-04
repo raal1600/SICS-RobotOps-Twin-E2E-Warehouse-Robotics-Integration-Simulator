@@ -1,0 +1,45 @@
+﻿{
+    "source_sha256":  {
+                          "apps/api/test_sessions.py":  "fdd3cc8149613b741265c91ba3354be68d57459bbcd1d0f314e7ea52cbae3b01",
+                          "apps/api/app.py":  "9819dc29fb8318e24e81e674ecd82288f2e18f6c1850313532c46152a35ae82f",
+                          "apps/erp_ui/index.html":  "4b8a7d1a6f64d5c6437ac80a9abf050ef62a457f65576329a4863348828d54d5",
+                          "apps/erp_ui/app.js":  "74e62ba8adb6ea6eb5e790a6377d75050c9e29fa51aed11b256c8f16d0f77bee",
+                          "apps/api/cell_profiles.py":  "b29f753b5edb128663a2e64611a0438dcdad3d3b3faa1fb9a4d663c381264cf8",
+                          "apps/desktop/backend.py":  "3fcfb00fc7dac888c7d79f0d98116a3fa6b92d9a6c9c72dc86375cb56bc0dcd6"
+                      },
+    "scope":  "Isolated actual EXE clear/close/reopen test; not a full acceptance attestation",
+    "checks":  [
+                   "actual EXE created HKM cell, persisted uncertain original, and registered a separate active test",
+                   "clear removes both test worlds and preserves a null active selection",
+                   "normal window close after clear drains backend and releases owned port",
+                   "native window reopens empty; management/static/OpenAPI routes remain available, old world routes are absent",
+                   "normal close after empty restart stops owned backend without forced termination"
+               ],
+    "native_empty_ui_verified":  false,
+    "source_commit":  "ae6d5d85c813e47aea042aea2a87236b5a8bc204",
+    "test_script_sha256":  "cbac92861bd6a23bc082386b2ec1c19315b320bfa980dc09562dbaba72e23432",
+    "data":  "C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\test-management-desktop\\7c22f499-8b52-45a8-b565-9d457292b571 lifecycle\\clear-reopen",
+    "native_ui_note":  "Exception calling \"FromHandle\" with \"1\" argument(s): \"hwnd cannot be IntPtr.Zero or null.\"",
+    "executable_sha256":  "24675affabe1e29c5e87ab25f751da92681eadc182863cbd31c6886124d9539a",
+    "runtime":  "headless",
+    "passed":  true,
+    "source_dirty":  true,
+    "source_unchanged_during_test":  true,
+    "http_status":  {
+                        "/":  200,
+                        "/simulation-tests":  200,
+                        "/cell-profiles":  200,
+                        "/orders":  404,
+                        "/health":  200,
+                        "/openapi.json":  200,
+                        "/fixtures":  404,
+                        "/ui/app.js":  200
+                    },
+    "empty_history":  {
+                          "schema_version":  "1.0",
+                          "active_test_id":  null,
+                          "tests":  [
+
+                                    ]
+                      }
+}

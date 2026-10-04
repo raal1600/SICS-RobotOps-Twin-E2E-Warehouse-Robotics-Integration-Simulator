@@ -24,6 +24,17 @@
           "title": "Active",
           "type": "boolean"
         },
+        "cell_display_name": {
+          "title": "Cell Display Name",
+          "type": "string"
+        },
+        "cell_profile_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Cell Profile Id",
+          "type": "string"
+        },
         "created_at": {
           "format": "date-time",
           "title": "Created At",
@@ -62,7 +73,9 @@
         "created_at",
         "active",
         "order_count",
-        "outcomes"
+        "outcomes",
+        "cell_profile_id",
+        "cell_display_name"
       ],
       "title": "SimulationTest",
       "type": "object"
@@ -71,8 +84,15 @@
   "additionalProperties": false,
   "properties": {
     "active_test_id": {
-      "title": "Active Test Id",
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Active Test Id"
     },
     "schema_version": {
       "const": "1.0",

@@ -13,11 +13,12 @@ Close/reopen the app after updating this checkout to load the new backend and UI
 Saved orders remain intact. Older runs expose **Load saved animation**, which
 exports their original `.blend` without executing another pick.
 Use the permanent **Start new test** control for any new execution/observation
-combination. It keeps selections and creates a fresh independent world in the
-same window with the six-SKU HKM-inspired profile. A fresh desktop data directory
+combination. **New simulation test** asks for **Robot cell**; **Create test** keeps
+the fault selections and creates a fresh independent world in the same window.
+The six-SKU HKM-inspired profile is the only selectable cell today. A fresh desktop data directory
 uses that profile too. Reopening existing data retains its saved profile, including
 the original three-product scene; choose Start new test to use the new cell without
-changing historical evidence. **Test history** retains all earlier outcomes, evidence and replay
+changing historical evidence. **Test history** retains earlier outcomes, evidence and replay
 read-only, including unknown and intervention states. Only running work blocks
 creation; **Return to current test** resumes the active world. Changing a scenario
 only configures the next order. Restock this test remains a separate guarded
@@ -25,6 +26,22 @@ operation for resolved jobs. The
 default Full delivery replay spans all products already executed in that scene;
 use Delivery replay to revisit a previous scene or select individual execution
 details to inspect one product.
+
+**Delete selected test** asks you to confirm removal of that test's orders,
+observations, journal evidence and replay. The dialog identifies its test and
+cell. **Clear all test data** identifies the current test count and confirms
+removal of that displayed set. Cancel either dialog to keep everything unchanged.
+These controls do not reconcile uncertain work or run a pick. A running operation
+must finish before deletion. Deleting the active test or clearing all tests leaves
+no active test; **Start new test** is the next explicit action. Retained
+archives are never automatically made active.
+
+Clear-all removes registered simulation worlds, not the app installation,
+launcher sessions, browser profile or lifecycle catalog. Unrelated files remain.
+Interrupted file cleanup is reported as pending and safely retried; a repeated
+clear request cannot remove later-created tests. Closing/reopening the app does
+not itself authorize deletion or recreate an empty active world. See
+[data ownership and recovery](../adr/0011-cell-selection-and-test-data-lifecycle.md).
 Lost acknowledgement pauses the next pick for every product. The **Review evidence** panel names the uncertain product and offers Reconcile [product]; choose Normal
 observation to check the original command before creating another order. If the
 evidence requires intervention, the panel offers **Observe again: [product]**.

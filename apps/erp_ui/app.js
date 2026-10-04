@@ -5,43 +5,56 @@ let selectedJob = null, selectedDelivery = null, fixture = null, deliveries = []
 let orderSignature = "", productSignature = "", deliverySignature = "", nextMotionPoll = 0, cellMode = "READY", refreshVersion = 0;
 let selectedTest = "original", activeTest = "original", testHistory = [], historySignature = "", viewVersion = 0;
 let guideEvidence = null, guideJob = null, guidance = null;
+let cellProfiles = [], newTestRequest = null, deletionRequest = null, historyVersion = 0;
 const attentionSeen = new Set();
-const readOnly = () => selectedTest !== activeTest;
+const readOnly = () => !selectedTest || selectedTest !== activeTest;
 const testPath = path => (selectedTest === "original" ? "" : `/simulation-tests/${selectedTest}`) + path;
 const sourceFor = product => fixture?.product_sources?.[product] || fixture?.source_id;
 const atSource = item => (item.location_id??item.location) === sourceFor(item.product_id);
 function testControls() {
   const current=testHistory.find(item=>item.test_id===selectedTest);
-  byId("test-history").value=selectedTest;
+  byId("test-history").value=selectedTest||"";
   byId("new-test").disabled=busy;
-  byId("test-history").disabled=busy;
-  byId("return-current").hidden=!readOnly();byId("return-current").disabled=busy;
-  text("test-status",readOnly()
-    ? `Test ${current?.number}: saved history, read-only. Its original outcomes are preserved. Return to the current test or start a new one.`
-    : `Test ${current?.number||1}: current test. Start new test restores all products in a separate world and keeps your scenario and observation choices. Previous results stay in history.`);
-  byId("metrics-link").href=testPath("/metrics");
+  byId("empty-new-test").disabled=busy;
+  byId("test-history").disabled=busy||!testHistory.length;
+  byId("delete-test").disabled=busy||!current;
+  byId("clear-tests").disabled=busy||!testHistory.length;
+  byId("return-current").hidden=!activeTest||selectedTest===activeTest;byId("return-current").disabled=busy;
+  byId("empty-workspace").hidden=!!selectedTest;
+  byId("test-workspace").hidden=!selectedTest;
+  byId("test-workflow-steps").hidden=!selectedTest;
+  text("test-status",!current
+    ? (testHistory.length?"No test selected. Saved tests are available for review, or create a new test.":"No test data. Start a new test and choose a robot cell.")
+    : `Test ${current.number} · ${current.cell_display_name} · `+(readOnly()
+      ? "saved history, read-only. Return to the current test or start a new one."
+      : "current test. Start new test creates a separate world; previous results stay in history."));
+  if(selectedTest)byId("metrics-link").href=testPath("/metrics");
 }
 async function refreshHistory() {
+  const version=++historyVersion;
   const data=await request("/simulation-tests");
+  if(version!==historyVersion)return;
   activeTest=data.active_test_id;testHistory=data.tests;
   const signature=JSON.stringify(data);
   if(signature!==historySignature){
     byId("test-history").replaceChildren();
+    byId("test-history").add(new Option("Select a test", ""));
     data.tests.slice().reverse().forEach(item=>byId("test-history").add(new Option(
-      `Test ${item.number} · ${item.active?"Current":"Saved"} · ${item.order_count} orders · ${[...new Set(item.outcomes)].join(", ")||"Ready"}`,item.test_id)));
+      `Test ${item.number} · ${item.cell_display_name} · ${item.active?"Current":"Saved"} · ${item.order_count} orders · ${[...new Set(item.outcomes)].join(", ")||"Ready"}`,item.test_id)));
     historySignature=signature;
   }
-  byId("test-history").value=selectedTest;testControls();
+  if(selectedTest&&!testHistory.some(item=>item.test_id===selectedTest))await selectTest(null);
+  byId("test-history").value=selectedTest||"";testControls();
 }
 async function selectTest(identity) {
   ++viewVersion;++refreshVersion;refreshing=false;
-  selectedTest=identity;selectedJob=null;selectedDelivery=null;fixture=null;deliveries=[];
+  selectedTest=identity||null;selectedJob=null;selectedDelivery=null;fixture=null;deliveries=[];
   guideEvidence=null;guideJob=null;
   byId("setup-panel").open=true;byId("review-panel").open=false;
   orderSignature=productSignature=deliverySignature="";nextMotionPoll=0;
   byId("orders").replaceChildren();byId("delivery").replaceChildren();
   byId("replay-scope").value="delivery";byId("visual-panel").hidden=true;byId("visual").removeAttribute("src");
-  player.select(null);testControls();renderGuidance();
+  player.select(null);testControls();fixtureControls();
   await refresh();await refreshMotion(true);
 }
 function pendingExecution() {
@@ -50,7 +63,10 @@ function pendingExecution() {
 }
 function fixtureControls() {
   testControls();
-  if (!fixture) {renderGuidance();return;}
+  if (!fixture) {
+    for(const id of ["create","tool-showcase","reconcile","resolve-blocker","fresh-scene","reset","motion-import"])byId(id).disabled=true;
+    renderGuidance();return;
+  }
   const products=fixture.products.map(item=>({...item,location:fixture.inventory.find(obj=>obj.product_id===item.product_id)?.location_id}));
   const anyAvailable=products.some(atSource);
   const signature=JSON.stringify(products);
@@ -155,10 +171,22 @@ function selectReplay() {
 async function request(path, body) {
   const options = body === undefined ? {cache:"no-store"} : {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)};
   const response = await fetch(path, options), data = await response.json();
-  if (!response.ok) throw new Error(data.reason || JSON.stringify(data.detail));
+  if (!response.ok) {
+    const explanations={
+      TEST_OPERATION_IN_PROGRESS:"A test operation is still running. Wait for it to finish, then try again.",
+      TEST_HISTORY_CHANGED:"The test list changed. Cancel and review Clear all test data again before deleting.",
+      CELL_PROFILE_NOT_AVAILABLE:"This robot cell is no longer available. Cancel and choose an available cell.",
+      CELL_PROFILE_STATE_MISMATCH:"Saved data for this request belongs to a different robot cell. Cancel and create a new test; the existing data was kept.",
+      TEST_REQUEST_CONFLICT:"This request conflicts with an earlier operation. Cancel and review the test list before trying again.",
+      TEST_DELETED:"This test was already deleted. Cancel and create a new test.",
+      TEST_STORAGE_UNSAFE_PATH:"The test storage path cannot be safely deleted. Data was kept; inspect the server log."
+    };
+    throw new Error(explanations[data.reason]||data.reason||JSON.stringify(data.detail));
+  }
   return data;
 }
 async function api(path, body) {
+  if(!selectedTest)throw new Error("Create or select a simulation test first.");
   if(body!==undefined&&readOnly())throw new Error("Saved tests are read-only. Return to the current test or start a new one.");
   return request(testPath(path),body);
 }
@@ -192,6 +220,7 @@ function roboticsEvidence(evidence){
   }
 }
 async function refresh(preferred, preferredDelivery) {
+  if(!selectedTest)return;
   if (refreshing && !preferred && !preferredDelivery) return;
   const version=++refreshVersion;
   refreshing = true;
@@ -326,12 +355,83 @@ byId("reconcile").onclick=()=>action(async()=>{if(selectedJob)await api(`/jobs/$
 byId("reset").onclick=()=>action(()=>api("/cell/reset",{}));
 byId("fresh-scene").onclick=()=>action(freshDelivery,"Preparing a new delivery; previous replays stay saved.");
 byId("scenario").onchange=()=>{fixtureControls();text("message","Scenario selected for the next order. Start new test for fresh products and an independent result.");};
-byId("new-test").onclick=()=>action(async()=>{
-  const created=await request("/simulation-tests",{request_id:crypto.randomUUID()});
-  await refreshHistory();await selectTest(created.test_id);
-},"Starting a fresh test and saving the previous result…",true);
+function cellDescription(){
+  const profile=cellProfiles.find(item=>item.cell_profile_id===byId("cell-profile").value);
+  text("cell-profile-description",profile?`${profile.description} ${profile.product_count} product families · ${profile.tool_count} tools.`:"No robot cells are available.");
+  byId("create-test").disabled=busy||!profile;
+}
+byId("new-test").onclick=async()=>{
+  if(busy)return;
+  try{
+    const data=await request("/cell-profiles");
+    cellProfiles=data.profiles.filter(item=>item.selectable);
+    byId("cell-profile").replaceChildren();
+    cellProfiles.forEach(item=>byId("cell-profile").add(new Option(item.display_name,item.cell_profile_id)));
+    byId("cell-profile").value=cellProfiles.find(item=>item.cell_profile_id===data.default_cell_profile_id)?.cell_profile_id||cellProfiles[0]?.cell_profile_id||"";
+    newTestRequest={request_id:crypto.randomUUID()};
+    byId("cell-profile").disabled=false;text("new-test-error","");cellDescription();
+    byId("new-test-dialog").showModal();
+  }catch(error){text("message",error.message);}
+};
+byId("empty-new-test").onclick=()=>byId("new-test").onclick();
+byId("cell-profile").onchange=cellDescription;
+async function manageTests(dialogId,errorId,operation){
+  if(busy)return;
+  busy=true;fixtureControls();
+  for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=true;
+  text(errorId,"");
+  try{
+    const message=await operation();
+    byId(dialogId).close();text("message",message);
+  }catch(error){text(errorId,error.message);text("message",error.message);}
+  finally{
+    busy=false;
+    for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=false;
+    try{await refreshHistory();await refresh();await refreshMotion(true);}catch(error){text("message",error.message);}
+    fixtureControls();
+  }
+}
+byId("create-test").onclick=()=>{
+  if(!newTestRequest||!byId("new-test-dialog").open||!cellProfiles.some(item=>item.cell_profile_id===byId("cell-profile").value))return;
+  newTestRequest.cell_profile_id??=byId("cell-profile").value;
+  byId("cell-profile").disabled=true;
+  return manageTests("new-test-dialog","new-test-error",async()=>{
+    const created=await request("/simulation-tests",newTestRequest);
+    await refreshHistory();await selectTest(created.test_id);
+    return `Test ${created.number} created · ${created.cell_display_name}. Choose a scenario and run an order.`;
+  });
+};
+function confirmDeletion(all){
+  if(busy)return;
+  const targets=all?testHistory:testHistory.filter(item=>item.test_id===selectedTest);
+  if(!targets.length)return;
+  deletionRequest={path:all?"/simulation-tests/clear":`/simulation-tests/${selectedTest}/delete`,
+    body:{request_id:crypto.randomUUID(),...(all?{expected_test_ids:targets.map(item=>item.test_id)}:{})}};
+  text("delete-test-title",all?"Clear all test data?":"Delete simulation test?");
+  text("confirm-delete-test",all?"Clear all test data":"Delete test");
+  const uncertain=targets.some(item=>item.outcomes.some(state=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(state)));
+  text("delete-test-detail",(all?`${targets.length} tests with ${targets.reduce((total,item)=>total+item.order_count,0)} orders will be deleted.`
+    :`Test ${targets[0].number} · ${targets[0].cell_display_name} · ${targets[0].order_count} orders will be deleted.`)
+    +(uncertain?" This includes unresolved outcomes. Their investigation evidence will also be removed.":"")
+    +(targets.some(item=>item.test_id===activeTest)?" There will be no current test until you create a new one.":""));
+  text("delete-test-error","");byId("delete-test-dialog").showModal();byId("cancel-delete-test").focus();
+}
+byId("delete-test").onclick=()=>confirmDeletion(false);
+byId("clear-tests").onclick=()=>confirmDeletion(true);
+byId("confirm-delete-test").onclick=()=>{
+  if(!deletionRequest||!byId("delete-test-dialog").open)return;
+  return manageTests("delete-test-dialog","delete-test-error",async()=>{
+    const result=await request(deletionRequest.path,deletionRequest.body);
+    await refreshHistory();
+    return result.cleanup_pending?"Test data removed from history. Some files are still in use; cleanup will retry when the app restarts.":"Test data deleted. Create a new test or review another saved test.";
+  });
+};
+for(const [dialog,cancel] of [["new-test-dialog","cancel-new-test"],["delete-test-dialog","cancel-delete-test"]]){
+  byId(cancel).onclick=()=>{if(!busy)byId(dialog).close();};
+  byId(dialog).addEventListener("cancel",event=>{if(busy)event.preventDefault();});
+}
 byId("test-history").onchange=()=>{
-  const identity=byId("test-history").value;
+  const identity=byId("test-history").value||null;
   return action(()=>selectTest(identity),"Loading saved test…",true);
 };
 byId("return-current").onclick=()=>action(()=>selectTest(activeTest),"Returning to the current test…",true);
@@ -387,7 +487,7 @@ for(const kind of ["scenario","observation"]){
 }
 (async()=>{try{
   await refreshHistory();await selectTest(activeTest);
-  text("runtime",fixture.runtime === "blender"?"Blender · CPU · synthetic world":"Deterministic headless world");
+  text("runtime",fixture?.runtime === "blender"?"Blender · CPU · synthetic world":"Deterministic headless world");
   setInterval(()=>refreshHistory().then(()=>refresh()).catch(error=>text("message",error.message)),1000);
   setInterval(()=>refreshMotion(),250);
 }catch(error){text("message",error.message);}})();

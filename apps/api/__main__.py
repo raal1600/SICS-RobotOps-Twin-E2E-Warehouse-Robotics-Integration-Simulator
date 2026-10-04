@@ -3,12 +3,10 @@ from pathlib import Path
 
 import uvicorn
 
-from apps.api.app import create_app
+from apps.api.app import create_workspace_app
 from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.config import Settings
-from robotops.workflow.engine import Engine
-from robotops.workflow.store import Store
 
 
 def main() -> None:
@@ -23,12 +21,12 @@ def main() -> None:
         if args.settings
         else Settings.hkm(visual_frame_seconds=1 / 24)
     )
-    store = Store(args.data_dir / "workflow.db")
-    runtime = (BlenderRuntime if args.runtime == "blender" else SyntheticRuntime)(
-        args.data_dir / "runtime.db", settings
+    app = create_workspace_app(
+        args.data_dir,
+        runtime_type=BlenderRuntime if args.runtime == "blender" else SyntheticRuntime,
+        settings=settings,
     )
-    engine = Engine(store, runtime, runtime.settings)
-    uvicorn.run(create_app(store, engine, recover=True), host="127.0.0.1", port=args.port)
+    uvicorn.run(app, host="127.0.0.1", port=args.port)
 
 
 if __name__ == "__main__":

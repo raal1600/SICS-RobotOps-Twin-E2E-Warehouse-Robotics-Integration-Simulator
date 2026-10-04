@@ -261,10 +261,10 @@ def build_report(meta: dict[str,str], refs: dict[str,Any], diagrams: dict[str,An
     toc.append(('referenser','Referenser och källbegränsningar'))
     toc_list='<ol>'+''.join(f'<li><a href="#{i}">{E(t)}</a></li>' for i,t in toc)+'</ol>'
     sidebar='<aside class="sidebar"><details open><summary>Innehåll</summary>'+toc_list+'</details><div class="side-meta">'
-    sidebar+=f'Rapport {meta["number"]} / 03<br>Version {DISPLAY_VERSION} · Svenska<br>HKM-revision pågår; acceptans spåras separat<br><a href="downloads/{meta["slug"]}.pdf">Ladda ned PDF</a></div></aside>'
+    sidebar+=f'Rapport {meta["number"]} / 03<br>Version {DISPLAY_VERSION} · Svenska<br>Aktuell status i rapportens revisionsruta<br><a href="downloads/{meta["slug"]}.pdf">Ladda ned PDF</a></div></aside>'
     cover=f'<section class="cover"><div class="eyebrow">Rapport {meta["number"]} / 03 · RobotOps Twin</div><h1>{E(meta["title"])}</h1>'
     cover+=f'<p class="subtitle">{E(meta["subtitle"])}</p><div class="metadata">Rami Halabi<br>Version {DISPLAY_VERSION} · {DISPLAY_DATE}<br>Oberoende tekniskt rapportpaket · Svenska</div>'
-    cover+='<div class="status"><strong>Status: HKM-inspirerad revision pågår.</strong> Den tidigare deterministiska systembaslinjen är bevarad; nya scen-, verktygs- och trajektoriekrav kräver egen acceptans. Aktuella resultat anges i statusrutan och governance-sidan. Inga fysiska robotresultat eller säkerhetsgarantier hävdas.</div>'
+    cover+='<div class="status"><strong>Status: se aktuell revisionsruta.</strong> Aktuella resultat anges i rapportens statusruta och på governance-sidan. Acceptans gäller endast den källrevision som anges i evidensen; tidigare resultat bevaras separat. Inga fysiska robotresultat eller säkerhetsgarantier hävdas.</div>'
     cover+=f'<div class="buttons"><a class="button" href="downloads/{meta["slug"]}.pdf" download>Ladda ned PDF</a><a class="button secondary" href="sources/{meta["slug"]}.md" download>Markdown-källa</a></div>'
     cover+='<p class="print-label">AI-assisterad text- och publiceringsframställning.<br>Ej sakkunniggranskad. Inte framtagen av eller godkänd av SICS AI.<br>Rapporternas källor, diagram och byggskript finns i projektets repository.</p></section>'
     content='<div class="shell">'+sidebar+'<main id="main" class="document">'+cover+'<nav class="print-toc" aria-label="Innehållsförteckning"><h2>Innehåll</h2>'+toc_list+'</nav>'+body+refs_html+'</main></div>'

@@ -2,6 +2,12 @@
 
 Accepted locally 2026-10-03. No commit, push or public deployment requested.
 
+Lifecycle extension: [ADR 0011](0011-cell-selection-and-test-data-lifecycle.md)
+adds cell selection and explicit confirmed retention controls. This decision's
+history-preservation rules still apply to ordinary creation/navigation/restart;
+operator-requested deletion is a separate catalog operation, never replay or
+reconciliation. The original decision and evidence below retain their dated scope.
+
 Users need to try every execution/observation combination with the same products,
 including after UNKNOWN_OUTCOME or REQUIRES_INTERVENTION. Clearing those states
 in the same physical world would erase uncertainty. Opening another window for

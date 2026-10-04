@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. Status: DONE.
+> **Implementation status, 2026-10-04:** Robot-cell selection and explicit test-data deletion are being implemented against baseline ae6d5d85c813e47aea042aea2a87236b5a8bc204. Previous 110-MUST HKM acceptance is preserved as historical evidence; this new revision is awaiting verification. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -257,6 +257,8 @@ Detta är frågor om arbetsinnehåll och leveransförväntningar, inte ett löft
 Förbered en ärlig statusruta med implementerat, simulerat, testat och återstående. Ha versionsnumret synligt. Visa ett litet dataexempel, en tillståndsövergång och minst ett relevant feltest. Rensa bort nycklar och privata kunddata från skärmen och terminalhistoriken som du visar.
 
 Om programmet fungerar: skapa ordern live, följ ID:t genom systemet och visa Blender-effekten. Visa sedan kvittensbortfall och ett oavgjort fall. Om programmet inte är färdigt: använd diagrammen och säg att det är designgranskning. En inspelad sekvens ska tydligt presenteras som inspelad.
+
+För nästa oberoende försök: välj ”Start new test”, granska ”Robot cell” och bekräfta ”Create test”. Endast den HKM-inspirerade cellen erbjuds för nya försök; äldre celler identifieras i historiken. Spara de körningar du vill kunna granska. ”Delete selected test” tar efter bekräftelse bort det valda försöket och ”Clear all test data” den bekräftade samlingen. Dessa åtgärder avgör inte ett osäkert plock. Efter radering av det aktiva försöket behöver du uttryckligen skapa ett nytt; ett arkiv blir inte automatiskt körbart. Använd separat demodata när du visar raderingsflödet (ADR 0011).
 
 Ha en reservversion av rapporterna som PDF. Börja inte installera nya drivrutiner eller flytta runtime till en okänd miljö precis före presentationen. Det är en praktisk rekommendation för denna demo, inte en uppgift om SICS interna rutiner.
 

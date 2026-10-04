@@ -72,8 +72,11 @@ hash-corrupt checkpoints and malformed requests that must produce no effect.
 A fixed test-only probe inspects the actual saved hierarchy, labels and camera
 sensor/frame/calibration/model properties. Presentation cameras and rendered
 pixels never become verifier input. Scoped development evidence is recorded in
-GOAL_PROGRESS.md; the complete accepted revision and audited source are recorded
-in ACCEPTANCE_REPORT.md.
+GOAL_PROGRESS.md. The accepted HKM source `ca779879` is preserved in
+[the lifecycle baseline archive](../evidence/test-lifecycle-baseline/README.md);
+ACCEPTANCE_REPORT.md records the current revision separately. Explicit test-data
+deletion may remove a selected test's Blender artifacts after confirmation; it
+never invokes the runtime to execute, recover or resolve that deleted world.
 
 Run:
 

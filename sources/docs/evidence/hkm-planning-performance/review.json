@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "evidence_kind": "SCOPED_PLANNING_PERFORMANCE_REGRESSION",
+  "baseline_commit": "0d8a8dbf72b063f43f7ca80460a7b67c577172e9",
+  "current_source_scope": "Uncommitted performance fix over baseline; only the five source-file hashes below are attested. A later commit is not claimed by these runs.",
+  "source_files_sha256": {
+    "robotops/robotics/catalogue.py": "570bdc3681dcbcbb349a7c3c9dfb7c8c1e957b85eaccd9f0877d347fdcd91965",
+    "robotops/robotics/trajectory.py": "fcf2deef8b59a8bce10f7f2d2f854ef8f2e2ed993fca608c6d19425e35096fac",
+    "tests/contract/test_hkm_catalogue.py": "ce40c8c3cb4724169b2a6c1055e0a2cafa7fa16548c256f5e94f9c219c8765c6",
+    "tests/unit/test_hkm_robotics.py": "b24860e9185b7bb23c2a49bb5becd7bc9cc891fc0af17324bcde381c9b43afde",
+    "docs/implementation/runtime.md": "6c695b9cce29a3c110ef26633599839afe94ca0e4c06e47daddcc0f09f38cf8c"
+  },
+  "artifacts": {
+    "benchmark-before.json": {
+      "sha256": "14bff1d3a3bcfef7d1e026d4ec1a00f1b4d0c7f910d0e1f9deb94d8750518c85",
+      "size_bytes": 115477,
+      "original_path": "artifacts/hkm-planning-original.json"
+    },
+    "benchmark-current.json": {
+      "sha256": "cd6291db7a251a75b4938ba2b61812750d0dadc0e9b0cafeafc05a3ebbab327c",
+      "size_bytes": 115497,
+      "original_path": "artifacts/hkm-planning-current.json"
+    },
+    "profile-before.txt": {
+      "sha256": "41747b6276c8d5ae2bde83e1f2358af005de1b4f48c8826a053e3b1397a1f125",
+      "size_bytes": 4385,
+      "original_path": "artifacts/hkm-planning-original-pstats.txt"
+    },
+    "profile-current.txt": {
+      "sha256": "7afe28d3e9b1e2e5863fae4717cab5a33459547a620ba19321f0a3f1ebc9fe72",
+      "size_bytes": 4369,
+      "original_path": "artifacts/hkm-planning-current-pstats.txt"
+    },
+    "regressions.xml": {
+      "sha256": "99399701da034f95a033aba0572ed3eeb13af59c4105c9650d31981f4c85646b",
+      "size_bytes": 22753,
+      "original_path": "artifacts/hkm-planning-regressions.xml"
+    },
+    "targeted.xml": {
+      "sha256": "ce10e70b4ef6837cc452e2081f3091b430ce70abd6b48a2f98d916ae8eb2d432",
+      "size_bytes": 9917,
+      "original_path": "artifacts/hkm-planning-targeted.xml"
+    },
+    "targeted-coverage.json": {
+      "sha256": "c126d71dd2ea45de11e1bd2c4c7e9b720e93d4677b9049b570ffb2022a1a86df",
+      "size_bytes": 216896,
+      "original_path": "artifacts/hkm-planning-targeted-coverage.json"
+    },
+    "original-review.json": {
+      "sha256": "4fe253651b2c9bd7fd0f74f9a900ca860af56a8420f394cfc31a8f09031fd2af",
+      "size_bytes": 1735,
+      "original_path": "artifacts/hkm-planning-performance-review.json"
+    },
+    "harness-before.py.txt": {
+      "sha256": "3e0ff34ef7db02b0c6ff3e401987263807a102c0cd3a66dc8f25b60fca37fe53",
+      "size_bytes": 7723,
+      "original_path": "artifacts/hkm-planning-profile.py"
+    },
+    "harness-current.py.txt": {
+      "sha256": "1148247d80a5e66feb33fba4d3f3d9bc66b337ca3134617644d51364977569eb",
+      "size_bytes": 2964,
+      "original_path": "artifacts/hkm-planning-current-profile.py"
+    }
+  },
+  "semantic_comparison": {
+    "all_six_selection_explanations_and_complete_trajectory_json_identical": true,
+    "compared_files": [
+      "benchmark-before.json",
+      "benchmark-current.json"
+    ]
+  },
+  "instrumentation": "coverage branch tracing plus cProfile; diagnostic validator supplied original observation timestamp to isolate profiling overhead, unchanged ordinary pytest tests separately passed",
+  "whole_catalogue_copies": {
+    "before": 5062,
+    "current": 258
+  },
+  "profile_elapsed_s": {
+    "before": 47.995,
+    "current": 3.284
+  },
+  "current_max_single_plan_s": 0.2734055999899283,
+  "current_sku_b_single_plan_s": 0.15003279999655206,
+  "targeted_tests_under_coverage": {
+    "tests_passed": 66,
+    "tests_failed": 0,
+    "command_exit": 1,
+    "coverage_percent": 69.17497733454216,
+    "required_full_suite_percent_unchanged": 85,
+    "coverage_gate": "FAIL: partial-suite coverage is below the unchanged full-suite gate",
+    "junit": "targeted.xml",
+    "coverage": "targeted-coverage.json"
+  },
+  "broader_affected_tests": {
+    "tests_passed": 144,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "command_exit": 0,
+    "elapsed_s": 69.82,
+    "junit": "regressions.xml"
+  },
+  "limits_changed": false,
+  "full_acceptance_claim": false,
+  "remote_ci_or_publication_claim": false,
+  "commands": [
+    ".venv\\Scripts\\python.exe artifacts/hkm-planning-profile.py --profile",
+    ".venv\\Scripts\\python.exe artifacts/hkm-planning-current-profile.py --profile",
+    ".venv\\Scripts\\python.exe -m pytest tests/unit/test_hkm_brain.py::test_hkm_brain_builds_valid_explainable_observation_only_plan tests/integration/test_hkm_api.py::test_fresh_api_fixture_and_six_product_orders_use_catalogued_sources_and_tools tests/contract/test_hkm_catalogue.py tests/unit/test_hkm_robotics.py --cov=robotops --cov=apps --cov-report=json:artifacts/hkm-planning-targeted-coverage.json --cov-report=term --junitxml=artifacts/hkm-planning-targeted.xml -q",
+    ".venv\\Scripts\\python.exe -m pytest tests/unit/test_hkm_robotics.py tests/unit/test_hkm_brain.py tests/contract/test_hkm_catalogue.py tests/contract/test_hkm_boundaries.py tests/unit/test_hkm_runtime_defenses.py tests/e2e/test_hkm_scenarios.py tests/integration/test_hkm_api.py -q --junitxml=artifacts/hkm-planning-regressions.xml"
+  ]
+}

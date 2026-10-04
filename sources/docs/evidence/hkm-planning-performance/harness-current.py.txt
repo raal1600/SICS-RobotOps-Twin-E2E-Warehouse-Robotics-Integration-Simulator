@@ -1,0 +1,67 @@
+"""Ignored diagnosis only: profile original/isolated proposed source under coverage."""
+import argparse
+import cProfile
+import difflib
+import importlib.abc
+import importlib.util
+import io
+import json
+import pstats
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+parser = argparse.ArgumentParser()
+parser.add_argument("--proposed", action="store_true")
+parser.add_argument("--profile", action="store_true")
+args = parser.parse_args()
+
+import coverage
+
+mode = "current"
+cov = coverage.Coverage(data_file=str(ROOT / f"artifacts/hkm-profile-{mode}.coverage"),
+                        source=["robotops", "apps"], branch=True)
+cov.start()
+from robotops.brain.deterministic import DeterministicBrain
+from robotops.brain.validation import ActionValidator
+from tests.unit.test_hkm_brain import planning_context
+
+profiler = cProfile.Profile()
+if args.profile:
+    profiler.enable()
+results = []
+with tempfile.TemporaryDirectory(prefix="robotops-planning-profile-") as directory:
+    for sku in ("SKU-A", "SKU-B", "SKU-C", "SKU-D", "SKU-E", "SKU-F"):
+        settings, job, observation, destination, cell = planning_context(Path(directory) / sku, sku)
+        brain = DeterministicBrain(settings)
+        start = time.perf_counter()
+        first = brain.plan(job, observation, destination)
+        first_duration = time.perf_counter() - start
+        start = time.perf_counter()
+        second = brain.plan(job, observation, destination)
+        second_duration = time.perf_counter() - start
+        assert first == second
+        start = time.perf_counter()
+        # Keep this diagnosis independent of observation age accumulated by cProfile.
+        # Production freshness thresholds are NOT changed; ordinary pytest retains them.
+        ActionValidator(settings).validate(first, job, observation, cell, destination,
+                                           now=observation.timestamp)
+        validation_duration = time.perf_counter() - start
+        result = {"sku": sku, "plan_1_s": first_duration, "plan_2_s": second_duration,
+                  "validation_s": validation_duration,
+                  "selection": first.tool_selection.model_dump(mode="json"),
+                  "trajectory": first.trajectory.model_dump(mode="json")}
+        results.append(result)
+        print(json.dumps({k: result[k] for k in ("sku", "plan_1_s", "plan_2_s", "validation_s")}), flush=True)
+if args.profile:
+    profiler.disable()
+    stream = io.StringIO()
+    pstats.Stats(profiler, stream=stream).sort_stats("cumulative").print_stats(30)
+    (ROOT / f"artifacts/hkm-planning-{mode}-pstats.txt").write_text(stream.getvalue(), encoding="utf-8")
+    print(stream.getvalue(), flush=True)
+cov.stop()
+cov.save()
+(ROOT / f"artifacts/hkm-planning-{mode}.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")

@@ -1,0 +1,145 @@
+"""Ignored diagnosis only: profile original/isolated proposed source under coverage."""
+import argparse
+import cProfile
+import difflib
+import importlib.abc
+import importlib.util
+import io
+import json
+import pstats
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+parser = argparse.ArgumentParser()
+parser.add_argument("--proposed", action="store_true")
+parser.add_argument("--profile", action="store_true")
+args = parser.parse_args()
+
+replacements = {}
+catalogue_path = ROOT / "robotops/robotics/catalogue.py"
+catalogue_original = catalogue_path.read_text(encoding="utf-8")
+catalogue = catalogue_original.replace(
+    "for item in load_catalogue().products:\n        if item.sku == sku:\n            return item",
+    "for item in _canonical_catalogue().products:\n        if item.sku == sku:\n            return item.model_copy(deep=True)",
+).replace(
+    "for item in load_catalogue().tools:\n        if item.tool_id == tool_id:\n            return item",
+    "for item in _canonical_catalogue().tools:\n        if item.tool_id == tool_id:\n            return item.model_copy(deep=True)",
+)
+assert catalogue != catalogue_original
+replacements["robotops.robotics.catalogue"] = (catalogue_path, catalogue_original, catalogue)
+
+trajectory_path = ROOT / "robotops/robotics/trajectory.py"
+trajectory_original = trajectory_path.read_text(encoding="utf-8")
+trajectory = trajectory_original.replace(
+    "    pose: Pose,\n) -> tuple[Vector3, Vector3]:",
+    "    pose: Pose,\n    empty_flange: tuple[Vector3, Vector3] | None = None,\n) -> tuple[Vector3, Vector3]:",
+).replace(
+    "    if tool is None:\n        catalogue = load_catalogue()\n        dimensions = catalogue.empty_flange_collision_envelope_m\n        centre = catalogue.empty_flange_collision_offset_m",
+    "    if tool is None:\n        if empty_flange is None:\n            catalogue = load_catalogue()\n            empty_flange = (\n                catalogue.empty_flange_collision_envelope_m,\n                catalogue.empty_flange_collision_offset_m,\n            )\n        dimensions, centre = empty_flange",
+).replace(
+    "    catalogue = load_catalogue()\n    docks = tool_docks if tool_docks is not None else catalogue.layout.tool_docks",
+    "    catalogue = load_catalogue()\n    specifications = {item.tool_id: item for item in catalogue.tools}\n    empty_flange = (\n        catalogue.empty_flange_collision_envelope_m,\n        catalogue.empty_flange_collision_offset_m,\n    )\n    cached_rack_bounds: dict[ToolId, CollisionObstacle] = {}\n    docks = tool_docks if tool_docks is not None else catalogue.layout.tool_docks",
+).replace(
+    "                tool_spec(point.active_tool_id) if point.active_tool_id else None,",
+    "                specifications[point.active_tool_id] if point.active_tool_id else None,",
+).replace(
+    "                point.pose,\n            )\n            for point in (start, end)",
+    "                point.pose,\n                empty_flange,\n            )\n            for point in (start, end)",
+)
+old = '''            spec = tool_spec(tool_id)
+            rack_low, rack_high = _bounds(product, spec, False, (0, 0, 0), dock)
+            rack_obstacles.append(
+                CollisionObstacle(
+                    obstacle_id="racked-" + tool_id,
+                    minimum=tuple(a + b for a, b in zip(dock.position, rack_low, strict=True)),
+                    maximum=tuple(a + b for a, b in zip(dock.position, rack_high, strict=True)),
+                )
+            )'''
+new = '''            if tool_id not in cached_rack_bounds:
+                rack_low, rack_high = _bounds(
+                    product, specifications[tool_id], False, (0, 0, 0), dock
+                )
+                cached_rack_bounds[tool_id] = CollisionObstacle(
+                    obstacle_id="racked-" + tool_id,
+                    minimum=tuple(a + b for a, b in zip(dock.position, rack_low, strict=True)),
+                    maximum=tuple(a + b for a, b in zip(dock.position, rack_high, strict=True)),
+                )
+            rack_obstacles.append(cached_rack_bounds[tool_id])'''
+assert old in trajectory
+trajectory = trajectory.replace(old, new)
+replacements["robotops.robotics.trajectory"] = (trajectory_path, trajectory_original, trajectory)
+patch = "".join(
+    "".join(difflib.unified_diff(old.splitlines(True), new.splitlines(True),
+                                fromfile="a/" + path.relative_to(ROOT).as_posix(),
+                                tofile="b/" + path.relative_to(ROOT).as_posix()))
+    for path, old, new in replacements.values()
+)
+(ROOT / "artifacts/hkm-planning-optimization.patch").write_text(patch, encoding="utf-8")
+
+class ProposedLoader(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path, target=None):
+        if fullname in replacements:
+            return importlib.util.spec_from_loader(fullname, self)
+        return None
+
+    def create_module(self, spec):
+        return None
+
+    def exec_module(self, module):
+        path, _, source = replacements[module.__name__]
+        module.__file__ = str(path)
+        exec(compile(source, str(path), "exec"), module.__dict__)
+
+if args.proposed:
+    sys.meta_path.insert(0, ProposedLoader())
+
+import coverage
+
+mode = "proposed" if args.proposed else "original"
+cov = coverage.Coverage(data_file=str(ROOT / f"artifacts/hkm-profile-{mode}.coverage"),
+                        source=["robotops", "apps"], branch=True)
+cov.start()
+from robotops.brain.deterministic import DeterministicBrain
+from robotops.brain.validation import ActionValidator
+from tests.unit.test_hkm_brain import planning_context
+
+profiler = cProfile.Profile()
+if args.profile:
+    profiler.enable()
+results = []
+with tempfile.TemporaryDirectory(prefix="robotops-planning-profile-") as directory:
+    for sku in ("SKU-A", "SKU-B", "SKU-C", "SKU-D", "SKU-E", "SKU-F"):
+        settings, job, observation, destination, cell = planning_context(Path(directory) / sku, sku)
+        brain = DeterministicBrain(settings)
+        start = time.perf_counter()
+        first = brain.plan(job, observation, destination)
+        first_duration = time.perf_counter() - start
+        start = time.perf_counter()
+        second = brain.plan(job, observation, destination)
+        second_duration = time.perf_counter() - start
+        assert first == second
+        start = time.perf_counter()
+        # Keep this diagnosis independent of observation age accumulated by cProfile.
+        # Production freshness thresholds are NOT changed; ordinary pytest retains them.
+        ActionValidator(settings).validate(first, job, observation, cell, destination,
+                                           now=observation.timestamp)
+        validation_duration = time.perf_counter() - start
+        result = {"sku": sku, "plan_1_s": first_duration, "plan_2_s": second_duration,
+                  "validation_s": validation_duration,
+                  "selection": first.tool_selection.model_dump(mode="json"),
+                  "trajectory": first.trajectory.model_dump(mode="json")}
+        results.append(result)
+        print(json.dumps({k: result[k] for k in ("sku", "plan_1_s", "plan_2_s", "validation_s")}), flush=True)
+if args.profile:
+    profiler.disable()
+    stream = io.StringIO()
+    pstats.Stats(profiler, stream=stream).sort_stats("cumulative").print_stats(30)
+    (ROOT / f"artifacts/hkm-planning-{mode}-pstats.txt").write_text(stream.getvalue(), encoding="utf-8")
+    print(stream.getvalue(), flush=True)
+cov.stop()
+cov.save()
+(ROOT / f"artifacts/hkm-planning-{mode}.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")

@@ -20,6 +20,13 @@ engage/uncouple motion. Tool changes are deterministic preparation under the sam
 command; their phases and final occupancy persist. `PICK_EFFECT` still means one
 product transfer. A tool change is never counted as another business effect.
 
+Planning retains one isolated catalogue snapshot for each collision preflight.
+Individual product/tool lookups copy only the requested specification; fixed rack
+bounds are reused within that preflight while occupancy and dock-contact policy
+are checked on every segment. This avoids copying the entire cell catalogue for
+each tool/segment under coverage instrumentation. Caller mutations remain isolated,
+and freshness, Brain timeout, collision and verification limits are unchanged.
+
 Configured small observation error uses a shared 5 mm synthetic source-contact
 centering bound at grasp, separate from observation/verifier pose tolerance.
 Frame/calibration/orientation and the final target remain strictly checked.

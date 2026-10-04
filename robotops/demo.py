@@ -9,14 +9,16 @@ from typing import Any
 
 from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
+from robotops.config import Settings
 from robotops.domain.models import Fault, JobState, OrderLine, OrderRequest, new_id
+from robotops.robotics.catalogue import product_spec
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Store
 
 
 def make_engine(directory: Path, runtime_mode: str = "headless") -> Engine:
     runtime = (BlenderRuntime if runtime_mode == "blender" else SyntheticRuntime)(
-        directory / "runtime.db"
+        directory / "runtime.db", Settings.hkm()
     )
     return Engine(Store(directory / "workflow.db"), runtime)
 
@@ -25,16 +27,20 @@ def run_demo(directory: Path, scenario: str, runtime_mode: str = "headless") -> 
     if (directory / "workflow.db").exists():
         raise ValueError("Demo needs a new directory; existing evidence is never overwritten.")
     engine = make_engine(directory, runtime_mode)
+    products = (
+        engine.settings.products if scenario == "tool_showcase" else engine.settings.products[:1]
+    )
     order = engine.store.intake(
         OrderRequest(
             order_id="demo-order",
-            lines=(
+            lines=tuple(
                 OrderLine(
-                    order_line_id="demo-line",
-                    product_id="product-red",
-                    source_id="source",
-                    destination_id="destination",
-                ),
+                    order_line_id="demo-line-" + str(index + 1),
+                    product_id=product.product_id,
+                    source_id=engine.settings.source_for(product.product_id),
+                    destination_id=engine.settings.destination_id,
+                )
+                for index, product in enumerate(products)
             ),
         ),
         "demo-idempotency-key",
@@ -47,9 +53,36 @@ def run_demo(directory: Path, scenario: str, runtime_mode: str = "headless") -> 
         "restart": Fault.DROP_ACK_AFTER_EFFECT,
         "logical_estop": Fault.LOGICAL_ESTOP,
         "cell_fault": Fault.CELL_FAULT,
+        "tool_showcase": None,
     }[scenario]
     job = engine.run(order.job_ids[0], fault)
     initial = job.state
+    original_command_id = job.command_id
+    showcase = []
+    if scenario == "tool_showcase":
+        for index, identity in enumerate(order.job_ids):
+            current = job if index == 0 else engine.run(identity)
+            evidence = engine.evidence(identity)
+            if (
+                current.state != JobState.COMPLETED
+                or evidence.command is None
+                or evidence.journal is None
+            ):
+                raise AssertionError("TOOL_SHOWCASE_JOB_NOT_COMPLETED:" + str(current))
+            specification = product_spec(products[index].sku)
+            if (
+                evidence.command.required_tool_id != specification.preferred_tool_id
+                or evidence.journal.effect_count != 1
+            ):
+                raise AssertionError("TOOL_SHOWCASE_DECISION_OR_EFFECT_MISMATCH")
+            showcase.append(
+                dict(
+                    sku=specification.sku,
+                    tool_id=evidence.command.required_tool_id,
+                    command_id=current.command_id,
+                    effect_count=1,
+                )
+            )
     if scenario == "restart":
         subprocess.run(
             [
@@ -72,7 +105,9 @@ def run_demo(directory: Path, scenario: str, runtime_mode: str = "headless") -> 
         )
     effect_count = sum(event.event_type == "PICK_EFFECT" for event in engine.runtime.events())
     expected_count = (
-        0 if scenario in {"lost_ack_before_effect", "logical_estop", "cell_fault"} else 1
+        6
+        if scenario == "tool_showcase"
+        else (0 if scenario in {"lost_ack_before_effect", "logical_estop", "cell_fault"} else 1)
     )
     expected_state = (
         JobState.REQUIRES_INTERVENTION
@@ -81,6 +116,12 @@ def run_demo(directory: Path, scenario: str, runtime_mode: str = "headless") -> 
     )
     if job.state != expected_state or effect_count != expected_count:
         raise AssertionError(f"SCENARIO_FAILED:{job.state}:{effect_count}")
+    with engine.store.connect() as db:
+        command_count = db.execute(
+            "SELECT count(*) FROM records WHERE kind='RobotCommand'"
+        ).fetchone()[0]
+    if command_count != len(order.job_ids) or job.command_id != original_command_id:
+        raise AssertionError("ORIGINAL_COMMAND_IDENTITY_NOT_PRESERVED")
     timeline = engine.store.timeline(order.order_id)
     result = dict(
         scenario=scenario,
@@ -89,7 +130,13 @@ def run_demo(directory: Path, scenario: str, runtime_mode: str = "headless") -> 
         final_state=job.state,
         command_id=job.command_id,
         pick_effect_count=effect_count,
-        duplicate_physical_picks=max(0, effect_count - 1),
+        duplicate_physical_picks=max(0, effect_count - len(order.job_ids)),
+        original_command_id=original_command_id,
+        command_count=command_count,
+        no_replacement_commands=True,
+        tool_showcase=showcase,
+        evidence=[engine.evidence(identity).model_dump(mode="json") for identity in order.job_ids],
+        oracle_label="SIMULATION GROUND TRUTH — NOT VERIFICATION EVIDENCE",
         order=engine.store.order(order.order_id).model_dump(mode="json"),
         timeline=[event.model_dump(mode="json") for event in timeline],
         controller_events=[event.model_dump(mode="json") for event in engine.runtime.events()],
@@ -113,6 +160,7 @@ def main() -> None:
             "restart",
             "logical_estop",
             "cell_fault",
+            "tool_showcase",
         ],
     )
     parser.add_argument("--directory", type=Path, default=None)

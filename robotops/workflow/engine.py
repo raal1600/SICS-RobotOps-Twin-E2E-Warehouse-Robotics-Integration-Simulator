@@ -44,8 +44,8 @@ class Engine:
     ):
         self.store = store
         self.runtime = runtime
-        self.settings = settings or Settings()
-        self.brain = brain or DeterministicBrain()
+        self.settings: Settings = settings or getattr(runtime, "settings", None) or Settings()
+        self.brain = brain or DeterministicBrain(self.settings)
         self.observer = observer or ObservationModel(self.settings)
         self.validator = ActionValidator(self.settings)
         self.verifier = Verifier(self.settings)
@@ -137,9 +137,30 @@ class Engine:
                         evidence_ids=(plan.action_plan_id,),
                     )
                     command = RobotCommand(
-                        **plan.model_dump(), command_id=stable_id(job_id, "pick-attempt-1")
+                        **plan.model_dump(),
+                        command_id=stable_id(job_id, "pick-attempt-1"),
+                        **(
+                            {"required_tool_id": plan.selected_tool_id}
+                            if plan.schema_version == "2.0"
+                            else {}
+                        ),
                     )
                     job = self.store.prepare(claim, plan, command)
+                    if plan.tool_selection is not None:
+                        self.store.emit(
+                            job,
+                            "brain",
+                            "GRASP_SELECTION_EVALUATED",
+                            "DETERMINISTIC_COMPATIBILITY_SCORE",
+                            evidence_ids=(plan.action_plan_id,),
+                        )
+                        self.store.emit(
+                            job,
+                            "planner",
+                            "TRAJECTORY_PLANNED",
+                            "CONSERVATIVE_SYNTHETIC_COLLISION_PREFLIGHT",
+                            evidence_ids=(plan.action_plan_id,),
+                        )
                     job = self.store.transition(
                         job_id, JobState.READY_TO_EXECUTE, "PLAN_PERSISTED", claim=claim
                     )

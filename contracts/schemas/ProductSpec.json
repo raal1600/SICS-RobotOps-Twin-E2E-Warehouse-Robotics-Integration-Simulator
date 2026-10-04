@@ -1,0 +1,168 @@
+{
+  "$defs": {
+    "ProductGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "flat_top_m": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "minimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Flat Top M",
+          "type": "array"
+        },
+        "grasp_width_m": {
+          "exclusiveMinimum": 0,
+          "title": "Grasp Width M",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "soft_envelope_m": {
+          "exclusiveMinimum": 0,
+          "title": "Soft Envelope M",
+          "type": "number"
+        },
+        "under_clearance": {
+          "title": "Under Clearance",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "flat_top_m",
+        "grasp_width_m",
+        "soft_envelope_m",
+        "under_clearance"
+      ],
+      "title": "ProductGeometry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "catalog_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Catalog Id",
+      "type": "string"
+    },
+    "compatibility": {
+      "additionalProperties": {
+        "enum": [
+          "P",
+          "C",
+          "N"
+        ],
+        "type": "string"
+      },
+      "propertyNames": {
+        "enum": [
+          "EE_VAC_SINGLE",
+          "EE_VAC_ARRAY",
+          "EE_PINCH_NARROW",
+          "EE_PINCH_WIDE",
+          "EE_ADAPTIVE_SOFT",
+          "EE_SUPPORT_FORK"
+        ]
+      },
+      "title": "Compatibility",
+      "type": "object"
+    },
+    "dimensions_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      ],
+      "title": "Dimensions M",
+      "type": "array"
+    },
+    "family": {
+      "enum": [
+        "small_carton",
+        "medium_carton",
+        "soft_pouch",
+        "bottle",
+        "can_jar",
+        "long_carton"
+      ],
+      "title": "Family",
+      "type": "string"
+    },
+    "geometry": {
+      "$ref": "#/$defs/ProductGeometry"
+    },
+    "mass_max_kg": {
+      "exclusiveMinimum": 0,
+      "title": "Mass Max Kg",
+      "type": "number"
+    },
+    "mass_min_kg": {
+      "exclusiveMinimum": 0,
+      "title": "Mass Min Kg",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sku": {
+      "enum": [
+        "SKU-A",
+        "SKU-B",
+        "SKU-C",
+        "SKU-D",
+        "SKU-E",
+        "SKU-F"
+      ],
+      "title": "Sku",
+      "type": "string"
+    },
+    "visual_variant_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Visual Variant Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "catalog_id",
+    "sku",
+    "family",
+    "dimensions_m",
+    "mass_min_kg",
+    "mass_max_kg",
+    "visual_variant_id",
+    "compatibility",
+    "geometry"
+  ],
+  "title": "ProductSpec",
+  "type": "object"
+}

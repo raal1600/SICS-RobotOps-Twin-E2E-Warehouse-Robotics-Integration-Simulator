@@ -10,6 +10,13 @@ const scenarioNames = {
   CELL_FAULT: "Cell fault", BRAIN_INVALID_OUTPUT: "Invalid Brain output",
   BRAIN_TIMEOUT: "Brain timeout", ROBOT_COMMAND_FAILURE: "Robot command failure"
 };
+function interpolateQuaternion(a,b,t){
+  let dot=a.reduce((sum,v,i)=>sum+v*b[i],0);
+  if(dot<0){b=b.map(v=>-v);dot=-dot;}
+  const angle=Math.acos(Math.min(1,dot));
+  const q=angle<0.001?a.map((v,i)=>v+(b[i]-v)*t):a.map((v,i)=>(v*Math.sin((1-t)*angle)+b[i]*Math.sin(t*angle))/Math.sin(angle));
+  const norm=Math.hypot(...q);return q.map(v=>v/norm);
+}
 class MotionPlayer {
   constructor() {
     this.view=new SceneView(document.getElementById("motion-canvas"));
@@ -27,6 +34,12 @@ class MotionPlayer {
     this.byId("motion-home").onclick=()=>this.view.reset();
     this.byId("motion-zoom-in").onclick=()=>this.view.zoom(0.8);
     this.byId("motion-zoom-out").onclick=()=>this.view.zoom(1.25);
+    for(const [id,name] of [["camera-operator","OperatorOverview"],["camera-overhead","OverheadObservation"],["camera-side","SideInspection"],["camera-follow","FollowTCP"]]){
+      this.byId(id).onclick=()=>this.view.viewpoint(name);
+    }
+    for(const [id,delta] of [["motion-step-back",-1],["motion-step-forward",1]]){
+      this.byId(id).onclick=()=>{this.cursor=Math.max(0,Math.min(this.limit(),Math.floor(this.cursor)+delta));this.playing=false;this.manualPause=true;this.controls();this.draw();};
+    }
     requestAnimationFrame(time=>this.tick(time));this.controls();
   }
   previewScene(scene){this.preview=scene;if(!this.job){this.scene=scene;this.byId("motion-state").textContent="3D cell ready";this.controls();this.draw();}}
@@ -104,7 +117,7 @@ class MotionPlayer {
   limit(){return Math.max(0,this.track.length-1);}
   atEnd(){return this.cursor>=this.limit();}
   controls(){
-    for(const id of ["motion-play","motion-replay","motion-scrub","motion-speed"])this.byId(id).disabled=!this.track.length;
+    for(const id of ["motion-play","motion-replay","motion-scrub","motion-speed","motion-step-back","motion-step-forward"])this.byId(id).disabled=!this.track.length;
     for(const id of ["motion-rotate","motion-home","motion-zoom-in","motion-zoom-out"])this.byId(id).disabled=!this.scene&&!this.recording;
     this.byId("motion-play").textContent=this.playing?"Pause":"Play";
     this.byId("motion-scrub").max=this.limit();this.byId("motion-scrub").value=Math.round(this.cursor);
@@ -121,21 +134,33 @@ class MotionPlayer {
   pose(){
     const step=this.track[Math.floor(this.cursor)],data=step?.clip||this.data,rec=data?.recording;
     const objects=rec?.objects||data?.scene?.objects||this.scene?.objects||[];
-    let positions={},phase="Cell ready",event=null;
+    let positions={},transforms={},phase="Cell ready",event=null;
     if(step?.kind==="motion"){
       const frame=rec.frames[step.frame],next=rec.frames[Math.min(step.frame+1,rec.frames.length-1)],fraction=this.cursor-Math.floor(this.cursor);
       for(const obj of objects){const a=frame.positions[obj.name]||obj.position,b=next.positions[obj.name]||a;positions[obj.name]=a.map((v,i)=>v+(b[i]-v)*fraction);}
-      phase=`${frame.phase} - Blender frame ${step.frame+1}/100 - ${(step.frame/24).toFixed(1)} s simulated`;
+      if(frame.transforms){
+        for(const obj of objects){
+          const a=frame.transforms[obj.name]||obj,b=next.transforms?.[obj.name]||a;
+          transforms[obj.name]={
+            position:a.position.map((v,i)=>v+(b.position[i]-v)*fraction),
+            quaternion_xyzw:interpolateQuaternion(a.quaternion_xyzw,b.quaternion_xyzw,fraction),
+            scale:(a.scale||[1,1,1]).map((v,i)=>v+((b.scale||[1,1,1])[i]-v)*fraction),
+            visible:a.visible!==false,
+          };
+        }
+      }
+      phase=`${frame.phase} - Blender frame ${step.frame+1}/${rec.total_frames||100} - ${(frame.sim_time_s??step.frame/(rec.fps||24)).toFixed(1)} s simulated`;
     }else if(step){
       event=step.event;phase=event.state_after||event.event_type;
-      if(step.afterMotion&&rec)positions=rec.frames.at(-1).positions;
+      if(step.afterMotion&&rec){positions=rec.frames.at(-1).positions;transforms=rec.frames.at(-1).transforms||{};}
     }
     if(this.delivery&&step)phase=`${step.index+1}/${this.delivery.jobs.length} · ${data.product_id} · ${phase}`;
-    return {objects,positions,phase,event,data};
+    return {objects,positions,transforms,phase,event,data};
   }
   draw(){
-    const {objects,positions,phase,event,data}=this.pose();
-    this.view.render(objects,positions,data?.product_id);
+    const {objects,positions,transforms,phase,event,data}=this.pose();
+    this.view.configure?.((data?.scene||this.scene)?.cameras);
+    this.view.render(objects,positions,data?.product_id,transforms);
     let message=this.job?"Waiting for persisted execution events":"Environment ready. Create and run an order to begin.";
     let tone="normal";
     if(event){
@@ -163,6 +188,9 @@ class MotionPlayer {
     if(banner.textContent!==message)banner.textContent=message;
     if(banner.dataset.tone!==tone)banner.dataset.tone=tone;
     if(this.byId("motion-phase").textContent!==phase)this.byId("motion-phase").textContent=phase;
+    const step=this.track[Math.floor(this.cursor)];
+    const frame=step?.kind==="motion"?data.recording.frames[step.frame]:step?.afterMotion?data?.recording?.frames.at(-1):null;
+    this.byId("motion-tool").textContent=frame?.schema_version==="2.0"?`Replay tool: ${frame.active_tool_id||"empty flange"} · ${frame.rack_tool_ids?.length??0} tools in rack`:"";
     const description=`3D warehouse cell. ${phase}. ${message}`;
     if(this.view.canvas.getAttribute("aria-label")!==description)this.view.canvas.setAttribute("aria-label",description);
   }

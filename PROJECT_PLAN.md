@@ -1,7 +1,7 @@
 # PROJECT_PLAN.md — RobotOps Twin Implementation Contract
 
 **Status:** Normative implementation plan  
-**Version:** 1.0 — 2026-10-01; local continuation addendum 2026-10-03 (ADR 0008)
+**Version:** 1.2 — 2026-10-04; HKM-inspired adaptation revision (ADR 0010). Original workflow requirements and ADR 0008 continuation remain normative.
 
 ## Mission
 
@@ -37,6 +37,8 @@ apps/api/                 integration/orchestration HTTP API
 robotops/domain/          typed domain schemas
 robotops/workflow/        state machines + reconciliation
 robotops/brain/           deterministic + optional model adapter
+robotops/robotics/        typed product/tool catalogue, selection and trajectory
+robotops/hkm_geometry.py  shared procedural cell and visual kinematics
 robotops/robot_gateway/   command boundary/journal
 robotops/cell/            PLC/cell-state emulator
 robotops/blender/         bounded Blender runtime adapter
@@ -45,11 +47,10 @@ robotops/verification/    outcome verifier
 robotops/observability/   logs/metrics/correlation
 robotops/faults/          deterministic fault injection
 contracts/                OpenAPI/events/schemas
-blender/scene/            synthetic warehouse scene
-blender/scripts/          runtime scripts
-tests/{unit,contract,integration,e2e,fixtures}/
+blender/scripts/          fixed runtime and procedural scene realization
+tests/{unit,contract,integration,e2e,blender,ui,fixtures}/
 docs/{adr,implementation,generated}/
-scripts/{demo.sh,test.sh,acceptance.sh}
+tools/                    stable developer, acceptance and publication commands
 ```
 
 ## Technology baseline
@@ -124,7 +125,11 @@ Do not describe an optional LLM/VLM adapter as SICS AI's core model.
 
 ## Blender runtime
 
-Blender is a synthetic test world, not validated robot physics. Stable scene concepts: `RobotOpsTwin/Cell`, `Robot`, `Gripper`, `SourceTote`, `DestinationTote`, `Products/<product_id>`, overview and observation cameras.
+Blender is a synthetic test world, not validated robot physics. The current
+profile uses stable `Robot/*` links/wrist/tool-changer objects, `Tools/EE_*`,
+`ToolRack/Dock*`, `Locations/SRC_A` through `SRC_F`, `Locations/DESTINATION`,
+`Products/<product_id>` and calibrated overview/observation cameras. Archived
+schema-1 scenes retain their original Cartesian object names and interpretation.
 
 Runtime supports deterministic scene reset, ground-truth query, simplified robot/gripper motion, attach/detach product, command journal/events, dropped acknowledgement after effect, logical cell faults, and screenshots.
 
@@ -257,6 +262,115 @@ Timeouts, confidence thresholds, observation freshness, workspace bounds, coordi
 ## Optional backlog
 
 ROS 2/Gazebo/Isaac adapters, real OPC UA/Modbus endpoints, advanced Blender physics, VLM perception, multi-cell scheduling, GPU inference, real hardware. None may block MVP DONE.
+
+## HKM-inspired adaptation revision
+
+Fresh API and desktop data roots and new test sessions select the HKM profile.
+Existing saved worlds remain authoritative for their own execution settings and
+are never silently migrated. Fixture metadata exposes each product's source and
+the destination by identity, not list position. New intake validates these
+identities atomically after idempotent replay/conflict handling.
+
+This is an adaptation of the existing implementation, not a replacement of its
+distributed-system semantics. The original P0-P7 phases above describe the
+baseline system; the enhancement uses HKM-P0 through HKM-P3 below. Its 25 new
+MUST criteria are additional to all 85 original MUSTs. No old pass is silently
+promoted to a pass for a changed schema, runtime or scene.
+
+The implemented cell is an original procedural **HKM1800-inspired hybrid-kinematic
+manipulator**, with six source product families, exactly six interchangeable
+tools, a six-position rack, destination tote/conveyor, enclosure, operator gate,
+control cabinet, logical E-stop/stack light and three camera viewpoints. The
+kinematic illustration is named `HKM_INSPIRED_VISUAL_KINEMATICS_V1`. It maps TCP
+pose to visibly connected parallel links; no exact manufacturer IK, CAD,
+controller code, dynamics, real throughput or safety certification is claimed.
+
+Strict schema-2 contracts now include canonical ProductSpec/EndEffectorSpec, persistent
+ToolState/robot presentation state, sensor/frame metadata, explainable selection
+and trajectory intent. Product instances retain stable IDs; the catalogue owns
+fixture dimensions, mass and compatibility. Runtime, UI and compatibility
+documentation derive from that canonical catalogue. Concrete schema/profile
+versions are recorded, tested against archived recordings and documented alongside
+generated contracts. Schema-1 serialization excludes absent schema-2 fields to
+preserve old payload hashes,
+journals and scene identities; no silent reinterpretation or destructive reset
+of saved user runs. Unsupported historical visualization is explicitly labelled.
+
+Tool preparation is a deterministic, journaled sub-operation under the existing
+PICK_AND_PLACE identity. Mounted/rack state and tool-change/no-change events
+persist. `effect_count` continues to count product transfers only. Selection
+filters compatibility, mass, geometry and availability with stable scoring and
+tie-breaking, recording every candidate's reasons. No suitable/available tool
+means zero product-transfer effects.
+
+The planner builds entry/lift/transfer/place/retreat segments with deterministic
+smooth presentation interpolation. It enforces the configured synthetic radial/Z
+envelope, clearance-expanded obstacle checks and finite deterministic alternate routes.
+Static collision bounds derive from the same visible meshes. Observed products,
+mounted tool/carried-product envelopes and occupied rack tools are checked;
+registered vertical engagement/uncoupling is an explicit contact exception.
+Changing yaw uses a conservative swept envelope. Moving visual links are not a
+validated articulated-body collision model.
+No route yields NO_COLLISION_FREE_SYNTHETIC_TRAJECTORY before transfer. Blender
+independently rechecks command identity/payload, scene/cell generation, product
+source, tool, calibration, finite target and trajectory structure. These are
+conservative synthetic checks, not certified robot motion planning.
+
+WorldState stays private; WorldObservation carries synthetic sensor evidence and
+explicitly distinguished SIMULATED_CELL_TELEMETRY. Normal, missing, low-confidence,
+stale, contradictory and pose-uncertain evidence is configured/seeded. Verifier
+and reconciliation cannot read hidden simulator truth. UNKNOWN_OUTCOME still
+requires original journal plus fresh sufficient observation, never a replacement
+pick or a successful render. Tool changing must not weaken restart recovery.
+
+Shared scene and motion contracts add stable object hierarchy, quaternion and
+visibility/phase/tool/attachment data for browser replay. Historical positional
+recordings remain explicitly interpreted. Camera switches, speed, scrub and step
+controls remain read-only; simulation timing is distinct from UTC/real latency.
+The UI exposes IDs, state, tool reasoning and exact observation/reconciliation
+evidence with an unobtrusive Simulation Boundaries explanation.
+
+The implementation is under final verification, not accepted as DONE. Targeted
+actual-Blender evidence covers all six tools, transform agreement, product
+attachment/release and original-command recovery. Clean repeated full suites,
+the final browser review and exact-current-SHA CI/publication attestation are
+still required; the historical baseline is not reused as enhancement acceptance.
+
+### HKM-P0 — Model and adapter
+
+Record/archive the current clean baseline, correct its known UI label regression,
+add procedural robot/cell/cameras and richer transforms with explicit legacy
+compatibility. Exit: existing happy/lost-ack semantics pass; articulated Blender
+poses and browser replay agree. Do not claim the later tool system is complete.
+
+### HKM-P1 — Catalogue, tools and trajectory
+
+Implement six typed products/tools, canonical compatibility, deterministic
+selection/reasons, durable occupancy, visible tool-changing, workspace and
+synthetic collision preflight. Add the six-SKU tool-showcase through the existing
+CLI. Exit: all preferred tools visibly used, invalid pairs/unavailable tools
+produce no transfer, and tool state survives restart.
+
+### HKM-P2 — Scenarios and preserved system semantics
+
+Add deterministic/negative contract/unit/integration/real-Blender/E2E tests for
+tool, geometry, workspace, collision, calibration and observation failures.
+Retain every old uncertainty/idempotency/race/restart fixture. Exit: exactly-one
+effects, no verifier truth access, archived replay compatibility and both old/new
+mandatory behavior pass without skips, weakened assertions or lower thresholds.
+
+### HKM-P3 — Operator review and publication
+
+Complete tool/evidence/status inspectors, camera and read-only playback controls,
+uncertainty guidance and boundaries panel. Review actual scene/motion in the app,
+synchronize architecture/state/frame/tool diagrams, reports, schemas and sources,
+then run clean acceptance twice and regenerate Pages/PDFs. Exit requires all
+110 MUSTs with exact-SHA CI, publication, public-link and final report evidence.
+
+See [ADR 0010](docs/adr/0010-hkm-inspired-versioned-cell.md) and the
+[implementation design](docs/implementation/hkm-inspired.md). Public manufacturer
+and deployment claims remain COMPANY_REPORTED_CLAIM; catalogue, kinematics,
+timing and collision thresholds are SIMULATOR_DESIGN.
 
 ## Knowledge-base synchronization protocol
 

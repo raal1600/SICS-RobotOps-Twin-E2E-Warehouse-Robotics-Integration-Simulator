@@ -1,8 +1,10 @@
 import json
+from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
-from tools import acceptance
+from tools import acceptance, sync_status
 from tools.drift_check import criterion_ids
 from tools.sync_status import completion_status
 
@@ -16,9 +18,41 @@ def test_completion_requires_every_must_and_all_remote_gates():
         completion_status(manifest)
     manifest["gates"] = {name: {"passed": True} for name in ("ci", "publication_remote", "pages")}
     assert completion_status(manifest) == "DONE"
+    manifest["criteria"]["HKM-VIS-MUST-025"]["passed"] = False
+    with pytest.raises(ValueError, match="Every MUST"):
+        completion_status(manifest)
+    manifest["criteria"]["HKM-VIS-MUST-025"]["passed"] = True
     manifest["criteria"]["SC-REC-004"]["passed"] = False
     with pytest.raises(ValueError, match="Every MUST"):
         completion_status(manifest)
+
+
+def test_status_sync_uses_current_utc_date_and_marks_unaccepted_revision_pending(
+    tmp_path, monkeypatch
+):
+    class FixedClock:
+        @staticmethod
+        def now(zone):
+            assert zone is UTC
+            return datetime(2031, 2, 3, 0, 5, tzinfo=UTC)
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(sync_status, "datetime", FixedClock)
+    Path("publication").mkdir()
+    Path("reports").mkdir()
+    Path("reports/design.md").write_text(
+        "<!-- implementation-status:start -->\nold\n<!-- implementation-status:end -->\n"
+        "Historical research stays unchanged.\n",
+        encoding="utf-8",
+    )
+    Path("README.md").write_text("**Aktuell status:** old\n\nSetup unchanged.\n", encoding="utf-8")
+    sync_status.update("HKM-P0", "Enhancement pending acceptance.")
+    report = Path("reports/design.md").read_text(encoding="utf-8")
+    assert "Implementation status, 2031-02-03:" in report
+    assert "Historical research stays unchanged." in report
+    assert "Enhancement pending acceptance. Status: NOT DONE." in report
+    assert json.loads(Path("publication/status.json").read_text())["status"] == "NOT DONE"
+    assert "**NOT DONE**" in Path("README.md").read_text()
 
 
 def test_remote_refresh_retains_failed_local_evidence(tmp_path, monkeypatch):

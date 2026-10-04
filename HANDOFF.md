@@ -35,6 +35,59 @@ Do not begin architecture-changing implementation before understanding the norma
 
 ## Execution loop
 
+### Active revision: HKM-inspired warehouse cell
+
+Fresh API/desktop worlds and Start new test use the six-SKU HKM profile. Existing
+worlds retain their persisted execution settings and historical evidence; do not
+pass a new default profile over a reopened runtime's resolved settings. Use
+`/fixtures.product_sources` and `destination_id` instead of assuming one source
+or that the second location is the destination. New-intake fixture validation
+must preserve existing idempotency replay/conflict semantics.
+
+The 2026-10-04 enhancement in PROJECT_PLAN.md and ADR 0010 is mandatory scope,
+in addition to the original deterministic-system requirements. Work through
+HKM-P0/P1/P2/P3, preserving all 85 existing MUSTs and satisfying the 25
+HKM-VIS-MUST criteria. Record the actual HEAD and fresh baseline before editing;
+archive prior reports/results with provenance instead of rewriting historical
+acceptance. Current evidence never attests a later commit by implication.
+
+Use original procedural HKM-inspired geometry, not exact/proprietary CAD or
+inferred real controller mechanics. Unspecified real-world details become
+explicit conservative SIMULATOR_DESIGN choices; they do not require ordinary
+implementation clarification. Maintain the bounded typed Blender runtime and
+the WorldState -> ObservationModel -> WorldObservation -> Verifier boundary.
+No MCP/natural-language/generated code is permitted in runtime commands.
+
+The procedural cell, six-product/tool catalogue, deterministic selection,
+segmented preflight, visible tool preparation and quaternion replay are now
+implemented. Continue from the current source and scoped evidence in
+GOAL_PROGRESS.md; do not restart this work as scaffolding. Final clean repeated
+acceptance and current-SHA CI/publication remain outstanding.
+
+Use the one canonical catalogue in `robotops/robotics/catalogue-v1.json` for
+products, tools, fixture layout and camera calibration. Shared geometry supplies
+both displayed static objects and collision bounds. Preserve the narrow registered
+vertical dock-contact policy; parked tools remain obstacles elsewhere. Synthetic
+source-contact centering uses the shared standard-library tolerance, distinct
+from verifier pose tolerance and real robot accuracy.
+
+Tool changes are persisted preparation under the original pick identity;
+effect_count remains product transfers. An uncertain pick cannot be replaced
+because of richer visuals/tool state. Version changed world/command/motion
+contracts explicitly and retain old scene, payload/hash and recording meanings.
+Schema-1 serializers omit schema-2 extensions, including defaults, so archived
+command digests remain unchanged. New schema-2 records retain strict typed
+fields; never replace that serializer with an unrestricted dictionary schema.
+Never destructively reset saved user tests to make new fixtures work. A truly
+destructive migration remains a human-escalation condition below.
+
+Each milestone synchronizes affected catalogue-generated docs, contracts,
+architecture/frame/state/tool diagrams, report provenance and public status.
+Until old and new MUSTs and exact-final-SHA remote gates pass, public status is
+NOT DONE. Planned tests or impressive renders are not acceptance evidence.
+
+### Repeated milestone loop
+
 Repeat:
 
 1. **Inspect** repository state, failing tests, current progress and documentation drift.

@@ -21,6 +21,7 @@ from robotops.blender.visualization import (
 )
 from robotops.cell.controller import CellController
 from robotops.cell.runtime import SyntheticRuntime
+from robotops.config import Settings
 from robotops.domain.models import (
     AuditEvent,
     CellState,
@@ -33,6 +34,7 @@ from robotops.domain.models import (
     RobotCommand,
 )
 from robotops.observability.metrics import prometheus
+from robotops.robotics.catalogue import load_catalogue
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Conflict, NotFound, Store
 
@@ -48,7 +50,9 @@ def create_app(
     test_registry: bool = True,
     recover: bool = False,
 ) -> FastAPI:
-    workflow = engine or Engine(store, SyntheticRuntime(store.path.with_name("runtime.db")))
+    workflow = engine or Engine(
+        store, SyntheticRuntime(store.path.with_name("runtime.db"), Settings.hkm())
+    )
     app = FastAPI(
         title="RobotOps Twin",
         version="1.0",
@@ -87,7 +91,17 @@ def create_app(
     def create_order(
         payload: OrderRequest, idempotency_key: Annotated[str, Header(min_length=1, max_length=160)]
     ) -> Order:
-        return store.intake(payload, idempotency_key)
+        def validate_fixture(request: OrderRequest) -> None:
+            products = {product.product_id for product in workflow.settings.products}
+            for line in request.lines:
+                if line.product_id not in products:
+                    raise HTTPException(422, "PRODUCT_NOT_IN_FIXTURE")
+                if line.source_id != workflow.settings.source_for(line.product_id):
+                    raise HTTPException(422, "PRODUCT_SOURCE_MISMATCH")
+                if line.destination_id != workflow.settings.destination_id:
+                    raise HTTPException(422, "DESTINATION_MISMATCH")
+
+        return store.intake(payload, idempotency_key, validate=validate_fixture)
 
     @app.get("/orders", response_model=list[Order])
     def orders() -> list[Order]:
@@ -197,7 +211,15 @@ def create_app(
             "runtime": "blender" if isinstance(workflow.runtime, BlenderRuntime) else "headless",
             "products": [product.model_dump(mode="json") for product in workflow.settings.products],
             "source_id": workflow.settings.locations[0].location_id,
-            "destination_id": workflow.settings.locations[1].location_id,
+            "product_sources": {
+                product.product_id: workflow.settings.source_for(product.product_id)
+                for product in workflow.settings.products
+            },
+            "destination_id": workflow.settings.destination_id,
+            "robot_profile_version": workflow.settings.robot_profile_version,
+            "catalogue": (
+                load_catalogue().model_dump(mode="json") if workflow.settings.is_hkm else None
+            ),
             "scene_epoch": world.scene_epoch,
             "inventory": [
                 {"product_id": obj.product.product_id, "location_id": obj.location_id}

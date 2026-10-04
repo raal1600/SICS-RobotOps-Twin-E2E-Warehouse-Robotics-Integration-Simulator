@@ -77,6 +77,14 @@ SYNC_FILES = [
     "docs/evidence/guided-workflow-local.json",
     "docs/implementation/scenarios.md",
     "docs/evidence/scenario-help-local.json",
+    "docs/adr/0010-hkm-inspired-versioned-cell.md",
+    "docs/implementation/hkm-inspired.md",
+    "docs/generated/product-tool-catalogue.md",
+    "publication/generated/product-tool-compatibility.mmd",
+    "robotops/robotics/catalogue-v1.json",
+    "docs/evidence/hkm-baseline-eaf35b4/provenance.json",
+    "docs/evidence/hkm-api/result.json",
+    "docs/evidence/hkm-blender-local/result.json",
 ]
 
 
@@ -304,6 +312,12 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
         "",
         "## Full 3D scenario replay",
         "",
+        "## HKM-inspired cell acceptance revision",
+        "",
+        "The schema-2 cell uses original procedural hybrid-inspired links, six product families, six interchangeable tools, persisted deterministic selection reasons and tool preparation, and conservative synthetic workspace/collision preflight. Actual Blender transforms include rotation, rack occupancy, attachment and motion phase for read-only browser replay. Three calibrated viewpoints are presentation/synthetic-sensor metadata; no image-based computer vision or validated robot dynamics is claimed. Schema-1 artifacts retain their original hashes, geometry and replay interpretation. [Design and limitations](docs/implementation/hkm-inspired.md), [versioning decision](docs/adr/0010-hkm-inspired-versioned-cell.md) and [canonical product/tool table](docs/generated/product-tool-catalogue.md) describe the implementation.",
+        "",
+        "The tool-showcase gate audits all six preferred tools and six original transfer commands. Lost-ack and restart gates retain original command identity and exactly one transfer; ambiguous evidence remains intervention. The criterion table above derives all 25 HKM and all existing MUST results from the named tests and current-run gates, not from these descriptions. The pre-enhancement report and failing baseline are retained in [baseline provenance](docs/evidence/hkm-baseline-eaf35b4/provenance.json).",
+        "",
         "The cell, machine and products remain visible for every scenario. Immutable starting scenes and audit events cover no-motion orders; evaluated Blender poses cover actual movement. Replay is read-only and cannot resolve uncertainty. [Scenario behavior](docs/implementation/playback.md), [browser evidence](docs/evidence/3d-scenarios.json) and [ADR 0004](docs/adr/0004-full-3d-scenario-replay.md) document the presentation boundary, offline renderer/fallback, Windows file publication and aligned native drain budgets. Scene history, every execution fault, carried-product poses and immutable replay are exercised by the mandatory suite.",
         "",
         "## Documentation drift and synchronization",
@@ -464,6 +478,7 @@ def main() -> None:
         "restart",
         "logical_estop",
         "cell_fault",
+        "tool_showcase",
     ):
         directory = ROOT / "runs" / out.name / scenario
         run(

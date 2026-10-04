@@ -6,10 +6,12 @@ from robotops.blender.visualization import (
     DeliveryPlayback,
     DeliverySummary,
     JobPlayback,
+    VisualCamera,
     VisualObject,
     VisualScene,
 )
 from robotops.domain.models import JobState, PresentationSnapshot, RobotCommand
+from robotops.hkm_geometry import camera_views, scene_primitives
 from robotops.scene_geometry import cell_meshes
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import NotFound
@@ -73,12 +75,27 @@ def visual_scene(workflow: Engine, job_id: str | None = None) -> VisualScene:
         except NotFound:
             pass  # Legacy history must not be represented as a historical snapshot.
     world = snapshot.world if snapshot else workflow.runtime.world()
+    hkm = world.schema_version == "2.0"
     return VisualScene(
+        **(
+            dict(
+                schema_version="2.0",
+                robot_profile_version=world.robot_profile_version,
+                cameras=[VisualCamera.model_validate(camera) for camera in camera_views()],
+            )
+            if hkm
+            else {}
+        ),
         source="SAVED_START_SCENE" if snapshot else "CURRENT_WORLD_REFERENCE",
         scene_epoch=world.scene_epoch,
         timestamp=snapshot.timestamp if snapshot else world.timestamp,
         cell_mode=world.cell.mode,
-        objects=[VisualObject.model_validate(item) for item in cell_meshes(world.model_dump())],
+        objects=[
+            VisualObject.model_validate(item)
+            for item in (
+                scene_primitives(world.model_dump()) if hkm else cell_meshes(world.model_dump())
+            )
+        ],
     )
 
 

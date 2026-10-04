@@ -1,68 +1,27 @@
 """Strict wire contracts. WorldState is deliberately distinct from WorldObservation."""
 
-from datetime import UTC, datetime
 from enum import StrEnum
-from math import isclose
-from typing import Annotated, Literal, Self
-from uuid import NAMESPACE_URL, uuid4, uuid5
+from typing import ClassVar, Literal, Self
 
-from pydantic import (
-    AwareDatetime,
-    BaseModel,
-    ConfigDict,
-    Field,
-    FiniteFloat,
-    StringConstraints,
-    field_validator,
-    model_validator,
+from pydantic import AwareDatetime, Field, model_validator
+
+# Public imports remain stable for archived consumers and existing integrations.
+from robotops.domain.base import Contract as Contract
+from robotops.domain.base import Identifier as Identifier
+from robotops.domain.base import Pose as Pose
+from robotops.domain.base import Record as Record
+from robotops.domain.base import V2Contract, VersionedContract, VersionedRecord
+from robotops.domain.base import new_id as new_id
+from robotops.domain.base import stable_id as stable_id
+from robotops.domain.base import utc_now as utc_now
+from robotops.robotics.models import (
+    RobotState,
+    SensorSpec,
+    ToolId,
+    ToolSelectionDecision,
+    ToolState,
+    TrajectoryIntent,
 )
-
-Identifier = Annotated[str, StringConstraints(min_length=1, max_length=160, pattern=r"^[\w.:-]+$")]
-
-
-def utc_now() -> datetime:
-    return datetime.now(UTC)
-
-
-def new_id() -> str:
-    return str(uuid4())
-
-
-def stable_id(namespace: str, value: str) -> str:
-    return str(uuid5(NAMESPACE_URL, namespace + ":" + value))
-
-
-class Contract(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid", frozen=True, validate_default=True, allow_inf_nan=False
-    )
-    schema_version: Literal["1.0"] = "1.0"
-
-
-class Record(Contract):
-    run_id: Identifier
-    correlation_id: Identifier
-    causation_id: Identifier
-    timestamp: AwareDatetime
-
-    @field_validator("timestamp")
-    @classmethod
-    def utc(cls, value: datetime) -> datetime:
-        return value.astimezone(UTC)
-
-
-class Pose(Contract):
-    position: tuple[FiniteFloat, FiniteFloat, FiniteFloat]
-    quaternion_xyzw: tuple[FiniteFloat, FiniteFloat, FiniteFloat, FiniteFloat] = (0, 0, 0, 1)
-    unit: Literal["m"] = "m"
-    frame_id: Identifier = "cell_world"
-    calibration_version: Identifier = "cal-1"
-
-    @model_validator(mode="after")
-    def normalized(self) -> Self:
-        if not isclose(sum(x * x for x in self.quaternion_xyzw), 1.0, abs_tol=1e-6):
-            raise ValueError("quaternion must have unit norm within 1e-6")
-        return self
 
 
 class Product(Contract):
@@ -156,23 +115,106 @@ class WorldObject(Contract):
     attached: bool = False
 
 
-class WorldState(Record):
+class WorldState(VersionedRecord):
+    extension_fields: ClassVar[frozenset[str]] = frozenset(
+        {
+            "robot_profile_version",
+            "product_catalog_version",
+            "tool_spec_version",
+            "frame_tree_version",
+            "robot_state",
+            "tool_state",
+        }
+    )
     scene_epoch: Identifier
     step: int = Field(ge=0)
     objects: tuple[WorldObject, ...]
     locations: tuple[InventoryLocation, ...]
     cell: CellState
+    robot_profile_version: Literal["hkm_inspired_v1"] | None = None
+    product_catalog_version: Literal["synthetic-products-1"] | None = None
+    tool_spec_version: Literal["synthetic-tools-1"] | None = None
+    frame_tree_version: Literal["hkm-frame-tree-1"] | None = None
+    robot_state: RobotState | None = None
+    tool_state: ToolState | None = None
+
+    @model_validator(mode="after")
+    def versioned_world(self) -> Self:
+        if self.schema_version == "2.0":
+            if any(getattr(self, name) is None for name in self.extension_fields):
+                raise ValueError("HKM_WORLD_METADATA_REQUIRED")
+            if self.robot_state is None or self.tool_state is None:
+                raise ValueError("HKM_WORLD_METADATA_REQUIRED")
+            if self.robot_state.active_tool_id != self.tool_state.active_tool_id:
+                raise ValueError("ROBOT_TOOL_STATE_CONFLICT")
+            if len({obj.product.product_id for obj in self.objects}) != len(self.objects) or len(
+                {loc.location_id for loc in self.locations}
+            ) != len(self.locations):
+                raise ValueError("DUPLICATE_WORLD_IDENTITY")
+            locations = {loc.location_id for loc in self.locations}
+            if any(obj.location_id not in locations for obj in self.objects):
+                raise ValueError("UNKNOWN_WORLD_LOCATION")
+            if any(
+                pose.calibration_version != "hkm-cal-1" or pose.frame_id != "cell_world"
+                for pose in [
+                    *(obj.pose for obj in self.objects),
+                    *(loc.pose for loc in self.locations),
+                ]
+            ):
+                raise ValueError("WORLD_SPATIAL_METADATA_MISMATCH")
+            if any(
+                obj.product.sku not in {"SKU-A", "SKU-B", "SKU-C", "SKU-D", "SKU-E", "SKU-F"}
+                for obj in self.objects
+            ):
+                raise ValueError("UNKNOWN_SKU")
+        return self
 
 
-class ObservedObject(Contract):
+class ObservedObject(VersionedContract):
+    extension_fields: ClassVar[frozenset[str]] = frozenset({"sensor_id", "evidence_source"})
     product_id: Identifier
     location_id: Identifier
     pose: Pose
     confidence: float = Field(ge=0, le=1, allow_inf_nan=False)
     uncertainty_m: float = Field(default=0, ge=0, allow_inf_nan=False)
+    sensor_id: Identifier | None = None
+    evidence_source: Literal["SYNTHETIC_OBSERVATION_MODEL"] | None = None
+
+    @model_validator(mode="after")
+    def sensor_source(self) -> Self:
+        if self.schema_version == "2.0" and (
+            self.sensor_id is None or self.evidence_source is None
+        ):
+            raise ValueError("OBSERVATION_SENSOR_REQUIRED")
+        return self
 
 
-class WorldObservation(Record):
+class ObservedMachineState(V2Contract):
+    source: Literal["SIMULATED_CELL_TELEMETRY"] = "SIMULATED_CELL_TELEMETRY"
+    tool_state: ToolState
+    tcp_pose: Pose
+    captured_at: AwareDatetime
+    cell_generation: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def telemetry_frame(self) -> Self:
+        if (
+            self.tcp_pose.frame_id != "cell_world"
+            or self.tcp_pose.calibration_version != "hkm-cal-1"
+        ):
+            raise ValueError("TELEMETRY_SPATIAL_METADATA_MISMATCH")
+        return self
+
+
+class WorldObservation(VersionedRecord):
+    extension_fields: ClassVar[frozenset[str]] = frozenset(
+        {
+            "robot_profile_version",
+            "frame_tree_version",
+            "sensors",
+            "machine_telemetry",
+        }
+    )
     observation_id: Identifier
     scene_epoch: Identifier
     step: int = Field(ge=0)
@@ -183,9 +225,52 @@ class WorldObservation(Record):
     covered_locations: tuple[Identifier, ...]
     # Explicit coverage is needed: absence alone never proves an empty source.
     cell_generation: int = Field(ge=0)
+    robot_profile_version: Literal["hkm_inspired_v1"] | None = None
+    frame_tree_version: Literal["hkm-frame-tree-1"] | None = None
+    sensors: tuple[SensorSpec, ...] | None = None
+    machine_telemetry: ObservedMachineState | None = None
+
+    @model_validator(mode="after")
+    def observed_versions(self) -> Self:
+        if self.schema_version == "2.0":
+            if any(getattr(self, name) is None for name in self.extension_fields):
+                raise ValueError("HKM_OBSERVATION_METADATA_REQUIRED")
+            if self.sensors is None or self.machine_telemetry is None:
+                raise ValueError("HKM_OBSERVATION_METADATA_REQUIRED")
+            if (
+                self.model_version != "synthetic-observer-2"
+                or self.calibration_version != "hkm-cal-1"
+            ):
+                raise ValueError("UNKNOWN_OBSERVATION_VERSION")
+            sensors = {sensor.sensor_id for sensor in self.sensors if not sensor.presentation_only}
+            if len(sensors) != len(self.sensors) or len(sensors) < 2:
+                raise ValueError("SENSING_CAMERA_METADATA_REQUIRED")
+            if len({sensor.frame_id for sensor in self.sensors}) != len(self.sensors):
+                raise ValueError("DUPLICATE_SENSOR_FRAME")
+            if any(
+                obj.schema_version != "2.0" or obj.sensor_id not in sensors for obj in self.objects
+            ):
+                raise ValueError("UNKNOWN_OBSERVATION_SENSOR")
+            if self.machine_telemetry.cell_generation != self.cell_generation:
+                raise ValueError("TELEMETRY_GENERATION_MISMATCH")
+            if self.machine_telemetry.captured_at != self.captured_at:
+                raise ValueError("TELEMETRY_CAPTURE_MISMATCH")
+        return self
 
 
-class ActionPlan(Record):
+class ActionPlan(VersionedRecord):
+    extension_fields: ClassVar[frozenset[str]] = frozenset(
+        {
+            "selected_tool_id",
+            "grasp_pose",
+            "trajectory",
+            "tool_selection",
+            "robot_profile_version",
+            "product_catalog_version",
+            "tool_spec_version",
+            "frame_tree_version",
+        }
+    )
     action_plan_id: Identifier
     job_id: Identifier
     order_id: Identifier
@@ -198,11 +283,51 @@ class ActionPlan(Record):
     scene_epoch: Identifier
     observation_id: Identifier
     cell_generation: int = Field(ge=0)
-    brain_version: Literal["deterministic-1", "structured-1"] = "deterministic-1"
+    brain_version: Literal["deterministic-1", "structured-1", "deterministic-hkm-1"] = (
+        "deterministic-1"
+    )
+    selected_tool_id: ToolId | None = None
+    grasp_pose: Pose | None = None
+    trajectory: TrajectoryIntent | None = None
+    tool_selection: ToolSelectionDecision | None = None
+    robot_profile_version: Literal["hkm_inspired_v1"] | None = None
+    product_catalog_version: Literal["synthetic-products-1"] | None = None
+    tool_spec_version: Literal["synthetic-tools-1"] | None = None
+    frame_tree_version: Literal["hkm-frame-tree-1"] | None = None
+
+    @model_validator(mode="after")
+    def robotics_intent(self) -> Self:
+        if self.schema_version == "2.0":
+            if any(getattr(self, name) is None for name in ActionPlan.extension_fields):
+                raise ValueError("HKM_ACTION_METADATA_REQUIRED")
+            if self.tool_selection is None or self.trajectory is None:
+                raise ValueError("HKM_ACTION_METADATA_REQUIRED")
+            if (
+                self.tool_selection.product_id != self.product_id
+                or self.tool_selection.selected_tool_id != self.selected_tool_id
+                or self.trajectory.required_tool_id != self.selected_tool_id
+                or self.trajectory.grasp_pose != self.grasp_pose
+                or self.target_pose.calibration_version != "hkm-cal-1"
+                or self.target_pose.frame_id != "cell_world"
+            ):
+                raise ValueError("HKM_ACTION_IDENTITY_MISMATCH")
+            if self.brain_version not in {"deterministic-hkm-1", "structured-1"}:
+                raise ValueError("HKM_BRAIN_VERSION_MISMATCH")
+        elif self.brain_version == "deterministic-hkm-1":
+            raise ValueError("HKM_BRAIN_REQUIRES_VERSION_2")
+        return self
 
 
 class RobotCommand(ActionPlan):
+    extension_fields: ClassVar[frozenset[str]] = ActionPlan.extension_fields | {"required_tool_id"}
     command_id: Identifier
+    required_tool_id: ToolId | None = None
+
+    @model_validator(mode="after")
+    def required_tool_matches_plan(self) -> Self:
+        if self.schema_version == "2.0" and self.required_tool_id != self.selected_tool_id:
+            raise ValueError("COMMAND_TOOL_MISMATCH")
+        return self
 
 
 class CommandStatus(StrEnum):
@@ -216,7 +341,15 @@ class CommandStatus(StrEnum):
     STATUS_UNKNOWN = "STATUS_UNKNOWN"
 
 
-class CommandReceipt(Record):
+class CommandReceipt(VersionedRecord):
+    extension_fields: ClassVar[frozenset[str]] = frozenset(
+        {
+            "active_tool_id",
+            "tool_change_performed",
+            "trajectory_id",
+            "runtime_profile_version",
+        }
+    )
     command_id: Identifier
     job_id: Identifier
     scene_epoch: Identifier
@@ -225,6 +358,32 @@ class CommandReceipt(Record):
     effect_count: int = Field(ge=0, le=1)
     payload_hash: str
     journal_durable: bool = True
+    active_tool_id: ToolId | None = None
+    tool_change_performed: bool | None = None
+    trajectory_id: Identifier | None = None
+    runtime_profile_version: Literal["hkm_inspired_v1"] | None = None
+
+    @model_validator(mode="after")
+    def robotics_receipt(self) -> Self:
+        if self.schema_version == "2.0":
+            if (
+                self.tool_change_performed is None
+                or self.trajectory_id is None
+                or self.runtime_profile_version is None
+            ):
+                raise ValueError("HKM_RECEIPT_METADATA_REQUIRED")
+            if (self.status == CommandStatus.SUCCEEDED and self.effect_count != 1) or (
+                self.status in {CommandStatus.FAILED, CommandStatus.REJECTED}
+                and self.effect_count != 0
+            ):
+                raise ValueError("RECEIPT_EFFECT_STATUS_CONFLICT")
+            if self.tool_change_performed and self.effect_count != 1:
+                raise ValueError("UNCOMMITTED_TOOL_CHANGE")
+            if len(self.payload_hash) != 64 or any(
+                character not in "0123456789abcdef" for character in self.payload_hash
+            ):
+                raise ValueError("INVALID_PAYLOAD_HASH")
+        return self
 
 
 class Verdict(StrEnum):
@@ -309,6 +468,7 @@ class JobEvidence(Contract):
 
 
 SCHEMAS: tuple[type[Contract], ...] = (
+    ObservedMachineState,
     PresentationSnapshot,
     JobEvidence,
     Product,

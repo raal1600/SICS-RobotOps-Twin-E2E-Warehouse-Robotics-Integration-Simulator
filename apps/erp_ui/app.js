@@ -8,6 +8,8 @@ let guideEvidence = null, guideJob = null, guidance = null;
 const attentionSeen = new Set();
 const readOnly = () => selectedTest !== activeTest;
 const testPath = path => (selectedTest === "original" ? "" : `/simulation-tests/${selectedTest}`) + path;
+const sourceFor = product => fixture?.product_sources?.[product] || fixture?.source_id;
+const atSource = item => (item.location_id??item.location) === sourceFor(item.product_id);
 function testControls() {
   const current=testHistory.find(item=>item.test_id===selectedTest);
   byId("test-history").value=selectedTest;
@@ -50,21 +52,21 @@ function fixtureControls() {
   testControls();
   if (!fixture) {renderGuidance();return;}
   const products=fixture.products.map(item=>({...item,location:fixture.inventory.find(obj=>obj.product_id===item.product_id)?.location_id}));
-  const anyAvailable=products.some(item=>item.location===fixture.source_id);
+  const anyAvailable=products.some(atSource);
   const signature=JSON.stringify(products);
   if(signature!==productSignature){
     const selected=byId("product").value;
     byId("product").replaceChildren();
     products.forEach(item=>{
-      const available=item.location===fixture.source_id;
+      const available=atSource(item);
       const option=new Option(`${item.sku} · ${available?"at source":anyAvailable?"already picked":"new delivery"}`,item.product_id);
       option.disabled=!available&&anyAvailable;byId("product").add(option);
     });
-    byId("product").value=products.find(item=>item.product_id===selected&&item.location===fixture.source_id)?.product_id
-      || products.find(item=>item.location===fixture.source_id)?.product_id || selected || products[0]?.product_id || "";
+    byId("product").value=products.find(item=>item.product_id===selected&&atSource(item))?.product_id
+      || products.find(atSource)?.product_id || selected || products[0]?.product_id || "";
     productSignature=signature;
   }
-  const available=products.some(item=>item.product_id===byId("product").value&&item.location===fixture.source_id);
+  const available=products.some(item=>item.product_id===byId("product").value&&atSource(item));
   const blocker=fixture.scene_reset_blocked_reason;
   const pending=blocker?pendingExecution():null;
   const productName=fixture.products.find(item=>item.product_id===pending?.product_id)?.sku||pending?.product_id;
@@ -83,6 +85,8 @@ function fixtureControls() {
   byId("scenario").disabled=busy;byId("product").disabled=busy||readOnly();
   byId("observation").disabled=busy;
   byId("fresh-scene").disabled=busy||readOnly()||!!blocker;
+  byId("tool-showcase").hidden=!fixture.catalogue;
+  byId("tool-showcase").disabled=busy||readOnly()||!!blocker||cellMode!=="READY";
   byId("reset").disabled=busy||readOnly();byId("motion-import").disabled=busy||readOnly();
   text("inventory-status", blocker==="SCENE_RESET_IN_PROGRESS" ? "Preparing a fresh scene. Previous orders and recordings are being retained."
     : pending ? `Next pick blocked by ${productName} (${pending.state}). Open Review evidence to continue.`
@@ -107,7 +111,7 @@ function renderGuidance() {
   const product=fixture?.products.find(item=>item.product_id===pending?.product_id)?.sku||pending?.product_id;
   const evidence=guideJob===execution?.job_id?guideEvidence:null;
   guidance=SimulationGuide.describe({ready:!!fixture,busy,archived:readOnly(),pending,state:execution?.state,
-    cellMode,blocked:fixture?.scene_reset_blocked_reason,available:fixture?.inventory.filter(item=>item.location_id===fixture.source_id).length,product,evidence});
+    cellMode,blocked:fixture?.scene_reset_blocked_reason,available:fixture?.inventory.filter(atSource).length,product,evidence});
   text("guide-title",guidance.title);text("guide-detail",guidance.detail);text("guide-action",guidance.label);
   text("guide-label",guidance.tone==="attention"?"NEEDS YOUR ATTENTION":"NEXT STEP");
   byId("workflow-guide").setAttribute("data-tone",guidance.tone);
@@ -159,6 +163,34 @@ async function api(path, body) {
   return request(testPath(path),body);
 }
 function text(id, value) { if(byId(id).textContent!==value)byId(id).textContent = value; }
+function roboticsEvidence(evidence){
+  const command=evidence?.command,observation=evidence?.observations?.at(-1),decision=command?.tool_selection;
+  const product=fixture?.products.find(item=>item.product_id===(evidence?.job?.line?.product_id||command?.product_id));
+  const observed=observation?.objects?.filter(item=>item.product_id===product?.product_id)||[];
+  const tool=observation?.machine_telemetry?.tool_state.active_tool_id;
+  const name=id=>fixture?.catalogue?.tools.find(item=>item.tool_id===id)?.display_name||id;
+  text("status-product",product?`${product.sku} / ${product.product_id}`:"No order selected");
+  text("status-tool",tool?name(tool):"Not observed yet");
+  const assessment=evidence?.verifications?.at(-1);
+  text("status-observation",observation?`${observed.length?Math.round(Math.min(...observed.map(item=>item.confidence))*100)+"% confidence":"No product evidence"} / ${assessment?.reason||"Awaiting assessment"} / ${observation.model_version}`:"Not captured");
+  text("status-calibration",observation?.calibration_version||"Not observed");
+  text("business-identity",evidence?`Order ${evidence.job.order_id} / Job ${evidence.job.job_id}`:"");
+  text("status-job",evidence?`${evidence.job.state} / ${evidence.job.job_id}`:"No job selected");
+  text("status-command",command?.command_id||"Not dispatched");
+  text("status-order",evidence?.job.order_id||"No order selected");
+  const uncertain=["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(evidence?.job.state);
+  text("knowledge-state",uncertain?`Execution result is uncertain — do not retry automatically. Controller: ${evidence.journal?.effect_count===1?"one transfer recorded":"no confirmed transfer"}. Workflow: ${evidence.job.state}.`:"");
+  byId("knowledge-state").hidden=!uncertain;
+  text("tool-decision",decision?`${name(decision.selected_tool_id)} selected. Assessed mass ${decision.assessed_mass_kg.toFixed(2)} kg. ${decision.tool_change_required?"Automatic tool change required.":"Mounted tool already matches."}`:command?"Historical recording: no tool-selection contract was recorded.":"Run a pick to inspect the persisted selection.");
+  byId("tool-candidates").replaceChildren();
+  for(const candidate of decision?.candidate_tools||[]){
+    const row=document.createElement("tr");
+    for(const value of [name(candidate.tool_id),candidate.eligible?`${candidate.score}${candidate.tool_id===decision.selected_tool_id?" / selected":" / lower ranked"}`:"Rejected",candidate.reasons.map(reason=>reason.replaceAll("_"," ").toLowerCase()).join(" · ")]){
+      const cell=document.createElement("td");cell.textContent=value;row.append(cell);
+    }
+    byId("tool-candidates").append(row);
+  }
+}
 async function refresh(preferred, preferredDelivery) {
   if (refreshing && !preferred && !preferredDelivery) return;
   const version=++refreshVersion;
@@ -173,6 +205,7 @@ async function refresh(preferred, preferredDelivery) {
     const group=groups.find(item=>item.delivery_id===selectedDelivery);
     const groupSignature=JSON.stringify(groups);
     if(groupSignature!==deliverySignature){
+      nextMotionPoll=0;
       byId("delivery").replaceChildren();
       groups.slice().reverse().forEach((item,index)=>byId("delivery").add(new Option(
         `${item.current?"Current delivery":"Saved delivery"} · ${item.started_at.slice(0,16).replace("T"," ")} UTC · ${item.executions.length} executions · ${item.delivery_id.slice(0,8)}`,item.delivery_id)));
@@ -192,6 +225,7 @@ async function refresh(preferred, preferredDelivery) {
     }
     if (!selection || orders.some(order => order.job_ids.includes(selection))) byId("orders").value = selection;
     text("cell-state",cell.mode);
+    text("status-cell",cell.mode);
     const order = orders.find(item => item.job_ids.includes(byId("orders").value));
     if (!order) {
       const scene=await api("/cell/scene");if(version!==refreshVersion)return;
@@ -199,7 +233,7 @@ async function refresh(preferred, preferredDelivery) {
       byId("visual-panel").hidden=true;byId("reconcile").disabled=true;
       text("order-state","No order selected");text("job-state","Ready for a new order");
       text("verdict","Select a saved order to inspect its verification.");text("command","");
-      text("evidence","No order selected.");byId("timeline").replaceChildren();await refreshGuide(null,version);return;
+      text("evidence","No order selected.");roboticsEvidence(null);byId("timeline").replaceChildren();await refreshGuide(null,version);return;
     }
     if (selectedJob !== byId("orders").value) {
       byId("visual-panel").hidden=true;byId("visual").removeAttribute("src");
@@ -215,6 +249,7 @@ async function refresh(preferred, preferredDelivery) {
     text("verdict",verdict ? verdict.verdict+" · "+verdict.reason : "No verification result yet.");
     text("command",evidence.command ? "Original command: "+evidence.command.command_id+" · Journal: "+(evidence.journal?.status || "unavailable") : "No robot command dispatched.");
     text("evidence",JSON.stringify(evidence,null,2));
+    roboticsEvidence(evidence);
     await refreshGuide(evidence,version);
     if(version!==refreshVersion)return;
     byId("timeline").replaceChildren();
@@ -237,7 +272,7 @@ async function refreshMotion(force=false) {
     if(version!==viewVersion)return;
     if(full)player.updateDelivery(data);else player.update(data);
     const clips=full?data.jobs:[data];
-    nextMotionPoll=Date.now()+(clips.some(clip=>["RECORDING","WAITING"].includes(clip.status))?200:1500);
+    nextMotionPoll=clips.some(clip=>["RECORDING","WAITING"].includes(clip.status))?Date.now()+250:Infinity;
   }
   catch(error){if(version===viewVersion)text("motion-state","Recording feed unavailable · reconnecting");}
   finally {pollingMotion=false;}
@@ -259,14 +294,28 @@ async function freshDelivery(){
 byId("create").addEventListener("click",()=>action(async()=>{
   if(fixture.scene_reset_blocked_reason)throw new Error("The previous job must be resolved before another pick. Open Review evidence to continue.");
   const product=byId("product").value, fault=byId("scenario").value||null;
-  if(!fixture.inventory.some(item=>item.product_id===product&&item.location_id===fixture.source_id))await freshDelivery();
+  if(!fixture.inventory.some(item=>item.product_id===product&&atSource(item)))await freshDelivery();
   byId("replay-scope").value="delivery";
   const orderId="order-"+crypto.randomUUID();
-  const response=await fetch(testPath("/orders"),{method:"POST",headers:{"Content-Type":"application/json","Idempotency-Key":orderId},body:JSON.stringify({order_id:orderId,lines:[{order_line_id:"line-1",product_id:product,source_id:fixture.source_id,destination_id:fixture.destination_id}]})});
+  const response=await fetch(testPath("/orders"),{method:"POST",headers:{"Content-Type":"application/json","Idempotency-Key":orderId},body:JSON.stringify({order_id:orderId,lines:[{order_line_id:"line-1",product_id:product,source_id:sourceFor(product),destination_id:fixture.destination_id}]})});
   const order=await response.json();if(!response.ok)throw new Error(JSON.stringify(order));
   await refresh(order.job_ids[0],fixture.scene_epoch); await refreshMotion(true);nextMotionPoll=0;
   await api(`/jobs/${order.job_ids[0]}/run`,{fault});
 }));
+byId("tool-showcase").onclick=()=>action(async()=>{
+  if(!fixture.catalogue||fixture.scene_reset_blocked_reason)throw new Error("Resolve the current job before starting the showcase.");
+  if(!fixture.inventory.every(atSource))await freshDelivery();
+  byId("scenario").value="";byId("replay-scope").value="delivery";
+  const orderId="showcase-"+crypto.randomUUID();
+  const lines=fixture.products.map((product,index)=>({order_line_id:"line-"+(index+1),product_id:product.product_id,source_id:sourceFor(product.product_id),destination_id:fixture.destination_id}));
+  const response=await fetch(testPath("/orders"),{method:"POST",headers:{"Content-Type":"application/json","Idempotency-Key":orderId},body:JSON.stringify({order_id:orderId,lines})});
+  const order=await response.json();if(!response.ok)throw new Error(JSON.stringify(order));
+  for(const jobId of order.job_ids){
+    await refresh(jobId,fixture.scene_epoch);await refreshMotion(true);nextMotionPoll=0;
+    const job=await api(`/jobs/${jobId}/run`,{fault:null});
+    if(job.state!=="COMPLETED")throw new Error("Showcase paused: "+job.state+". Review the original command evidence before continuing.");
+  }
+},"Running the six-tool happy-path showcase. Each product is verified before the next pick.");
 byId("resolve-blocker").onclick=()=>action(async()=>{
   const pending=pendingExecution();if(!pending)return;
   const group=deliveries.find(item=>item.executions.some(run=>run.job_id===pending.job_id));

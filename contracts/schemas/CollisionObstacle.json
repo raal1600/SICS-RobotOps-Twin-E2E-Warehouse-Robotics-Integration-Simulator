@@ -1,0 +1,83 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "default": "STATIC",
+      "enum": [
+        "STATIC",
+        "PRODUCT"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "maximum": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Maximum",
+      "type": "array"
+    },
+    "minimum": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Minimum",
+      "type": "array"
+    },
+    "obstacle_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[\\w.:-]+$",
+      "title": "Obstacle Id",
+      "type": "string"
+    },
+    "product_id": {
+      "anyOf": [
+        {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Product Id"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "obstacle_id",
+    "minimum",
+    "maximum"
+  ],
+  "title": "CollisionObstacle",
+  "type": "object"
+}

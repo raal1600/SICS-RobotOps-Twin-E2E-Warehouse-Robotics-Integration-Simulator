@@ -3,8 +3,11 @@
 The Windows EXE and browser dashboard always show the environment, machine and
 products, before orders and for every scenario. The interactive perspective view
 uses offline Three.js, with a software 3D fallback when WebGL is unavailable.
-The stylized Cartesian gantry is an explanatory synthetic model, not real robot
-kinematics. Blender and the initial view share the same cell geometry.
+Fresh worlds use the original procedural HKM1800-inspired hybrid-kinematic
+manipulator, six product families, six tools and a bounded synthetic workspace.
+This is visual kinematics, not the real HKM mechanism or validated dynamics.
+Blender and the browser consume the same named primitive geometry. Saved
+schema-1 worlds retain the historical Cartesian gantry and positional recordings.
 
 The product selector shows current fixture availability. **Start new test** is
 always present and creates an independent world while keeping scenario and
@@ -20,8 +23,8 @@ remains available. Fresh scenes are blocked by active or unresolved jobs.
 **Delivery replay** selects a current or saved scene. **Full delivery (all products)**
 is the default scope: Replay and the scrubber span every product execution in
 the original execution order. **Selected product execution** replays just the
-chosen item in **Product execution details**. Three picks therefore appear as
-one delivery with three segments; each retains its own command and outcome.
+chosen item in **Product execution details**. Six picks therefore appear as
+one delivery with six segments; each retains its own command and outcome.
 Earlier delivered products use their saved positions in later clips. Preparing
 a fresh scene preserves the earlier delivery; starting a new test retains that
 world's deliveries under Test history.
@@ -41,7 +44,14 @@ remains available independently, and never changes the result (ADR 0008).
   zoom buttons and Reset camera also work with a keyboard.
 - Pause / Play stops or resumes the view. Replay restarts the same scenario;
   it never sends a command. The slider scrubs received motion and saved events.
-- Speed selects 0.25x, 0.5x, 1x or 2x playback time. Event steps use a readable
+- Previous/Next frame steps through the received track and pauses presentation.
+- Operator, Overhead, Side inspection and Follow TCP change presentation only;
+  switching views never captures sensor evidence or changes calibration.
+  Browser overhead/side presets use an 84-degree vertical field of view to frame
+  the full cell; Operator, Follow TCP and Reset use 42 degrees. WebGL and software
+  projection share this framing. These are presentation settings, not changes to
+  the canonical synthetic camera model or observation evidence.
+- Speed selects 0.25x, 0.5x, 1x, 2x or 4x playback time. Event steps use a readable
   half-second pace, while motion labels show Blender frames and simulation time.
   Original event timestamps remain available in the causal timeline.
 - Load saved animation reads an older order's original keyed Blender scene
@@ -95,7 +105,15 @@ default and labelled **Saved Blender snapshot**. Opening it does not execute or
 reconcile anything; the full 3D cell and replay remain the primary visualization.
 
 MotionRecording includes command/job/product/epoch IDs, frame ID, metre units,
-24 fps, object geometry and 1..100 contiguous VisualFrame records. The Blender
+24 fps and object geometry. Schema 1 retains 100 frames and its 2 MB bound.
+Schema 2 records up to 720 contiguous frames within a 32 MB bound, with actual
+evaluated world position/quaternion/scale/visibility transforms for a fixed union
+of animated objects. Static geometry is shared by every frame. Tool/rack state,
+attachment identity, phase and synthetic time remain explicit. Quaternion
+interpolation uses the shortest rotation; discrete visibility is not blended.
+Interrupted clips keep their last received pose. Completed recordings are not
+re-fetched until delivery state changes or an explicit review requests them.
+The Blender
 process writes atomic snapshots to its original command exchange's `motion.json`.
 Windows sharing-lock conflicts retry only the atomic file rename, bounded to
 50 attempts with 10 ms intervals; no physical command is retried.
@@ -122,7 +140,8 @@ restart, older scene import, corruption/partial-recording and no-effect tests,
 plus Node's built-in tests for playback controls. Install Node 20.17.0 for these
 development tests; the application itself requires no Node runtime or CDN.
 See tests/blender/test_playback.py, tests/unit/test_visualization.py and
-tests/ui/playback.test.cjs. The test that imports an older scene verifies that
+tests/ui/playback.test.cjs, plus tests/blender/test_hkm_runtime.py for articulated
+tools and all six product families. The test that imports an older scene verifies that
 world, journal, events, workflow history and the `.blend` hash do not change.
 
 [Pose provenance](../adr/0003-recorded-motion-illustration.md) and
@@ -134,3 +153,14 @@ card uses persisted workflow/evidence and points to the active unresolved job ev
 while an older recording is selected. It never uses the visible scene or replay
 poses as verification. Review evidence opens once when attention is needed; the
 scene, journal and sensor-observation provenance remain separate (ADR 0009).
+
+The status strip identifies the selected order, job, original command, product,
+cell, observed tool and observation confidence/version/calibration. The replay
+phase/tool label describes the viewed frame, which may be an earlier product in
+the full delivery. **Why this tool?** reads the persisted selection candidates,
+scores, conservative assessed mass and constraint reasons from the command.
+**Run six-tool showcase (happy path)** explicitly runs all six catalogue products,
+verifying each before the next. It prepares a new delivery if the resolved
+current one has already consumed products; it cannot bypass an uncertain job.
+The Simulation boundaries panel explains synthetic observations and collision
+preflight; the optional static checkpoint stays collapsed in Technical details.

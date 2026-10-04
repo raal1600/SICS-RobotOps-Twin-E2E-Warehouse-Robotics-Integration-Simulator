@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-10-04T00:56:05.303370+00:00",
+  "base_commit": "eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98",
+  "source_dirty": true,
+  "scope": "Targeted API/default-profile implementation evidence; not complete enhancement acceptance",
+  "checks": [
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/integration/test_hkm_api.py tests/contract/test_api.py -k \"not openapi\" --junitxml=artifacts/hkm-api-initial.xml",
+      "passed": true,
+      "tests": 10,
+      "deselected": 1,
+      "artifact": "hkm-api-initial.xml"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/integration/test_hkm_api.py -k archived_nonoriginal",
+      "passed": true,
+      "tests": 1,
+      "deselected": 9,
+      "artifact": "hkm-archived-profile.xml"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/integration/test_simulation_tests.py tests/integration/test_desktop_backend.py -m \"not blender\"",
+      "passed": true,
+      "tests": 102,
+      "deselected": 3,
+      "artifact": "hkm-profile-compatibility.xml"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m mypy apps/api/app.py apps/api/test_sessions.py apps/api/__main__.py apps/desktop/backend.py robotops/workflow/store.py",
+      "passed": true
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m ruff check apps/api/app.py apps/api/test_sessions.py apps/api/__main__.py apps/desktop/backend.py robotops/workflow/store.py tests/contract/test_api.py tests/integration/test_simulation_tests.py tests/integration/test_desktop_backend.py tests/integration/test_hkm_api.py",
+      "passed": true
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.drift_check --strict",
+      "passed": true
+    },
+    {
+      "command": "PowerShell Language.Parser.ParseFile tools/test-desktop.ps1",
+      "passed": true
+    }
+  ],
+  "notes": [
+    "The inherited legacy uncertainty/scenario assertions remain, and each independent new test uses the six-SKU profile.",
+    "Desktop backend subprocess close/reopen passed for both legacy and fresh HKM worlds with one original command/effect.",
+    "Native desktop-window smoke and real Blender integration are separate pending checks; OpenAPI regeneration belongs to the combined milestone."
+  ]
+}

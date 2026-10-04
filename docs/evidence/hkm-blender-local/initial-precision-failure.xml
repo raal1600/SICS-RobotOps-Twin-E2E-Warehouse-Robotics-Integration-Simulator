@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="42.787" timestamp="2026-10-04T11:36:35.554648+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.blender.test_hkm_runtime" name="test_hkm_real_blender_six_tool_showcase_articulates_attaches_and_releases" time="42.343"><failure message="assert (1.3900017738...9999713897705) == approx((1.39 ...55 ± 1.0e-06))&#10;  &#10;  comparison failed. Mismatched elements: 1 / 3:&#10;  Max absolute difference: 1.7738342286133246e-06&#10;  Max relative difference: 1.276138104284802e-06&#10;  Index | Obtained           | Expected      &#10;  0     | 1.3900017738342285 | 1.39 ± 1.0e-06">tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/hkm-blender-test-temp/test_hkm_real_blender_six_tool0')
+
+    def test_hkm_real_blender_six_tool_showcase_articulates_attaches_and_releases(tmp_path):
+        engine = make_engine(tmp_path)
+        catalogue = load_catalogue()
+        evidence = Path("artifacts/hkm-blender/tool-showcase")
+        evidence.mkdir(parents=True, exist_ok=True)
+        summaries = []
+        for index, product in enumerate(catalogue.products):
+            before = engine.runtime.world()
+            job = engine.run(intake(engine, index, "showcase-" + product.sku))
+            assert job.state == JobState.COMPLETED, failure_context(engine)
+            command = engine.store.load(RobotCommand, job.command_id)
+            assert command.required_tool_id == product.preferred_tool_id
+            assert command.tool_selection.selected_tool_id == product.preferred_tool_id
+&gt;           recording = assert_recording(engine, command, before)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\blender\test_hkm_runtime.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = &lt;robotops.workflow.engine.Engine object at 0x0000026F6C766510&gt;
+command = RobotCommand(schema_version='2.0', run_id='293c5044-36bd-47fc-b6f0-eafbb965c57c', correlation_id='34d7b340-0950-52ea-b...tree_version='hkm-frame-tree-1', command_id='63117b3d-5e5c-50df-bc4f-a7e39feac8ce', required_tool_id='EE_PINCH_NARROW')
+before = WorldState(schema_version='2.0', run_id='3afa6820-5a0e-40fc-81fb-333f1439229c', correlation_id='d2c12d48-511a-4d36-a59..., 'EE_VAC_ARRAY', 'EE_PINCH_NARROW', 'EE_PINCH_WIDE', 'EE_SUPPORT_FORK'), tool_state_version='synthetic-tool-state-1'))
+
+    def assert_recording(engine, command, before):
+        runtime = engine.runtime
+        catalogue = load_catalogue()
+        recording = runtime.motion(command)
+        assert recording is not None and recording.complete
+        assert recording.schema_version == "2.0"
+        assert recording.source == "BLENDER_EVALUATED_SCENE"
+        assert recording.kinematics_version == "HKM_INSPIRED_VISUAL_KINEMATICS_V1"
+        assert recording.command_id == command.command_id
+        assert recording.total_frames == len(recording.frames)
+        assert recording.frames[-1].sim_time_s == pytest.approx(recording.simulated_duration_s)
+        assert set(REQUIRED_PICK_PHASES) &lt;= {frame.phase for frame in recording.frames}
+        objects = {item.name: item for item in recording.objects}
+        assert {
+            "RobotOpsTwin/Cell",
+            "Robot/BaseColumn",
+            "Robot/RotaryBase",
+            "Robot/UpperAssembly",
+            "Robot/WristAssembly",
+            "Robot/ToolFlange",
+            "Robot/ToolChanger",
+            "ToolRack",
+            "Conveyor",
+            "ControlCabinet",
+            "ControlCabinet/LogicalEstop",
+            "Enclosure/OperatorGate",
+            *(f"ToolRack/Dock{index:02}" for index in range(1, 7)),
+            *("Locations/" + source.location_id for source in catalogue.layout.sources.values()),
+            "Locations/" + catalogue.layout.destination.location_id,
+            *("Tools/" + tool.tool_id for tool in catalogue.tools),
+            *("Products/" + item.product_id for item in engine.settings.products),
+        } &lt;= objects.keys()
+        assert not {"RobotCarriage", "RobotArm", "RobotSpindle"} &amp; objects.keys()
+        assert {
+            objects["Locations/" + source.location_id].label
+            for source in catalogue.layout.sources.values()
+        } == set("ABCDEF")
+        assert (
+            len({objects["Products/" + item.product_id].size for item in engine.settings.products}) == 6
+        )
+        for side in ("Left", "Right"):
+            for segment in ("Upper", "Lower"):
+                name = f"Robot/ParallelLink{side}{segment}"
+                rotations = {
+                    tuple(round(v, 5) for v in frame.transforms[name].quaternion_xyzw)
+                    for frame in recording.frames
+                }
+                assert len(rotations) &gt; 10, name
+    
+        product_name = "Products/" + command.product_id
+        original = next(
+            item for item in before.objects if item.product.product_id == command.product_id
+        )
+        final = next(
+            item for item in runtime.world().objects if item.product.product_id == command.product_id
+        )
+        assert recording.frames[0].transforms[product_name].position == pytest.approx(
+            original.pose.position, abs=1e-6
+        )
+        assert recording.frames[-1].transforms[product_name].position == pytest.approx(
+            final.pose.position, abs=1e-6
+        )
+        assert final.pose.position == pytest.approx(command.target_pose.position, abs=1e-6)
+        assert final.location_id == command.destination_id and not final.attached
+        attached = [
+            frame for frame in recording.frames if frame.attached_product_id == command.product_id
+        ]
+        assert len(attached) &gt; 20
+        offsets = []
+        for frame in attached:
+            assert frame.active_tool_id == command.required_tool_id
+            tool = frame.transforms["Tools/" + frame.active_tool_id]
+            product = frame.transforms[product_name]
+            inverse_rotation = tuple(-v for v in tool.quaternion_xyzw[:3]) + (tool.quaternion_xyzw[3],)
+            offsets.append(
+                rotate_vector(
+                    tuple(a - b for a, b in zip(product.position, tool.position, strict=True)),
+                    inverse_rotation,
+                )
+            )
+        assert all(offset == pytest.approx(offsets[0], abs=1e-6) for offset in offsets)
+        assert (
+            math.dist(
+                attached[0].transforms[product_name].position,
+                attached[-1].transforms[product_name].position,
+            )
+            &gt; 0.4
+        )
+        release_time = next(
+            point.sim_time_s for point in command.trajectory.waypoints if point.phase == "RELEASE"
+        )
+        released = [frame for frame in recording.frames if frame.sim_time_s &gt;= release_time]
+        assert released and all(frame.attached_product_id is None for frame in released)
+        assert all(
+            frame.transforms[product_name].position
+            == pytest.approx(command.target_pose.position, abs=1e-6)
+            for frame in released
+        )
+    
+        tool_ids = {tool.tool_id for tool in catalogue.tools}
+        for frame in recording.frames:
+            rack = set(frame.rack_tool_ids)
+            assert len(rack) == (5 if frame.active_tool_id else 6)
+            assert frame.active_tool_id not in rack
+            assert rack | ({frame.active_tool_id} if frame.active_tool_id else set()) == tool_ids
+            for tool_id in rack:
+                tool = frame.transforms["Tools/" + tool_id]
+                expected = tool_primitives(tool_id, catalogue.layout.tool_docks[tool_id].position)[0]
+&gt;               assert tool.position == pytest.approx(expected["position"], abs=1e-6)
+E               assert (1.3900017738...9999713897705) == approx((1.39 ...55 ± 1.0e-06))
+E                 
+E                 comparison failed. Mismatched elements: 1 / 3:
+E                 Max absolute difference: 1.7738342286133246e-06
+E                 Max relative difference: 1.276138104284802e-06
+E                 Index | Obtained           | Expected      
+E                 0     | 1.3900017738342285 | 1.39 ± 1.0e-06
+
+tests\blender\test_hkm_runtime.py:164: AssertionError</failure></testcase></testsuite></testsuites>

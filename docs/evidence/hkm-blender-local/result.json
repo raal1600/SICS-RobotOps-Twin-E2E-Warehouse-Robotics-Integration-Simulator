@@ -1,0 +1,65 @@
+{
+  "timestamp_utc": "2026-10-04T09:49:00.994320+00:00",
+  "base_commit": "eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98",
+  "source_dirty": true,
+  "scope": "Targeted actual Blender/native desktop evidence for uncommitted HKM enhancement; not full acceptance or remote publication attestation",
+  "blender_versions": [
+    "5.2.1 LTS"
+  ],
+  "python_version": "Python 3.13.15",
+  "commands": [
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/blender/test_hkm_runtime.py -x --basetemp=artifacts/hkm-blender-complete-temp -p no:cacheprovider --junitxml=artifacts/hkm-blender-complete.xml",
+      "passed": true,
+      "tests": 12,
+      "skips": 0,
+      "xfails": 0,
+      "artifact": "tests.xml"
+    },
+    {
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-desktop.ps1",
+      "passed": true,
+      "artifact": "native-build.json"
+    },
+    {
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/test-desktop.ps1 -Runtime blender",
+      "passed": true,
+      "checks": 8,
+      "artifact": "native-desktop.json"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m ruff check tests/blender/test_hkm_runtime.py",
+      "passed": true
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m tools.drift_check --strict",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "tests/blender/test_hkm_runtime.py": "d7745f090749ac218da21b4ee168c1b1f1c4abbf46a6c1c91a2fbd8962b03250",
+    "blender/scripts/runtime.py": "4adb88fc21e73d0987752c4b8e6ca9a0afc8187a3121e782e32cafea12777baa",
+    "blender/scripts/hkm_runtime.py": "a2b7b476d0d906c9bc24b6641c809c431c08ade8613dc008dbec19788251276a",
+    "blender/scripts/hkm_scene.py": "d456140b15196baea0ccf6495de8ed0ad9864b384ebaef186ec07f826c726adb",
+    "robotops/hkm_geometry.py": "37ff266d2fbdf560550d91a8d62d02bb408dd4aa2a0cc569be022c803c7de0b9",
+    "robotops/blender/adapter.py": "177acaa93d2959a99f2a25aecfdc05d90c1be24e15ee2fcdfbd6dcc79a8a7899",
+    "robotops/robotics/catalogue-v1.json": "de09ce0165000bc2f29e7597bbc98f8c4349effe07ab65f226d63eb4ebbc0e07"
+  },
+  "showcase": {
+    "tools": 6,
+    "product_families": 6,
+    "product_transfer_effects": 6,
+    "effects_per_original_command": 1,
+    "artifact": "tool-showcase-summary.json"
+  },
+  "recovery": "Lost-ack after effect, restart, contradictory fresh observation, later normal reconciliation and duplicate delivery preserve the original command and exactly one effect.",
+  "replay": "Saved Blender keyframes re-export with identical phases/tool/rack/attachment metadata and transforms within 1e-6. Original scene hash, world, events and workflow evidence remain unchanged.",
+  "defensive_runtime": "Eight deliberately broken JSON requests each fail in the real Blender process before any scene, motion, response or product effect is produced.",
+  "numeric_tolerance": "1e-6 for evaluated transform agreement; not real robot accuracy.",
+  "fixed_failures": [
+    "Docked tool inverse-parent float32 residual 1.77e-6 fixed in production parent-space baking. Original assertions retained.",
+    "New strict runtime dock transition compared raw catalogue dict with defaulted Pose schema metadata; fixed field-exact pose comparison. Original valid command and assertions retained."
+  ],
+  "native_scope": "Only test-owned windows/backends/Blender children in an isolated GUID artifact data root. No Install, user shortcut change, user app restart or user data reset.",
+  "remaining": "Full mandatory repeated acceptance, final visual review, dependency/publication/remote exact-SHA gates remain the parent milestone work."
+}

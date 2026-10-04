@@ -4,10 +4,12 @@ import os
 import shutil
 import subprocess
 import threading
+from math import dist
 from pathlib import Path
 from typing import Any
 
 from robotops.blender.visualization import MotionRecording
+from robotops.cell.hkm_execution import final_machine, receipt_metadata
 from robotops.cell.runtime import CommunicationTimeout, SyntheticRuntime
 from robotops.config import Settings
 from robotops.domain.models import (
@@ -51,12 +53,14 @@ class BlenderRuntime(SyntheticRuntime):
         directory = self.artifacts / new_id()
         directory.mkdir()
         request = {
-            "schema_version": "1.0",
+            "schema_version": world.schema_version,
             "operation": operation,
             "world": world.model_dump(mode="json"),
             "command": command.model_dump(mode="json") if command else None,
             "visual_frame_seconds": self.settings.visual_frame_seconds,
         }
+        if world.schema_version == "2.0":
+            request["durable_payload_hash"] = digest(command) if command else None
         (directory / "request.json").write_text(json.dumps(request), encoding="utf-8")
         return directory
 
@@ -84,8 +88,13 @@ class BlenderRuntime(SyntheticRuntime):
                 check=False,
             )
         except subprocess.TimeoutExpired as exc:
+            output = "\n".join(
+                value.decode("utf-8", errors="replace") if isinstance(value, bytes) else value
+                for value in (exc.stdout, exc.stderr)
+                if value
+            )
             (directory / ("replay.log" if record_existing else "runtime.log")).write_text(
-                str(exc), encoding="utf-8"
+                output + "\n" + str(exc), encoding="utf-8"
             )
             raise CommunicationTimeout("BLENDER_PROCESS_TIMEOUT") from exc
         (directory / ("replay.log" if record_existing else "runtime.log")).write_text(
@@ -109,17 +118,90 @@ class BlenderRuntime(SyntheticRuntime):
                 != hashlib.sha256((directory / "scene.blend").read_bytes()).hexdigest()
             ):
                 return None
+            request = json.loads((directory / "request.json").read_text(encoding="utf-8"))
+            original_world = WorldState.model_validate(request["world"])
+            if command.schema_version == "2.0":
+                if (
+                    response.get("schema_version") != "2.0"
+                    or response.get("durable_payload_hash") != digest(command)
+                    or request.get("durable_payload_hash") != digest(command)
+                    or RobotCommand.model_validate(request["command"]) != command
+                    or response.get("runtime_profile_version") != "hkm_inspired_v1"
+                    or world.schema_version != "2.0"
+                    or self.rejection_reason(original_world, command, None) is not None
+                ):
+                    return None
+                robot, tools = final_machine(original_world, command)
+                expected_objects = tuple(
+                    obj.model_copy(
+                        update={
+                            "location_id": command.destination_id,
+                            "pose": command.target_pose,
+                            "attached": False,
+                        }
+                    )
+                    if obj.product.product_id == command.product_id
+                    else obj
+                    for obj in original_world.objects
+                )
+                expected = original_world.model_copy(
+                    update={
+                        "objects": expected_objects,
+                        "step": original_world.step + 1,
+                        "timestamp": world.timestamp,
+                        "robot_state": robot,
+                        "tool_state": tools,
+                    }
+                )
+                normalized_objects = []
+                for actual, intended in zip(world.objects, expected.objects, strict=True):
+                    if (
+                        dist(actual.pose.position, intended.pose.position) > 1e-6
+                        or min(
+                            dist(actual.pose.quaternion_xyzw, intended.pose.quaternion_xyzw),
+                            dist(
+                                actual.pose.quaternion_xyzw,
+                                tuple(-v for v in intended.pose.quaternion_xyzw),
+                            ),
+                        )
+                        > 1e-6
+                        or actual.pose.model_copy(
+                            update={
+                                "position": intended.pose.position,
+                                "quaternion_xyzw": intended.pose.quaternion_xyzw,
+                            }
+                        )
+                        != intended.pose
+                    ):
+                        return None
+                    normalized_objects.append(actual.model_copy(update={"pose": intended.pose}))
+                if world.model_copy(update={"objects": tuple(normalized_objects)}) != expected:
+                    return None
             with self.db.transaction() as db:
                 row = db.execute(
-                    "SELECT receipt FROM controller_journal WHERE id=?", (command.command_id,)
+                    "SELECT receipt,payload_hash,command FROM controller_journal WHERE id=?",
+                    (command.command_id,),
                 ).fetchone()
                 if row is None:
                     return None
                 original = CommandReceipt.model_validate_json(row[0])
+                if row[1] != digest(command) or RobotCommand.model_validate_json(row[2]) != command:
+                    return None
                 if original.status == CommandStatus.SUCCEEDED:
                     return original
                 current = self._world(db)
                 if current.scene_epoch != world.scene_epoch or world.step != current.step + 1:
+                    return None
+                if (
+                    command.schema_version == "2.0"
+                    and current.model_copy(
+                        update={"cell": original_world.cell, "timestamp": original_world.timestamp}
+                    )
+                    != original_world
+                ):
+                    # The request is an exchange artifact, not authoritative state.
+                    # Bind its entire starting world to the durable controller row;
+                    # only asynchronous logical cell updates are allowed in flight.
                     return None
                 cell = current.cell
                 if cell.mode == CellMode.BUSY and cell.generation == command.cell_generation:
@@ -130,16 +212,19 @@ class BlenderRuntime(SyntheticRuntime):
                 self._write_world(db, world)
                 receipt = original.model_copy(
                     update={
+                        **receipt_metadata(original_world, command, effect=True),
                         "status": CommandStatus.SUCCEEDED,
                         "effect_count": 1,
                         "reason": "BLENDER_PICK_APPLIED",
                         "timestamp": utc_now(),
                     }
                 )
+                receipt = CommandReceipt.model_validate_json(receipt.model_dump_json())
                 db.execute(
                     "UPDATE controller_journal SET receipt=? WHERE id=?",
                     (receipt.model_dump_json(), command.command_id),
                 )
+                self._motion_events(db, command, world)
                 self._event(db, command, world, "PICK_EFFECT", "BLENDER_ATTACH_TRANSFER_DETACH")
                 self._event(db, command, world, "COMMAND_SUCCEEDED", "BLENDER_CHECKPOINT_COMMITTED")
                 db.execute(
@@ -206,6 +291,7 @@ class BlenderRuntime(SyntheticRuntime):
                 directory = self._exchange("pick", world, command)
                 receipt = CommandReceipt(
                     **metadata(command, command.command_id),
+                    **receipt_metadata(world, command),
                     command_id=command.command_id,
                     job_id=command.job_id,
                     scene_epoch=command.scene_epoch,
@@ -270,10 +356,30 @@ class BlenderRuntime(SyntheticRuntime):
         version = subprocess.run(
             [self.executable, "--version"], capture_output=True, text=True, check=True
         )
+        root = SCRIPT.parents[2]
+        # Entry-point identity alone does not identify the bounded v2 runtime.
+        # Hash every checked-in runtime helper and its declarative fixture data.
+        closure_files = (
+            "blender/scripts/runtime.py",
+            "blender/scripts/hkm_runtime.py",
+            "blender/scripts/hkm_scene.py",
+            "robotops/hkm_geometry.py",
+            "robotops/scene_geometry.py",
+            "robotops/presentation_io.py",
+            "robotops/robotics/catalogue_data.py",
+            "robotops/robotics/catalogue-v1.json",
+        )
+        closure = {
+            name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in closure_files
+        }
         return {
             "adapter": "blender-batch-1",
             "blender": version.stdout.splitlines()[0],
             "script_sha256": hashlib.sha256(SCRIPT.read_bytes()).hexdigest(),
+            "runtime_files_sha256": closure,
+            "runtime_closure_sha256": hashlib.sha256(
+                json.dumps(closure, sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest(),
             "gpu_required": False,
         }
 
@@ -306,9 +412,11 @@ class BlenderRuntime(SyntheticRuntime):
         path = self.command_artifact(command.command_id, "motion.json")
         if path is None:
             return None
-        if path.stat().st_size > 2_000_000:
+        if path.stat().st_size > (32_000_000 if command.schema_version == "2.0" else 2_000_000):
             raise ValueError("RECORDING_TOO_LARGE")
         recording = MotionRecording.model_validate_json(path.read_bytes())
+        if recording.schema_version != command.schema_version:
+            raise ValueError("RECORDING_SCHEMA_MISMATCH")
         if (
             recording.command_id,
             recording.job_id,

@@ -12,6 +12,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
+from robotops.config import Settings
 from robotops.domain.models import Contract, JobState, utc_now
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Conflict, NotFound, Store
@@ -112,17 +113,16 @@ class TestRegistry:
     def make_engine(self, test_id: str) -> Engine:
         # Only generated, catalogued UUIDs can select a directory.
         directory = self.root / str(UUID(test_id))
-        settings = self.original.settings
+        settings = Settings.hkm(visual_frame_seconds=self.original.settings.visual_frame_seconds)
         runtime_type = (
             BlenderRuntime
             if isinstance(self.original.runtime, BlenderRuntime)
             else SyntheticRuntime
         )
-        return Engine(
-            Store(directory / "workflow.db"),
-            runtime_type(directory / "runtime.db", settings),
-            settings,
-        )
+        # A fresh test uses the current profile; reopening resolves the saved
+        # world's own settings, including legacy recordings, without migration.
+        runtime = runtime_type(directory / "runtime.db", settings)
+        return Engine(Store(directory / "workflow.db"), runtime, runtime.settings)
 
     @contextmanager
     def mutation(self, test_id: str) -> Iterator[None]:

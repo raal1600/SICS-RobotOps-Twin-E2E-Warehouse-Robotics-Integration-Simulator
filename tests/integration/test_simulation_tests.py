@@ -31,6 +31,19 @@ def new_test(client, request_id=None):
 
 
 def run(client, order_request, prefix="", fault=None):
+    if prefix:
+        # New experiments use the six-SKU profile, while the original fixture
+        # remains legacy. Keep the ERP identity and use the new fixture's item.
+        fixture = client.get(prefix + "/fixtures").json()
+        product = fixture["products"][0]["product_id"]
+        line = order_request.lines[0].model_copy(
+            update={
+                "product_id": product,
+                "source_id": fixture["product_sources"][product],
+                "destination_id": fixture["destination_id"],
+            }
+        )
+        order_request = order_request.model_copy(update={"lines": (line,)})
     response = client.post(
         prefix + "/orders",
         json=order_request.model_dump(mode="json"),
@@ -68,14 +81,19 @@ def test_every_combination_can_start_an_independent_test_without_changing_old_ev
     prefix = new_test(client)
     fixture = client.get(prefix + "/fixtures").json()
     assert fixture["scene_epoch"] != engine.runtime.world().scene_epoch
-    assert all(item["location_id"] == "source" for item in fixture["inventory"])
+    assert fixture["robot_profile_version"] == "hkm_inspired_v1"
+    assert len(fixture["products"]) == 6
+    assert all(
+        item["location_id"] == fixture["product_sources"][item["product_id"]]
+        for item in fixture["inventory"]
+    )
     assert client.get(prefix + "/orders").json() == []
     assert client.get(prefix + "/cell").json()["mode"] == "READY"
     history = client.get("/simulation-tests").json()
     assert history["tests"][0]["outcomes"] == [job["state"]]
     assert not history["tests"][0]["active"]
     assert history["tests"][1]["active"]
-    # Identical ERP input belongs to a distinct experiment, not a retry of the old pick.
+    # Reused ERP identity belongs to a distinct experiment, not a retry of the old pick.
     fresh = run(client, order_request, prefix)
     assert fresh["state"] == "COMPLETED"
     active = app.state.test_registry.engine(history["active_test_id"])

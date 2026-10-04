@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from robotops.brain.deterministic import observed_obstacles
 from robotops.config import Settings
 from robotops.domain.models import (
     ActionPlan,
@@ -11,6 +12,9 @@ from robotops.domain.models import (
     utc_now,
 )
 from robotops.observation.quality import quality
+from robotops.robotics.catalogue import product_spec, tool_spec
+from robotops.robotics.selector import select_tool
+from robotops.robotics.trajectory import plan_trajectory, validate_trajectory
 
 
 class ActionValidator:
@@ -68,7 +72,8 @@ class ActionValidator:
         obj = next(obj for obj in observation.objects if obj.product_id == plan.product_id)
         if obj.location_id != plan.source_id or plan.source_id not in observation.covered_locations:
             raise ValueError("SOURCE_NOT_OBSERVED")
-        if destination.location_id != plan.destination_id or plan.target_pose != destination.pose:
+        expected_target = self.settings.target_pose(plan.product_id, destination)
+        if destination.location_id != plan.destination_id or plan.target_pose != expected_target:
             raise ValueError("DESTINATION_MISMATCH")
         if (
             plan.target_pose.frame_id != self.settings.frame_id
@@ -85,4 +90,64 @@ class ActionValidator:
             )
         ):
             raise ValueError("WORKSPACE_BOUNDS")
+        if self.settings.is_hkm:
+            self._validate_hkm(plan, observation, now or utc_now())
+        elif plan.schema_version != "1.0":
+            raise ValueError("LEGACY_PROFILE_REQUIRES_VERSION_1")
         return plan
+
+    def _validate_hkm(self, plan: ActionPlan, observation: WorldObservation, now: datetime) -> None:
+        observation = WorldObservation.model_validate(observation.model_dump())
+        if plan.schema_version != "2.0" or observation.schema_version != "2.0":
+            raise ValueError("HKM_PROFILE_REQUIRES_VERSION_2")
+        machine = observation.machine_telemetry
+        if machine is None:
+            raise ValueError("OBSERVED_MACHINE_TELEMETRY_REQUIRED")
+        age = (now - machine.captured_at).total_seconds()
+        if age < 0 or age > self.settings.freshness_seconds:
+            raise ValueError("STALE_OR_FUTURE_MACHINE_TELEMETRY")
+        if (
+            machine.source != "SIMULATED_CELL_TELEMETRY"
+            or machine.cell_generation != observation.cell_generation
+            or machine.tcp_pose.frame_id != self.settings.frame_id
+            or machine.tcp_pose.calibration_version != self.settings.calibration_version
+        ):
+            raise ValueError("MACHINE_TELEMETRY_METADATA_MISMATCH")
+        if plan.brain_version not in {"deterministic-hkm-1", "structured-1"}:
+            raise ValueError("HKM_BRAIN_VERSION_MISMATCH")
+        product = next(
+            product for product in self.settings.products if product.product_id == plan.product_id
+        )
+        specification = product_spec(product.sku)
+        if plan.source_id != self.settings.source_for(product.product_id):
+            raise ValueError("FIXTURE_SOURCE_MISMATCH")
+        selection = select_tool(specification, machine.tool_state, product_id=product.product_id)
+        if plan.selected_tool_id != selection.selected_tool_id or plan.tool_selection != selection:
+            raise ValueError("TOOL_SELECTION_EVIDENCE_MISMATCH")
+        if plan.trajectory is None or plan.selected_tool_id is None:
+            raise ValueError("HKM_TRAJECTORY_AND_TOOL_REQUIRED")
+        source = next(obj for obj in observation.objects if obj.product_id == plan.product_id)
+        barriers = observed_obstacles(self.settings, observation, plan.product_id)
+        selected = tool_spec(plan.selected_tool_id)
+        validate_trajectory(
+            plan.trajectory,
+            specification,
+            selected,
+            obstacles=barriers,
+            source_pose=source.pose,
+            target_pose=plan.target_pose,
+            tool_state=machine.tool_state,
+        )
+        # Rebuilding the bounded deterministic profile also verifies preparation
+        # dock poses, phases, timing and the original observed machine start pose.
+        expected = plan_trajectory(
+            specification,
+            selected,
+            source.pose,
+            plan.target_pose,
+            initial_tcp=machine.tcp_pose,
+            tool_state=machine.tool_state,
+            obstacles=barriers,
+        )
+        if plan.trajectory != expected or plan.grasp_pose != expected.grasp_pose:
+            raise ValueError("TRAJECTORY_INTENT_MISMATCH")

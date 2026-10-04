@@ -3,6 +3,7 @@
 import json
 import re
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tools.drift_check import criterion_ids
@@ -27,6 +28,7 @@ def completion_status(manifest: dict | None) -> str:
 def update(phase: str, summary: str, completion_manifest: Path | None = None) -> None:
     manifest = json.loads(completion_manifest.read_text()) if completion_manifest else None
     state = completion_status(manifest)
+    status_date = datetime.now(UTC).date().isoformat()
     status = {"phase": phase, "status": state, "summary": summary}
     Path("publication/status.json").write_text(
         json.dumps(status, indent=2) + "\n", encoding="utf-8"
@@ -35,7 +37,7 @@ def update(phase: str, summary: str, completion_manifest: Path | None = None) ->
         text = path.read_text(encoding="utf-8")
         replacement = (
             "<!-- implementation-status:start -->\n"
-            "> **Implementation status, 2026-10-02:** " + summary + f" Status: {state}.\n"
+            f"> **Implementation status, {status_date}:** " + summary + f" Status: {state}.\n"
             "> Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.\n"
             "> The research below records design rationale, not real-world robot validation.\n"
             "<!-- implementation-status:end -->"

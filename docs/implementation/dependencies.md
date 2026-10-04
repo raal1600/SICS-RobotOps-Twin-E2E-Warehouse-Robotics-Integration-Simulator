@@ -29,6 +29,14 @@ GHSA-jf6q-chmf-3h3v; the locked environment is audited again rather than suppres
 these findings. The advisory check uses the network during installation preflight,
 separately from deterministic runtime tests.
 
+The HKM-inspired revision adds procedural geometry and a local JSON catalogue,
+without adding a runtime dependency or model service. Its Brain and execution
+guards raise explicit exceptions rather than relying on Python `assert`, which
+can disappear under optimized execution. The existing demo restart subprocess
+scope was reviewed again on 2026-10-04 after adding the six-tool showcase; its
+fixed argument list and no-shell execution are unchanged. The review updates
+only that exact AST fingerprint, with no new rule-level or dependency exceptions.
+
 Blender 5.2.1 LTS is the selected real-runtime acceptance executable. Mandatory
 headless logic tests always run. The Blender acceptance lane must fail explicitly
 when the executable is missing, never skip or silently fall back to a fake runtime.

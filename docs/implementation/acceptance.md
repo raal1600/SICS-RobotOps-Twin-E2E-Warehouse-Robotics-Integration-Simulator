@@ -2,7 +2,7 @@
 
 `uv run --locked python -m tools.dev acceptance` runs setup, the full mandatory
 suite twice with separate temporary fixture roots, coverage (minimum 85%), lint,
-strict types, security, seven deterministic Blender scenarios, documentation drift
+strict types, security, eight deterministic Blender scenarios, documentation drift
 checks and publication. Blender and PDF system libraries are required. Installation
 and vulnerability auditing may use the network; runtime tests and demos do not.
 
@@ -17,6 +17,10 @@ evidence, not a replacement for runtime tests.
 Each demo starts with a new data directory. Lost acknowledgement checks one effect
 and zero duplicates; ambiguous reconciliation checks intervention; restart creates
 a separate process. A separate test kills an orchestrator after runtime commit.
+The eighth scenario, `tool_showcase`, executes all six preferred tools with six
+verified jobs and exactly one transfer per original command. The HKM criterion
+mapping adds the new geometry, tool, observation-boundary and compatibility tests
+without deleting or weakening any original criterion.
 
 Remote gates query public GitHub Actions and Pages and require the tested commit.
 Unavailable, stale or failed remote evidence is FAIL, never presumed green. The

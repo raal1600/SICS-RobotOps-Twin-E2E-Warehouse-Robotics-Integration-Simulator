@@ -1,3 +1,5 @@
+from html.parser import HTMLParser
+
 from fastapi.testclient import TestClient
 
 from apps.api.app import create_app
@@ -49,8 +51,21 @@ def test_metrics_timeline_and_dashboard_survive_restart(tmp_path, order_request)
     assert page.status_code == 200
     assert all(
         label in page.text
-        for label in ["Causal timeline", "Reconcile selected job", "Latest Blender artifact"]
+        for label in ["Causal timeline", "Reconcile selected job", "Saved Blender snapshot"]
     )
+
+    class SnapshotDisclosure(HTMLParser):
+        panel = None
+
+        def handle_starttag(self, tag, attrs):
+            if dict(attrs).get("id") == "visual-panel":
+                self.panel = tag, dict(attrs)
+
+    disclosure = SnapshotDisclosure()
+    disclosure.feed(page.text)
+    assert disclosure.panel is not None
+    tag, attributes = disclosure.panel
+    assert tag == "details" and "open" not in attributes
     assert restarted.get("/ui/app.js").status_code == 200
     assert restarted.get("/fixtures").json()["runtime"] == "headless"
     assert restarted.get("/artifacts/latest.png").status_code == 404

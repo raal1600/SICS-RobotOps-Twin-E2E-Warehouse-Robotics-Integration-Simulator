@@ -4,6 +4,23 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
+### HKM-inspired revision in progress (2026-10-04)
+
+The new adaptation is a separate acceptance revision. Current public status is
+NOT DONE; the verified 59ace31 deterministic-system release remains historical
+evidence. Exact prior and fresh eaf35b4 baseline reports are archived with hashes
+in [baseline provenance](docs/evidence/hkm-baseline-eaf35b4/provenance.json).
+The fresh baseline retains its repeated obsolete UI-label failure; no historical
+report was rewritten to make the enhancement appear accepted.
+
+Generate final geometry/frame/tool/state diagrams and product/tool compatibility
+documentation from synchronized source/catalogue definitions. Report status
+dates use current UTC. Preserve manufacturer/deployment claims separately from
+our synthetic catalogue, visual kinematics, timing and collision rules. Rebuild
+Pages/PDFs through the normal workflow after the coherent milestone, then verify
+the actual deployed source SHA and public artifacts. A local build does not
+establish remote publication or completed HKM requirements.
+
 Redigera rapporterna i `reports/`. Referenser ligger i `publication/references.json`. Diagrammens texter, noder och positioner ligger i `publication/diagrams.json`. `tools/build_publication.py` genererar både SVG och redigerbar Mermaid från samma diagramdefinitioner. Mermaid beskriver den logiska strukturen; JSON styr layouten för publicerade SVG-bilder.
 
 Källmarkörer som `[S03]` länkas automatiskt till en fullständig källförteckning i respektive rapport. Nya sakuppgifter ska ha en identifierbar källa och ett tydligt bevisvärde. Uppdatera datum/version vid en materiell revision. Skriv inte om planerade tester till genomförda resultat utan körningsdata.
@@ -40,12 +57,22 @@ uv run --locked python -m tools.dev docs
 
 CI använder Ubuntu-paketen ovan. PDF-sidantal kan skilja mellan plattformarnas
 typsnittsversioner; manifestet redovisar det verkliga sidantalet och filhasharna.
-Källornas kontrolltid är 1 oktober 2026; implementationsrevisionen är 1.1 från
-2 oktober 2026. De datumen avser olika saker.
+Basgranskningen av källor gjordes 1 oktober 2026; HKM-kompletteringen granskades
+4 oktober. Varje registerpost behåller sitt eget kontrolldatum och sin
+proveniensklass. Publikationsrevisionen är 1.2 från 4 oktober 2026; pågående
+implementation och aktuell acceptans visas separat i den gemensamma statusrutan.
 
 ## Utdata
 
-Bygget skapar sju HTML-sidor, inklusive aktuell governance/status, sju SVG-diagram, motsvarande Mermaid-definitioner, tre separata PDF-rapporter, ett samlat PDF-paket, Markdown-källor, BibTeX och JSON-register. `build.json` innehåller källcommit, sidantal och PDF-hashar.
+Bygget skapar sju HTML-sidor, inklusive aktuell governance/status, SVG-diagram med motsvarande Mermaid-definitioner, tre separata PDF-rapporter, ett samlat PDF-paket, Markdown-källor, BibTeX och JSON-register. Antal diagram och källor hämtas ur aktuella register. `build.json` innehåller källcommit, sidantal, källornas kontrolldatum och PDF-hashar.
+
+Produkt-/verktygstabellen och dess Mermaid-källa genereras från
+`robotops/robotics/catalogue-v1.json` via `python -m tools.generate_robotics_docs`.
+`make docs` kör samma generator före publiceringsbygget; `--check` upptäcker
+drift utan att skriva filer. Diagrammet `product-tool-compatibility` använder
+samma katalog vid SVG-rendering. Redigera katalogen och generera om, inte
+`docs/generated/product-tool-catalogue.md` eller den genererade Mermaid-filen
+för hand. Katalogens existens är inte evidens för godkänd körning.
 
 Automatiska kontroller fångar okända käll-ID:n, kvarvarande figurplatshållare, ogiltig SVG-XML, bristande PDF-textutvinning samt trasiga interna länkar/ankare. Dessa kontroller ersätter inte visuell PDF- och webbläsargranskning.
 

@@ -6,7 +6,7 @@ Transactions never include runtime calls. A committed command intent precedes di
 import hashlib
 import json
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -217,7 +217,13 @@ class Store:
             self._record(db, event.event_id, event)
             self._event(db, audit)
 
-    def intake(self, request: OrderRequest, key: str) -> Order:
+    def intake(
+        self,
+        request: OrderRequest,
+        key: str,
+        *,
+        validate: Callable[[OrderRequest], None] | None = None,
+    ) -> Order:
         if not key or len(key) > 160:
             raise ValueError("INVALID_IDEMPOTENCY_KEY")
         hashed = digest(request)
@@ -241,6 +247,10 @@ class Store:
                 return self._order(db, request.order_id)
             if db.execute("SELECT 1 FROM meta WHERE key='scene_reset'").fetchone():
                 raise Conflict("SCENE_RESET_IN_PROGRESS")
+            # Replays/conflicts retain their original semantics. Validate only
+            # new intake, atomically before creating business or effect intent.
+            if validate is not None:
+                validate(request)
             now = utc_now()
             event_id = new_id()
             common = dict(

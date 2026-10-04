@@ -10,7 +10,7 @@ function setup() {
       dataset:{},setAttribute(){},getAttribute(){return '';},classList:{toggle(){}}, getContext(){return {};}});
     return elements.get(id);
   }};
-  const context=vm.createContext({document,SceneView:class {constructor(canvas){this.canvas=canvas;}render(){}reset(){}rotate(){}zoom(){}},requestAnimationFrame(){},fetch(){throw Error('Playback must not dispatch');}});
+  const context=vm.createContext({document,SceneView:class {constructor(canvas){this.canvas=canvas;this.views=[];}render(){}reset(){}rotate(){}zoom(){}configure(){}viewpoint(name){this.views.push(name);}},requestAnimationFrame(){},fetch(){throw Error('Playback must not dispatch');}});
   vm.runInContext(fs.readFileSync('apps/erp_ui/playback.js','utf8')+'\nglobalThis.player=new MotionPlayer();',context);
   return {player:context.player, el:id=>document.getElementById(id)};
 }
@@ -124,4 +124,86 @@ test('paused delivery cursor stays on its product when earlier reconciliation ev
   jobs[0].events.push({event_type:'JOB_TRANSITION',state_after:'COMPLETED',reason:'LATE_AUDIT'});
   p.updateDelivery(data);assert.equal(p.playing,false);assert.equal(p.pose().data.product_id,'blue');
   assert.equal(p.pose().positions.blue[0],before);
+});
+
+
+test('version 2 replay interpolates actual rotations, positions and scale without changing evidence',()=>{
+  const {player:p,el}=setup();
+  const q=[0,0,Math.SQRT1_2,Math.SQRT1_2];
+  const object={schema_version:'2.0',name:'Robot/link',position:[0,0,0],quaternion_xyzw:[0,0,0,1],scale:[1,1,1],visible:true};
+  const data=clip(2,true);data.recording.schema_version='2.0';data.recording.total_frames=2;data.recording.objects=[object];
+  data.recording.frames=[
+    {schema_version:'2.0',frame:1,phase:'LIFT',positions:{},sim_time_s:0,active_tool_id:'EE_VAC_ARRAY',rack_tool_ids:[],transforms:{'Robot/link':{position:[0,0,0],quaternion_xyzw:[0,0,0,1],scale:[1,1,1],visible:true}}},
+    {schema_version:'2.0',frame:2,phase:'SAFE_TRANSFER',positions:{},sim_time_s:1,active_tool_id:'EE_VAC_ARRAY',rack_tool_ids:[],transforms:{'Robot/link':{position:[2,0,1],quaternion_xyzw:q,scale:[1,1,2],visible:false}}},
+  ];
+  const before=JSON.stringify(data);p.select('j1');p.update(data);p.cursor=.5;
+  const transform=p.pose().transforms['Robot/link'];
+  assert.deepEqual(Array.from(transform.position),[1,0,.5]);assert.deepEqual(Array.from(transform.scale),[1,1,1.5]);
+  assert.ok(Math.abs(transform.quaternion_xyzw[2]-Math.sin(Math.PI/8))<1e-8);
+  assert.ok(Math.abs(Math.hypot(...transform.quaternion_xyzw)-1)<1e-8);assert.equal(transform.visible,true);
+  p.cursor=1;assert.equal(p.pose().transforms['Robot/link'].visible,false);p.draw();
+  assert.match(el('motion-tool').textContent,/EE_VAC_ARRAY/);assert.equal(JSON.stringify(data),before);
+});
+
+test('camera selection, frame stepping and 4x speed change only presentation',()=>{
+  const {player:p,el}=setup();p.select('j1');const data=clip(5,true);p.update(data);
+  const before=JSON.stringify(data);
+  for(const [id,name] of [['camera-operator','OperatorOverview'],['camera-overhead','OverheadObservation'],['camera-side','SideInspection'],['camera-follow','FollowTCP']]){
+    el(id).onclick();assert.equal(p.view.views.at(-1),name);
+  }
+  p.cursor=2.7;el('motion-step-back').onclick();assert.equal(p.cursor,1);assert.equal(p.playing,false);
+  el('motion-step-forward').onclick();assert.equal(p.cursor,2);assert.equal(p.manualPause,true);
+  el('motion-speed').onchange({target:{value:'4'}});assert.equal(p.speed,4);
+  assert.equal(JSON.stringify(data),before);assert.equal(data.job_state,'UNKNOWN_OUTCOME');
+});
+
+function realSceneTypes(){
+  const context=vm.createContext({fetch(){throw Error('Presentation must not send commands or capture evidence');}});
+  vm.runInContext(fs.readFileSync('apps/erp_ui/scene-view.js','utf8')+'\nglobalThis.types={SceneView,SoftwareSceneView};',context);
+  return context.types;
+}
+
+function softwareCanvas(){
+  const points=[];
+  const drawing={fillRect(){},beginPath(){},moveTo(...point){points.push(point);},lineTo(){},stroke(){},closePath(){},fill(){},fillText(){},measureText(){return {width:0};}};
+  return {points,canvas:{width:1000,height:600,getContext(){return drawing;},addEventListener(){}}};
+}
+
+test('actual camera presets widen presentation projection and reset without changing sensor metadata',()=>{
+  const {SceneView,SoftwareSceneView}=realSceneTypes(),{canvas}=softwareCanvas();
+  const cameras=[
+    {name:'Camera/OperatorOverview',position:[3.7,-4.7,3.4],target:[0,0,.55],sensor_id:'operator-overview',calibration_version:'hkm-cal-1'},
+    {name:'Camera/OverheadObservation',position:[0,0,2.6],target:[0,0,.18],sensor_id:'overhead-observation',calibration_version:'hkm-cal-1'},
+    {name:'Camera/SideInspection',position:[-1.85,-.65,1.25],target:[0,0,.18],sensor_id:'side-inspection',calibration_version:'hkm-cal-1'},
+  ];
+  const before=JSON.stringify(cameras);
+  let updates=0;
+  const view=Object.create(SceneView.prototype);
+  view.fallback=new SoftwareSceneView(canvas);
+  view.camera={position:{set(){}},fov:42,updateProjectionMatrix(){updates++;}};
+  view.controls={target:{set(){}},update(){}};
+  view.configure(cameras);
+  for(const [preset,fov] of [['OverheadObservation',84],['SideInspection',84],['OperatorOverview',42],['SideInspection',84],['FollowTCP',42]]){
+    const prior=updates;view.viewpoint(preset);
+    assert.equal(view.camera.fov,fov);assert.equal(view.fallback.fov,fov);
+    assert.equal(updates,prior+1);assert.equal(view.following,preset==='FollowTCP');
+  }
+  view.viewpoint('OverheadObservation');view.reset();
+  assert.equal(view.camera.fov,42);assert.equal(view.fallback.fov,42);assert.equal(view.following,false);
+  assert.equal(JSON.stringify(cameras),before);
+});
+
+test('software projection uses vertical field of view and redraws when only framing changes',()=>{
+  const {SoftwareSceneView}=realSceneTypes(),{canvas,points}=softwareCanvas();
+  const view=new SoftwareSceneView(canvas),camera={position:[0,0,2.6],target:[0,0,.18]};
+  view.viewpoint(camera,42);view.render([],{},null);
+  const narrow=points[0],drawn=points.length;
+  view.viewpoint(camera,84);view.render([],{},null);
+  assert.ok(points.length>drawn,'a framing-only change invalidates the render cache');
+  const wide=points[drawn],focalLength=canvas.height/(2*Math.tan(84*Math.PI/360));
+  assert.ok(Math.abs(wide[0]-(canvas.width/2-2*focalLength/2.71))<1e-9);
+  assert.ok(Math.abs(wide[1]-(canvas.height/2-2*focalLength/2.71))<1e-9);
+  assert.ok(narrow[1]<0,'the old narrow overhead frame crops the cell floor');
+  assert.ok(wide[1]>0&&wide[1]<canvas.height,'the wider frame includes the floor');
+  assert.deepEqual(camera,{position:[0,0,2.6],target:[0,0,.18]});
 });

@@ -54,7 +54,8 @@ function Assert-Exited($App) {
 }
 function Begin-BlenderPick($App,[string]$Product) {
     Add-Type -AssemblyName System.Net.Http
-    $body=@{order_id=$Product;lines=@(@{order_line_id='line';product_id=$Product;source_id='source';destination_id='destination'})} | ConvertTo-Json -Depth 5
+    $fixture=Invoke-RestMethod -Uri ($App.origin+'/fixtures')
+    $body=@{order_id=$Product;lines=@(@{order_line_id='line';product_id=$Product;source_id=$fixture.product_sources.$Product;destination_id=$fixture.destination_id})} | ConvertTo-Json -Depth 5
     $order=Invoke-RestMethod -Uri ($App.origin+'/orders') -Method Post -Headers @{'Idempotency-Key'=$Product} -ContentType application/json -Body $body
     $http=New-Object Net.Http.HttpClient
     $content=New-Object Net.Http.StringContent('{}',[Text.Encoding]::UTF8,'application/json')
@@ -75,7 +76,10 @@ try {
     if (-not $duplicate.WaitForExit(5000) -or $duplicate.ExitCode -ne 0) { throw 'Duplicate launch did not activate existing instance' }
     if (@(Get-ChildItem -LiteralPath (Join-Path $root 'sessions') -Directory).Count -ne $count) { throw 'Duplicate launch created another backend' }
     $record.checks+='duplicate launch reuses window without new backend'
-    $payload=@{order_id='desktop-smoke';lines=@(@{order_line_id='line';product_id='product-red';source_id='source';destination_id='destination'})} | ConvertTo-Json -Depth 5
+    $fixture=Invoke-RestMethod -Uri ($first.origin+'/fixtures')
+    if ($fixture.robot_profile_version -ne 'hkm_inspired_v1' -or $fixture.products.Count -ne 6) { throw 'Fresh desktop did not initialize the six-SKU HKM-inspired cell' }
+    $product=$fixture.products[0].product_id
+    $payload=@{order_id='desktop-smoke';lines=@(@{order_line_id='line';product_id=$product;source_id=$fixture.product_sources.$product;destination_id=$fixture.destination_id})} | ConvertTo-Json -Depth 5
     $order=Invoke-RestMethod -Uri ($first.origin+'/orders') -Method Post -Headers @{'Idempotency-Key'='desktop-smoke'} -ContentType application/json -Body $payload
     $job=Invoke-RestMethod -Uri ($first.origin+'/jobs/'+$order.job_ids[0]+'/run') -Method Post -ContentType application/json -Body '{"fault":"DROP_ACK_AFTER_EFFECT"}' -TimeoutSec 90
     if ($job.state -ne 'UNKNOWN_OUTCOME') { throw 'Lost acknowledgement did not remain uncertain' }
@@ -96,7 +100,7 @@ try {
     $third=Start-OwnedApp
     $thirdJob=Invoke-RestMethod -Uri ($third.origin+'/jobs/'+$order.job_ids[0])
     if ($thirdJob.state -ne 'COMPLETED') { throw 'Persisted result lost after forced close' }
-    if ($Runtime -eq 'blender') { $inflight=Begin-BlenderPick $third 'product-blue' }
+    if ($Runtime -eq 'blender') { $inflight=Begin-BlenderPick $third $fixture.products[1].product_id }
     if (-not [RobotOpsOwnedWindow]::Close($third.process.Id)) { throw 'Final window close failed' }
     Assert-Exited $third
     $record.checks+='reopen after forced close preserves completed work'
@@ -107,7 +111,7 @@ try {
         $inflight.client.Dispose()
         $record.checks+='normal window close during a real Blender pick drains it to completion'
         $fourth=Start-OwnedApp
-        $interrupted=Begin-BlenderPick $fourth 'product-green'
+        $interrupted=Begin-BlenderPick $fourth $fixture.products[2].product_id
         $fourth.process.Kill()
         Assert-Exited $fourth
         if (-not $interrupted.blender.WaitForExit(5000)) { throw 'Owned Blender escaped the crashed desktop job' }

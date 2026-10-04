@@ -1,0 +1,710 @@
+{
+  "scope": "Independent read-only audit of browser Test 2: lost acknowledgement, contradictory reconciliation, fresh resolution",
+  "acceptance_attestation": false,
+  "result": "PASS",
+  "classification": "SIMULATOR_DESIGN / LOCAL_EXECUTION_EVIDENCE",
+  "audited_at_utc": "2026-10-04T11:37:47.352306+00:00",
+  "source": {
+    "commit": "eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98",
+    "dirty": true,
+    "source_sha256": "84bc06002d6894fd1fe41223cb21febe4e5f7f324ac647edb67889280b1ec7fe"
+  },
+  "source_at_audit_start": {
+    "commit": "eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98",
+    "dirty": true,
+    "source_sha256": "84bc06002d6894fd1fe41223cb21febe4e5f7f324ac647edb67889280b1ec7fe"
+  },
+  "source_unchanged_during_audit": true,
+  "source_note": "Source identity is measured at audit time; it does not retroactively attest the precise browser execution source. Full acceptance and CI are separate gates.",
+  "test_identity": {
+    "number": 2,
+    "test_id": "61178db1-0fbf-4424-9ecd-1a0430626018"
+  },
+  "data_directory": "runs/hkm-browser-review-3/simulation-tests/61178db1-0fbf-4424-9ecd-1a0430626018",
+  "database_snapshots": [
+    {
+      "path": "runs/hkm-browser-review-3/simulation-tests/61178db1-0fbf-4424-9ecd-1a0430626018/workflow.db",
+      "uri_mode": "ro",
+      "query_only": true,
+      "total_changes": 0,
+      "logical_snapshot_sha256": "f8bda37cc707cd80cc6b14c8dc71f42618beccbd03f67dd65240e9388f02b3e6",
+      "tables": {
+        "orders": 1,
+        "jobs": 1,
+        "records": 31,
+        "events": 48,
+        "meta": 1,
+        "idempotency": 1
+      }
+    },
+    {
+      "path": "runs/hkm-browser-review-3/simulation-tests/61178db1-0fbf-4424-9ecd-1a0430626018/runtime.db",
+      "uri_mode": "ro",
+      "query_only": true,
+      "total_changes": 0,
+      "logical_snapshot_sha256": "563890c41b759a3d0a18c9cfd61e8fd065860f0ee7e3701ffeedb871ecccc0c8",
+      "tables": {
+        "runtime_world": 1,
+        "controller_journal": 1,
+        "robot_events": 21,
+        "meta": 4
+      }
+    }
+  ],
+  "audit_method": "SQLite URI mode=ro, PRAGMA query_only=ON, read transactions; no Store, Engine or Runtime instantiated. Logical hashes cover serialized ordered rows. Assertions independently verify identities, state chain, journal, controller events, typed observation evidence and freshness.",
+  "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+  "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+  "original_command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+  "product_id": "product-SKU-A-01",
+  "selected_tool_id": "EE_VAC_SINGLE",
+  "counts": {
+    "orders": 1,
+    "jobs": 1,
+    "robot_commands": 1,
+    "controller_journal_rows": 1,
+    "gateway_dispatches": 1,
+    "controller_pick_effects": 1,
+    "replacement_commands": 0,
+    "reconciliations": 2,
+    "journal_queries": 2,
+    "observations": 3
+  },
+  "state_chain": [
+    "RECEIVED",
+    "VALIDATED",
+    "PLANNING",
+    "READY_TO_EXECUTE",
+    "EXECUTING",
+    "UNKNOWN_OUTCOME",
+    "RECONCILING",
+    "REQUIRES_INTERVENTION",
+    "RECONCILING",
+    "COMPLETED"
+  ],
+  "state_transition_evidence": [
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "a3301718-d323-4989-b05b-8418c6ef0697",
+      "timestamp": "2026-10-04T11:30:40.977154Z",
+      "event_id": "8e0649b6-824f-4c77-b4d7-d79c51453cc3",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": null,
+      "state_before": "RECEIVED",
+      "state_after": "VALIDATED",
+      "reason": "ORDER_SCHEMA_VALID",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "8e0649b6-824f-4c77-b4d7-d79c51453cc3",
+      "timestamp": "2026-10-04T11:30:40.991457Z",
+      "event_id": "7900d3de-fb7a-405e-aab1-82ed360123a4",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": null,
+      "state_before": "VALIDATED",
+      "state_after": "PLANNING",
+      "reason": "BRAIN_REQUESTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "63747a1f-1579-4c32-981e-b9c825492291",
+      "timestamp": "2026-10-04T11:30:41.385619Z",
+      "event_id": "6da6ffb3-a715-47af-8d7f-bce829e81a26",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "state_before": "PLANNING",
+      "state_after": "READY_TO_EXECUTE",
+      "reason": "PLAN_PERSISTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "6da6ffb3-a715-47af-8d7f-bce829e81a26",
+      "timestamp": "2026-10-04T11:30:41.404759Z",
+      "event_id": "bac68d12-a4f4-45c5-8017-d5b7bf4b4fa0",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "EXECUTING",
+      "reason": "DISPATCH_INTENT",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "92a19d64-c5ca-47a9-912c-7d0dc6bfa217",
+      "timestamp": "2026-10-04T11:30:57.674523Z",
+      "event_id": "32288dc7-0c00-468e-96e6-0a81fc7da384",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "state_before": "EXECUTING",
+      "state_after": "UNKNOWN_OUTCOME",
+      "reason": "COMMUNICATION_UNCERTAIN",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "92c9f147-5d7f-4f1a-aab2-47726db36eb1",
+      "timestamp": "2026-10-04T11:31:02.797078Z",
+      "event_id": "653b3762-ba39-43dd-8866-7cb35f270a91",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "state_before": "UNKNOWN_OUTCOME",
+      "state_after": "RECONCILING",
+      "reason": "EVIDENCE_COLLECTED",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "7779ed8a-ee59-49ad-8cfa-fb67aba1cc66"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "653b3762-ba39-43dd-8866-7cb35f270a91",
+      "timestamp": "2026-10-04T11:31:02.811058Z",
+      "event_id": "d8c480fa-99be-40c8-a472-035f318fbd24",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "state_before": "RECONCILING",
+      "state_after": "REQUIRES_INTERVENTION",
+      "reason": "CONTRADICTORY_OBSERVATION",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "7779ed8a-ee59-49ad-8cfa-fb67aba1cc66"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "3b4af0b4-eefb-4718-bf57-a13371196bd3",
+      "timestamp": "2026-10-04T11:31:07.716551Z",
+      "event_id": "c4961362-e634-4fa7-a1db-74c01c797478",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "state_before": "REQUIRES_INTERVENTION",
+      "state_after": "RECONCILING",
+      "reason": "OPERATOR_REOBSERVATION",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "ca306c5a-bdcd-46aa-b547-f137956feafb"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "c4961362-e634-4fa7-a1db-74c01c797478",
+      "timestamp": "2026-10-04T11:31:07.732567Z",
+      "event_id": "790c15c0-38ef-4a9b-b11e-b914fd1357f1",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "state_before": "RECONCILING",
+      "state_after": "COMPLETED",
+      "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "ca306c5a-bdcd-46aa-b547-f137956feafb"
+      ]
+    }
+  ],
+  "fault_injections": [
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "0b6ad8d0-28d0-4af7-b1c1-d6ea40f58919",
+      "timestamp": "2026-10-04T11:30:40.947381Z",
+      "injection_id": "cdadb10b-44d0-4ccf-a117-ec6199d587d8",
+      "fault": "DROP_ACK_AFTER_EFFECT",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "enabled": true
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+      "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+      "causation_id": "32288dc7-0c00-468e-96e6-0a81fc7da384",
+      "timestamp": "2026-10-04T11:31:02.630300Z",
+      "injection_id": "bd9d3a61-fcbf-43a7-8525-658ec01530ee",
+      "fault": "CONTRADICTORY_OBSERVATION",
+      "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+      "enabled": true
+    }
+  ],
+  "controller_receipt": {
+    "schema_version": "2.0",
+    "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+    "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+    "causation_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+    "timestamp": "2026-10-04T11:30:57.327156Z",
+    "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+    "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+    "scene_epoch": "80e76ac7-7bea-458a-8860-52cf02dad3a7",
+    "status": "SUCCEEDED",
+    "reason": "BLENDER_PICK_APPLIED",
+    "effect_count": 1,
+    "payload_hash": "017a698a860ed7c924c07a2b8f25fe387fefd7b83a4be9642c1774911a9ea1be",
+    "journal_durable": true,
+    "active_tool_id": "EE_VAC_SINGLE",
+    "tool_change_performed": false,
+    "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+    "runtime_profile_version": "hkm_inspired_v1"
+  },
+  "controller_effect_event": {
+    "schema_version": "1.0",
+    "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+    "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+    "causation_id": "64d7afb7-509c-4588-9b47-d1328feefa38",
+    "timestamp": "2026-10-04T11:30:57.327710Z",
+    "event_id": "b0ebfbec-d519-4c11-9354-cb838ba84445",
+    "component": "runtime",
+    "event_type": "PICK_EFFECT",
+    "order_id": "order-1bd88194-6ad9-4237-bdb5-0514a75a714c",
+    "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+    "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+    "state_before": null,
+    "state_after": null,
+    "reason": "BLENDER_ATTACH_TRANSFER_DETACH",
+    "duration_ms": 0.0,
+    "evidence_ids": [],
+    "scene_epoch": "80e76ac7-7bea-458a-8860-52cf02dad3a7",
+    "step": 1
+  },
+  "reconciliations": [
+    {
+      "evidence_id": "7779ed8a-ee59-49ad-8cfa-fb67aba1cc66",
+      "timestamp": "2026-10-04T11:31:02.796726Z",
+      "original_command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "receipt": {
+        "schema_version": "2.0",
+        "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+        "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+        "causation_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+        "timestamp": "2026-10-04T11:30:57.327156Z",
+        "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+        "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+        "scene_epoch": "80e76ac7-7bea-458a-8860-52cf02dad3a7",
+        "status": "SUCCEEDED",
+        "reason": "BLENDER_PICK_APPLIED",
+        "effect_count": 1,
+        "payload_hash": "017a698a860ed7c924c07a2b8f25fe387fefd7b83a4be9642c1774911a9ea1be",
+        "journal_durable": true,
+        "active_tool_id": "EE_VAC_SINGLE",
+        "tool_change_performed": false,
+        "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+        "runtime_profile_version": "hkm_inspired_v1"
+      },
+      "observation": {
+        "observation_id": "6d3414e9-8b86-40d2-aa07-02ec0b697ac4",
+        "schema_version": "2.0",
+        "captured_at": "2026-10-04T11:31:02.762475Z",
+        "model_version": "synthetic-observer-2",
+        "calibration_version": "hkm-cal-1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "scene_epoch": "80e76ac7-7bea-458a-8860-52cf02dad3a7",
+        "step": 1,
+        "covered_locations": [
+          "SRC_A",
+          "SRC_B",
+          "SRC_C",
+          "SRC_D",
+          "SRC_E",
+          "SRC_F",
+          "DESTINATION"
+        ],
+        "sensors": [
+          {
+            "schema_version": "2.0",
+            "sensor_id": "overhead-observation",
+            "frame_id": "camera_overhead",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                0.0,
+                2.6
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          },
+          {
+            "schema_version": "2.0",
+            "sensor_id": "side-inspection",
+            "frame_id": "camera_side",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.85,
+                -0.65,
+                1.25
+              ],
+              "quaternion_xyzw": [
+                0.4164435022802413,
+                -0.295082221134753,
+                -0.4971755075060524,
+                0.7016536231751722
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          }
+        ],
+        "machine_telemetry": {
+          "schema_version": "2.0",
+          "source": "SIMULATED_CELL_TELEMETRY",
+          "tool_state": {
+            "schema_version": "2.0",
+            "active_tool_id": "EE_VAC_SINGLE",
+            "changer_state": "READY",
+            "rack_tool_ids": [
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ],
+            "tool_state_version": "synthetic-tool-state-1"
+          },
+          "tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              0.0,
+              -0.6,
+              1.02
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "captured_at": "2026-10-04T11:31:02.762475Z",
+          "cell_generation": 0
+        }
+      },
+      "selected_product_detections": [
+        {
+          "schema_version": "2.0",
+          "product_id": "product-SKU-A-01",
+          "location_id": "DESTINATION",
+          "pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.3799999952316284,
+              0.9399999976158142,
+              0.20249998569488525
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "confidence": 1.0,
+          "uncertainty_m": 0.0,
+          "sensor_id": "overhead-observation",
+          "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+        },
+        {
+          "schema_version": "2.0",
+          "product_id": "product-SKU-A-01",
+          "location_id": "SRC_A",
+          "pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.3799999952316284,
+              0.9399999976158142,
+              0.20249998569488525
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "confidence": 1.0,
+          "uncertainty_m": 0.0,
+          "sensor_id": "side-inspection",
+          "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+        }
+      ],
+      "observation_age_seconds_at_verification": 0.034111,
+      "verification": {
+        "schema_version": "1.0",
+        "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+        "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+        "causation_id": "6d3414e9-8b86-40d2-aa07-02ec0b697ac4",
+        "timestamp": "2026-10-04T11:31:02.796586Z",
+        "verification_id": "a49269ba-2707-4e40-a9f1-eb9317ee5332",
+        "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+        "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+        "observation_id": "6d3414e9-8b86-40d2-aa07-02ec0b697ac4",
+        "verdict": "INCONCLUSIVE",
+        "reason": "CONTRADICTORY_OBSERVATION"
+      }
+    },
+    {
+      "evidence_id": "ca306c5a-bdcd-46aa-b547-f137956feafb",
+      "timestamp": "2026-10-04T11:31:07.716364Z",
+      "original_command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+      "receipt": {
+        "schema_version": "2.0",
+        "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+        "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+        "causation_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+        "timestamp": "2026-10-04T11:30:57.327156Z",
+        "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+        "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+        "scene_epoch": "80e76ac7-7bea-458a-8860-52cf02dad3a7",
+        "status": "SUCCEEDED",
+        "reason": "BLENDER_PICK_APPLIED",
+        "effect_count": 1,
+        "payload_hash": "017a698a860ed7c924c07a2b8f25fe387fefd7b83a4be9642c1774911a9ea1be",
+        "journal_durable": true,
+        "active_tool_id": "EE_VAC_SINGLE",
+        "tool_change_performed": false,
+        "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+        "runtime_profile_version": "hkm_inspired_v1"
+      },
+      "observation": {
+        "observation_id": "c4eb42ff-7db3-42bf-aff5-4acc6f9486df",
+        "schema_version": "2.0",
+        "captured_at": "2026-10-04T11:31:07.685503Z",
+        "model_version": "synthetic-observer-2",
+        "calibration_version": "hkm-cal-1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "scene_epoch": "80e76ac7-7bea-458a-8860-52cf02dad3a7",
+        "step": 1,
+        "covered_locations": [
+          "SRC_A",
+          "SRC_B",
+          "SRC_C",
+          "SRC_D",
+          "SRC_E",
+          "SRC_F",
+          "DESTINATION"
+        ],
+        "sensors": [
+          {
+            "schema_version": "2.0",
+            "sensor_id": "overhead-observation",
+            "frame_id": "camera_overhead",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                0.0,
+                2.6
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          },
+          {
+            "schema_version": "2.0",
+            "sensor_id": "side-inspection",
+            "frame_id": "camera_side",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.85,
+                -0.65,
+                1.25
+              ],
+              "quaternion_xyzw": [
+                0.4164435022802413,
+                -0.295082221134753,
+                -0.4971755075060524,
+                0.7016536231751722
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          }
+        ],
+        "machine_telemetry": {
+          "schema_version": "2.0",
+          "source": "SIMULATED_CELL_TELEMETRY",
+          "tool_state": {
+            "schema_version": "2.0",
+            "active_tool_id": "EE_VAC_SINGLE",
+            "changer_state": "READY",
+            "rack_tool_ids": [
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ],
+            "tool_state_version": "synthetic-tool-state-1"
+          },
+          "tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              0.0,
+              -0.6,
+              1.02
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "captured_at": "2026-10-04T11:31:07.685503Z",
+          "cell_generation": 0
+        }
+      },
+      "selected_product_detections": [
+        {
+          "schema_version": "2.0",
+          "product_id": "product-SKU-A-01",
+          "location_id": "DESTINATION",
+          "pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.3799999952316284,
+              0.9399999976158142,
+              0.20249998569488525
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "confidence": 1.0,
+          "uncertainty_m": 0.0,
+          "sensor_id": "overhead-observation",
+          "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+        }
+      ],
+      "observation_age_seconds_at_verification": 0.029715,
+      "verification": {
+        "schema_version": "1.0",
+        "run_id": "7395f982-9689-44b4-bb23-a4babef71a37",
+        "correlation_id": "76e4353d-64b2-54bf-adbb-2a8747d3cece",
+        "causation_id": "c4eb42ff-7db3-42bf-aff5-4acc6f9486df",
+        "timestamp": "2026-10-04T11:31:07.715218Z",
+        "verification_id": "e3dab2e8-950e-4f84-b51c-320991bd5849",
+        "job_id": "ffaf79b7-203c-5d7f-9f7e-faa9cba66bc2",
+        "command_id": "f28af7d9-58bb-504c-a61e-8878cd74029b",
+        "observation_id": "c4eb42ff-7db3-42bf-aff5-4acc6f9486df",
+        "verdict": "VERIFIED_SUCCESS",
+        "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+      }
+    }
+  ],
+  "archived_test_1_unchanged": [
+    {
+      "path": "runs/hkm-browser-review-3/workflow.db",
+      "logical_snapshot_sha256": "3d1a34699194cef5057c6b41e494be573bd411269c14bb80ba0e49c92cdadbac",
+      "unchanged_since_showcase_audit": true
+    },
+    {
+      "path": "runs/hkm-browser-review-3/runtime.db",
+      "logical_snapshot_sha256": "57888a8be5f534054cbfc5019fc92eab66d1537f398b973935a72e0eb8cf396b",
+      "unchanged_since_showcase_audit": true
+    }
+  ],
+  "evidence_boundary": "Controller events establish simulator-side effect count. Reconciliation verdicts are cross-checked against the persisted WorldObservation, never substituted with WorldState. Screenshot appearance is not verification evidence. Runtime and workflow mirrored events are not double-counted.",
+  "limitations": [
+    "Scoped local browser scenario audit, not final mandatory acceptance or public CI attestation.",
+    "Does not establish real robot dynamics, physical sensing, safety certification or throughput."
+  ]
+}

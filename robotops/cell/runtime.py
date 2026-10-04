@@ -4,6 +4,7 @@ import json
 import sqlite3
 from pathlib import Path
 
+from robotops.cell.hkm_execution import final_machine, receipt_metadata, validate_execution
 from robotops.config import Settings
 from robotops.domain.models import (
     CellMode,
@@ -18,6 +19,8 @@ from robotops.domain.models import (
     new_id,
     utc_now,
 )
+from robotops.robotics.catalogue import fixture_source_pose, initial_tool_state, load_catalogue
+from robotops.robotics.models import RobotState
 from robotops.workflow.store import Conflict, Store, digest, metadata
 
 
@@ -41,7 +44,35 @@ class SyntheticRuntime:
             """)
         with self.db.transaction() as db:
             if not db.execute("SELECT 1 FROM runtime_world WHERE id=1").fetchone():
+                db.execute(
+                    "INSERT OR REPLACE INTO meta VALUES ('execution_settings',?)",
+                    (self.settings.model_dump_json(),),
+                )
                 self._reset(db)
+            else:
+                saved = db.execute(
+                    "SELECT value FROM meta WHERE key='execution_settings'"
+                ).fetchone()
+                if saved:
+                    self.settings = Settings.model_validate_json(saved[0])
+                    if settings is not None:
+                        self.settings = self.settings.model_copy(
+                            update={"visual_frame_seconds": settings.visual_frame_seconds}
+                        )
+                else:
+                    # Historical worlds keep their own fixture and wire format. Reading them
+                    # does not migrate their durable records or command hashes.
+                    world = self._world(db)
+                    if world.schema_version != "1.0":
+                        raise ValueError("VERSIONED_WORLD_MISSING_EXECUTION_SETTINGS")
+                    self.settings = (
+                        settings if settings is not None and not settings.is_hkm else Settings()
+                    ).model_copy(
+                        update={
+                            "products": tuple(obj.product for obj in world.objects),
+                            "locations": world.locations,
+                        }
+                    )
 
     def reset(self, scene_epoch: str | None = None) -> WorldState:
         with self.db.transaction() as db:
@@ -82,8 +113,24 @@ class SyntheticRuntime:
         )
         cell = CellState(**common)
         source = self.settings.locations[0]
+        extensions = {}
+        if self.settings.is_hkm:
+            catalogue = load_catalogue()
+            tools = initial_tool_state()
+            extensions = dict(
+                schema_version="2.0",
+                robot_profile_version=catalogue.profile_version,
+                product_catalog_version=catalogue.product_catalog_version,
+                tool_spec_version=catalogue.tool_catalog_version,
+                frame_tree_version=catalogue.frame_tree_version,
+                robot_state=RobotState(
+                    tcp_pose=catalogue.layout.home_tcp_pose, active_tool_id=tools.active_tool_id
+                ),
+                tool_state=tools,
+            )
         world = WorldState(
             **common,
+            **extensions,
             scene_epoch=epoch,
             step=0,
             cell=cell,
@@ -91,8 +138,10 @@ class SyntheticRuntime:
             objects=tuple(
                 WorldObject(
                     product=p,
-                    location_id=source.location_id,
-                    pose=source.pose.model_copy(
+                    location_id=self.settings.source_for(p.product_id),
+                    pose=fixture_source_pose(p.sku)
+                    if self.settings.is_hkm
+                    else source.pose.model_copy(
                         update={
                             "position": (
                                 source.pose.position[0],
@@ -218,18 +267,34 @@ class SyntheticRuntime:
             return "UNKNOWN_PRODUCT_OR_DESTINATION"
         elif objects[command.product_id].location_id != command.source_id:
             return "SOURCE_PRECONDITION_FAILED"
+        elif world.schema_version != command.schema_version:
+            return "RUNTIME_PROFILE_VERSION_MISMATCH"
+        elif world.schema_version == "2.0":
+            try:
+                validate_execution(world, command)
+            except (ValueError, StopIteration) as exc:
+                return str(exc) or "RUNTIME_PRECONDITION_FAILED"
         elif command.target_pose != locations[command.destination_id].pose:
             return "TARGET_POSE_MISMATCH"
-        elif fault == Fault.DROP_ACK_BEFORE_EFFECT:
+        if fault == Fault.DROP_ACK_BEFORE_EFFECT:
             return "PROVEN_NOT_STARTED"
         elif fault == Fault.ROBOT_COMMAND_FAILURE:
             return "SIMULATED_COMMAND_FAILURE"
         return None
 
+    def _motion_events(
+        self, db: sqlite3.Connection, command: RobotCommand, world: WorldState
+    ) -> None:
+        if command.trajectory is None:
+            return
+        for point in command.trajectory.waypoints:
+            self._event(db, command, world, point.phase, f"SIM_TIME_S={point.sim_time_s:.9f}")
+
     def _execute(
         self, db: sqlite3.Connection, command: RobotCommand, fault: Fault | None
     ) -> CommandReceipt:
         world = self._world(db)
+        original_world = world
         hashed = digest(command)
         existing = db.execute(
             "SELECT payload_hash,receipt FROM controller_journal WHERE id=?", (command.command_id,)
@@ -269,6 +334,7 @@ class SyntheticRuntime:
         else:
             self._event(db, command, world, "COMMAND_ACCEPTED", "PRECONDITIONS_PASSED")
             self._event(db, command, world, "COMMAND_RUNNING", "SIMULATED_PICK")
+            self._motion_events(db, command, world)
             moved = objects[command.product_id].model_copy(
                 update={
                     "location_id": command.destination_id,
@@ -286,11 +352,15 @@ class SyntheticRuntime:
                     ),
                 }
             )
+            if command.schema_version == "2.0":
+                robot, tools = final_machine(original_world, command)
+                world = world.model_copy(update={"robot_state": robot, "tool_state": tools})
             self._event(db, command, world, "PICK_EFFECT", "ATTACH_TRANSFER_DETACH")
             count = 1
         self._write_world(db, world)
         receipt = CommandReceipt(
             **metadata(command, command.command_id),
+            **receipt_metadata(original_world, command, effect=count == 1),
             command_id=command.command_id,
             job_id=command.job_id,
             scene_epoch=command.scene_epoch,

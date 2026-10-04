@@ -3,11 +3,13 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 
-async function dashboard(){
+async function dashboard({hkm=false}={}){
+  const catalogue=hkm?JSON.parse(fs.readFileSync('robotops/robotics/catalogue-v1.json','utf8')):null;
+  const sources=catalogue?Object.fromEntries(catalogue.products.map(p=>['product-'+p.sku+'-01',catalogue.layout.sources[p.sku].location_id])):{};
   const elements=new Map(),posts=[],worlds=new Map();
   let active='original',sequence=0;
   const makeWorld=id=>({id,number:worlds.size+1,orders:[],groups:[{delivery_id:id+'-scene-1',started_at:'2026-10-03T14:00:00Z',current:true,executions:[]}],epoch:1,cellMode:'READY',blocked:null,
-    inventory:['red','blue','green'].map(color=>({product_id:'product-'+color,location_id:'source'}))});
+    inventory:hkm?catalogue.products.map(p=>({product_id:'product-'+p.sku+'-01',location_id:sources['product-'+p.sku+'-01']})):['red','blue','green'].map(color=>({product_id:'product-'+color,location_id:'source'}))});
   worlds.set(active,makeWorld(active));
   const initial=worlds.get(active);
   const el=id=>{
@@ -35,7 +37,7 @@ async function dashboard(){
     if(body&&id!==active)return {ok:false,json:async()=>({reason:'TEST_ARCHIVED_READ_ONLY'})};
     const scene=()=>({scene_epoch:id+'-scene-'+world.epoch,source:'CURRENT_WORLD_REFERENCE',objects:[]});
     const fixture=()=>({runtime:'headless',scene_epoch:scene().scene_epoch,source_id:'source',destination_id:'destination',
-      products:inventory.map(item=>({product_id:item.product_id,sku:item.product_id})),inventory,scene_reset_blocked_reason:world.blocked});
+      products:inventory.map(item=>({product_id:item.product_id,sku:hkm?item.product_id.slice(8,-3):item.product_id})),catalogue,product_sources:sources,inventory,scene_reset_blocked_reason:world.blocked});
     if(path==='/orders'&&body){
       data={...body,job_ids:['job-'+orders.length],status:'RECEIVED'};orders.push(data);
     }else if(path==='/orders')data=orders;
@@ -46,7 +48,7 @@ async function dashboard(){
     else if(path==='/deliveries')data=groups;
     else if(path==='/fixtures/fresh-scene'){
       if(world.blocked){status=409;data={reason:world.blocked};}
-      else{groups.forEach(group=>{group.current=false;});world.epoch++;groups.push({delivery_id:scene().scene_epoch,started_at:'2026-10-03T14:00:00Z',current:true,executions:[]});inventory.forEach(item=>{item.location_id='source';});world.cellMode='READY';data=scene();}
+      else{groups.forEach(group=>{group.current=false;});world.epoch++;groups.push({delivery_id:scene().scene_epoch,started_at:'2026-10-03T14:00:00Z',current:true,executions:[]});inventory.forEach(item=>{item.location_id=sources[item.product_id]||'source';});world.cellMode='READY';data=scene();}
     }else if(path.startsWith('/deliveries/')&&path.endsWith('/playback')){
       const group=groups.find(item=>path.includes('/'+item.delivery_id+'/'));
       data={...group,scene:scene(),jobs:group.executions.map(item=>({job_id:item.job_id,job_state:item.state,status:'UNAVAILABLE'}))};
@@ -83,7 +85,7 @@ async function dashboard(){
   vm.runInContext(fs.readFileSync('apps/erp_ui/workflow-guide.js','utf8'),context);
   vm.runInContext(fs.readFileSync('apps/erp_ui/app.js','utf8'),context);
   await new Promise(setImmediate);
-  return {el,posts,...initial,player,worlds,current:()=>worlds.get(active),refresh:()=>vm.runInContext('refresh()',context),block:reason=>{worlds.get(active).blocked=reason;}};
+  return {el,posts,...initial,player,worlds,evidence:data=>{context.evidence=data;vm.runInContext('roboticsEvidence(evidence)',context);},current:()=>worlds.get(active),refresh:()=>vm.runInContext('refresh()',context),block:reason=>{worlds.get(active).blocked=reason;}};
 }
 
 test('three product clicks build one delivery; scenario selection is pure configuration and explicit restock preserves playback',async()=>{
@@ -357,4 +359,36 @@ test('execution and review help explain different stages without changing the un
   assert.match(el('observation-difference').textContent,/does not undo an execution fault or guarantee success/);
   assert.equal(orders[0].status,'UNKNOWN_OUTCOME');assert.equal(orders[0].job_ids[0],job);
   assert.equal(el('create').disabled,true);assert.equal(posts.length,count);
+});
+
+
+test('six source products use their own source IDs and remain available until individually picked',async()=>{
+  const ui=await dashboard({hkm:true});
+  for(const sku of ['A','B','C','D','E','F']){
+    assert.equal(ui.el('product').value,'product-SKU-'+sku+'-01');
+    assert.equal(ui.el('create').disabled,false);
+    await ui.el('create').onclick();
+  }
+  const orders=ui.posts.filter(item=>item.path==='/orders');
+  assert.deepEqual(orders.map(item=>item.body.lines[0].source_id),['SRC_A','SRC_B','SRC_C','SRC_D','SRC_E','SRC_F']);
+  assert.equal(ui.groups[0].executions.length,6);
+  assert.match(ui.el('create').textContent,/new delivery/);
+  assert.equal(ui.el('tool-showcase').hidden,false);
+});
+
+test('tool and uncertainty inspector reads persisted decision and observation without dispatching',async()=>{
+  const ui=await dashboard({hkm:true});const before=ui.posts.length;
+  const command={command_id:'original-command',product_id:'product-SKU-B-01',tool_selection:{selected_tool_id:'EE_VAC_ARRAY',assessed_mass_kg:1.2,tool_change_required:true,candidate_tools:[{tool_id:'EE_VAC_ARRAY',eligible:true,score:110,reasons:['PREFERRED_FOR_PRODUCT_FAMILY','MASS_WITHIN_SIMULATED_LIMIT']},{tool_id:'EE_VAC_SINGLE',eligible:false,score:null,reasons:['SIMULATED_MASS_LIMIT_EXCEEDED']}]}};
+  const evidence={job:{order_id:'original-order',job_id:'original-job',state:'UNKNOWN_OUTCOME',line:{product_id:command.product_id}},command,journal:{effect_count:1},observations:[{model_version:'synthetic-observer-2',calibration_version:'hkm-cal-1',machine_telemetry:{tool_state:{active_tool_id:'EE_VAC_ARRAY'}},objects:[{product_id:command.product_id,confidence:.35}]}],verifications:[{reason:'LOW_CONFIDENCE'}]};
+  ui.evidence(evidence);
+  assert.match(ui.el('tool-decision').textContent,/Multi-cup suction plate.*1.20 kg.*tool change/);
+  assert.equal(ui.el('status-command').textContent,'original-command');assert.match(ui.el('status-job').textContent,/UNKNOWN_OUTCOME.*original-job/);
+  assert.match(ui.el('status-observation').textContent,/35%.*LOW_CONFIDENCE.*synthetic-observer-2/);
+  assert.equal(ui.el('status-calibration').textContent,'hkm-cal-1');
+  assert.match(ui.el('knowledge-state').textContent,/uncertain.*do not retry.*one transfer recorded/);
+  assert.equal(ui.posts.length,before);
+  const rows=ui.el('tool-candidates').children;
+  assert.equal(rows.length,2);assert.equal(rows[1].children[1].textContent,'Rejected');
+  const html=fs.readFileSync('apps/erp_ui/index.html','utf8');
+  for(const text of ['Simulation boundaries','Not Cognibotics CAD','Not validated robot dynamics','Not SICS AI proprietary software','camera images are not analyzed'])assert.ok(html.includes(text));
 });

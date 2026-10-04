@@ -9,12 +9,13 @@ from urllib.parse import unquote, urlsplit
 from markdown_it import MarkdownIt
 
 ROOT = Path(__file__).resolve().parents[1]
+CRITERION_PATTERN = r"(?:SC-[A-Z]+-\d{3}|HKM-VIS-MUST-\d{3})"
 
 
 def criterion_ids(root: Path = ROOT, level: str = "MUST") -> set[str]:
     return set(
         re.findall(
-            rf"\*\*(SC-[A-Z]+-\d{{3}}) {level}\*\*",
+            rf"\*\*({CRITERION_PATTERN}) {re.escape(level)}\*\*",
             (root / "SUCCESS_CRITERIA.md").read_text(encoding="utf-8"),
         )
     )
@@ -39,7 +40,7 @@ def check(root: Path = ROOT) -> dict:
     for path in paths:
         text = path.read_text(encoding="utf-8")
         checked.append(path.relative_to(root).as_posix())
-        for ident in re.findall(r"\bSC-[A-Z]+-\d{3}\b", text):
+        for ident in re.findall(rf"\b{CRITERION_PATTERN}\b", text):
             if ident not in known_ids:
                 errors.append(f"Unknown criterion {ident}: {path.name}")
         for token in parser.parse(text):

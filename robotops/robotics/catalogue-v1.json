@@ -1,0 +1,870 @@
+{
+  "schema_version": "2.0",
+  "classification": "SIMULATOR_DESIGN",
+  "profile_version": "hkm_inspired_v1",
+  "robot_profile_version": "hkm_inspired_v1",
+  "product_catalog_version": "synthetic-products-1",
+  "tool_catalog_version": "synthetic-tools-1",
+  "frame_tree_version": "hkm-frame-tree-1",
+  "public_reference": {
+    "classification": "COMPANY_REPORTED_CLAIM",
+    "nominal_radial_reach_m": 1.8,
+    "approximate_z_stroke_m": 1
+  },
+  "workspace": {
+    "radial_limit_m": 1.55,
+    "min_z_m": 0.16,
+    "max_z_m": 1.15,
+    "safe_transfer_z_m": 1.02,
+    "frame_id": "cell_world",
+    "calibration_version": "hkm-cal-1"
+  },
+  "visual_motion": {
+    "classification": "SIMULATOR_PRESENTATION_TIMING",
+    "approach_s": 0.6,
+    "grasp_dwell_s": 0.2,
+    "lift_s": 0.5,
+    "transfer_speed_m_s": 1.2,
+    "transfer_min_s": 0.5,
+    "transfer_max_s": 1.5,
+    "place_s": 0.5,
+    "release_dwell_s": 0.15,
+    "retract_s": 0.5,
+    "tool_change_s": 1.75
+  },
+  "products": [
+    {
+      "schema_version": "2.0",
+      "catalog_id": "synthetic-products-1",
+      "sku": "SKU-A",
+      "family": "small_carton",
+      "dimensions_m": [
+        0.12,
+        0.08,
+        0.045
+      ],
+      "mass_min_kg": 0.15,
+      "mass_max_kg": 0.4,
+      "visual_variant_id": "kraft_label",
+      "compatibility": {
+        "EE_VAC_SINGLE": "P",
+        "EE_VAC_ARRAY": "C",
+        "EE_PINCH_NARROW": "C",
+        "EE_PINCH_WIDE": "C",
+        "EE_ADAPTIVE_SOFT": "C",
+        "EE_SUPPORT_FORK": "C"
+      },
+      "geometry": {
+        "flat_top_m": [
+          0.12,
+          0.08
+        ],
+        "grasp_width_m": 0.08,
+        "soft_envelope_m": 0.08,
+        "under_clearance": true
+      }
+    },
+    {
+      "schema_version": "2.0",
+      "catalog_id": "synthetic-products-1",
+      "sku": "SKU-B",
+      "family": "medium_carton",
+      "dimensions_m": [
+        0.24,
+        0.16,
+        0.1
+      ],
+      "mass_min_kg": 0.5,
+      "mass_max_kg": 1.2,
+      "visual_variant_id": "corrugated_tape",
+      "compatibility": {
+        "EE_VAC_SINGLE": "C",
+        "EE_VAC_ARRAY": "P",
+        "EE_PINCH_NARROW": "N",
+        "EE_PINCH_WIDE": "C",
+        "EE_ADAPTIVE_SOFT": "C",
+        "EE_SUPPORT_FORK": "C"
+      },
+      "geometry": {
+        "flat_top_m": [
+          0.24,
+          0.16
+        ],
+        "grasp_width_m": 0.16,
+        "soft_envelope_m": 0.16,
+        "under_clearance": true
+      }
+    },
+    {
+      "schema_version": "2.0",
+      "catalog_id": "synthetic-products-1",
+      "sku": "SKU-C",
+      "family": "soft_pouch",
+      "dimensions_m": [
+        0.18,
+        0.12,
+        0.04
+      ],
+      "mass_min_kg": 0.08,
+      "mass_max_kg": 0.35,
+      "visual_variant_id": "rounded_pouch",
+      "compatibility": {
+        "EE_VAC_SINGLE": "C",
+        "EE_VAC_ARRAY": "N",
+        "EE_PINCH_NARROW": "C",
+        "EE_PINCH_WIDE": "N",
+        "EE_ADAPTIVE_SOFT": "P",
+        "EE_SUPPORT_FORK": "C"
+      },
+      "geometry": {
+        "flat_top_m": [
+          0.06,
+          0.06
+        ],
+        "grasp_width_m": 0.04,
+        "soft_envelope_m": 0.12,
+        "under_clearance": true
+      }
+    },
+    {
+      "schema_version": "2.0",
+      "catalog_id": "synthetic-products-1",
+      "sku": "SKU-D",
+      "family": "bottle",
+      "dimensions_m": [
+        0.075,
+        0.075,
+        0.23
+      ],
+      "mass_min_kg": 0.25,
+      "mass_max_kg": 0.75,
+      "visual_variant_id": "labelled_bottle",
+      "compatibility": {
+        "EE_VAC_SINGLE": "N",
+        "EE_VAC_ARRAY": "N",
+        "EE_PINCH_NARROW": "P",
+        "EE_PINCH_WIDE": "C",
+        "EE_ADAPTIVE_SOFT": "C",
+        "EE_SUPPORT_FORK": "N"
+      },
+      "geometry": {
+        "flat_top_m": [
+          0,
+          0
+        ],
+        "grasp_width_m": 0.075,
+        "soft_envelope_m": 0.075,
+        "under_clearance": false
+      }
+    },
+    {
+      "schema_version": "2.0",
+      "catalog_id": "synthetic-products-1",
+      "sku": "SKU-E",
+      "family": "can_jar",
+      "dimensions_m": [
+        0.09,
+        0.09,
+        0.12
+      ],
+      "mass_min_kg": 0.3,
+      "mass_max_kg": 0.8,
+      "visual_variant_id": "metallic_can",
+      "compatibility": {
+        "EE_VAC_SINGLE": "C",
+        "EE_VAC_ARRAY": "C",
+        "EE_PINCH_NARROW": "C",
+        "EE_PINCH_WIDE": "P",
+        "EE_ADAPTIVE_SOFT": "C",
+        "EE_SUPPORT_FORK": "N"
+      },
+      "geometry": {
+        "flat_top_m": [
+          0.09,
+          0.09
+        ],
+        "grasp_width_m": 0.09,
+        "soft_envelope_m": 0.09,
+        "under_clearance": false
+      }
+    },
+    {
+      "schema_version": "2.0",
+      "catalog_id": "synthetic-products-1",
+      "sku": "SKU-F",
+      "family": "long_carton",
+      "dimensions_m": [
+        0.42,
+        0.09,
+        0.06
+      ],
+      "mass_min_kg": 0.6,
+      "mass_max_kg": 1.8,
+      "visual_variant_id": "long_box",
+      "compatibility": {
+        "EE_VAC_SINGLE": "N",
+        "EE_VAC_ARRAY": "C",
+        "EE_PINCH_NARROW": "N",
+        "EE_PINCH_WIDE": "C",
+        "EE_ADAPTIVE_SOFT": "N",
+        "EE_SUPPORT_FORK": "P"
+      },
+      "geometry": {
+        "flat_top_m": [
+          0.42,
+          0.09
+        ],
+        "grasp_width_m": 0.09,
+        "soft_envelope_m": 0.09,
+        "under_clearance": true
+      }
+    }
+  ],
+  "tools": [
+    {
+      "schema_version": "2.0",
+      "tool_id": "EE_VAC_SINGLE",
+      "family": "vacuum",
+      "display_name": "Single suction cup",
+      "max_simulated_mass_kg": 0.8,
+      "tcp_transform": {
+        "position": [
+          0,
+          0,
+          -0.18
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "tool_flange",
+        "calibration_version": "hkm-cal-1"
+      },
+      "collision_envelope_m": [
+        0.073,
+        0.073,
+        0.18
+      ],
+      "constraints": {
+        "kind": "flat_top",
+        "minimum_flat_top_m": [
+          0.05,
+          0.05
+        ]
+      },
+      "visual_asset_id": "ee_vac_single",
+      "tool_spec_version": "synthetic-tools-1",
+      "collision_offset_m": [
+        0,
+        0,
+        0.09
+      ]
+    },
+    {
+      "schema_version": "2.0",
+      "tool_id": "EE_VAC_ARRAY",
+      "family": "vacuum",
+      "display_name": "Multi-cup suction plate",
+      "max_simulated_mass_kg": 1.5,
+      "tcp_transform": {
+        "position": [
+          0,
+          0,
+          -0.18
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "tool_flange",
+        "calibration_version": "hkm-cal-1"
+      },
+      "collision_envelope_m": [
+        0.18,
+        0.13,
+        0.18
+      ],
+      "constraints": {
+        "kind": "flat_top",
+        "minimum_flat_top_m": [
+          0.1,
+          0.08
+        ]
+      },
+      "visual_asset_id": "ee_vac_array",
+      "tool_spec_version": "synthetic-tools-1",
+      "collision_offset_m": [
+        0,
+        0,
+        0.09
+      ]
+    },
+    {
+      "schema_version": "2.0",
+      "tool_id": "EE_PINCH_NARROW",
+      "family": "pinch",
+      "display_name": "Narrow parallel-jaw gripper",
+      "max_simulated_mass_kg": 1,
+      "tcp_transform": {
+        "position": [
+          0,
+          0,
+          -0.18
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "tool_flange",
+        "calibration_version": "hkm-cal-1"
+      },
+      "collision_envelope_m": [
+        0.15,
+        0.075,
+        0.213
+      ],
+      "constraints": {
+        "kind": "grasp_width",
+        "minimum_width_m": 0.03,
+        "maximum_width_m": 0.09
+      },
+      "visual_asset_id": "ee_pinch_narrow",
+      "tool_spec_version": "synthetic-tools-1",
+      "collision_offset_m": [
+        0,
+        0,
+        0.0735
+      ]
+    },
+    {
+      "schema_version": "2.0",
+      "tool_id": "EE_PINCH_WIDE",
+      "family": "pinch",
+      "display_name": "Wide parallel-jaw gripper",
+      "max_simulated_mass_kg": 2,
+      "tcp_transform": {
+        "position": [
+          0,
+          0,
+          -0.18
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "tool_flange",
+        "calibration_version": "hkm-cal-1"
+      },
+      "collision_envelope_m": [
+        0.31,
+        0.11,
+        0.213
+      ],
+      "constraints": {
+        "kind": "grasp_width",
+        "minimum_width_m": 0.07,
+        "maximum_width_m": 0.26
+      },
+      "visual_asset_id": "ee_pinch_wide",
+      "tool_spec_version": "synthetic-tools-1",
+      "collision_offset_m": [
+        0,
+        0,
+        0.0735
+      ]
+    },
+    {
+      "schema_version": "2.0",
+      "tool_id": "EE_ADAPTIVE_SOFT",
+      "family": "soft",
+      "display_name": "Adaptive soft-finger gripper",
+      "max_simulated_mass_kg": 0.9,
+      "tcp_transform": {
+        "position": [
+          0,
+          0,
+          -0.18
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "tool_flange",
+        "calibration_version": "hkm-cal-1"
+      },
+      "collision_envelope_m": [
+        0.19,
+        0.18,
+        0.2155
+      ],
+      "constraints": {
+        "kind": "soft_envelope",
+        "minimum_width_m": 0.05,
+        "maximum_width_m": 0.14
+      },
+      "visual_asset_id": "ee_adaptive_soft",
+      "tool_spec_version": "synthetic-tools-1",
+      "collision_offset_m": [
+        0,
+        0,
+        0.07225000000000001
+      ]
+    },
+    {
+      "schema_version": "2.0",
+      "tool_id": "EE_SUPPORT_FORK",
+      "family": "fork",
+      "display_name": "Under-support fork",
+      "max_simulated_mass_kg": 2,
+      "tcp_transform": {
+        "position": [
+          0,
+          0,
+          -0.18
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "tool_flange",
+        "calibration_version": "hkm-cal-1"
+      },
+      "collision_envelope_m": [
+        0.463,
+        0.16,
+        0.215
+      ],
+      "constraints": {
+        "kind": "under_clearance"
+      },
+      "visual_asset_id": "ee_support_fork",
+      "tool_spec_version": "synthetic-tools-1",
+      "collision_offset_m": [
+        -0.0265,
+        0,
+        0.0725
+      ]
+    }
+  ],
+  "layout": {
+    "floor_width_m": 4.6,
+    "floor_depth_m": 4.2,
+    "home_tcp_pose": {
+      "position": [
+        0,
+        -0.6,
+        1.02
+      ],
+      "quaternion_xyzw": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "unit": "m",
+      "frame_id": "cell_world",
+      "calibration_version": "hkm-cal-1"
+    },
+    "sources": {
+      "SKU-A": {
+        "location_id": "SRC_A",
+        "pose": {
+          "position": [
+            1.08,
+            -0.68,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "interior_m": [
+          0.5,
+          0.4
+        ],
+        "wall_height_m": 0.2
+      },
+      "SKU-B": {
+        "location_id": "SRC_B",
+        "pose": {
+          "position": [
+            0.1,
+            -1.24,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "interior_m": [
+          0.5,
+          0.4
+        ],
+        "wall_height_m": 0.2
+      },
+      "SKU-C": {
+        "location_id": "SRC_C",
+        "pose": {
+          "position": [
+            -0.85,
+            -0.92,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "interior_m": [
+          0.5,
+          0.4
+        ],
+        "wall_height_m": 0.2,
+        "product_support_offset_m": 0.02
+      },
+      "SKU-D": {
+        "location_id": "SRC_D",
+        "pose": {
+          "position": [
+            -1.26,
+            -0.08,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "interior_m": [
+          0.5,
+          0.4
+        ],
+        "wall_height_m": 0.2
+      },
+      "SKU-E": {
+        "location_id": "SRC_E",
+        "pose": {
+          "position": [
+            -1.15,
+            0.75,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "interior_m": [
+          0.5,
+          0.4
+        ],
+        "wall_height_m": 0.2
+      },
+      "SKU-F": {
+        "location_id": "SRC_F",
+        "pose": {
+          "position": [
+            1.14,
+            0.75,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "interior_m": [
+          0.62,
+          0.4
+        ],
+        "wall_height_m": 0.2,
+        "product_support_offset_m": 0.04
+      }
+    },
+    "destination": {
+      "location_id": "DESTINATION",
+      "pose": {
+        "position": [
+          0,
+          1.12,
+          0.18
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "interior_m": [
+        1.12,
+        0.7
+      ],
+      "wall_height_m": 0.24
+    },
+    "destination_slots": {
+      "SKU-A": [
+        -0.38,
+        -0.18,
+        0
+      ],
+      "SKU-B": [
+        0.17,
+        -0.1,
+        0
+      ],
+      "SKU-C": [
+        -0.4,
+        0.12,
+        0.02
+      ],
+      "SKU-D": [
+        -0.13,
+        -0.16,
+        0
+      ],
+      "SKU-E": [
+        -0.12,
+        0.075,
+        0
+      ],
+      "SKU-F": [
+        0.18,
+        0.23,
+        0.04
+      ]
+    },
+    "tool_docks": {
+      "EE_VAC_SINGLE": {
+        "position": [
+          0.98,
+          -0.27,
+          0.56
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "EE_VAC_ARRAY": {
+        "position": [
+          0.98,
+          0,
+          0.56
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "EE_PINCH_NARROW": {
+        "position": [
+          0.98,
+          0.27,
+          0.56
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "EE_PINCH_WIDE": {
+        "position": [
+          1.39,
+          -0.27,
+          0.56
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "EE_ADAPTIVE_SOFT": {
+        "position": [
+          1.39,
+          0,
+          0.56
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "EE_SUPPORT_FORK": {
+        "position": [
+          1.39,
+          0.27,
+          0.56
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      }
+    }
+  },
+  "cameras": [
+    {
+      "sensor_id": "operator-overview",
+      "frame_id": "camera_operator",
+      "calibration_version": "hkm-cal-1",
+      "camera_model_version": "synthetic-orthographic-1",
+      "pose": {
+        "position": [
+          3.7,
+          -4.7,
+          3.4
+        ],
+        "quaternion_xyzw": [
+          0.5043901169063275,
+          0.17471508889409704,
+          0.27677734473107896,
+          0.7990366381609559
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "presentation_only": true
+    },
+    {
+      "sensor_id": "overhead-observation",
+      "frame_id": "camera_overhead",
+      "calibration_version": "hkm-cal-1",
+      "camera_model_version": "synthetic-orthographic-1",
+      "pose": {
+        "position": [
+          0,
+          0,
+          2.6
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "presentation_only": false
+    },
+    {
+      "sensor_id": "side-inspection",
+      "frame_id": "camera_side",
+      "calibration_version": "hkm-cal-1",
+      "camera_model_version": "synthetic-orthographic-1",
+      "pose": {
+        "position": [
+          -1.85,
+          -0.65,
+          1.25
+        ],
+        "quaternion_xyzw": [
+          0.4164435022802413,
+          -0.295082221134753,
+          -0.4971755075060524,
+          0.7016536231751722
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "presentation_only": false
+    }
+  ],
+  "empty_flange_collision_envelope_m": [
+    0.105,
+    0.105,
+    0.08
+  ],
+  "empty_flange_collision_offset_m": [
+    0,
+    0,
+    0.13
+  ]
+}

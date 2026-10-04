@@ -114,6 +114,7 @@
         "schema_version": {
           "const": "1.0",
           "default": "1.0",
+          "pattern": "^1\\.0$",
           "title": "Schema Version",
           "type": "string"
         },
@@ -239,6 +240,7 @@
         "schema_version": {
           "const": "1.0",
           "default": "1.0",
+          "pattern": "^1\\.0$",
           "title": "Schema Version",
           "type": "string"
         },
@@ -286,6 +288,21 @@
     "MotionRecording": {
       "additionalProperties": false,
       "properties": {
+        "calibration_version": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Calibration Version"
+        },
         "command_id": {
           "maxLength": 160,
           "minLength": 1,
@@ -310,11 +327,26 @@
           "title": "Frame Id",
           "type": "string"
         },
+        "frame_tree_version": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frame Tree Version"
+        },
         "frames": {
           "items": {
             "$ref": "#/$defs/VisualFrame"
           },
-          "maxItems": 100,
+          "maxItems": 720,
           "minItems": 1,
           "title": "Frames",
           "type": "array"
@@ -326,11 +358,24 @@
           "title": "Job Id",
           "type": "string"
         },
+        "kinematics_version": {
+          "anyOf": [
+            {
+              "const": "HKM_INSPIRED_VISUAL_KINEMATICS_V1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Kinematics Version"
+        },
         "objects": {
           "items": {
             "$ref": "#/$defs/VisualObject"
           },
-          "maxItems": 100,
+          "maxItems": 512,
           "minItems": 1,
           "title": "Objects",
           "type": "array"
@@ -342,6 +387,19 @@
           "title": "Product Id",
           "type": "string"
         },
+        "robot_profile_version": {
+          "anyOf": [
+            {
+              "const": "hkm_inspired_v1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Robot Profile Version"
+        },
         "scene_epoch": {
           "maxLength": 160,
           "minLength": 1,
@@ -350,10 +408,27 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "1.0",
           "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0"
+          ],
           "title": "Schema Version",
           "type": "string"
+        },
+        "simulated_duration_s": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 30,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Simulated Duration S"
         },
         "source": {
           "const": "BLENDER_EVALUATED_SCENE",
@@ -362,8 +437,9 @@
           "type": "string"
         },
         "total_frames": {
-          "const": 100,
           "default": 100,
+          "maximum": 720,
+          "minimum": 1,
           "title": "Total Frames",
           "type": "integer"
         },
@@ -387,11 +463,150 @@
       "title": "MotionRecording",
       "type": "object"
     },
+    "VisualCamera": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "camera_model_version": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Camera Model Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "role": {
+          "enum": [
+            "PRESENTATION",
+            "SYNTHETIC_SENSOR"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sensor_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sensor Id"
+        },
+        "target": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Target",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "position",
+        "target",
+        "role",
+        "frame_id",
+        "calibration_version",
+        "camera_model_version"
+      ],
+      "title": "VisualCamera",
+      "type": "object"
+    },
     "VisualFrame": {
       "additionalProperties": false,
       "properties": {
+        "active_tool_id": {
+          "anyOf": [
+            {
+              "enum": [
+                "EE_VAC_SINGLE",
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Active Tool Id"
+        },
+        "attached_product_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attached Product Id"
+        },
         "frame": {
-          "maximum": 100,
+          "maximum": 720,
           "minimum": 1,
           "title": "Frame",
           "type": "integer"
@@ -403,7 +618,27 @@
             "LIFT",
             "TRANSFER",
             "DETACH",
-            "RETRACT"
+            "RETRACT",
+            "HOME",
+            "TOOL_CHANGE_REQUESTED",
+            "MOVE_TO_SAFE_POSE",
+            "MOVE_TO_TOOL_DOCK",
+            "RELEASE_CURRENT_TOOL",
+            "VERIFY_FLANGE_EMPTY",
+            "ENGAGE_REQUESTED_TOOL",
+            "VERIFY_TOOL_ID",
+            "RETREAT_FROM_TOOL_RACK",
+            "TOOL_CHANGE_COMPLETED",
+            "TOOL_CHANGE_NOT_REQUIRED",
+            "PRE_GRASP",
+            "GRASP",
+            "GRASP_CONFIRM",
+            "SAFE_TRANSFER",
+            "PRE_PLACE",
+            "PLACE",
+            "RELEASE",
+            "RELEASE_CONFIRM",
+            "NEXT_SAFE_POSE"
           ],
           "title": "Phase",
           "type": "string"
@@ -428,11 +663,65 @@
           "title": "Positions",
           "type": "object"
         },
+        "rack_tool_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "EE_VAC_SINGLE",
+                  "EE_VAC_ARRAY",
+                  "EE_PINCH_NARROW",
+                  "EE_PINCH_WIDE",
+                  "EE_ADAPTIVE_SOFT",
+                  "EE_SUPPORT_FORK"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rack Tool Ids"
+        },
         "schema_version": {
-          "const": "1.0",
           "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0"
+          ],
           "title": "Schema Version",
           "type": "string"
+        },
+        "sim_time_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sim Time S"
+        },
+        "transforms": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/VisualTransform"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Transforms"
         }
       },
       "required": [
@@ -463,6 +752,18 @@
           "title": "Color",
           "type": "array"
         },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
         "location_id": {
           "anyOf": [
             {
@@ -478,11 +779,49 @@
           "default": null,
           "title": "Location Id"
         },
+        "material_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Material Role"
+        },
         "name": {
           "maxLength": 200,
           "minLength": 1,
           "title": "Name",
           "type": "string"
+        },
+        "opacity": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Opacity"
+        },
+        "parent_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Name"
         },
         "position": {
           "maxItems": 3,
@@ -501,6 +840,22 @@
           "title": "Position",
           "type": "array"
         },
+        "primitive": {
+          "anyOf": [
+            {
+              "enum": [
+                "box",
+                "cylinder"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primitive"
+        },
         "product_id": {
           "anyOf": [
             {
@@ -516,11 +871,82 @@
           "default": null,
           "title": "Product Id"
         },
+        "quaternion_xyzw": {
+          "anyOf": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quaternion Xyzw"
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scale"
+        },
         "schema_version": {
-          "const": "1.0",
           "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0"
+          ],
           "title": "Schema Version",
           "type": "string"
+        },
+        "semantic_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Semantic Tags"
         },
         "size": {
           "maxItems": 3,
@@ -538,6 +964,38 @@
           ],
           "title": "Size",
           "type": "array"
+        },
+        "tool_id": {
+          "anyOf": [
+            {
+              "enum": [
+                "EE_VAC_SINGLE",
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool Id"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visible"
         }
       },
       "required": [
@@ -552,6 +1010,21 @@
     "VisualScene": {
       "additionalProperties": false,
       "properties": {
+        "cameras": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/VisualCamera"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cameras"
+        },
         "cell_mode": {
           "$ref": "#/$defs/CellMode"
         },
@@ -559,10 +1032,23 @@
           "items": {
             "$ref": "#/$defs/VisualObject"
           },
-          "maxItems": 100,
+          "maxItems": 512,
           "minItems": 1,
           "title": "Objects",
           "type": "array"
+        },
+        "robot_profile_version": {
+          "anyOf": [
+            {
+              "const": "hkm_inspired_v1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Robot Profile Version"
         },
         "scene_epoch": {
           "maxLength": 160,
@@ -572,8 +1058,11 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "1.0",
           "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0"
+          ],
           "title": "Schema Version",
           "type": "string"
         },
@@ -599,6 +1088,87 @@
         "objects"
       ],
       "title": "VisualScene",
+      "type": "object"
+    },
+    "VisualTransform": {
+      "additionalProperties": false,
+      "properties": {
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "quaternion_xyzw": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Quaternion Xyzw",
+          "type": "array"
+        },
+        "scale": {
+          "default": [
+            1,
+            1,
+            1
+          ],
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Scale",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "visible": {
+          "default": true,
+          "title": "Visible",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "position",
+        "quaternion_xyzw"
+      ],
+      "title": "VisualTransform",
       "type": "object"
     }
   },
@@ -629,6 +1199,7 @@
     "schema_version": {
       "const": "1.0",
       "default": "1.0",
+      "pattern": "^1\\.0$",
       "title": "Schema Version",
       "type": "string"
     }

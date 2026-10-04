@@ -5,6 +5,9 @@ from fastapi.testclient import TestClient
 from jsonschema import Draft202012Validator
 
 from apps.api.app import create_app
+from robotops.cell.runtime import SyntheticRuntime
+from robotops.config import Settings
+from robotops.workflow.engine import Engine
 from robotops.workflow.store import Store
 
 
@@ -18,7 +21,9 @@ def test_openapi_is_current_and_schemas_validate(tmp_path):
 
 
 def test_http_intake_idempotency_conflict_and_timeline(tmp_path, order_request):
-    client = TestClient(create_app(Store(tmp_path / "api.db")))
+    store = Store(tmp_path / "api.db")
+    runtime = SyntheticRuntime(tmp_path / "runtime.db", Settings())
+    client = TestClient(create_app(store, Engine(store, runtime, runtime.settings)))
     payload = order_request.model_dump(mode="json")
     first = client.post("/orders", json=payload, headers={"Idempotency-Key": "key"})
     assert first.status_code == 201

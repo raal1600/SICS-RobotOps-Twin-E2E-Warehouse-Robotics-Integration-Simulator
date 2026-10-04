@@ -1,0 +1,49 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "flat_top_m": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "minimum": 0,
+          "type": "number"
+        }
+      ],
+      "title": "Flat Top M",
+      "type": "array"
+    },
+    "grasp_width_m": {
+      "exclusiveMinimum": 0,
+      "title": "Grasp Width M",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "soft_envelope_m": {
+      "exclusiveMinimum": 0,
+      "title": "Soft Envelope M",
+      "type": "number"
+    },
+    "under_clearance": {
+      "title": "Under Clearance",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "flat_top_m",
+    "grasp_width_m",
+    "soft_envelope_m",
+    "under_clearance"
+  ],
+  "title": "ProductGeometry",
+  "type": "object"
+}

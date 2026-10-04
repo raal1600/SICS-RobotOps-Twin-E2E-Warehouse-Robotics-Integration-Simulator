@@ -21,13 +21,13 @@ def main() -> None:
     settings = (
         Settings.model_validate_json(args.settings.read_text())
         if args.settings
-        else Settings(visual_frame_seconds=1 / 24)
+        else Settings.hkm(visual_frame_seconds=1 / 24)
     )
     store = Store(args.data_dir / "workflow.db")
     runtime = (BlenderRuntime if args.runtime == "blender" else SyntheticRuntime)(
         args.data_dir / "runtime.db", settings
     )
-    engine = Engine(store, runtime, settings)
+    engine = Engine(store, runtime, runtime.settings)
     uvicorn.run(create_app(store, engine, recover=True), host="127.0.0.1", port=args.port)
 
 

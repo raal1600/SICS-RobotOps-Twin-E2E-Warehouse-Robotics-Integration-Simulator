@@ -1,8 +1,165 @@
 # Goal Progress
-Last updated: 2026-10-03 UTC
+Last updated: 2026-10-04 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: P7 compact snapshot presentation follow-up
+## Current phase: HKM-P2/P3 final verification and knowledge-base synchronization
+
+Enhancement base/current HEAD:
+`eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98` (clean before baseline execution;
+current enhancement worktree is uncommitted).
+The HKM-inspired six-tool/six-SKU adaptation is **NOT DONE**. It is a new
+implementation/acceptance revision, not a reinterpretation of the prior release.
+
+Implemented: canonical typed six-product/tool catalogue, deterministic selection
+with persisted candidate reasons, segmented workspace/collision preflight,
+original articulated shared geometry, schema-2 world/tool/observation/plan/command
+and quaternion recording contracts, persisted profile settings, and explicit
+schema-1 compatibility. The bounded Blender runtime executes tool preparation,
+product attachment, transfer and release. Browser replay consumes evaluated
+transforms and retains read-only historical delivery playback. Status/tool/evidence
+inspectors, camera controls and the six-tool showcase are implemented. The static
+snapshot remains inside collapsed Technical details.
+
+Targeted evidence includes 12 actual Blender tests passing together, with all six
+preferred tools, six transfers, exact-one-effect lost-ack/restart recovery,
+contradictory/fresh reconciliation, corruption defenses and immutable saved-scene
+re-export. See [scoped Blender/native evidence](docs/evidence/hkm-blender-local/result.json)
+and its preserved failure/fix provenance. These checks do not attest later source
+changes. The affected robotics/Brain/contract/E2E regression run passed 112 tests
+(`artifacts/hkm-baseline-eaf35b4/robotics-brain-regressions.xml`); 22 targeted
+contract/governance/documentation/Brain checks also passed. The Node UI suite now
+has 105 passing checks (`artifacts/hkm-ui-tests.log` retains the follow-up run).
+Full repeated acceptance is still required.
+
+Final pre-commit checks: 112 schema, legacy-hash, boundary and timeout-diagnostic
+tests passed; lint/strict types/security passed. The final camera-framing suite
+has 107 passing UI checks (`artifacts/hkm-ui-camera-final.log`). Actual browser
+execution completed a six-product delivery, then a separate lost-ack pick moved
+through UNKNOWN_OUTCOME, contradictory intervention and fresh-observation
+completion without another command. Independent SQLite audits and screenshots
+are retained under `docs/evidence/hkm-browser-local/`. A coordinated request/response
+tampering regression preserves durable inventory and imports zero effects.
+The publication preflight built all reports, diagrams and PDFs successfully.
+These remain scoped development checks; the next milestone is a clean-commit
+full acceptance run twice, eight Blender demos, then exact-SHA CI/Pages evidence.
+
+The security gate passed with zero dependency advisories and valid vendored
+asset hashes; its five existing low-severity subprocess scopes remain explicitly
+reviewed. Only the changed demo function's AST fingerprint was refreshed; no new
+exception class or reduced threshold was introduced. The formal MUST verdicts,
+full-suite count/coverage and final source SHA remain the acceptance runner's
+responsibility. Current-SHA CI, publication, public links and final visual review
+are still pending.
+
+New decisions: schema-1 serialization omits all absent schema-2 extensions so
+original durable payload hashes remain unchanged; fresh worlds persist their
+execution settings, while archived worlds retain their original profile. API
+serialization schemas must remain typed and reject unknown fields. Tool geometry
+and static-obstacle bounds share the same procedural definition; fork/pouch
+fixtures use visible support skids where the tool needs clearance. These are
+original simulator-design choices, not manufacturer geometry or capabilities.
+
+Baseline `uv run --locked python -m tools.dev acceptance --local` ran the mandatory
+suite twice without modifying source: 389 tests each, 388 passed and one failed
+in each run, zero skips; coverage 89.11000552791597%. The failure is the obsolete
+`Latest Blender artifact` label assertion in
+`test_metrics_timeline_and_dashboard_survive_restart`, after the approved compact
+snapshot presentation changed that label. The current revision corrects that assertion with meaningful collapsed-details
+coverage while preserving the journal/metrics/restart assertions. The original
+failed baseline evidence remains archived unchanged.
+All 101 Node UI checks, setup, lint, typecheck, security, seven actual Blender
+demos, drift and both local publication builds passed. Lost-ack/restart demos
+each retained one transfer; contradictory reconciliation remained intervention.
+Environment: Python 3.13.15, Blender 5.2.1 LTS, Node 20.17.0, uv 0.12.13.
+
+Baseline MUST PASS: SC-TEST-004, SC-TEST-005, SC-TEST-006, SC-KB-009,
+SC-ACC-005, SC-DOC-003, SC-DOC-004 and SC-DOC-005. Other baseline criteria
+fail their shared full-suite/repeatability gates or lack current-SHA remote
+evidence; this does not mean 77 distinct behavior failures. The original 85 MUSTs
+remain unchanged. HKM-VIS-MUST-001 through HKM-VIS-MUST-025 are in progress,
+with FAIL/pending acceptance until their implementation and inspectable evidence
+exist. Optional provider fallback remains the documented SC-BRAIN-005 SHOULD gap.
+
+Evidence: [clean baseline manifest](docs/evidence/acceptance/20261004T000708/manifest.json),
+[summary](docs/evidence/hkm-baseline-eaf35b4/baseline-result.json) and
+[immutable report/provenance archive](docs/evidence/hkm-baseline-eaf35b4/provenance.json).
+Old acceptance files were not overwritten; exact before/baseline reports are
+retained as text archives with hashes. No saved user test or active app was touched.
+
+Decisions: extend the bounded adapter and shared procedural scene; make the
+TCP-driven visual kinematics explicit; persist tool preparation under the original
+pick identity; retain product-transfer effect counts and observation-only
+verification. Version new recordings/contracts explicitly and preserve old scene,
+payload/journal and replay interpretations. No imported HKM CAD or guessed true
+robot/controller geometry. [ADR 0010](docs/adr/0010-hkm-inspired-versioned-cell.md)
+records the accepted design; [implementation scope](docs/implementation/hkm-inspired.md)
+describes implemented runtime features with scoped evidence while retaining
+pending final acceptance.
+
+Drift detected: unconditional DONE referred to the previous audited release, and
+the UI follow-up left an old wording assertion. Synchronized plan, success criteria,
+handoff, checklist, README, report status blocks, publication status/policy,
+acceptance map/report, new ADR/design guide and criterion/status tooling. New
+criterion IDs are included in drift and completion checks; status dates now use
+UTC rather than a fixed past date. Research provenance and generated catalogue/
+diagram synchronization remain part of the implementation milestones. Generated
+Pages/PDFs must be rebuilt after the coherent source milestone, never hand-edited.
+
+Governance follow-up: nine targeted tests, scoped Ruff lint/format and strict
+drift pass; all 85 original MUST definitions are byte-equivalent as text to the
+base definitions. Negative tests reject unknown/missing HKM criteria and prevent
+DONE with even one new criterion failing. [Scoped evidence](docs/evidence/hkm-governance/result.json)
+does not attest runtime enhancement completion. Pending test names in the
+acceptance map must be replaced/refined against implemented tests and artifacts.
+
+Next milestone: complete final browser review, run the complete clean mandatory suite twice and
+all eight Blender demos, then regenerate acceptance and publication. Verify the
+exact final commit in CI/Pages; do not promote scoped results to final acceptance.
+
+Final source synchronization replaces stale planned-feature descriptions with
+implemented HKM geometry, six-tool selection/preparation, schema-2 contracts and
+read-only replay, without changing generated status blocks or formal acceptance
+verdicts. Updated README, plan, handoff, checklist, runtime/contracts/persistence/
+operations/acceptance documentation and design/scope reports. Historical baseline
+and failure evidence remain unchanged. The host and fixed Blender source-contact
+checks now share the 5 mm simulator centering bound; the coordinated 1 mm noise
+probe completed in actual Blender and targeted runtime checks passed. That bound
+is separate from verifier pose tolerance and is not real gripper accuracy.
+
+API/default-profile follow-up: fresh API/desktop worlds and Start new test now use
+the six-SKU HKM profile; reopened originals and archives keep their own saved
+settings. Fixture metadata supplies every product's source and the actual
+destination plus the canonical catalogue. New intake rejects invalid fixture
+identities before creating jobs while retaining replay/conflict semantics.
+Targeted checks passed: 11 API/profile regressions and 102 scenario/history/desktop
+backend checks, scoped Ruff/mypy and strict drift. Six HTTP orders selected all
+six preferred tools with one transfer each. Legacy and fresh desktop backends
+both preserved original command identity and one effect after close/reopen.
+[Scoped evidence](docs/evidence/hkm-api/result.json) records commands and exclusions;
+these checks do not replace actual Blender/native-window/final acceptance checks.
+Synchronized README, plan, handoff and contracts/operations/desktop/adaptation
+guides. The desktop smoke script now derives SKU/source IDs from the fixture.
+
+Actual Blender follow-up: all 12 tests in `tests/blender/test_hkm_runtime.py`
+pass in one run (124.38 s, no skips/xfails). Six SKUs use six preferred tools and
+produce six transfers, one per original command. Every sampled carrying/rack
+pose is checked within 1e-6; link rotations, tool exchange, attachment/release,
+final checkpoint poses, actual camera metadata and A-F labels are inspected.
+Lost-ack/restart/contradiction and later reconciliation preserve one command/effect.
+Saved-scene re-export preserves transforms and leaves world/journal/timeline and
+the original scene hash unchanged. Eight malformed requests fail in actual Blender
+before scene/motion/effect creation. An initial floating-point rack residual and
+a later strict dock-pose comparison regression were fixed in production; neither
+assertion nor tolerance was weakened. Both failures remain archived alongside
+the passing suite in [scoped evidence](docs/evidence/hkm-blender-local/result.json).
+The native host rebuilt without installation; its isolated Blender lifecycle
+smoke passed eight checks, including graceful in-flight close, lost-ack recovery
+and forced owned-process-tree cleanup. No active user app/data was touched.
+Runtime/adaptation documentation now distinguishes legacy Cartesian evidence from
+schema-2 articulated transforms, tools, cameras and original synthetic open totes.
+Full repeated acceptance and final source-SHA publication gates remain pending.
+
+## Previous phase: P7 compact snapshot presentation follow-up
 Base: `5db9bf973026fd111adc97885cfb1080060a25c5` (published and verified).
 The saved Blender snapshot is now under **Technical details**, collapsed by
 default. The full 3D cell/replay stays primary. This is a native HTML disclosure;

@@ -21,7 +21,7 @@ async def serve(data: Path, session: Path, identity: str, runtime_name: str) -> 
     session.mkdir(parents=True, exist_ok=True)
     store = Store(data / "workflow.db")
     runtime = (BlenderRuntime if runtime_name == "blender" else SyntheticRuntime)(
-        data / "runtime.db", Settings(visual_frame_seconds=1 / 24)
+        data / "runtime.db", Settings.hkm(visual_frame_seconds=1 / 24)
     )
     engine = Engine(store, runtime, runtime.settings)
     server = uvicorn.Server(

@@ -2,6 +2,7 @@ import ast
 import json
 from pathlib import Path
 
+from tools import drift_check
 from tools.acceptance import evaluate, read_junit
 from tools.drift_check import check, criterion_ids
 from tools.security_check import review
@@ -10,6 +11,29 @@ from tools.security_check import review
 def test_knowledge_base_links_ids_sources_and_status():
     result = check()
     assert result["passed"], result["errors"]
+
+
+def test_drift_rejects_unknown_hkm_criterion_and_missing_hkm_mapping(tmp_path, monkeypatch):
+    (tmp_path / "publication").mkdir()
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "SUCCESS_CRITERIA.md").write_text(
+        "**SC-ARCH-001 MUST**\n**HKM-VIS-MUST-001 MUST**\n", encoding="utf-8"
+    )
+    (tmp_path / "README.md").write_text("Current status.\n", encoding="utf-8")
+    (tmp_path / "publication/references.json").write_text("[]")
+    (tmp_path / "publication/diagrams.json").write_text("{}")
+    (tmp_path / "publication/status.json").write_text('{"summary":"Current status."}')
+    (tmp_path / "Makefile").write_text("setup test lint typecheck demo acceptance docs security:\n")
+    mapping = {ident: {"files": []} for ident in criterion_ids(tmp_path)}
+    (tmp_path / "docs/acceptance-map.json").write_text(json.dumps(mapping))
+    monkeypatch.setattr(drift_check.subprocess, "check_output", lambda *args, **kwargs: b"")
+    assert check(tmp_path)["passed"]
+    (tmp_path / "README.md").write_text("Current status. HKM-VIS-MUST-999\n")
+    assert any("Unknown criterion HKM-VIS-MUST-999" in e for e in check(tmp_path)["errors"])
+    (tmp_path / "README.md").write_text("Current status.\n")
+    del mapping["HKM-VIS-MUST-001"]
+    (tmp_path / "docs/acceptance-map.json").write_text(json.dumps(mapping))
+    assert any("Acceptance mapping mismatch" in e for e in check(tmp_path)["errors"])
 
 
 def test_domain_boundary_has_no_blender_or_network_dependency():
@@ -71,3 +95,18 @@ def test_security_exceptions_reject_changed_scope_and_severity():
     assert not review([{**finding, "issue_severity": "HIGH"}], exceptions)[0]["reviewed"]
     changed = [{**item, "ast_sha256": "changed"} for item in exceptions]
     assert not review([finding], changed)[0]["reviewed"]
+
+
+def test_criterion_registry_accepts_both_revisions_without_dropping_legacy_ids(tmp_path):
+    (tmp_path / "SUCCESS_CRITERIA.md").write_text(
+        "**SC-ARCH-001 MUST**\n**SC-ARCH-004 SHOULD**\n"
+        "**HKM-VIS-MUST-001 MUST**\n**HKM-VIS-MUST-025 MUST**\n",
+        encoding="utf-8",
+    )
+    assert criterion_ids(tmp_path) == {"SC-ARCH-001", "HKM-VIS-MUST-001", "HKM-VIS-MUST-025"}
+    assert criterion_ids(tmp_path, "SHOULD") == {"SC-ARCH-004"}
+    actual = criterion_ids()
+    assert len({ident for ident in actual if ident.startswith("SC-")}) == 85
+    assert {ident for ident in actual if ident.startswith("HKM-")} == {
+        f"HKM-VIS-MUST-{number:03d}" for number in range(1, 26)
+    }

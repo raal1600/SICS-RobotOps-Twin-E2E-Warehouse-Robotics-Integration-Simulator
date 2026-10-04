@@ -2,7 +2,53 @@
 Last updated: 2026-10-04 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: HKM-P3 acceptance complete at audited source
+## Current phase: test lifecycle and robot-cell selection
+
+Implementation baseline: `ae6d5d85c813e47aea042aea2a87236b5a8bc204`.
+This new revision is in progress; the prior 110-MUST acceptance below remains
+historical evidence and does not attest these changes. No user test data has
+been deleted during development.
+
+Milestone: introduce a registered robot-cell selector for new tests, explicit
+selected-test deletion and clear-all confirmation, durable deletion identity,
+safe file cleanup and an empty workspace. Only the implemented HKM-inspired
+profile is selectable; legacy recordings preserve their original profile.
+Deleting an active test leaves no active test and never promotes an archived
+uncertain workflow. Playback and data management dispatch no robot commands.
+
+Implemented: typed cell registry, profile-aware test history, confirmation
+dialogs, empty workspace, request-bound retries, committed deletion tombstones,
+bounded cleanup and cross-process response-lifetime locks. API and desktop
+bootstrap read the catalog before opening any world, so deletion survives
+restart. The original test uses its configured database basenames; unrelated
+files remain intact. Empty-workspace health and OpenAPI remain available.
+
+Scoped checks: 146 targeted backend checks (including 32 new lifecycle checks),
+137 affected API/desktop/replay regressions, 119 UI checks and 71
+governance/schema checks pass. Six final backend smoke checks also pass. Lint,
+strict typing, security audit, source drift and generated HTML/PDF publication
+pass. Actual isolated browser review covered creation, a completed pick,
+confirmed deletion, clear-all, empty restart and creation of six fresh HKM
+products, including a narrow-screen dialog check. Development artifacts are in
+`docs/evidence/test-management-local/`; the independent review retains initial
+findings and corrected source hashes. Full acceptance is pending for this
+revision. Existing MUST thresholds and uncertainty/idempotency semantics are
+unchanged.
+
+Knowledge-base review: ADR 0011, plan, handoff, checklist, implementation/API
+documentation, reports and diagrams are synchronized in this milestone. The
+acceptance map adds lifecycle regression evidence to existing persistence and
+demo criteria. Prior report bytes remain archived separately.
+Publication review also caught obsolete HKM-in-progress wording on PDF covers;
+the builder source now refers to the current revision status. Actual Windows
+EXE lifecycle and clear-all/reopen checks also pass in isolated data roots;
+closing the test window releases its backend and empty restart keeps databases
+deleted. Hidden native-window text inspection was unavailable; the separate
+browser review verifies the rendered empty panel.
+Next: commit the coherent milestone, then run complete acceptance and verify
+the corresponding CI/publication revision.
+
+## Historical milestone: HKM-P3 acceptance complete at audited source
 
 Enhancement baseline: `eaf35b499e80a5ce31b2ea3a24fbfa010bc67c98`.
 Audited implementation source: `ca7798798f916c8130e1833cf16b4d4d3f10d546`,

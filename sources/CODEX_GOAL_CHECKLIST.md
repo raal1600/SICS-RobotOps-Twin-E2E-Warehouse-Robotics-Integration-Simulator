@@ -2,10 +2,25 @@
 
 Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain normative.
 
-## Accepted HKM-inspired revision
+## Current revision: cell selection and test-data lifecycle
+
+The accepted HKM revision below is historical evidence. ADR 0011 adds UI/API
+lifecycle behavior; its verification does not inherit earlier PASS results.
+The original 110 MUST criteria remain unchanged.
+
+- [ ] Expose typed cell-profile metadata; only HKM is selectable for new tests.
+- [ ] Persist the selected profile and keep legacy history readable.
+- [ ] Confirm selected-test deletion and snapshot-bound clear-all in the UI.
+- [ ] Preserve retry/tombstone semantics, reject busy work and confine cleanup.
+- [ ] Verify no-active-test restart and no automatic archival promotion.
+- [ ] Test cancellation, stale requests and unchanged surviving evidence using disposable data.
+- [ ] Synchronize contracts, ADR, operator docs, reports and architecture diagram.
+- [ ] Complete affected tests, full acceptance and source-specific publication gates.
+
+## Historical accepted HKM-inspired revision
 
 The HKM-inspired revision adds 25 MUST criteria to the original 85. All 110
-criteria pass for the audited source recorded in ACCEPTANCE_REPORT.md, including
+criteria passed for audited source `ca7798798f916c8130e1833cf16b4d4d3f10d546`, including
 clean repeated suites, browser review and exact-source remote/public-link evidence.
 The historical checklist below retains the prior release's scope; this checklist
 is not proof by itself.

@@ -169,6 +169,87 @@
         "title": "CellMode",
         "type": "string"
       },
+      "CellProfile": {
+        "additionalProperties": false,
+        "properties": {
+          "cell_profile_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Cell Profile Id",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "product_count": {
+            "title": "Product Count",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "selectable": {
+            "title": "Selectable",
+            "type": "boolean"
+          },
+          "tool_count": {
+            "title": "Tool Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cell_profile_id",
+          "display_name",
+          "description",
+          "selectable",
+          "product_count",
+          "tool_count"
+        ],
+        "title": "CellProfile",
+        "type": "object"
+      },
+      "CellProfiles": {
+        "additionalProperties": false,
+        "properties": {
+          "default_cell_profile_id": {
+            "default": "hkm_inspired_v1",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Default Cell Profile Id",
+            "type": "string"
+          },
+          "profiles": {
+            "items": {
+              "$ref": "#/components/schemas/CellProfile"
+            },
+            "title": "Profiles",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "profiles"
+        ],
+        "title": "CellProfiles",
+        "type": "object"
+      },
       "CellState": {
         "additionalProperties": false,
         "properties": {
@@ -236,6 +317,37 @@
           "timestamp"
         ],
         "title": "CellState",
+        "type": "object"
+      },
+      "ClearTestsRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_test_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10000,
+            "title": "Expected Test Ids",
+            "type": "array"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_test_ids"
+        ],
+        "title": "ClearTestsRequest",
         "type": "object"
       },
       "CommandReceipt": {
@@ -405,6 +517,28 @@
         ],
         "title": "CommandStatus",
         "type": "string"
+      },
+      "DeleteTestRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id"
+        ],
+        "title": "DeleteTestRequest",
+        "type": "object"
       },
       "DeliveryExecution": {
         "additionalProperties": false,
@@ -1822,6 +1956,17 @@
             "title": "Active",
             "type": "boolean"
           },
+          "cell_display_name": {
+            "title": "Cell Display Name",
+            "type": "string"
+          },
+          "cell_profile_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Cell Profile Id",
+            "type": "string"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -1860,7 +2005,9 @@
           "created_at",
           "active",
           "order_count",
-          "outcomes"
+          "outcomes",
+          "cell_profile_id",
+          "cell_display_name"
         ],
         "title": "SimulationTest",
         "type": "object"
@@ -1868,6 +2015,14 @@
       "StartTestRequest": {
         "additionalProperties": false,
         "properties": {
+          "cell_profile_id": {
+            "default": "hkm_inspired_v1",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Cell Profile Id",
+            "type": "string"
+          },
           "request_id": {
             "format": "uuid",
             "title": "Request Id",
@@ -1887,12 +2042,58 @@
         "title": "StartTestRequest",
         "type": "object"
       },
+      "TestDeletion": {
+        "additionalProperties": false,
+        "properties": {
+          "cleanup_pending": {
+            "title": "Cleanup Pending",
+            "type": "boolean"
+          },
+          "deleted_test_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Deleted Test Ids",
+            "type": "array"
+          },
+          "history": {
+            "$ref": "#/components/schemas/TestHistory"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "deleted_test_ids",
+          "cleanup_pending",
+          "history"
+        ],
+        "title": "TestDeletion",
+        "type": "object"
+      },
       "TestHistory": {
         "additionalProperties": false,
         "properties": {
           "active_test_id": {
-            "title": "Active Test Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Test Id"
           },
           "schema_version": {
             "const": "1.0",
@@ -3381,6 +3582,24 @@
         "summary": "Cell"
       }
     },
+    "/cell-profiles": {
+      "get": {
+        "operationId": "available_cells_cell_profiles_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CellProfiles"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Available Cells"
+      }
+    },
     "/cell/reset": {
       "post": {
         "operationId": "reset_cell_cell_reset_post",
@@ -4048,6 +4267,93 @@
           }
         },
         "summary": "Start Test"
+      }
+    },
+    "/simulation-tests/clear": {
+      "post": {
+        "operationId": "clear_tests_simulation_tests_clear_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClearTestsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestDeletion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear Tests"
+      }
+    },
+    "/simulation-tests/{test_id}/delete": {
+      "post": {
+        "operationId": "delete_test_simulation_tests__test_id__delete_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "test_id",
+            "required": true,
+            "schema": {
+              "title": "Test Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteTestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestDeletion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Test"
       }
     },
     "/ui/app.js": {

@@ -1,0 +1,40 @@
+{
+  "scope": "Independent isolated-fixture follow-up of lifecycle review; no real user data or tracked source edits. Not full acceptance.",
+  "passed": true,
+  "checks": [
+    {
+      "check": "additional_host_during_shared_read_without_pending_cleanup",
+      "passed": true
+    },
+    {
+      "check": "orphan_profile_mismatch_refused_without_adoption_or_relabeling",
+      "passed": true
+    },
+    {
+      "check": "request_identity_bound_across_start_delete_and_clear",
+      "passed": true
+    },
+    {
+      "check": "deleted_original_not_recreated_after_bootstrap",
+      "passed": true
+    },
+    {
+      "check": "sqlite_access_database_handle_released_for_windows_fixture_cleanup",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "apps/api/test_sessions.py": "449ce7c50a25439a7edffd7ac18a9ad15e0ead0b7d523387475cf4aeda5e7d6c",
+    "apps/api/cell_profiles.py": "b29f753b5edb128663a2e64611a0438dcdad3d3b3faa1fb9a4d663c381264cf8",
+    "apps/api/app.py": "c23d534c676a906dbd4a7d1060042510cf9472c9f1643ef355ba389d256c9b9d",
+    "apps/api/__main__.py": "2554756dd1f968123dafbb218aae684eccd315cd5142549a042772268fe10276",
+    "apps/desktop/backend.py": "3fcfb00fc7dac888c7d79f0d98116a3fa6b92d9a6c9c72dc86375cb56bc0dcd6",
+    "tests/integration/test_test_management.py": "663864eee52395bb7f6660d926c0c46969cc1f3f55c9329f8d1374e5c9cb5dfd"
+  },
+  "review_notes": [
+    "Scoped middleware holds the shared barrier through complete await target ASGI responses, including FileResponse file consumption.",
+    "Tombstones are rechecked before cached child engines; deleted original routes fail without touching Store/Runtime.",
+    "Cleanup commits durable tombstones first, confines original managed filenames, preserves catalog and unrelated files, and defers cleanup while live readers exist.",
+    "Recovery uses only non-null active identity; deletion never promotes an uncertain archive."
+  ]
+}

@@ -187,6 +187,24 @@ unavailable tool, invalid product/tool pairing, workspace violation, impossible
 collision route, stale calibration, historical replay compatibility and semantic
 determinism. Thresholds and physics limitations remain explicit simulator rules.
 
+## Cell selection and test-data lifecycle addendum (2026-10-04)
+
+ADR 0011 extends the documented UI/API lifecycle without adding or weakening
+criterion IDs: the existing total remains 110 MUST criteria. Its scoped tests
+join the evidence for SC-ARCH, SC-IDEM, SC-PERSIST, SC-DEMO, SC-TEST and SC-KB
+requirements as applicable. Prior accepted source `ca779879` does not attest the
+new behavior.
+
+Verification includes the one selectable HKM cell, nonselectable legacy history,
+durable per-test profile metadata, explicit confirmed deletion, stale clear-all
+snapshot rejection, idempotent retries, tombstones, no-active-test restart,
+in-flight operation guards and confined cleanup. Cancellation and navigation
+leave data intact. Clear retries cannot delete later-created tests. Deletion
+never fabricates a business verdict, sends a pick or promotes an archived world;
+retained tests preserve their original outcomes and read-only replay semantics.
+These destructive-action checks use isolated disposable data, not user history.
+Full source-specific acceptance and publication remain governed by the rules below.
+
 ## DONE
 
 The project is DONE only when:

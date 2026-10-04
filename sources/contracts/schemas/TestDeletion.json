@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "JobState": {
+      "enum": [
+        "RECEIVED",
+        "VALIDATED",
+        "PLANNING",
+        "READY_TO_EXECUTE",
+        "EXECUTING",
+        "VERIFYING",
+        "UNKNOWN_OUTCOME",
+        "RECONCILING",
+        "COMPLETED",
+        "FAILED",
+        "REQUIRES_INTERVENTION"
+      ],
+      "title": "JobState",
+      "type": "string"
+    },
+    "SimulationTest": {
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "title": "Active",
+          "type": "boolean"
+        },
+        "cell_display_name": {
+          "title": "Cell Display Name",
+          "type": "string"
+        },
+        "cell_profile_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Cell Profile Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "number": {
+          "title": "Number",
+          "type": "integer"
+        },
+        "order_count": {
+          "title": "Order Count",
+          "type": "integer"
+        },
+        "outcomes": {
+          "items": {
+            "$ref": "#/$defs/JobState"
+          },
+          "title": "Outcomes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "test_id": {
+          "title": "Test Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "test_id",
+        "number",
+        "created_at",
+        "active",
+        "order_count",
+        "outcomes",
+        "cell_profile_id",
+        "cell_display_name"
+      ],
+      "title": "SimulationTest",
+      "type": "object"
+    },
+    "TestHistory": {
+      "additionalProperties": false,
+      "properties": {
+        "active_test_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Active Test Id"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tests": {
+          "items": {
+            "$ref": "#/$defs/SimulationTest"
+          },
+          "title": "Tests",
+          "type": "array"
+        }
+      },
+      "required": [
+        "active_test_id",
+        "tests"
+      ],
+      "title": "TestHistory",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "cleanup_pending": {
+      "title": "Cleanup Pending",
+      "type": "boolean"
+    },
+    "deleted_test_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Deleted Test Ids",
+      "type": "array"
+    },
+    "history": {
+      "$ref": "#/$defs/TestHistory"
+    },
+    "request_id": {
+      "format": "uuid",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "pattern": "^1\\.0$",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_id",
+    "deleted_test_ids",
+    "cleanup_pending",
+    "history"
+  ],
+  "title": "TestDeletion",
+  "type": "object"
+}

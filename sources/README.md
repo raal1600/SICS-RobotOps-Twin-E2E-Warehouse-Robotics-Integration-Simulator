@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. **DONE**.
+**Aktuell status:** Robot-cell selection and explicit test-data deletion are being implemented against baseline ae6d5d85c813e47aea042aea2a87236b5a8bc204. Previous 110-MUST HKM acceptance is preserved as historical evidence; this new revision is awaiting verification. **NOT DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -18,15 +18,19 @@ geometry and recorded quaternion transforms drive Blender and read-only browser
 replay. [The adaptation guide](docs/implementation/hkm-inspired.md) describes the
 synthetic mechanics and conservative geometric checks.
 
-Fresh API/desktop data and **Start new test** use this six-SKU profile. Saved
-legacy tests retain their original Cartesian scene, command hashes and evidence.
+Fresh API/desktop data uses this six-SKU profile. **Start new test** opens
+**New simulation test**: choose **Robot cell**, then **Create test**. The
+HKM-inspired cell is the only selectable cell today; the registry supports future
+additions. Saved legacy tests retain their original Cartesian scene, command
+hashes and evidence, and are labelled by their saved cell.
 [Actual Blender evidence](docs/evidence/hkm-blender-local/result.json) covers the
 six-tool showcase, attachment/release, uncertainty, restart and read-only replay.
 [The baseline archive](docs/evidence/hkm-baseline-eaf35b4/provenance.json) preserves
 the earlier release and the fresh baseline failure. Scoped development results
-retain their original source attribution. [Current acceptance](ACCEPTANCE_REPORT.md)
-records all 110 MUST criteria, repeated mandatory suites and the exact audited
-source with CI/publication evidence.
+retain their original source attribution. The 110-MUST HKM acceptance belongs
+to audited source `ca779879` and its publication successor `ae6d5d8`.
+[Current acceptance](ACCEPTANCE_REPORT.md) records evidence and remaining gates
+for subsequent changes, including cell selection and test-data deletion.
 
 This is an independent simulator inspired by public sources and general practice.
 It does not reproduce SICS AI proprietary architecture or AGI. Blender supplies
@@ -127,11 +131,22 @@ The saved Blender snapshot is available in the collapsed **Technical details**
 section; the full 3D view and replay are the main visualization.
 Reusing the data directory preserves state across restart.
 Use **Start new test** at the top for any new execution/observation combination.
-It keeps both selections, restores all products in an independent world and saves
-the previous test unchanged. This works after success, failure, uncertainty or
+Choose **Robot cell** in the dialog, then **Create test**. It keeps both fault
+selections, restores all products in an independent world and saves the previous
+test unchanged. This works after success, failure, uncertainty or
 intervention; a running operation must finish first. **Test history** opens saved
 evidence and replay in the same window, read-only. **Return to current test**
 resumes the active test. Startup recovers only that active world.
+
+**Delete selected test** removes the selected test's orders, evidence and replay
+after confirmation. **Clear all test data** confirms the displayed test set and
+removes those registered worlds. These actions do not run or reconcile a pick.
+Deleting the active test or clearing all tests leaves no active test; choose
+**Start new test** to continue. No archived test is promoted automatically.
+Cancellation changes nothing, and in-flight work blocks deletion. Cleanup that
+cannot finish immediately remains visible as pending and is retried safely.
+[Data scope and recovery](docs/adr/0011-cell-selection-and-test-data-lifecycle.md)
+explain retained catalog metadata and the boundary around application-owned files.
 
 Changing **Execution scenario** changes the next order's configuration only.
 **Restock this test → Start fresh scene** restores products within a resolved
@@ -175,7 +190,9 @@ This local demo API has no production authentication and binds to loopback.
 ```mermaid
 flowchart LR
     ERP[ERP/WMS UI] --> API[Integration API]
-    API --> TEST[Test catalog: active world / read-only history]
+    API --> PROFILES[Registered cell profiles]
+    API --> TEST[Test catalog: active world / retained history]
+    TEST --> RETAIN[Confirmed deletion / tombstones / bounded cleanup]
     API --> WF[Durable workflow]
     WF --> O[ObservationModel]
     WO[WorldObservation] --> B[DeterministicBrain]

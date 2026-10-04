@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** The HKM-inspired six-product/six-tool cell passes all 110 MUST criteria at audited source ca7798798f916c8130e1833cf16b4d4d3f10d546. Both clean Windows runs passed 622 tests with 91.18% coverage, including 107 UI checks; eight real Blender demos, quality/security gates, CI and publication passed. Schema-2 contracts preserve schema-1 histories. Final evidence/status commits receive their own CI and Pages attestations; prior results remain archived. Status: DONE.
+> **Implementation status, 2026-10-04:** Robot-cell selection and explicit test-data deletion are being implemented against baseline ae6d5d85c813e47aea042aea2a87236b5a8bc204. Previous 110-MUST HKM acceptance is preserved as historical evidence; this new revision is awaiting verification. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -32,7 +32,7 @@ Jämförelsen är alltså inte en omvänd konstruktion av SICS AI:s produkt. Den
 
 | Aspekt | Offentlig eller generell verklighetsbild | RobotOps Twins mål |
 |---|---|---|
-| Kundflöde | Rollen omfattar kundens API/WMS/ERP. [S01] | Sex syntetiska SKU-familjer i revision 1.2; gamla tre-SKU-körningar bevaras. Ett plock per orderrad. |
+| Kundflöde | Rollen omfattar kundens API/WMS/ERP. [S01] | Sex syntetiska SKU-familjer i revision 1.2; sparade tre-SKU-körningar behåller sin tolkning. Ett plock per orderrad. |
 | Affärsregler | Exakta kundregler är inte offentliga. | En enkel regel: rätt exemplar till rätt orderlåda. |
 | Integration | Leverantörsmaterial beskriver lagerstyrning runt robotcellen. [S07] | Separat kundadapter och kvittenskontrakt. |
 | Inventering | Verklig redovisning, reservation och korrigering är inte kartlagda. | Förenklad reservations- och saldomodell utan bokföring. |
@@ -55,7 +55,9 @@ Ett lyckat plock kan också vara olika saker i olika affärsprocesser: flyttat o
 
 En animation kan vara begriplig utan att dess moment, kontaktkrafter eller ledhastigheter motsvarar en verklig robot. Det är tillåtet i en integrationsdemo om det är tydligt deklarerat. Problemet uppstår när visuellt övertygande rörelse används som underlag för påståenden om dynamisk noggrannhet.
 
-Tabellen beskriver den implementerade simulatoravgränsningen för revision 1.2. Sex verktyg och produktfamiljer har verifierats i faktisk Blender. ACCEPTANCE_REPORT.md redovisar full upprepad acceptans och publicering för den granskade källrevisionen samt vilka resultat som hör till äldre riktade körningar. Verktygsbyte under samma journalförda kommando ändrar inte innebörden av effect_count: endast produktförflyttningar räknas. Arbetsområde och konservativ geometrisk kollisionskontroll är egna simulatorregler, inte certifierad robotbanplanering. Små källpositionsfel kan centreras inom en uttrycklig syntetisk grepptolerans; det är ingen modell av riktiga gripkrafter eller uppmätt robotnoggrannhet.
+Tabellen beskriver den implementerade simulatoravgränsningen för revision 1.2. Sex verktyg och produktfamiljer verifierades i faktisk Blender vid den accepterade källrevisionen ca7798798f916c8130e1833cf16b4d4d3f10d546. Den historiska acceptansen är arkiverad under docs/evidence/test-lifecycle-baseline; ACCEPTANCE_REPORT.md anger status för senare ändringar. Verktygsbyte under samma journalförda kommando ändrar inte innebörden av effect_count: endast produktförflyttningar räknas. Arbetsområde och konservativ geometrisk kollisionskontroll är egna simulatorregler, inte certifierad robotbanplanering. Små källpositionsfel kan centreras inom en uttrycklig syntetisk grepptolerans; det är ingen modell av riktiga gripkrafter eller uppmätt robotnoggrannhet.
+
+Cellregistret och de uttryckliga raderingsfunktionerna är simulatorns egen datahantering, inte en modell av en kunds lagringspolicy. Nya försök väljer en registrerad cell utan att ändra äldre världar. Bekräftad radering tar bort den valda försöksevidensen men ger inget affärsbeslut och kör inget robotkommando. Applikationens katalog och raderingskvitton behålls för säkra återförsök; funktionen lovar inte säker överskrivning av lagringsmediet. Vanlig navigering, replay och omstart raderar ingenting (ADR 0011).
 
 ### 2.3 PLC, beräkning och drift
 

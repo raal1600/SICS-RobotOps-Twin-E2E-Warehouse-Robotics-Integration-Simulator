@@ -65,3 +65,13 @@ The later selector-explanation change is scoped separately in
 Affected UI, observation, reconciliation, test-history and contract suites verify
 the follow-up. Browser checks cover all choices, comparison tables and narrow
 screens; reading help must leave the original uncertain command unchanged.
+
+The cell-selection and explicit deletion revision (ADR 0011) is tested by
+`tests/integration/test_test_management.py` and the mandatory dashboard suite.
+Coverage includes saved legacy profiles, selected-cell validation, confirmation
+and cancellation, deletion without archive activation, empty-workspace restart,
+durable tombstones, interrupted cleanup, bounded paths, cross-process execution
+and download races, and request retries after a lost response. These checks extend
+the existing persistence and demonstration evidence mappings without changing any
+MUST threshold. The previous HKM acceptance is preserved in
+`docs/evidence/test-lifecycle-baseline/`; it does not attest this revision.

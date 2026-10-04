@@ -3,7 +3,8 @@
 The normative vocabulary is PROJECT_PLAN.md. JSON Schemas are generated from
 `robotops/domain/models.py` and the separate presentation contracts in
 `robotops/blender/visualization.py`, plus test-lifecycle contracts in
-`apps/api/test_sessions.py`, by `uv run python -m tools.export_contracts` and
+`apps/api/test_sessions.py` and `apps/api/cell_profiles.py`, by
+`uv run python -m tools.export_contracts` and
 compared by contract tests. Additional keys and arbitrary code fields are
 rejected. Schema version 1.0 uses UTC timestamps, stable IDs, metres, an explicit
 coordinate frame and calibration version. Quaternion norm tolerance is 1e-6.
@@ -69,10 +70,18 @@ saved scene identities are rejected by the delivery contract. Ordering uses
 durable execution events rather than intake timestamps (ADR 0006).
 Current evidence is in GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md.
 
-GET /simulation-tests returns TestHistory: the active identity and numbered
-SimulationTest summaries with their persisted job outcomes. POST /simulation-tests
-accepts StartTestRequest with a UUID request_id and creates one independent world.
-The UUID is idempotent even after later tests; retrying never reactivates an archive.
+GET /cell-profiles returns CellProfiles: `default_cell_profile_id` and typed
+`profiles`, each with `cell_profile_id`, `display_name`, `description`,
+`selectable`, `product_count` and `tool_count`. Only `hkm_inspired_v1` is
+selectable; `legacy_cartesian_v1` labels saved history and cannot create a test.
+These are server-defined profiles, not executable configuration from the browser.
+
+GET /simulation-tests returns TestHistory: nullable `active_test_id` and numbered
+SimulationTest summaries with persisted job outcomes, `cell_profile_id` and
+`cell_display_name`. POST /simulation-tests accepts StartTestRequest with UUID
+`request_id` and `cell_profile_id` (default `hkm_inspired_v1`) and creates one
+independent world. The UUID is idempotent even after later tests; retrying never
+reactivates an archive or recreates a deleted test.
 Original routes retain their paths; another test uses `/simulation-tests/<UUID>`
 before the same routes. Writes to any archive return 409 TEST_ARCHIVED_READ_ONLY;
 creation during work returns 409 TEST_OPERATION_IN_PROGRESS. Only the active test
@@ -81,6 +90,35 @@ Fresh API/desktop worlds and Start new test use `Settings.hkm()`; each reopened
 world resolves its own persisted execution settings. Historical three-product
 worlds, their commands and recordings are not migrated. Explicit CLI settings
 configure a new world and cannot reinterpret an already saved world.
+
+POST /simulation-tests/{test_id}/delete accepts `request_id: UUID` and explicitly
+removes that registered test. POST /simulation-tests/clear accepts `request_id`
+and `expected_test_ids`: the initially displayed live test set must still match.
+Both return TestDeletion with `request_id`, `deleted_test_ids`, `cleanup_pending`
+and `history: TestHistory`. A retry is tied to its persisted original target set;
+it cannot clear tests created later. UI confirmation precedes these calls; they
+are separate from the archived world's execution routes. They never dispatch,
+reconcile or assign a business verdict.
+
+Lifecycle conflicts return HTTP 409 with a reason code: `CELL_PROFILE_NOT_AVAILABLE`
+for unknown/nonselectable profiles, `TEST_HISTORY_CHANGED` for a changed clear
+snapshot, `TEST_REQUEST_CONFLICT` for UUID reuse with another payload/operation,
+`CELL_PROFILE_STATE_MISMATCH` when a partial uncatalogued world conflicts with
+the requested cell (its files and the active test are preserved),
+`TEST_DELETED` for creation retries whose test was deleted,
+`TEST_OPERATION_IN_PROGRESS` for busy work or lifecycle access, and
+`TEST_STORAGE_UNSAFE_PATH` for unsafe cleanup paths. Deleted test reads/writes
+return 404. An empty clear snapshot is valid only when no live tests remain.
+
+Deleting the active test leaves `active_test_id: null`; deleting an archive
+preserves a different active identity. No world is promoted or recreated on
+restart. The UI offers explicit new-test creation in this state. A separate
+SQLite access barrier serializes deletion with reads, writes and downloads;
+catalog transactions serialize lifecycle mutations, and live work prevents
+cleanup. `cleanup_pending` distinguishes logical removal from unfinished bounded
+file removal. ADR 0011 documents scope, tombstones and restart behavior. Lifecycle
+contracts/OpenAPI are generated alongside the existing schemas; business command,
+observation and verification contracts are unchanged by this extension.
 
 The local dashboard also serves bounded presentation assets at `/ui/theme.css`
 and `/ui/workflow-guide.js`. The guide is a pure presentation of persisted job and

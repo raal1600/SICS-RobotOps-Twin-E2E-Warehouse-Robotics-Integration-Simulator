@@ -4,11 +4,19 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
-### HKM-inspired accepted revision (2026-10-04)
+### Cell-selection and test-data lifecycle revision (2026-10-04)
 
-The HKM-inspired adaptation is a separate accepted revision. Its audited source,
-110 MUST results and exact-source publication evidence are recorded in
-ACCEPTANCE_REPORT.md. The verified 59ace31 deterministic-system release remains
+ADR 0011 adds one currently selectable HKM cell and explicit test-data retention
+controls. Synchronize their API/UI descriptions and architecture diagram before
+rebuilding. Current verification status belongs to GOAL_PROGRESS.md,
+ACCEPTANCE_REPORT.md and the generated shared status block; do not infer a new
+PASS from the earlier accepted HKM publication.
+
+### Historical HKM-inspired accepted revision (2026-10-04)
+
+The HKM-inspired adaptation was accepted at audited source `ca779879`, with
+publication successor `ae6d5d8`; its 110-MUST results retain that exact attribution.
+The verified 59ace31 deterministic-system release remains
 historical evidence. Exact prior and fresh eaf35b4 baseline reports are archived with hashes
 in [baseline provenance](docs/evidence/hkm-baseline-eaf35b4/provenance.json).
 The fresh baseline retains its repeated obsolete UI-label failure; no historical

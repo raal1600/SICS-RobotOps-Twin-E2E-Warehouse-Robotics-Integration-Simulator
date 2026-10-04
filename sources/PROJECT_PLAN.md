@@ -198,6 +198,27 @@ pick is issued by creation. A durable catalog serializes test creation with API
 mutations and startup recovers only the active world (ADR 0007). Job state-machine,
 idempotency, reconciliation and observation-boundary rules are unchanged.
 
+### Cell selection and explicit retention controls
+
+ADR 0011 extends the experiment lifecycle. Start new test opens a cell selector
+backed by `GET /cell-profiles`; only the HKM-inspired profile is currently
+selectable. Legacy profile metadata labels saved tests without making that cell
+available for new creation. A test's profile is durable and never changed by
+opening it or choosing a new default.
+
+Delete selected test and Clear all test data are explicit confirmed retention
+actions, distinct from physical execution, reconciliation and restocking. A
+clear request names the displayed live test set; stale snapshots are rejected,
+and retries retain their original targets. Removing an active test leaves an
+empty active pointer, with no automatic archive promotion or world recreation.
+Durable tombstones and deletion receipts prevent resurrection and support
+interrupted bounded cleanup. The catalog serializes lifecycle operations with
+reads, writes and downloads; in-flight work blocks deletion. Only registered
+application-owned world files are removed; unrelated data and lifecycle metadata
+remain. Tests validate these operations in temporary roots, never the owner's
+existing data. The 110 existing MUST criteria and physical-effect semantics are
+unchanged; current acceptance must include the new lifecycle regression evidence.
+
 ## Test strategy
 
 Unit: schemas, transition guards, idempotency, verifier, reconciliation decision table, observation degradation.
@@ -330,11 +351,12 @@ controls remain read-only; simulation timing is distinct from UTC/real latency.
 The UI exposes IDs, state, tool reasoning and exact observation/reconciliation
 evidence with an unobtrusive Simulation Boundaries explanation.
 
-The HKM-inspired revision has passed all 110 MUST criteria at the audited source
-identified in ACCEPTANCE_REPORT.md. Its evidence records repeated mandatory
+The HKM-inspired revision passed all 110 MUST criteria at audited source
+`ca7798798f916c8130e1833cf16b4d4d3f10d546`. Its evidence records repeated mandatory
 suites, actual Blender six-tool/transform/attachment tests, original-command
 recovery, browser review and exact-source CI/publication verification. The
-historical baseline remains separately attributed. The phase definitions below
+historical baseline remains separately attributed; it does not attest later
+test-lifecycle changes. The phase definitions below
 retain the implementation and exit requirements used for this revision.
 
 ### HKM-P0 — Model and adapter

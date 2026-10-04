@@ -35,7 +35,25 @@ Do not begin architecture-changing implementation before understanding the norma
 
 ## Execution loop
 
-### Active revision: HKM-inspired warehouse cell
+### Current change: cell selection and test-data lifecycle
+
+ADR 0011 adds registry-backed cell selection for a new test and explicit deletion
+of a selected test or the confirmed current test set. Only `hkm_inspired_v1` is
+selectable; legacy cell metadata exists for saved history, not new creation.
+Keep profile selection separate from execution/observation faults. Reopening
+always preserves a saved world's own settings and historical contract semantics.
+
+Implement and verify destructive actions using disposable temporary data roots.
+Do not delete the owner's tests while developing or validating this feature.
+Deletion requires an explicit data-management request and UI confirmation; it
+is never triggered by replay, navigation, startup, scenario changes or new-test
+creation. Preserve tombstones, request identity, bounded cleanup and the catalog
+lock. Removing the active test leaves no active world and never promotes history.
+Unknown/intervention outcomes are not resolved by deleting their test evidence.
+The original 110 MUSTs remain normative; prior acceptance is historical evidence
+for its exact source, not a pass for this lifecycle change.
+
+### Accepted HKM-inspired warehouse cell baseline
 
 Fresh API/desktop worlds and Start new test use the six-SKU HKM profile. Existing
 worlds retain their persisted execution settings and historical evidence; do not
@@ -60,7 +78,8 @@ No MCP/natural-language/generated code is permitted in runtime commands.
 
 The procedural cell, six-product/tool catalogue, deterministic selection,
 segmented preflight, visible tool preparation and quaternion replay are now
-implemented and accepted at the audited source identified in ACCEPTANCE_REPORT.md.
+implemented and accepted at audited source
+`ca7798798f916c8130e1833cf16b4d4d3f10d546` (publication successor `ae6d5d8`).
 Continue from that implementation and preserve the archived evidence in
 GOAL_PROGRESS.md; do not restart this work as scaffolding. Later material changes
 require fresh scoped evidence and the applicable acceptance gates.
@@ -79,8 +98,9 @@ contracts explicitly and retain old scene, payload/hash and recording meanings.
 Schema-1 serializers omit schema-2 extensions, including defaults, so archived
 command digests remain unchanged. New schema-2 records retain strict typed
 fields; never replace that serializer with an unrestricted dictionary schema.
-Never destructively reset saved user tests to make new fixtures work. A truly
-destructive migration remains a human-escalation condition below.
+Never destructively reset saved user tests to make new fixtures work. Explicit
+operator-requested test deletion is governed by ADR 0011; a destructive migration
+without that authorization remains a human-escalation condition below.
 
 Each milestone synchronizes affected catalogue-generated docs, contracts,
 architecture/frame/state/tool diagrams, report provenance and public status.

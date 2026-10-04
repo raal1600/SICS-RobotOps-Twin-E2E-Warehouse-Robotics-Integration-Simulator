@@ -52,6 +52,13 @@ unknown/intervention states and evidence remain unchanged in read-only history.
 Restart recovery applies only to the active world; archived uncertainty never
 becomes success through navigation or restart. See ADR 0007.
 
+The separate confirmed test-data deletion controls in ADR 0011 may discard a
+selected experiment, including its uncertain evidence. This is not a verdict or
+reconciliation: no replacement pick is issued and no job is marked successful
+or failed. Retained tests keep their original state, and deleting the active test
+does not reactivate an archive. Lifecycle cleanup never inspects hidden truth to
+decide a business outcome.
+
 Run `uv run --locked python -m tools.dev demo` for happy path; add
 `--scenario lost_ack_after_effect`, `ambiguous`, or `restart`. Each fresh run writes
 its timeline, original command identity, controller events and a clearly labelled

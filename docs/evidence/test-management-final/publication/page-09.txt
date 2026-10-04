@@ -1,0 +1,51 @@
+4. Krav och minsta meningsfulla omfattning
+4.1 Ett litet system med verkliga ansvarsskillnader
+Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt
+gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en
+HKM-inspirerad manipulator. HKM-utökningen verifierades med upprepad full acceptans,
+Blender-tester och publicering vid källrevision
+ca7798798f916c8130e1833cf16b4d4d3f10d546. Den historiska evidensen ligger under docs/
+evidence/test-lifecycle-baseline; ACCEPTANCE_REPORT.md redovisar aktuell revisionsstatus.
+En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag.
+Sparade körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.
+Den efterföljande livscykeländringen skiljer val av robotcell från fel- och observationsscenario.
+”Start new test” öppnar ett cellval; endast den HKM-inspirerade cellen kan väljas för nya
+försök. Äldre kartesiska körningar är fortfarande läsbara. ”Delete selected test” och ”Clear all
+test data” kräver uttrycklig bekräftelse av vilken evidens som tas bort. Radering är varken
+avstämning eller ett lyckat/misslyckat plock. Om det aktiva försöket raderas skapas ingen
+ersättningsvärld och inget arkiv blir automatiskt aktivt. ADR 0011 beskriver beständiga
+raderingskvitton, avgränsad filhantering och verifiering i isolerade testdata.
+Systemet ska kunna köras utan externa modellkonton. Blender visar förändringen i världen,
+men ordern blir inte färdig bara för att animationen slutar. UI:t visar orderstatus, cellstatus,
+kommandostatus och verifieringsstatus var för sig.
+4.2 Kravspårbarhet mot rollen
+ID Arbetsområde Planerad
+projektartefakt
+Vad som kan bedömas
+K01 Pythonutveckling Modulärt backend och
+typade modeller.
+Kodstruktur, felhantering
+och tester.
+K02 Kund-API/WMS Mock-ERP och adapter
+med kvittenser.
+Kontrakt och
+affärssemantik.
+K03 Robotintegration RobotGateway med
+Blender-adapter.
+Ansvarsgräns och
+versionshantering.
+K04 PLC/cellsignaler Logisk CellController. Interlocks och tillstånd,
+inte PLC-certifiering.
+K05 LLM/VLM Valfri adapter för
+strukturerade förslag.
+Validering, tidsgränser
+och avvisning.
+K06 Driftsättning Lokal installationsguide
+och versionsmanifest.
+Repeterbar start och
+konfiguration.
+K07 Drift/felsökning Händelsetidslinje och
+felinjektion.
+Spårbarhet och diagnos.
+ROBOTOPS TWIN / TEKNISKT RAPPORTPAKET
+Rami Halabi · Oberoende simulatorstudie · 4 oktober 2026 9 / 33

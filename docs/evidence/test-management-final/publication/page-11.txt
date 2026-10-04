@@ -1,0 +1,62 @@
+Figure 2. SIMULATOR_DESIGN architecture; revision-specific acceptance is stated separately. The durable workflow
+validates observed plans and preserves original command identity. The bounded Blender runtime owns private world/
+tool state and controller checkpoints. ObservationModel alone converts world data into WorldObservation with explicit
+sensor and simulated telemetry provenance; Verifier has no direct world path. T ool preparation shares the product-
+transfer command and does not add a transfer effect. Replay reads versioned artifacts. The API cell registry initializes
+new tests; retained archives remain read-only. Explicit confirmed deletion uses the test catalog, tombstones and
+bounded cleanup, never a robot command or verdict. Deleting the active test leaves no active world. Lost
+acknowledgement still requires original journal plus fresh sufficient observation, with no replacement pick.
+Del Äger Får inte göra
+Mock ERP/WMS Order, artikelregister och kundens
+kvittens.
+Skriva robotleder eller modellens
+interna tillstånd.
+Integrationslager Uppdrag, avsikt, försök och
+rapportering.
+T olka timeout som bevis för
+utebliven effekt.
+Brain-adapter Ett handlingsförslag och
+modellmetadata.
+Exekvera kod i Blender eller
+godkänna sig själv.
+Systemgränser och ägarskap
+Typed tools and TCP - explicit test lifecycle - original evidence boundaries
+ERP / WMS
+Current test / retained
+history
+API / durable
+workflow
+Typed plans / cell and
+test scope
+RobotGateway
+Typade kommandon och
+status
+Deterministic
+Brain
+Catalogue / tool /
+trajectory
+Beständig lagring
+Test catalog /
+tombstones / evidence
+Bounded Blender
+runtime
+Private world / tool
+checkpoints
+Operationsvy
+Timeline / cell choice
+/ retention
+Verifierare
+Observation → bedömning
+Cell / command
+journal
+Logical interlocks /
+tool state
+ObservationModel
+Sensors / labelled
+telemetry
+Read-only 3D
+replay
+Versioned transforms /
+phase / tool
+ROBOTOPS TWIN / TEKNISKT RAPPORTPAKET
+Rami Halabi · Oberoende simulatorstudie · 4 oktober 2026 11 / 33

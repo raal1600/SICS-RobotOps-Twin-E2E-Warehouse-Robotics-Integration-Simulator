@@ -35,7 +35,7 @@ Do not begin architecture-changing implementation before understanding the norma
 
 ## Execution loop
 
-### Current change: cell selection and test-data lifecycle
+### Accepted cell selection and test-data lifecycle revision
 
 ADR 0011 adds registry-backed cell selection for a new test and explicit deletion
 of a selected test or the confirmed current test set. Only `hkm_inspired_v1` is
@@ -52,6 +52,14 @@ lock. Removing the active test leaves no active world and never promotes history
 Unknown/intervention outcomes are not resolved by deleting their test evidence.
 The original 110 MUSTs remain normative; prior acceptance is historical evidence
 for its exact source, not a pass for this lifecycle change.
+
+Fresh acceptance for clean source `b1c374ae76144309cc4476392dec681292f0e3a7`
+passes all 110 MUSTs in the
+[refreshed manifest](docs/evidence/acceptance/20261004T204452/manifest.json).
+[CI and public-publication evidence](docs/evidence/test-management-final/README.md)
+retains the independent exact-source checks and original artifacts. Preserve
+this attribution; a later evidence/status commit requires its own CI and Pages
+attestation under ADR 0002.
 
 ### Accepted HKM-inspired warehouse cell baseline
 

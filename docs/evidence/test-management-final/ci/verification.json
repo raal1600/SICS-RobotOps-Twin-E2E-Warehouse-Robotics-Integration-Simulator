@@ -1,0 +1,575 @@
+{
+  "result": "PASS_FOR_CI_LOCAL_EVIDENCE_AUDIT",
+  "verified_at_utc": "2026-10-04T21:14:39.938663+00:00",
+  "source": {
+    "commit": "b1c374ae76144309cc4476392dec681292f0e3a7",
+    "dirty": false,
+    "source_sha256": "6b185c9ea50e12c6ea40e81e5b05f84bb2fab912d4f0ec323767ba291c4fb879"
+  },
+  "artifact_id": 11315576113,
+  "artifact_sha256": "044308f69a1b60d7ea925a4d3027d86228e09b87ea01c9a48c6dae14dbf11de7",
+  "artifact_digest_verified": true,
+  "archive_entries_validated": 659,
+  "selected_manifest": "docs/evidence/acceptance/20261004T204556/manifest.json",
+  "selected_manifest_sha256": "63861fe8b0b7c43ba5418d2e23033bd5de3ff07321887cdfef4a742414f1cc7f",
+  "environment": {
+    "python": "3.13.15 (main, Aug  6 2026, 02:15:18) [GCC 13.3.0]",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "dependencies": {
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "pytest": "9.1.1",
+      "ruff": "0.16.10",
+      "mypy": "2.4.0",
+      "weasyprint": "70.0",
+      "bandit": "1.9.4",
+      "pip-audit": "2.10.1"
+    },
+    "lock_sha256": "33bbc8b179d9e4b731b1630291380ecd8900b93ea2e9a36f816c5b081c196921"
+  },
+  "tests": [
+    {
+      "run": 1,
+      "tests": 659,
+      "passed": 659,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "coverage_percent": 91.51873767258382,
+      "junit_sha256": "2c63429bf5990597b9f92a68fb6f7c8cfa275df2e153a295a7b5330522b78fb4",
+      "coverage_sha256": "e2d88dc62a15ea0478d53e86570f1fab5f079f6a7cfd01c12f75f36a6b267d16"
+    },
+    {
+      "run": 2,
+      "tests": 659,
+      "passed": 659,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "coverage_percent": 91.51873767258382,
+      "junit_sha256": "3e2f63f7f1f9f2f2d0f974a8d4876e425554c6a33ac6efabc0272360af1e49d1",
+      "coverage_sha256": "81143cb8f0bfa0e0a2a128daba0b25eebf4c733f7ffc3633560245a0bfcbcbfe"
+    }
+  ],
+  "test_identities_identical": true,
+  "local_gate_count": 19,
+  "local_gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.15/x64/bin/uv",
+        "sync",
+        "--locked",
+        "--all-groups"
+      ],
+      "seconds": 0.010335786000013059,
+      "log": "docs/evidence/acceptance/20261004T204556/setup.log"
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/_temp/blender-5.2.1-linux-x64/blender",
+        "--version"
+      ],
+      "seconds": 0.2191642770000044,
+      "log": "docs/evidence/acceptance/20261004T204556/blender_version.log"
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "security"
+      ],
+      "seconds": 4.091379507999989,
+      "log": "docs/evidence/acceptance/20261004T204556/security.log"
+    },
+    "tests_1": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=/tmp/robotops-acceptance-1-scnwltuh/fixtures",
+        "--junitxml=/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261004T204556/tests-1.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261004T204556/coverage-1.json",
+        "--cov-report=term"
+      ],
+      "seconds": 659.787377706,
+      "log": "docs/evidence/acceptance/20261004T204556/tests_1.log"
+    },
+    "tests_2": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=/tmp/robotops-acceptance-2-l5772cmt/fixtures",
+        "--junitxml=/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261004T204556/tests-2.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261004T204556/coverage-2.json",
+        "--cov-report=term"
+      ],
+      "seconds": 654.1945146959999,
+      "log": "docs/evidence/acceptance/20261004T204556/tests_2.log"
+    },
+    "repeatability": {
+      "passed": true,
+      "log": "docs/evidence/acceptance/20261004T204556/repeatability.json"
+    },
+    "lint": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "lint"
+      ],
+      "seconds": 0.13442141299992727,
+      "log": "docs/evidence/acceptance/20261004T204556/lint.log"
+    },
+    "typecheck": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "typecheck"
+      ],
+      "seconds": 4.106681120000076,
+      "log": "docs/evidence/acceptance/20261004T204556/typecheck.log"
+    },
+    "demo_happy_path": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "happy_path",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/happy_path"
+      ],
+      "seconds": 22.04063225499999,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_happy_path.log"
+    },
+    "demo_lost_ack_after_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_after_effect",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/lost_ack_after_effect"
+      ],
+      "seconds": 21.984443224000188,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_lost_ack_after_effect.log"
+    },
+    "demo_lost_ack_before_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_before_effect",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/lost_ack_before_effect"
+      ],
+      "seconds": 0.5108150000000933,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_lost_ack_before_effect.log"
+    },
+    "demo_ambiguous": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "ambiguous",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/ambiguous"
+      ],
+      "seconds": 22.169806476000076,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_ambiguous.log"
+    },
+    "demo_restart": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "restart",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/restart"
+      ],
+      "seconds": 22.547307877000094,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_restart.log"
+    },
+    "demo_logical_estop": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "logical_estop",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/logical_estop"
+      ],
+      "seconds": 0.47866065500011246,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_logical_estop.log"
+    },
+    "demo_cell_fault": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "cell_fault",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/cell_fault"
+      ],
+      "seconds": 0.47834345199999007,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_cell_fault.log"
+    },
+    "demo_tool_showcase": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "tool_showcase",
+        "--directory",
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/runs/20261004T204556/tool_showcase"
+      ],
+      "seconds": 140.35277187499992,
+      "log": "docs/evidence/acceptance/20261004T204556/demo_tool_showcase.log"
+    },
+    "drift": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.drift_check"
+      ],
+      "seconds": 0.4086186080000971,
+      "log": "docs/evidence/acceptance/20261004T204556/drift.log"
+    },
+    "publication": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 13.48654756000019,
+      "log": "docs/evidence/acceptance/20261004T204556/publication.log"
+    },
+    "publication_final": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 12.370540476000087,
+      "log": "docs/evidence/acceptance/20261004T204556/publication_final.log"
+    }
+  },
+  "mandatory_criteria_count": 110,
+  "archived_unrefreshed_musts": {
+    "HKM-VIS-MUST-025": {
+      "passed": false,
+      "failures": [
+        "ci",
+        "publication_remote",
+        "pages"
+      ]
+    },
+    "SC-DATA-005": {
+      "passed": false,
+      "failures": [
+        "ci"
+      ]
+    },
+    "SC-KB-006": {
+      "passed": false,
+      "failures": [
+        "publication_remote"
+      ]
+    },
+    "SC-KB-007": {
+      "passed": false,
+      "failures": [
+        "publication_remote"
+      ]
+    },
+    "SC-KB-008": {
+      "passed": false,
+      "failures": [
+        "pages",
+        "publication_remote"
+      ]
+    }
+  },
+  "remote_gate_placeholders": {
+    "pages": {
+      "passed": false
+    },
+    "publication_remote": {
+      "passed": false
+    },
+    "ci": {
+      "passed": false
+    }
+  },
+  "evidence_files": [
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/bandit.json",
+      "sha256": "bd083a83a2bfd4803e816f4465cf457d437cf6a3cdd09587134e2f1e4c805ef2",
+      "bytes": 22644
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/coverage-1.json",
+      "sha256": "e2d88dc62a15ea0478d53e86570f1fab5f079f6a7cfd01c12f75f36a6b267d16",
+      "bytes": 230815
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/blender_version.log",
+      "sha256": "3be4f92171c0a7c0fccda151def95807349221b85697d5dc83a0f4a93797e49d",
+      "bytes": 1462
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/coverage-2.json",
+      "sha256": "81143cb8f0bfa0e0a2a128daba0b25eebf4c733f7ffc3633560245a0bfcbcbfe",
+      "bytes": 230815
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-ambiguous.json",
+      "sha256": "a168e8cef881ec8a6e7ef47b903968269626d2d2937eab5978e0eef7d6399a5b",
+      "bytes": 134687
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-cell_fault.json",
+      "sha256": "d6adcac7d4268309e493dadbd6aa11e3a85de9be8de701f0079411c7c588bf33",
+      "bytes": 65295
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-happy_path.json",
+      "sha256": "b4c10ea6859286f447cd8220557003efec9132138dcb511c826f99200bf311b6",
+      "bytes": 88494
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-logical_estop.json",
+      "sha256": "a76875da6d3110483a9deb327bb5c4139217d47baa1660fd2636114d417669a4",
+      "bytes": 65315
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-lost_ack_after_effect.json",
+      "sha256": "4d9bf3679af4c2be2807f002f4a7a53b18f1d2e2ad4a81fcdb5b78e178903e8b",
+      "bytes": 123541
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-restart.json",
+      "sha256": "8c0e6ec8a3166b7a7a1e6224d5ccd2fac160dadafb7fe86c466b009561ce0904",
+      "bytes": 123528
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-lost_ack_before_effect.json",
+      "sha256": "db7753d5e3f062f14179e426ceb903cdb12d831baf91e1c0e09a0deff8a8c75d",
+      "bytes": 98031
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_ambiguous.log",
+      "sha256": "b1b916d7ba9cd90354a762999565e14bb76d6212c9b1ccf364f5707dc6e074db",
+      "bytes": 424
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo-tool_showcase.json",
+      "sha256": "ecb42e9ed5ca3327bf79f356ff3111f6e2ce2f56ac7fb5f4d15e5fa9facc920f",
+      "bytes": 603262
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_cell_fault.log",
+      "sha256": "66c0270fdd04e7fa834d70b0bd0b4a6960140005d6ed5dc18df952557cca5d8f",
+      "bytes": 402
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_happy_path.log",
+      "sha256": "b949abb555693602c3aa3cb14017bf6092745617a25c2aee9c0a2ec2b14785e3",
+      "bytes": 408
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_logical_estop.log",
+      "sha256": "3e305e81c369ced8c0ab44798caa012a74f38b23c6bed7ae27668903547fddf0",
+      "bytes": 408
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_lost_ack_after_effect.log",
+      "sha256": "e276e6bc91f4e35fa25bc8e8f6d827750e0bbef03c0bfb77248a5e56c29b452d",
+      "bytes": 436
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_restart.log",
+      "sha256": "cc701b87899dcf38bb17e1d7eb6895384509d931c5a2cfe9cc8066855314013f",
+      "bytes": 437
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_tool_showcase.log",
+      "sha256": "e50d22100dd3279498364e4a864fec5d685c2b34573d652898dd5ee1e4b70e2d",
+      "bytes": 414
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/drift.json",
+      "sha256": "6a46a8e64005e12554d2b3a43d6a74b0aac4342e50a3cea820867f3961370683",
+      "bytes": 1987
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/demo_lost_ack_before_effect.log",
+      "sha256": "1dcf48fd13fa3ca211a8846dff2f45344101f25ccda069923008319c210a1bc3",
+      "bytes": 435
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/drift.log",
+      "sha256": "6a46a8e64005e12554d2b3a43d6a74b0aac4342e50a3cea820867f3961370683",
+      "bytes": 1987
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/lint.log",
+      "sha256": "539192c6f273557bba0649140f922bc9029fddc262fd3877c241361fc74aab00",
+      "bytes": 47
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/manifest.json",
+      "sha256": "63861fe8b0b7c43ba5418d2e23033bd5de3ff07321887cdfef4a742414f1cc7f",
+      "bytes": 20755
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/pip-audit.json",
+      "sha256": "8052fd889c01408c4e38711a680e2698a769560f2ebfb688abee5f970e6071e6",
+      "bytes": 4430
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/publication-build.json",
+      "sha256": "6e4e3a5652c9675e02bd16699d24f48fd9b66a526183c795e90ff195b8dd9cc9",
+      "bytes": 3447
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/publication.log",
+      "sha256": "74cf6fda08c34c751f91661431cfa39241e58f45e44f9653c11cba410d407ec3",
+      "bytes": 4480
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/publication_final.log",
+      "sha256": "74cf6fda08c34c751f91661431cfa39241e58f45e44f9653c11cba410d407ec3",
+      "bytes": 4480
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/remote.json",
+      "sha256": "e6757e5b55aaa6ad21c3ed1a953f53e4a5a6d3c71d4aa46842a555d0debb0a50",
+      "bytes": 81
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/repeatability.json",
+      "sha256": "13a8837f235bb3fee80dc488619010af12b4ea2bd1d0a15f70925dbc224ffb70",
+      "bytes": 169878
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/security-review.json",
+      "sha256": "ecd1c250545ea0263eeb04a810e367df69507af89d62d6e8ab801c4ce9f3a2c6",
+      "bytes": 2416
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/security.log",
+      "sha256": "0cb8a430c6d9c80577a84c571728144b5bca8c8a2be5402752d2c6415715ef37",
+      "bytes": 2953
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/tests-1.xml",
+      "sha256": "2c63429bf5990597b9f92a68fb6f7c8cfa275df2e153a295a7b5330522b78fb4",
+      "bytes": 101636
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/setup.log",
+      "sha256": "762a88ce58cfedbb1a06a824896ed81ae74a5c472a55144f8b399f986c2b9011",
+      "bytes": 61
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/tests-2.xml",
+      "sha256": "3e2f63f7f1f9f2f2d0f974a8d4876e425554c6a33ac6efabc0272360af1e49d1",
+      "bytes": 101636
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/tests_1.log",
+      "sha256": "305cc0a07d2bc59570c52e5dffd436e9d27c99a304bdedd58ca32848d27487a9",
+      "bytes": 9555
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/tests_2.log",
+      "sha256": "7d40b7fe585b5440f5fb124fe8a743eb826c9f0612b9db72eaf00a849713f4ba",
+      "bytes": 9581
+    },
+    {
+      "path": "docs/evidence/acceptance/20261004T204556/typecheck.log",
+      "sha256": "cd9c340faf049f23b702d9a64d1ac922e06d74db0f0721886b346ae6282a3aad",
+      "bytes": 44
+    }
+  ],
+  "limitations": "CI --local leaves remote gate placeholders unrefreshed. Original manifest remains byte-exact; separate workflow/Pages evidence supplies remote results. Historical manifests were excluded."
+}

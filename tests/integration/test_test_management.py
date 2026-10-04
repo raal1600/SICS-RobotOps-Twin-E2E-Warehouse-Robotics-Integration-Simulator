@@ -2,6 +2,7 @@
 
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from pathlib import Path
 from threading import Event
 from uuid import uuid4
@@ -454,7 +455,7 @@ def test_legacy_catalog_upgrade_keeps_ids_numbers_and_saved_profiles(tmp_path):
     identity = str(uuid4())
     SyntheticRuntime(root / identity / "runtime.db", Settings())
     Store(root / identity / "workflow.db")
-    with sqlite3.connect(root / "catalog.db") as db:
+    with closing(sqlite3.connect(root / "catalog.db")) as db, db:
         db.executescript(
             "CREATE TABLE tests(number INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT UNIQUE NOT NULL,created TEXT NOT NULL); CREATE TABLE active(id INTEGER PRIMARY KEY,test_id TEXT NOT NULL);"
         )

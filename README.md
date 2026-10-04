@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** Robot-cell selection and explicit test-data deletion are being implemented against baseline ae6d5d85c813e47aea042aea2a87236b5a8bc204. Previous 110-MUST HKM acceptance is preserved as historical evidence; this new revision is awaiting verification. **NOT DONE**.
+**Aktuell status:** Test deletion, clear-all, empty restart and registered robot-cell selection accepted at b1c374ae76144309cc4476392dec681292f0e3a7: all 110 MUSTs pass; 659 tests twice, 119 UI checks, eight Blender demos and exact-source CI/publication verified. Only the HKM-inspired profile is currently selectable. Evidence/status successors receive their own workflow attestation. **DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -29,8 +29,11 @@ six-tool showcase, attachment/release, uncertainty, restart and read-only replay
 the earlier release and the fresh baseline failure. Scoped development results
 retain their original source attribution. The 110-MUST HKM acceptance belongs
 to audited source `ca779879` and its publication successor `ae6d5d8`.
-[Current acceptance](ACCEPTANCE_REPORT.md) records evidence and remaining gates
-for subsequent changes, including cell selection and test-data deletion.
+The cell-selection and test-data deletion revision passes all 110 MUSTs at clean
+source `b1c374ae76144309cc4476392dec681292f0e3a7`.
+[Current acceptance](ACCEPTANCE_REPORT.md) indexes its repeated local suites and
+[independent CI/publication evidence](docs/evidence/test-management-final/README.md).
+Final evidence/status successors receive their own exact-SHA CI and Pages checks.
 
 This is an independent simulator inspired by public sources and general practice.
 It does not reproduce SICS AI proprietary architecture or AGI. Blender supplies

@@ -75,3 +75,12 @@ and download races, and request retries after a lost response. These checks exte
 the existing persistence and demonstration evidence mappings without changing any
 MUST threshold. The previous HKM acceptance is preserved in
 `docs/evidence/test-lifecycle-baseline/`; it does not attest this revision.
+
+Fresh acceptance of clean source `b1c374ae76144309cc4476392dec681292f0e3a7`
+passes all 110 MUSTs in
+[the refreshed local manifest](../evidence/acceptance/20261004T204452/manifest.json).
+Both local suites and both independent CI suites contain 659 passing tests with
+zero failures, errors or skips. [The remote evidence archive](../evidence/test-management-final/README.md)
+retains the original CI manifest, including its unrefreshed remote placeholders,
+alongside successful workflow and public-publication checks. The final status
+and evidence successor still needs its own exact-SHA CI and Pages attestation.

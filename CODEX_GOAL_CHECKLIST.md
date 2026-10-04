@@ -2,20 +2,27 @@
 
 Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain normative.
 
-## Current revision: cell selection and test-data lifecycle
+## Accepted cell selection and test-data lifecycle revision
 
 The accepted HKM revision below is historical evidence. ADR 0011 adds UI/API
 lifecycle behavior; its verification does not inherit earlier PASS results.
 The original 110 MUST criteria remain unchanged.
 
-- [ ] Expose typed cell-profile metadata; only HKM is selectable for new tests.
-- [ ] Persist the selected profile and keep legacy history readable.
-- [ ] Confirm selected-test deletion and snapshot-bound clear-all in the UI.
-- [ ] Preserve retry/tombstone semantics, reject busy work and confine cleanup.
-- [ ] Verify no-active-test restart and no automatic archival promotion.
-- [ ] Test cancellation, stale requests and unchanged surviving evidence using disposable data.
-- [ ] Synchronize contracts, ADR, operator docs, reports and architecture diagram.
-- [ ] Complete affected tests, full acceptance and source-specific publication gates.
+All 110 MUST criteria pass for clean source
+`b1c374ae76144309cc4476392dec681292f0e3a7` in the
+[refreshed acceptance manifest](docs/evidence/acceptance/20261004T204452/manifest.json).
+[Exact-source CI and publication evidence](docs/evidence/test-management-final/README.md)
+preserves the independent remote results. Any evidence/status successor still
+requires its own exact-SHA CI and deployed-publication checks under ADR 0002.
+
+- [x] Expose typed cell-profile metadata; only HKM is selectable for new tests.
+- [x] Persist the selected profile and keep legacy history readable.
+- [x] Confirm selected-test deletion and snapshot-bound clear-all in the UI.
+- [x] Preserve retry/tombstone semantics, reject busy work and confine cleanup.
+- [x] Verify no-active-test restart and no automatic archival promotion.
+- [x] Test cancellation, stale requests and unchanged surviving evidence using disposable data.
+- [x] Synchronize contracts, ADR, operator docs, reports and architecture diagram.
+- [x] Complete affected tests, full acceptance and source-specific publication gates.
 
 ## Historical accepted HKM-inspired revision
 

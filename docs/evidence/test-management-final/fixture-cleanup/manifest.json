@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "scope": "Test-helper connection closure after audited source b1c374ae76144309cc4476392dec681292f0e3a7; no production or assertion changes; this is scoped follow-up verification, not a rewritten full acceptance run.",
+  "base_commit": "b1c374ae76144309cc4476392dec681292f0e3a7",
+  "recorded_at": "2026-10-04T21:23:47.184631+00:00",
+  "source_file": "tests/integration/test_test_management.py",
+  "source_sha256": "5bf04d842d447ee9d4c37e07f59ca9e0dbc39db732df31ef571c78ff06bb01b4",
+  "source_normalized_lf_sha256": "5bf04d842d447ee9d4c37e07f59ca9e0dbc39db732df31ef571c78ff06bb01b4",
+  "change": "Import contextlib.closing; use closing(sqlite3.connect(...)) plus its existing transaction context in legacy-catalog fixture.",
+  "verification": {
+    "pytest": {
+      "tests": 32,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "pytest_duration_s": 20.986,
+    "resource_warning_policy": "error::ResourceWarning",
+    "explicit_gc": "PASS: zero ResourceWarning and zero unraisable destructor exceptions",
+    "ruff_check": "PASS",
+    "ruff_format_check": "PASS",
+    "python": "3.13.15"
+  },
+  "commands": [
+    ".venv/Scripts/ruff.exe check tests/integration/test_test_management.py",
+    ".venv/Scripts/ruff.exe format --check tests/integration/test_test_management.py",
+    ".venv/Scripts/python.exe -W error::ResourceWarning -m pytest tests/integration/test_test_management.py --basetemp=artifacts/test-management-closed-final --junitxml=docs/evidence/test-management-final/fixture-cleanup/tests.xml",
+    "Inline Python harness: runpy.run_path tests/integration/test_test_management.py; tracemalloc.start(15); warnings.simplefilter(error, ResourceWarning); invoke test_legacy_catalog_upgrade_keeps_ids_numbers_and_saved_profiles in isolated artifacts temporary directory; gc.collect(); capture sys.unraisablehook; assert no resource warnings or destructor exceptions."
+  ],
+  "remaining_warning": "Existing third-party Starlette TestClient/httpx deprecation only.",
+  "artifacts": [
+    {
+      "path": "explicit-gc.json",
+      "sha256": "a5ec895a5cf06965575766af7ad874bcf308c3b76fed98a3b91b381004fce798",
+      "bytes": 621
+    },
+    {
+      "path": "initial-warning-audit.json",
+      "sha256": "a9e91e7e32dd40e7e1658f86c60316ec7b98e0b85a1532938177b6599374248f",
+      "bytes": 381
+    },
+    {
+      "path": "tests.log",
+      "sha256": "26ac0a42806eca21c33f85563897b33da1de82576bb40581b8781480b1fea875",
+      "bytes": 2314
+    },
+    {
+      "path": "tests.xml",
+      "sha256": "bed49f6d88b2d0ded952d5c44242b262c79365b2f32d397a41bae580bf0ba563",
+      "bytes": 5260
+    }
+  ]
+}

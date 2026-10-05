@@ -27,6 +27,13 @@ Earlier failures, final targeted results and screenshots are retained in
 The publication rebuild, security scan, lint/typecheck and drift check pass.
 Next: clean-source repeated acceptance and exact-source remote checks.
 
+The first implementation commit is `2eddd8a`. Its Windows workflow detected overly
+long archived browser-case paths at checkout, before running the launcher tests.
+The evidence directories were shortened without changing their bytes; the failure
+and path/hash provenance remain archived. Runtime code/tests did not change.
+Local acceptance `20261005T113217` started before that documentation-only relocation;
+use the corrected commit's full CI and publication as its exact-source attestation.
+
 ADR 0013 and affected API contracts, plan/handoff, operator/persistence/playback
 guides, all three reports and architecture caption are synchronized. Robot wire
 schemas and research provenance are unchanged. Prior acceptance below is historical.

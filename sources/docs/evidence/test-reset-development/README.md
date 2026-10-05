@@ -36,3 +36,18 @@ discarded data; the cleared compact view shows Test 1, restored products and kep
 scenario choice; the replacement test is empty and numbered 1. These are UI checks,
 not usability-study results or physical/vision verification evidence. All fixtures
 are disposable; the owner's application data was not modified.
+
+## Windows checkout correction
+
+The first implementation commit `2eddd8a` failed Windows checkout before building:
+the expanded repository prefix plus descriptive browser-case directory exceeded
+Windows' path limit. `windows-checkout.log` and `windows-jobs.json` preserve the
+failure. The four directories now use short viewport/runtime names. Their bytes
+are unchanged; `path-relocations.json` maps the paths in the original provenance
+manifest to their new locations, and every recorded hash was verified after moving.
+
+The local acceptance run `20261005T113217` started at clean `2eddd8a` before this
+documentation-only relocation. Its recorded source identity is the start snapshot;
+the archive relocation occurred during that run. Do not treat it as a clean-source
+acceptance attestation for the corrected commit. Exact-source CI reruns all gates
+on the corrected tree, including Windows checkout and the desktop lifecycle.

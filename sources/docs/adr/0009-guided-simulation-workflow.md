@@ -2,6 +2,11 @@
 
 Accepted locally 2026-10-03. Classification: SIMULATOR_DESIGN.
 
+Presentation follow-up: [ADR 0012](0012-evidence-driven-investigation.md)
+supersedes automatic review opening and the stacked page layout. Attention now
+highlights an explicit investigation action; the bounded inspector preserves
+replay context. The evidence, uncertainty and explicit-action rules below remain.
+
 Operators should not have to memorize different recovery sequences for each
 execution/observation combination. The dashboard now has a dark theme, a
 Prepare / Run / Review / Continue indicator and a persistent next-step card.

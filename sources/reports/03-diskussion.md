@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** Test deletion, clear-all, empty restart and registered robot-cell selection accepted at b1c374ae76144309cc4476392dec681292f0e3a7: all 110 MUSTs pass; 659 tests twice, 119 UI checks, eight Blender demos and exact-source CI/publication verified. Only the HKM-inspired profile is currently selectable. Evidence/status successors receive their own workflow attestation. Status: DONE.
+> **Implementation status, 2026-10-05:** Run, notice and investigate UI redesign in progress from accepted baseline 0db6168. Existing HKM and test-lifecycle evidence remains historical; the new user journey needs browser and source-specific acceptance. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -284,3 +284,13 @@ En möjlig sammanfattning efter samtalet är:
 > Jag ville använda projektet för att göra mina antaganden synliga, inte för att låtsas känna er implementation. Det viktigaste jag tar med mig är var ni sätter gränsen mellan modell, integration och robot, och vilken evidens som behövs för att ett uppdrag ska räknas som lyckat. Nästa steg för mig är att pröva de antagandena med ett litet reproducerbart test.
 
 **Det starkaste du kan visa är inte att du redan kan allt. Det är att du kan avgränsa ett problem, formulera ett testbart kontrakt, förklara en avvägning och ändra uppfattning när bättre information kommer fram.**
+
+## Granska det nya undersökningsflödet (2026-10-05)
+
+Kör först ett normalfall och därefter kvittensbortfall efter effekt. Följ den
+markerade åtgärden till symptom, originaljournal och exakt bedömd observation.
+Öppna manuell inspektion och kontrollera att API-adress, export och kommandots ID
+hör till samma test. Återgå utan att tappa uppspelningen. Visa sedan hur ett
+motstridigt sensorunderlag förblir oavgjort och en senare normal observation kan
+avgöra samma kommando utan ett nytt plock. Be en ny granskare försöka detta utan
+handledning: fungerande automation är inte bevis för intuitiv förståelse.

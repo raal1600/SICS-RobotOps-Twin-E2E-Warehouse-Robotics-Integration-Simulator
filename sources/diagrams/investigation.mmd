@@ -1,0 +1,13 @@
+flowchart TD
+  run["Run a scenario<br/>Purpose + what to watch + cell"]
+  notice["Notice the recorded result<br/>Normal / uncertain / failed"]
+  inspect["Investigate this pick<br/>Symptom / finding / limits / hypothesis"]
+  evidence["Evidence + manual inspection<br/>Journal / assessed report / events / files"]
+  return["Return to simulation<br/>Same selection and paused replay frame"]
+  review["Explicitly request a sensor report<br/>Original-command reconciliation only"]
+  run --> notice
+  notice --> inspect
+  inspect --> evidence
+  evidence --> return
+  return --> run
+  inspect --> review

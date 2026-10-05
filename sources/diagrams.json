@@ -125,7 +125,7 @@
     "subtitle": "Typed tools and TCP - explicit test lifecycle - original evidence boundaries",
     "width": 900,
     "height": 850,
-    "caption": "Figure 2. SIMULATOR_DESIGN architecture; revision-specific acceptance is stated separately. The durable workflow validates observed plans and preserves original command identity. The bounded Blender runtime owns private world/tool state and controller checkpoints. ObservationModel alone converts world data into WorldObservation with explicit sensor and simulated telemetry provenance; Verifier has no direct world path. Tool preparation shares the product-transfer command and does not add a transfer effect. Replay reads versioned artifacts. The API cell registry initializes new tests; retained archives remain read-only. Explicit confirmed deletion uses the test catalog, tombstones and bounded cleanup, never a robot command or verdict. Deleting the active test leaves no active world. Lost acknowledgement still requires original journal plus fresh sufficient observation, with no replacement pick.",
+    "caption": "Figure 2. SIMULATOR_DESIGN architecture; revision-specific acceptance is stated separately. The durable workflow validates observed plans and preserves original command identity. The bounded Blender runtime owns private world/tool state and controller checkpoints. ObservationModel alone converts world data into WorldObservation with explicit sensor and simulated telemetry provenance; Verifier has no direct world path. Tool preparation shares the product-transfer command and does not add a transfer effect. Replay reads versioned artifacts. The API cell registry initializes new tests; retained archives remain read-only. Explicit confirmed deletion uses the test catalog, tombstones and bounded cleanup, never a robot command or verdict. Deleting the active test leaves no active world. Lost acknowledgement still requires original journal plus fresh sufficient observation, with no replacement pick. Investigation reads job-scoped persisted evidence independently of replay. Explicit re-observation alone invokes reconciliation; navigation and downloads do not mutate the world.",
     "nodes": [
       [
         "erp",
@@ -1178,5 +1178,101 @@
     "width": 900,
     "height": 690,
     "caption": "Figure 11. SIMULATOR_DESIGN compatibility matrix generated from robotops/robotics/catalogue-v1.json. P/C eligibility remains subject to actual fixture mass, geometry and tool availability. These are not manufacturer gripper specifications. The selected tool and candidate rejection reasons must be persisted separately as execution evidence."
+  },
+  "investigation": {
+    "number": 12,
+    "title": "Run, notice and investigate",
+    "subtitle": "SIMULATOR_DESIGN presentation flow - unchanged command and evidence boundary",
+    "width": 900,
+    "height": 660,
+    "caption": "Figure 12. The operator runs a scenario and follows the recorded result into a bounded investigation panel. Symptoms, record findings and possible explanations stay distinct. Evidence and manual inspection use the same test/job identity; the timeline is secondary. Return preserves replay context. Only explicit re-observation invokes existing original-command reconciliation; replay, tabs and downloads issue no pick. Browser automation checks function, not first-time usability.",
+    "nodes": [
+      [
+        "run",
+        35,
+        85,
+        365,
+        85,
+        "Run a scenario",
+        "Purpose + what to watch + cell",
+        "business"
+      ],
+      [
+        "notice",
+        500,
+        85,
+        365,
+        85,
+        "Notice the recorded result",
+        "Normal / uncertain / failed",
+        "core"
+      ],
+      [
+        "inspect",
+        500,
+        245,
+        365,
+        100,
+        "Investigate this pick",
+        "Symptom / finding / limits / hypothesis",
+        "core"
+      ],
+      [
+        "evidence",
+        35,
+        245,
+        365,
+        100,
+        "Evidence + manual inspection",
+        "Journal / assessed report / events / files",
+        "core"
+      ],
+      [
+        "return",
+        35,
+        435,
+        365,
+        95,
+        "Return to simulation",
+        "Same selection and paused replay frame",
+        "business"
+      ],
+      [
+        "review",
+        500,
+        435,
+        365,
+        95,
+        "Explicitly request a sensor report",
+        "Original-command reconciliation only",
+        "core"
+      ]
+    ],
+    "edges": [
+      [
+        "run",
+        "notice"
+      ],
+      [
+        "notice",
+        "inspect"
+      ],
+      [
+        "inspect",
+        "evidence"
+      ],
+      [
+        "evidence",
+        "return"
+      ],
+      [
+        "return",
+        "run"
+      ],
+      [
+        "inspect",
+        "review"
+      ]
+    ]
   }
 }

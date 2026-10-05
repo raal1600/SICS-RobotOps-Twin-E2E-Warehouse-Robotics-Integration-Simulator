@@ -12,6 +12,14 @@ npm install or Node process is required at runtime. A perspective Canvas rendere
 retains camera controls if WebGL is unavailable. The security gate runs npm audit
 against the committed vendor lockfile and checks the served files' hashes.
 
+Playwright 1.63.0 is a locked **development/test** dependency. Install its pinned
+Chromium headless shell with `uv run --locked python -m playwright install chromium
+--only-shell` (included in `make setup` and acceptance). Linux CI adds
+`--with-deps` for system libraries. Missing browsers fail the mandatory journeys;
+they are never skipped. The application/desktop runtime does not depend on
+Playwright or download a browser. Browser test servers bind only to loopback and
+use disposable data. See [investigation checks](investigation.md).
+
 Ruff checks new Python formatting/lint; mypy strict checks all runtime and API
 modules. The pre-existing publication generator retains its separate build and
 link/PDF checks. Coverage must be at least 85% for the combined mandatory suite;

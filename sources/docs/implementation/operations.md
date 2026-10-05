@@ -18,11 +18,11 @@ currently offers only the HKM-inspired cell, with six catalogued products at
 their own source boxes; legacy cell metadata labels history but is not selectable.
 Fresh API data directories also use this profile. Existing saved worlds keep
 their own profile; opening a historical three-product test does not upgrade it.
-The previous test remains unchanged in **Test history**,
+The previous test remains unchanged in **Simulation test** history,
 including uncertain/intervention outcomes. Review its evidence and full replay
 in the same window; **Return to current test** resumes the active world.
 Startup recovers only that active world, without replaying uncertain commands.
-Retained archives remain read-only. Explicit **Delete selected test** and
+Retained archives remain read-only. Under **Manage test data**, explicit **Delete selected test** and
 **Clear all test data** are separate data-management actions. Each confirmation
 names its scope and the evidence that will be removed; cancel changes nothing.
 Deleting the active test leaves no active world. The app offers new-test creation
@@ -35,35 +35,43 @@ registered-file boundary and retained lifecycle metadata.
 This local demo has no
 production authentication/authorization boundary and binds to loopback only.
 
-The dark workspace has a persistent Next step card and Prepare / Run / Review /
-Continue indicator. Each execution/observation choice shows its stage, definition,
-key difference and expected behavior. Expand Compare all execution scenarios or
-Compare all observation modes to read them together. The execution selector
-applies to a new order and its first post-pick check; the observation selector
-applies only to the next explicit reconciliation capture. See the
-[definitions and comparisons](scenarios.md) for similar-looking outcomes.
-Run it, then follow the resulting guide. An uncertain/intervention job automatically
-opens and focuses Review evidence once; regular polling and repeated observations
-do not move keyboard focus. The panel names the original product/job, summarizes
-the journal, exact assessed observation, latest verifier reason and saved attempts.
-A pre-pick planning capture is never shown as an assessed post-pick observation.
-Inspect full evidence & timeline navigates to that same original job, even if an
-older replay was selected. Neither navigation nor viewing evidence submits work.
-Use normal observation only changes the selector and focuses the explicit review
-action. Its helper text does not promise success. Any supported observation mode
-can be repeated in this same test. The guide prioritizes unresolved work, then
-cell reset, then next-pick setup or a new test for an exhausted delivery. Cell &
-diagnostics and advanced replay selection are expandable. See ADR 0009.
+The dark workspace follows **Set up / Watch / Investigate / Continue**. A short
+scenario purpose and **Watch for** line explain what to expect before running.
+The cell stays central; an amber guide and highlighted **Investigate this pick**
+button identify unusual outcomes. The operator opens the bounded panel explicitly;
+polling never steals focus or obscures the animation. **What happened** separates
+symptom, confirmed record contents, their limits and possible explanation.
+**Evidence** exposes the original command/journal, exact assessed observation,
+verification/review history, tool decision and full JSON. The event timeline is
+collapsed, filtered and height-bounded, with each full record available on demand.
+
+**Manual inspection** offers test/job-scoped GET requests, evidence/event download,
+recorded-fault reproduction guidance and actual repository/storage/log locations.
+Investigation pins its own context while preserving the replay selection/frame;
+opening it pauses only the replay. **Back to simulation** retains that view, and
+Play resumes explicitly. The guide can inspect the blocking pick while an older
+replay stays selected. New tests invalidate old panel responses. The
+[investigation walkthrough](investigation.md) and ADR 0012 explain these boundaries.
+
+Execution choices apply to a new order and its first post-pick check. **Sensor
+report for the next check** changes only a later explicit reconciliation capture,
+not the product position. Expand the scenario/sensor explanation and comparison
+sections for definitions and differences. **Use normal observation** only changes
+the selector; the named reconciliation action collects the report. Detailed
+[scenario definitions](scenarios.md) describe similar-looking outcomes. Actual
+service failures are labelled **App request problem**, separately from simulation
+results. Cell & diagnostics, advanced replay selection and test-data management
+are progressive disclosures; technical depth remains available.
 
 Choose a product and fault, then Create and run order. Lost acknowledgement after
 effect displays UNKNOWN_OUTCOME even though Blender has moved the product. Use
-the named Reconcile [product] action in **Review evidence** (or Reconcile selected job)
+the named Reconcile [product] action in the investigation panel (or Reconcile selected job)
 with a normal fresh observation to complete it. An uncertain pick pauses the
 whole cell, so choosing another product cannot bypass this step. Each pick in
 the lost-ack scenario requires reconciliation before the next explicit order. Selecting
 contradictory/missing/low-confidence/stale evidence instead yields intervention.
 To continue that same test, choose an observation mode and click **Observe
-again and reconcile** (or **Observe again: [product]** in **Review evidence**). The new capture
+again and reconcile** (or **Observe again: [product]** in the investigation panel). The new capture
 checks the original command without another pick. The unchanged verifier either
 resolves the job or pauses it again. Every attempt stays in the causal timeline;
 Normal observation cannot establish success if the journal is missing/conflicting.
@@ -92,7 +100,7 @@ The default Full delivery scope replays all product runs in the selected scene.
 Saved deliveries remain selectable after scenario changes. Individual product
 details and replay remain available; their business identities are unchanged.
 
-The status strip adds the observed tool and observation confidence/model/calibration.
+The Evidence tab’s expandable technical details add the observed tool and observation confidence/model/calibration.
 The replay phase/tool display identifies the currently viewed frame, which may
 belong to an earlier delivery item. **Why this tool?** reads the persisted six
 candidate scores and mass/geometry/availability reasons. **Run six-tool showcase
@@ -126,7 +134,7 @@ retry policy). CLI controls database directory, runtime and port. No secret is
 required. Retry policy is manual after proven no-effect; arbitrary values do not
 enable automatic retries. Optional remote ERP/model/hardware work is non-blocking.
 
-Local guided-workspace captures: [dark desktop view](../evidence/guided-workflow-dark.png)
-and [mobile intervention review](../evidence/guided-workflow-mobile.png).
-The [validation record](../evidence/guided-workflow-local.json) distinguishes
-isolated test writes from read-only inspection of the user's open session.
+Historical guided-workspace captures and validation remain in
+`docs/evidence/guided-workflow-local.json`; they do not depict the current layout.
+The current browser suite writes screenshots, traces and results under
+`artifacts/investigation-browser/`, with revision-scoped acceptance evidence.

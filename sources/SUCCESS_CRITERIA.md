@@ -205,6 +205,21 @@ retained tests preserve their original outcomes and read-only replay semantics.
 These destructive-action checks use isolated disposable data, not user history.
 Full source-specific acceptance and publication remain governed by the rules below.
 
+## Investigation workflow revision (2026-10-05)
+
+These eight criteria add to all 110 prior MUSTs. The execution, observation,
+idempotency, evidence and coverage requirements remain unchanged. Historical
+passes are scoped to their original source; this revision needs fresh evidence.
+
+- **UI-INV-MUST-001 MUST**: The primary workspace explains the cell's task, selected scenario purpose and a concrete behavior to watch, and offers a working run action alongside the cell/current result. Detailed explanations remain available without dominating the normal view. Evidence: desktop and compact normal-pick browser journeys and scenario-guide tests.
+- **UI-INV-MUST-002 MUST**: Investigation separates observed symptom, confirmed record contents, their limits and unproven possible explanation. Claims come from the inspected job's evidence/events; a controller receipt, current dropdown, unrelated job or WorldState must never be substituted for an assessed observation/verdict. Evidence: attribution/negative tests and uncertain/ambiguous browser checks.
+- **UI-INV-MUST-003 MUST**: A result needing attention links directly to the relevant command/journal, exact assessed observation, verification/reconciliation attempts, tool decision, identifiers and full structured evidence. Uncertain and intervention outcomes remain distinguishable from failure/success. Evidence: real lost-ack and contradictory-review journeys with original command ownership assertions.
+- **UI-INV-MUST-004 MUST**: Investigation preserves the selected test/run/job and replay context, including when inspecting a blocking job while replaying an earlier pick. Opening inspection pauses only replay; returning retains its selection/frame. Polling must not steal focus or switch the inspector's tab. New test selection invalidates old inspection responses. Evidence: browser and dashboard/player context tests.
+- **UI-INV-MUST-005 MUST**: The event timeline is secondary, initially collapsed and bounded on desktop and compact viewports, with accessible relevant events and exact record inspection. It must not push evidence below an unbounded event list. Evidence: actual browser geometry and interaction assertions.
+- **UI-INV-MUST-006 MUST**: Manual inspection provides correctly scoped read-only requests, a usable evidence/event JSON export, recorded-input reproduction guidance and real source/configuration/log/storage paths. It must not infer the historical scenario from the current selector. Browsing/downloading does not mutate the world or workflow. Evidence: live API/download comparisons and no-write assertions.
+- **UI-INV-MUST-007 MUST**: Actual application/request failures are labelled separately from injected simulation faults and do not invent a workflow outcome. Running work, recorded workflow result and paused/completed replay remain distinguishable. Evidence: intentional service-failure browser test, normal/fault journeys and slow-planning selection regression.
+- **UI-INV-MUST-008 MUST**: Repeatable actual-browser tests exercise normal run, supported fault, evidence/manual inspection, return and saved history at desktop and compact viewports with both deterministic synthetic and actual Blender runtimes. They verify actions, evidence ownership, no navigation writes, no unexpected browser errors and bounded layout; retain screenshots, traces and semantic results. Clarity/discoverability assessment and first-time-user uncertainty are reported separately from functional test success. All prior MUSTs and final exact-SHA publication gates still apply.
+
 ## DONE
 
 The project is DONE only when:

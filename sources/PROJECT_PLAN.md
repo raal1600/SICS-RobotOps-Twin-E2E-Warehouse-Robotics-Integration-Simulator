@@ -395,6 +395,41 @@ See [ADR 0010](docs/adr/0010-hkm-inspired-versioned-cell.md) and the
 and deployment claims remain COMPANY_REPORTED_CLAIM; catalogue, kinematics,
 timing and collision thresholds are SIMULATOR_DESIGN.
 
+## Investigation workflow revision (2026-10-05)
+
+Adapt the accepted workspace at clean `0db6168` around **Set up / Watch /
+Investigate / Continue**, preserving all runtime/business semantics. The previous
+report is archived in `docs/evidence/investigation-ui-baseline/`; new behavior
+does not inherit its PASS results. ADR 0012 records this presentation boundary.
+Eight UI-INV MUSTs join the existing 110, for 118 total.
+
+The primary workspace shows a short scenario purpose, behavior to watch, run
+action, scene and current outcome. Abnormal results highlight an explicit
+investigation action without obscuring the cell automatically. A bounded dialog
+separates symptom, confirmed evidence, limits and possible explanation. Evidence
+and manual inspection remain one tab away; the timeline is collapsed, filtered
+and height-bounded. Exact JSON, IDs, command/journal, assessed observation,
+verification/review history and tool decisions remain accessible.
+
+Inspection pins its own test/job while preserving replay selection/frame.
+Navigation/downloads are read-only. Explicit sensor re-observation still invokes
+the existing original-command reconciliation. New tests and deletion retain
+ADR 0011's independent lifecycle. No API, robot schema, database migration or
+state-machine change is introduced; the download wrapper is labelled
+`robotops-investigation-1`. Manual guidance points to actual scoped endpoints,
+source/configuration and local storage rather than a scripted root-cause claim.
+
+Implementation/exit milestones:
+
+1. Inspect/archive baseline, identify overload and real evidence ownership.
+2. Implement the compact run/notice/inspect interface and pure evidence summaries;
+   test attribution, focus, selection races, errors and replay preservation.
+3. Exercise full real-browser journeys with both runtimes on desktop and compact
+   screens; fix findings, retain screenshots/traces, assess clarity separately.
+4. Synchronize operator docs, diagrams, criteria and reports; run clean full
+   acceptance twice with the additive browser suite and unchanged quality gates,
+   then verify exact-SHA CI/Pages/PDFs and current acceptance provenance.
+
 ## Knowledge-base synchronization protocol
 
 Before every milestone commit:

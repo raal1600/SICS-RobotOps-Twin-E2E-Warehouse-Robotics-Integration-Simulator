@@ -6,7 +6,7 @@ assessed WorldObservation determine each actual outcome; the 3D view is illustra
 
 **Execution scenario** applies when Create and run order starts a new pick. It can
 change planning, cell control, acknowledgement delivery or the first observation
-after movement. **Observation for this review** applies only when Reconcile or
+after movement. **Sensor report for the next check** in the investigation panel applies only when Reconcile or
 Observe again captures new evidence for the original command. It does not repeat
 the pick, rewind the scene, or change an earlier assessment. Selecting either
 option alone does not execute anything.
@@ -24,9 +24,12 @@ preserves the data. If the active test is removed, explicitly create a new test
 before running another combination. Retained archives are not promoted. See
 [operator workflow](operations.md) for scope and retry behavior.
 
-Both selectors show the stage, **What this simulates**, **Key difference**, and the
-expected behavior. **Compare all execution scenarios** and **Compare all
-observation modes** let the operator read every option without running it.
+The main execution selector shows a short purpose and **Watch for** line. Expand
+its explanation or the sensor-report explanation for the stage, **What this
+simulates**, **Key difference**, and expected behavior. **Compare all execution
+scenarios** and **Compare all observation modes** let the operator read every
+option without running it. [The investigation guide](investigation.md) explains
+the path from an unusual result to exact records and manual inspection.
 
 ## Execution scenarios
 

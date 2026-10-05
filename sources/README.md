@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** Test deletion, clear-all, empty restart and registered robot-cell selection accepted at b1c374ae76144309cc4476392dec681292f0e3a7: all 110 MUSTs pass; 659 tests twice, 119 UI checks, eight Blender demos and exact-source CI/publication verified. Only the HKM-inspired profile is currently selectable. Evidence/status successors receive their own workflow attestation. **DONE**.
+**Aktuell status:** Run, notice and investigate UI redesign in progress from accepted baseline 0db6168. Existing HKM and test-lifecycle evidence remains historical; the new user journey needs browser and source-specific acceptance. **NOT DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -31,7 +31,7 @@ retain their original source attribution. The 110-MUST HKM acceptance belongs
 to audited source `ca779879` and its publication successor `ae6d5d8`.
 The cell-selection and test-data deletion revision passes all 110 MUSTs at clean
 source `b1c374ae76144309cc4476392dec681292f0e3a7`.
-[Current acceptance](ACCEPTANCE_REPORT.md) indexes its repeated local suites and
+[Historical acceptance](docs/evidence/investigation-ui-baseline/ACCEPTANCE_REPORT.txt) indexes its repeated local suites and
 [independent CI/publication evidence](docs/evidence/test-management-final/README.md).
 Final evidence/status successors receive their own exact-SHA CI and Pages checks.
 
@@ -56,6 +56,7 @@ The standard Windows Blender 5.2 installation is also detected.
 git clone https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator.git
 cd SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator
 uv sync --locked --all-groups
+uv run --locked python -m playwright install chromium --only-shell
 uv run --locked python -m tools.dev demo
 ```
 
@@ -67,7 +68,7 @@ needs the system libraries documented in [PUBLICATION.md](PUBLICATION.md).
 
 | Make command | Portable equivalent (including PowerShell) |
 |---|---|
-| `make setup` | `uv sync --locked --all-groups` |
+| `make setup` | The `uv sync` and Chromium-install commands above |
 | `make test` | `uv run --locked python -m tools.dev test` |
 | `make lint` | `uv run --locked python -m tools.dev lint` |
 | `make typecheck` | `uv run --locked python -m tools.dev typecheck` |
@@ -115,21 +116,25 @@ uv run --locked python -m apps.api --runtime blender --data-dir runs/my-demo --p
 ```
 
 Open http://127.0.0.1:8000 for the local dashboard. The dark workspace guides you
-through **Prepare / Run / Review / Continue** with a persistent **Next step** card.
-Choose a product and scenario in **Set up a pick**. Each choice explains **What
-this simulates**, its stage, its **Key difference** and the expected result.
-Expand **Compare all execution scenarios** or **Compare all observation modes**
-to read the options together. The execution selector changes a new order; the
-observation selector changes only a later review capture for the original pick.
-[Scenario and observation definitions](docs/implementation/scenarios.md).
-Watch **Live cell & replay**, then follow the guide's next action.
-If attention is needed, **Review evidence** opens and receives focus automatically.
-It explains the original journal, the assessed observation and the latest decision,
-with observation choices and the reconciliation action together. **Use normal
-observation** only selects the next capture mode; click the named review action to
-collect it. Repeated bad evidence keeps review available. Completed picks lead to
-the next setup, stopped cells to reset, and saved tests back to the current test.
-[Guided workflow and evidence boundary](docs/adr/0009-guided-simulation-workflow.md).
+through **Set up / Watch / Investigate / Continue**. Choose a product and scenario
+in **Run a pick**, read its short purpose and **Watch for** line, then run it.
+The cell and current result stay central; an amber guide and highlighted
+**Investigate this pick** button point to unusual outcomes without covering the
+animation automatically. Open it for **What happened**, **Evidence** and **Manual
+inspection**. The panel separates symptoms, confirmed records and possible causes.
+Exact command/journal, assessed observation, tool decision and JSON remain
+available; the event timeline is collapsed and height-bounded.
+
+Manual inspection provides scoped API requests, evidence/event download, recorded
+fault reproduction guidance and real code/log locations. **Back to simulation**
+keeps your replay selection and frame. Investigation pauses replay only; Play
+resumes it. For an unresolved pick, **Sensor report for the next check** changes
+only the next explicit reconciliation observation, never the product position.
+Click the named review action to collect it; repeated unclear reports stay
+investigable. Detailed choice definitions and comparisons remain expandable.
+[Investigation walkthrough](docs/implementation/investigation.md) ·
+[Scenario/observation definitions](docs/implementation/scenarios.md) ·
+[Presentation boundary](docs/adr/0012-evidence-driven-investigation.md).
 The saved Blender snapshot is available in the collapsed **Technical details**
 section; the full 3D view and replay are the main visualization.
 Reusing the data directory preserves state across restart.
@@ -162,7 +167,7 @@ product replay remains available.
 app. **Why this tool?** exposes persisted candidate scores and constraint reasons.
 
 After a lost acknowledgement, the **Next step** card names the unresolved product
-and opens **Review evidence**. Select **Normal observation** and use
+and offers its review action. Open it, select **Normal observation**, and use
 **Reconcile [product]** to check that original pick before running another product.
 Each pick in the lost-ack scenario needs this step. Contradictory or insufficient
 evidence pauses the next pick but allows **Observe again and reconcile** in the
@@ -174,7 +179,7 @@ No new pick is sent by observation. Restart leaves intervention paused.
 You can always start an independent test with **Start new test**; the previous
 uncertain/intervention outcome remains recorded and is never labelled resolved.
 
-**Live cell & replay** always shows the 3D environment, machine and products.
+**The robotic cell** shows the 3D environment, machine and products.
 Orbit, pan and zoom around the cell. Orders with an effect move the machine and
 product using recorded Blender poses; blocked orders replay their events with
 the saved starting scene held still. Play/pause, scrubbing and speed affect only

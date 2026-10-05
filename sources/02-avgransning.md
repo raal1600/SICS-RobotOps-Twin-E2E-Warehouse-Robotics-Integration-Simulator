@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** Test deletion, clear-all, empty restart and registered robot-cell selection accepted at b1c374ae76144309cc4476392dec681292f0e3a7: all 110 MUSTs pass; 659 tests twice, 119 UI checks, eight Blender demos and exact-source CI/publication verified. Only the HKM-inspired profile is currently selectable. Evidence/status successors receive their own workflow attestation. Status: DONE.
+> **Implementation status, 2026-10-05:** Run, notice and investigate UI redesign in progress from accepted baseline 0db6168. Existing HKM and test-lifecycle evidence remains historical; the new user journey needs browser and source-specific acceptance. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -181,3 +181,13 @@ Den rimliga ambitionen är **hög tydlighet i integrationssemantik och låg, öp
 Före varje demonstration ska projektägaren kunna besvara följande i vanliga ord: vad är implementerat, vad är simulerat, vilka källor inspirerade valet, vilka tester har körts och vad kräver fortfarande verklig utrustning? När dessa svar är tydliga blir begränsningarna en del av det tekniska resonemanget, inte något som behöver döljas.
 
 **Rapportens slutsats är inte att simulatorn motsvarar den verkliga miljön. Slutsatsen är att den kan bevara utvalda, betydelsefulla integrationsproblem samtidigt som den gör deras gränser synliga.**
+
+## Undersökningens presentationsgräns (2026-10-05)
+
+Den omarbetade arbetsytan sammanfattar bevarade jobb-, journal- och observationsdata.
+Symptom, bekräftat innehåll och hypotes hålls isär; en sammanfattning är inte en ny
+sensor eller en genväg förbi verifieraren. Manuell inspektion använder samma test
+via läsande API-anrop och evidensexport. Endast en uttrycklig ny observation kan
+starta avstämningen. Uppspelning och navigation förändrar inte utfallet.
+Webbläsartester visar att de provade resorna fungerar, inte att en förstagångs-
+användare säkert förstår dem eller att verklig robotik har validerats.

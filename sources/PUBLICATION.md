@@ -77,7 +77,7 @@ CI använder Ubuntu-paketen ovan. PDF-sidantal kan skilja mellan plattformarnas
 typsnittsversioner; manifestet redovisar det verkliga sidantalet och filhasharna.
 Basgranskningen av källor gjordes 1 oktober 2026; HKM-kompletteringen granskades
 4 oktober. Varje registerpost behåller sitt eget kontrolldatum och sin
-proveniensklass. Publikationsrevisionen är 1.2 från 4 oktober 2026; implementationens
+proveniensklass. Publikationsrevisionen är 1.3 från 5 oktober 2026; implementationens
 verifiering och aktuell acceptans visas separat i den gemensamma statusrutan.
 
 ## Utdata
@@ -134,7 +134,7 @@ not a new external research finding or a guarantee of successful recovery.
 
 ADR 0009 adds a dark operator workspace with a persisted-state next-step guide,
 scenario expectations and readable evidence beside explicit re-observation.
-Attention opens the original pick review; navigation never decides an outcome or
+The historical ADR 0009 attention behavior opened the original pick review; navigation never decides an outcome or
 sends a command. The architecture caption, operational guides and current-status
 sources describe this presentation boundary. Generated output still comes only
 from the publication builder; local rebuilding does not publish these changes.
@@ -146,6 +146,16 @@ injection times and similar-looking outcomes. It changes presentation only;
 state, architecture, contracts and external source claims remain unchanged.
 The earlier full-system acceptance remains a dated baseline; the separate UI
 follow-up evidence records its own affected-suite and browser checks.
+
+ADR 0012 supersedes automatic review opening with a highlighted investigation
+action beside the cell. Its bounded panel separates symptoms, confirmed records
+and possible explanations, exposes exact evidence and manual inspection paths,
+and keeps the event timeline secondary. Opening it pauses only replay; return
+preserves context. Reports and architecture captions describe this UI boundary,
+not a new sensor, verifier or real-world research claim. Eight additive UI-INV
+MUSTs require actual browser journeys and fresh acceptance of the changed source.
+Screenshots/results remain revision-scoped; generated Pages/PDFs still come only
+from the publication workflow. Functional automation is not a first-time user study.
 
 The guided-workspace release is verified for clean source `59ace31`: all MUST
 criteria pass, and CI, Windows native lifecycle checks and public publication are

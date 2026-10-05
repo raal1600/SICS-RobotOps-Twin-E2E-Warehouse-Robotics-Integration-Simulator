@@ -124,3 +124,12 @@ The local dashboard also serves bounded presentation assets at `/ui/theme.css`
 and `/ui/workflow-guide.js`. The guide is a pure presentation of persisted job and
 verification records. No domain schema, transition, or command endpoint changed
 for ADR 0009; OpenAPI records the confined new asset routes.
+
+ADR 0012 reorganizes these same assets without changing API/domain wire schemas.
+Its manual-inspection download is an explicitly labelled presentation bundle:
+`format: robotops-investigation-1`, `test_id`, typed `evidence: JobEvidence`, and
+`order_events` containing the full order timeline. The panel filters events to
+its pinned job plus shared order events; the export preserves the full order
+scope. Read-only API examples use that test's route prefix. The assessed sensor
+report is resolved by the verification's observation ID, not array position or
+the current scenario selector. Neither the bundle nor the UI is verifier input.

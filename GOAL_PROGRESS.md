@@ -4,7 +4,8 @@ Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c73
 
 ## Current phase: investigation workflow redesign (in progress)
 
-Baseline/current source: `0db6168b71bc4b500894fe7695ce082384c777b2`.
+Baseline source: `0db6168b71bc4b500894fe7695ce082384c777b2`.
+Implementation milestone: `fd47d3277132cb12554751ea223dc6af20d24d6f`.
 The active goal adds an intuitive run -> notice -> investigate journey. Prior
 110-MUST acceptance remains archived and does not prove this UI revision.
 Baseline browser review confirms a 2,421 px ready page at 1440x1000, with raw
@@ -45,10 +46,24 @@ Source registry classifications were reviewed and unchanged: this is simulator
 presentation work, not new HKM/SICS research. Generated Pages/PDFs were rebuilt,
 never edited manually. The UI is not independently user-tested.
 
-Next milestone: commit the coherent implementation, run clean full acceptance
-twice, publish and verify exact-source CI/Pages/PDFs, then finalize current evidence
-and status with the successor's own exact-SHA gates. The enhancement is NOT DONE
-until all 118 MUSTs and final remote attestations pass.
+The first clean full attempt at fd47 passed 664 of 665 tests. The older restart
+dashboard smoke test expected the deliberately renamed `Causal timeline` label.
+The failure and original manifest/JUnit are retained in
+[the failed attempt](docs/evidence/acceptance/20261005T012342/README.md).
+The second suite was interrupted before source changed. The correction preserves
+all metrics, restart and exact-one-effect checks, updates the label to `Event
+timeline`, and additionally verifies the collapsed timeline and real investigation
+controls. No production semantics or acceptance thresholds were changed.
+All 19 affected restart, UI-wrapper and governance checks now pass, as do lint and
+the 118-criterion drift scan. The scoped rerun used a fresh fixture directory
+because this machine's default pytest temporary directory denied access.
+
+The fd47 publication and Windows launcher workflows passed; its public PDFs and
+links were checked against that source. These do not attest the corrected source.
+Next milestone: commit the regression-check correction, rerun clean full acceptance
+twice and exact-source CI/Pages, then finalize evidence and status with the
+successor's own gates. The enhancement remains NOT DONE until all 118 MUSTs and
+final remote attestations pass.
 
 ## Historical accepted phase: test lifecycle and robot-cell selection accepted at audited source
 

@@ -51,21 +51,35 @@ def test_metrics_timeline_and_dashboard_survive_restart(tmp_path, order_request)
     assert page.status_code == 200
     assert all(
         label in page.text
-        for label in ["Causal timeline", "Reconcile selected job", "Saved Blender snapshot"]
+        for label in ["Event timeline", "Reconcile selected job", "Saved Blender snapshot"]
     )
 
     class SnapshotDisclosure(HTMLParser):
         panel = None
 
+        def __init__(self):
+            super().__init__()
+            self.controls = {}
+
         def handle_starttag(self, tag, attrs):
-            if dict(attrs).get("id") == "visual-panel":
-                self.panel = tag, dict(attrs)
+            attributes = dict(attrs)
+            if ident := attributes.get("id"):
+                self.controls[ident] = tag, attributes
+            if attributes.get("id") == "visual-panel":
+                self.panel = tag, attributes
 
     disclosure = SnapshotDisclosure()
     disclosure.feed(page.text)
     assert disclosure.panel is not None
     tag, attributes = disclosure.panel
     assert tag == "details" and "open" not in attributes
+    timeline_tag, timeline_attributes = disclosure.controls["timeline-panel"]
+    assert timeline_tag == "details" and "open" not in timeline_attributes
+    assert disclosure.controls["investigation-dialog"][0] == "dialog"
+    for tab, pane in (("tab-evidence", "pane-evidence"), ("tab-manual", "pane-manual")):
+        assert disclosure.controls[tab][1]["aria-controls"] == pane
+        assert disclosure.controls[pane][1]["role"] == "tabpanel"
+    assert disclosure.controls["reconcile"][0] == "button"
     assert restarted.get("/ui/app.js").status_code == 200
     assert restarted.get("/fixtures").json()["runtime"] == "headless"
     assert restarted.get("/artifacts/latest.png").status_code == 404

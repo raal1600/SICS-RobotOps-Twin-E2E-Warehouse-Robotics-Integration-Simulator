@@ -225,6 +225,10 @@ The catalog serializes lifecycle operations with reads, writes and downloads;
 in-flight work blocks clear/deletion. Only registered application-owned files
 are removed. Tests use disposable roots, never the owner's current data. Existing
 robot MUST criteria and uncertainty/idempotency semantics remain unchanged.
+Before a confirmed lifecycle request, the UI pauses polling and drains its own
+JSON and saved-snapshot response bodies. It keeps controls busy through the final
+refresh. A stalled view read times out without sending the lifecycle request;
+other clients' reads, downloads and running work still retain the backend guards.
 
 ## Test strategy
 

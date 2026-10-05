@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 
-async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,afterManagement=null}={}){
+async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,afterManagement=null,beforeReadBody=null,scheduleTimeout=setTimeout,cancelTimeout=clearTimeout}={}){
   const hkmCatalogue=JSON.parse(fs.readFileSync('robotops/robotics/catalogue-v1.json','utf8'));
   const registeredProfiles=profiles||[{cell_profile_id:'hkm_inspired_v1',display_name:'HKM1800-inspired warehouse cell',description:'Six product families and six interchangeable tools.',selectable:true,product_count:6,tool_count:6},{cell_profile_id:'legacy_cartesian_v1',display_name:'Legacy Cartesian cell',description:'Saved historical tests only.',selectable:false,product_count:3,tool_count:1}];
   const elements=new Map(),posts=[],requests=[],worlds=new Map(),failures=[],managementResults=new Map(),timers=[];
@@ -123,13 +123,16 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
   }
   const context=vm.createContext({document:{getElementById:el,createElement:tag=>makeElement(tag)},
     Option:class{constructor(text,value){this.text=text;this.value=value;}},MotionPlayer:class{constructor(){return player;}},
-    fetch,crypto:{randomUUID:()=>String(++sequence)},setInterval(fn){timers.push(fn);},console});
+    fetch:async(path,options={})=>{
+      const response=await fetch(path,options);
+      return !options.method&&beforeReadBody?{...response,json:async()=>{await beforeReadBody(path);return response.json();}}:response;
+    },crypto:{randomUUID:()=>String(++sequence)},setInterval(fn){timers.push(fn);},setTimeout:scheduleTimeout,clearTimeout:cancelTimeout,console});
   vm.runInContext(fs.readFileSync('apps/erp_ui/workflow-guide.js','utf8'),context);
   vm.runInContext(fs.readFileSync('apps/erp_ui/app.js','utf8'),context);
   await new Promise(setImmediate);
   return {el,posts,requests,timers,...initial,player,worlds,profiles:registeredProfiles,
     evidence:data=>{context.evidence=data;vm.runInContext('roboticsEvidence(evidence)',context);},
-    current:()=>worlds.get(active),activeId:()=>active,refresh:()=>vm.runInContext('refresh()',context),
+    current:()=>worlds.get(active),activeId:()=>active,refresh:()=>vm.runInContext('refresh()',context),motion:()=>vm.runInContext('refreshMotion(true)',context),
     poll:()=>vm.runInContext('(async()=>{await refreshHistory();await refresh();})()',context),
     block:reason=>{worlds.get(active).blocked=reason;},
     failNext:(path,{afterCommit=false,status=503,reason='SIMULATED_RESPONSE_FAILURE'}={})=>failures.push({path,afterCommit,status,reason}),
@@ -137,6 +140,80 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
     serverClear:id=>{const old=worlds.get(id),fresh=makeWorld(id,old.cell_profile_id);fresh.number=old.number;fresh.revision=old.revision+1;fresh.epoch=old.epoch+1;fresh.groups[0].delivery_id=id+'-scene-'+fresh.epoch;worlds.set(id,fresh);active=id;},
     serverStart:()=>{active='external-'+(++sequence);worlds.set(active,makeWorld(active,'hkm_inspired_v1'));return active;}};
 }
+
+for(const operation of ['clear','delete','create'])test(`${operation} waits for the current replay response body before changing test data`,async()=>{
+  let armed=false,release,started;
+  const held=new Promise(resolve=>{release=resolve;}),reading=new Promise(resolve=>{started=resolve;});
+  const ui=await dashboard({beforeReadBody:async path=>{if(armed&&path.endsWith('/playback')){armed=false;started();await held;}}});
+  await ui.el('create').onclick();
+  armed=true;const replay=ui.motion();await reading;
+  const posts=ui.posts.length;
+  if(operation==='create')await ui.el('new-test').onclick();else ui.el(operation==='clear'?'clear-test':'delete-test').onclick();
+  const confirmation=ui.el(operation==='create'?'create-test':'confirm-delete-test').onclick();
+  await new Promise(setImmediate);
+  assert.equal(ui.posts.length,posts,'management must not race an outstanding response body');
+  assert.match(ui.el('message').textContent,/Finishing loading the current view/);
+  for(const timer of ui.timers)timer();
+  await new Promise(setImmediate);
+  assert.equal(ui.posts.length,posts);
+  release();await replay;await confirmation;
+  assert.equal(ui.posts.length,posts+1,'one confirmed management request, no automatic pick');
+  if(operation==='delete')assert.equal(ui.worlds.size,0);
+  else if(operation==='clear'){assert.equal(ui.current().id,'original');assert.equal(ui.current().revision,2);assert.equal(ui.current().orders.length,0);}
+  else{assert.equal(ui.worlds.size,2);assert.notEqual(ui.current().id,'original');}
+});
+
+test('a failed outstanding replay read does not strand confirmed deletion or overwrite its result',async()=>{
+  let armed=false,release,started;
+  const held=new Promise(resolve=>{release=resolve;}),reading=new Promise(resolve=>{started=resolve;});
+  const ui=await dashboard({beforeReadBody:async path=>{if(armed&&path.endsWith('/playback')){armed=false;started();await held;throw Error('Interrupted response');}}});
+  armed=true;const replay=ui.motion();await reading;
+  ui.el('delete-test').onclick();const confirmation=ui.el('confirm-delete-test').onclick();
+  await new Promise(setImmediate);assert.equal(ui.posts.length,0);
+  release();await replay;await confirmation;
+  assert.equal(ui.worlds.size,0);assert.equal(ui.posts.length,1);
+  assert.match(ui.el('message').textContent,/Test data deleted/);
+});
+
+test('a stalled view read bounds the management wait and permits an explicit retry without changing data',async()=>{
+  let armed=false,release,started,expire;
+  const held=new Promise(resolve=>{release=resolve;}),reading=new Promise(resolve=>{started=resolve;});
+  const ui=await dashboard({scheduleTimeout:fn=>{expire=fn;return 1;},cancelTimeout:()=>{},beforeReadBody:async path=>{if(armed&&path.endsWith('/playback')){armed=false;started();await held;}}});
+  armed=true;const replay=ui.motion();await reading;
+  ui.el('delete-test').onclick();const confirmation=ui.el('confirm-delete-test').onclick();
+  await new Promise(setImmediate);expire();await confirmation;
+  assert.equal(ui.posts.length,0);assert.equal(ui.worlds.size,1);assert.equal(ui.el('delete-test-dialog').open,true);
+  assert.match(ui.el('delete-test-error').textContent,/still loading.*No test data was changed/);
+  assert.equal(ui.el('confirm-delete-test').disabled,false);
+  release();await replay;await ui.el('confirm-delete-test').onclick();
+  assert.equal(ui.posts.length,1);assert.equal(ui.worlds.size,0);
+});
+
+test('a finished pick keeps management disabled until its final replay refresh completes',async()=>{
+  let armed=false,release,started;
+  const held=new Promise(resolve=>{release=resolve;}),reading=new Promise(resolve=>{started=resolve;});
+  const ui=await dashboard({beforeRun:()=>{armed=true;},beforeReadBody:async path=>{if(armed&&path.endsWith('/playback')){armed=false;started();await held;}}});
+  const run=ui.el('create').onclick();await reading;
+  assert.equal(ui.current().orders[0].status,'COMPLETED');
+  assert.equal(ui.el('delete-test').disabled,true);assert.equal(ui.el('new-test').disabled,true);
+  ui.el('delete-test').onclick();assert.equal(ui.el('delete-test-dialog').open,false);
+  release();await run;
+  assert.equal(ui.el('delete-test').disabled,false);assert.equal(ui.posts.length,2);
+});
+
+test('management stays exclusive through its final history refresh',async()=>{
+  let armed=false,historyReads=0,release,started;
+  const held=new Promise(resolve=>{release=resolve;}),reading=new Promise(resolve=>{started=resolve;});
+  const ui=await dashboard({afterManagement:()=>{armed=true;},beforeReadBody:async path=>{if(armed&&path==='/simulation-tests'&&++historyReads===2){started();await held;}}});
+  ui.el('clear-test').onclick();const clear=ui.el('confirm-delete-test').onclick();await reading;
+  assert.equal(ui.current().revision,2);assert.equal(ui.el('delete-test').disabled,true);
+  assert.equal(ui.el('confirm-delete-test').disabled,true);
+  const before=ui.requests.length;
+  for(const timer of ui.timers)timer();
+  await new Promise(setImmediate);assert.equal(ui.requests.length,before);
+  release();await clear;
+  assert.equal(ui.el('delete-test').disabled,false);assert.equal(ui.posts.length,1);
+});
 
 test('background polling pauses across committed clear or delete until its response is applied',async()=>{
   for(const button of ['clear-test','delete-test']){

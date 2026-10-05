@@ -36,6 +36,9 @@ starting scene. Confirm, then run again in that same test. Other tests remain.
 **Delete selected test** removes its saved world and test entry completely.
 **Delete all tests** removes the confirmed set. New tests reuse available numbers,
 starting at Test 1 when the list is empty; surviving tests are not renumbered.
+The app finishes loading its current replay/snapshot before sending confirmed
+test management. If the view remains stalled, data stays intact and the dialog
+offers retry. Controls stay busy until the resulting view has finished refreshing.
 
 These actions require confirmation and perform no pick or reconciliation.
 Running work must finish first. Deleted active tests leave no current test;

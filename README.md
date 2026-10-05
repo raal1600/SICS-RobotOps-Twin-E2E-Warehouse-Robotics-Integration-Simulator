@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** Test lifecycle correction accepted at audited implementation df45c93: all 118 MUSTs PASS, 688 tests twice, 139 UI checks, nine real-browser cases and eight Blender demos. Delete removes the test and frees its number; clear restores the same test for retry. CI, Windows launcher and publication verified; original evidence and mapping correction remain archived. **DONE**.
+**Aktuell status:** Final-source CI found a replay-read/delete race: the first suite passed 688 tests; the second passed 687 with one failure. Prior acceptance at df45c93 is preserved. Client read draining and 146 passing UI checks now cover the race; fresh full acceptance is in progress. **NOT DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·

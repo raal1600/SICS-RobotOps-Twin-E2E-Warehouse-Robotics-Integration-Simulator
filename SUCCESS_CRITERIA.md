@@ -214,6 +214,10 @@ revision fencing, cached hosts, pending-clear restart, digest-only retry guards,
 old-tombstone cleanup, intact neighboring tests and real browser clear/delete
 journeys. An earlier expectation of monotonic labels or permanent deleted rows
 is intentionally superseded; robot-effect and evidence assertions are unchanged.
+Management verification includes delayed response bodies: the UI waits for its
+own replay/snapshot reads before sending a confirmed lifecycle request. A stalled
+read must leave data intact with an explicit retry, and final refresh must finish
+before controls resume. Existing backend running-work/download guards remain required.
 
 ## Investigation workflow revision (2026-10-05)
 

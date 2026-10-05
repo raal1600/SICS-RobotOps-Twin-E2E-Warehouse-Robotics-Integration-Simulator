@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Test lifecycle correction accepted at audited implementation df45c93: all 118 MUSTs PASS, 688 tests twice, 139 UI checks, nine real-browser cases and eight Blender demos. Delete removes the test and frees its number; clear restores the same test for retry. CI, Windows launcher and publication verified; original evidence and mapping correction remain archived. Status: DONE.
+> **Implementation status, 2026-10-05:** Final-source CI found a replay-read/delete race: the first suite passed 688 tests; the second passed 687 with one failure. Prior acceptance at df45c93 is preserved. Client read draining and 146 passing UI checks now cover the race; fresh full acceptance is in progress. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -259,6 +259,8 @@ Förbered en ärlig statusruta med implementerat, simulerat, testat och återst�
 Om programmet fungerar: skapa ordern live, följ ID:t genom systemet och visa Blender-effekten. Visa sedan kvittensbortfall och ett oavgjort fall. Om programmet inte är färdigt: använd diagrammen och säg att det är designgranskning. En inspelad sekvens ska tydligt presenteras som inspelad.
 
 För ett nytt oberoende försök: välj ”Start new test”, granska ”Robot cell” och bekräfta ”Create test”. För att köra om samma försök: välj ”Manage test data → Clear test and retry”. Bekräftelsen kasserar gamla resultat/evidens och återställer produkter, men behåller numret, cellen och scenariovalet. ”Delete selected test” tar bort försöket helt; ”Delete all tests” den bekräftade samlingen. Efter en helt tömd lista får nästa nya försök nummer 1. Dessa åtgärder avgör inte ett osäkert plock. Ett arkiv blir bara aktivt efter ett uttryckligt val att rensa och återanvända det. Använd separat demodata när du visar raderings-/rensningsflödet (ADR 0013).
+
+Appen avslutar först sin pågående läsning av vyn. Om den fastnar görs ingen dataändring; vänta och välj att försöka igen. Kontrollerna blir tillgängliga efter att den uppdaterade vyn har lästs in.
 
 Ha en reservversion av rapporterna som PDF. Börja inte installera nya drivrutiner eller flytta runtime till en okänd miljö precis före presentationen. Det är en praktisk rekommendation för denna demo, inte en uppgift om SICS interna rutiner.
 

@@ -6,6 +6,8 @@ let orderSignature = "", productSignature = "", deliverySignature = "", nextMoti
 let selectedTest = "original", activeTest = "original", testHistory = [], historySignature = "", viewVersion = 0;
 let selectedRevision = 1;
 let managingTests = false;
+const pendingReads = new Set();
+let artifactPath = null, artifactObjectUrl = null;
 let guideEvidence = null, guideJob = null, guidance = null;
 let cellProfiles = [], newTestRequest = null, deletionRequest = null, historyVersion = 0;
 let selectedEvidence = null, selectedEvents = [], knownOrders = [], inspection = null, inspectionVersion = 0, timelineSignature = "";
@@ -145,7 +147,7 @@ async function selectTest(identity) {
   byId("setup-panel").open=true;byId("review-panel").open=false;
   orderSignature=productSignature=deliverySignature="";nextMotionPoll=0;
   byId("orders").replaceChildren();byId("delivery").replaceChildren();
-  byId("replay-scope").value="delivery";byId("visual-panel").hidden=true;byId("visual").removeAttribute("src");
+  byId("replay-scope").value="delivery";clearArtifact();
   player.select(null);testControls();fixtureControls();
   await refresh();await refreshMotion(true);
 }
@@ -190,6 +192,7 @@ function fixtureControls() {
   byId("resolve-blocker").disabled=busy||!pending||readOnly();
   byId("resolve-blocker").hidden=!pending;
   byId("reconcile").hidden=!!pending;
+  byId("reconcile").disabled=busy||readOnly()||!["UNKNOWN_OUTCOME","EXECUTING","VERIFYING","RECONCILING","REQUIRES_INTERVENTION"].includes(selectedEvidence?.job.state);
   byId("scenario").disabled=busy;byId("product").disabled=busy||readOnly();
   byId("observation").disabled=busy;
   byId("fresh-scene").disabled=busy||readOnly()||!!blocker;
@@ -262,7 +265,24 @@ async function refreshGuide(selectedEvidence, version) {
 function selectReplay() {
   player.select(byId("replay-scope").value==="delivery"&&selectedDelivery?"delivery:"+selectedDelivery:selectedJob);
 }
-async function request(path, body, revision) {
+async function trackedRead(operation) {
+  pendingReads.add(operation);
+  try{return await operation;}finally{pendingReads.delete(operation);}
+}
+async function drainReads() {
+  let timeout;
+  try{
+    await Promise.race([
+      (async()=>{while(pendingReads.size)await Promise.allSettled([...pendingReads]);})(),
+      new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error("The current view is still loading. Wait for it to finish, then retry. No test data was changed.")),5000);})
+    ]);
+  }finally{clearTimeout(timeout);}
+}
+function request(path, body, revision) {
+  const operation=requestData(path,body,revision);
+  return body===undefined?trackedRead(operation):operation;
+}
+async function requestData(path, body, revision) {
   const options = body === undefined ? {cache:"no-store"} : {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)};
   if(body!==undefined&&revision!==undefined)options.headers["X-Test-Revision"]=String(revision);
   const response = await fetch(path, options), data = await response.json();
@@ -281,6 +301,26 @@ async function request(path, body, revision) {
     throw new Error(explanations[data.reason]||data.reason||JSON.stringify(data.detail));
   }
   return data;
+}
+function clearArtifact() {
+  artifactPath=null;
+  byId("visual-panel").hidden=true;byId("visual").removeAttribute("src");
+  if(artifactObjectUrl)URL.revokeObjectURL(artifactObjectUrl);
+  artifactObjectUrl=null;
+}
+async function loadArtifact(path) {
+  if(artifactPath===path)return;
+  clearArtifact();artifactPath=path;
+  const version=viewVersion;
+  try{
+    const blob=await trackedRead((async()=>{
+      const response=await fetch(path,{cache:"no-store"});
+      if(!response.ok)throw new Error("Saved snapshot unavailable");
+      return response.blob();
+    })());
+    if(version!==viewVersion||artifactPath!==path){if(artifactPath===path)clearArtifact();return;}
+    artifactObjectUrl=URL.createObjectURL(blob);byId("visual").src=artifactObjectUrl;
+  }catch{if(artifactPath===path)clearArtifact();}
 }
 async function api(path, body) {
   if(!selectedTest)throw new Error("Create or select a simulation test first.");
@@ -370,7 +410,7 @@ async function refresh(preferred, preferredDelivery) {
       text("evidence","No order selected.");roboticsEvidence(null);byId("timeline").replaceChildren();await refreshGuide(null,version);return;
     }
     if (selectedJob !== byId("orders").value) {
-      byId("visual-panel").hidden=true;byId("visual").removeAttribute("src");
+      clearArtifact();
     }
     selectedJob = byId("orders").value; selectReplay();
     const job = selectedJob;
@@ -393,8 +433,7 @@ async function refresh(preferred, preferredDelivery) {
     renderInspection();
     if(fixture.runtime === "blender" && evidence.command && evidence.journal?.status==="SUCCEEDED"
       &&["COMPLETED","UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(evidence.job.state)) {
-      const url=testPath(`/jobs/${job}/artifact.png`);
-      if(byId("visual").getAttribute("src")!==url) byId("visual").src=url;
+      loadArtifact(testPath(`/jobs/${job}/artifact.png`));
     }
   } finally {if(version===refreshVersion)refreshing=false;}
 }
@@ -423,8 +462,8 @@ async function action(fn, message="Running… live motion and status update belo
   try {await fn();text("message","Updated from persisted evidence. Replay only changes the view.");}
   catch(error){appError(error);}
   finally {
-    busy=false;
     try{await refreshHistory();await refresh();await refreshMotion(true);}catch(error){appError(error);}
+    busy=false;
     fixtureControls();
   }
 }
@@ -499,14 +538,15 @@ async function manageTests(dialogId,errorId,operation){
   for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=true;
   text(errorId,"");
   try{
+    text("message","Finishing loading the current view before updating test data…");
+    await drainReads();
     const message=await operation();
     byId(dialogId).close();text("message",message);
   }catch(error){text(errorId,error.message);appError(error);}
   finally{
-    busy=false;
-    for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=false;
     try{await refreshHistory();await refresh();await refreshMotion(true);}catch(error){appError(error);}
-    managingTests=false;
+    busy=false;managingTests=false;
+    for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=false;
     fixtureControls();
   }
 }

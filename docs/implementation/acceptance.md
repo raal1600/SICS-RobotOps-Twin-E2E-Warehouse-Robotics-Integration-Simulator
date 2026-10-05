@@ -25,6 +25,13 @@ lines, logs, JUnit, environment versions, lock hash and Git identity are retaine
 Source documents and automated drift checks supply inspectable documentation
 evidence, not a replacement for runtime tests.
 
+Keep imported evidence paths within 100 characters relative to the repository
+root so Windows can check out this repository inside GitHub's nested workspace.
+Use short case/session folders and preserve the full original artifact paths and
+byte hashes in the archive manifest. Renaming an archived copy must not modify
+its content or relabel its audited source. The investigation archive retains the
+checkout failure at `77a8237` and its path-only correction as inspectable history.
+
 Each demo starts with a new data directory. Lost acknowledgement checks one effect
 and zero duplicates; ambiguous reconciliation checks intervention; restart creates
 a separate process. A separate test kills an orchestrator after runtime commit.

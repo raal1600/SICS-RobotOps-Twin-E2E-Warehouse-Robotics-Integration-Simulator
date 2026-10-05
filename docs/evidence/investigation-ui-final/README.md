@@ -47,10 +47,10 @@ The separate 503 case deliberately records the expected console error while the
 job stays RECEIVED with no command or journal; it is not a simulated pick failure.
 
 - [Linux browser audit and original records](browser/browser-verification.json)
-- [Desktop uncertain result](<browser/original/20261005T020824715345/test_run_notice_investigate_and_return[blender-desktop]/03-unusual-result.png>)
-- [Compact uncertain result](<browser/original/20261005T021014720115/test_run_notice_investigate_and_return[blender-compact]/03-unusual-result.png>)
-- [Desktop evidence](<browser/original/20261005T020824715345/test_run_notice_investigate_and_return[blender-desktop]/04-evidence.png>)
-- [Compact manual inspection](<browser/original/20261005T021014720115/test_run_notice_investigate_and_return[blender-compact]/05-manual-inspection.png>)
+- [Desktop uncertain result](<browser/pass2-blender-desktop/03-unusual-result.png>)
+- [Compact uncertain result](<browser/pass2-blender-compact/03-unusual-result.png>)
+- [Desktop evidence](<browser/pass2-blender-desktop/04-evidence.png>)
+- [Compact manual inspection](<browser/pass2-blender-compact/05-manual-inspection.png>)
 - [Development comparison and clarity assessment](../investigation-ui-development/README.md)
 
 The complete CI artifact retains both runs' screenshots and Playwright traces.
@@ -137,3 +137,7 @@ requires no model API. The existing HKM-inspired/synthetic observation, dynamics
 collision-preflight and safety limitations continue to apply. See
 [the operator guide](../../implementation/investigation.md) and
 [ADR 0002](../../adr/0002-acceptance-attestations.md) for exact-source attestation.
+
+## Portable archive correction
+
+The evidence/status commit `77a8237` failed the Windows workflow during checkout: the original browser/native folder names exceeded the runner path limit. [The original job log](checkout-77.log) preserves that failure. The archive now uses short case/session folders, retaining all 117 imported files byte-for-byte. The archive manifest records each prior archive path alongside its original artifact path and hash. No test result or source identity was changed; the corrected successor receives complete CI, native and publication checks.

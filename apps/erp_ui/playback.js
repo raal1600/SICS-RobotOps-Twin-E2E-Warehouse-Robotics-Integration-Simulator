@@ -130,7 +130,14 @@ class MotionPlayer {
       if(this.atEnd()&&!['WAITING','RECORDING'].includes(this.track.at(-1)?.clip.status))this.playing=false;
       this.controls();
     }
-    this.draw();requestAnimationFrame(next=>this.tick(next));
+    // Draw at the recording rate. A CPU WebGL renderer must share the host
+    // with Blender; display refresh (60/144 Hz) is not a simulation clock.
+    const interval=1000/24;
+    if(this.lastDraw===undefined||time-this.lastDraw>=interval){
+      this.lastDraw=this.lastDraw===undefined?time:time-(time-this.lastDraw)%interval;
+      this.draw();
+    }
+    requestAnimationFrame(next=>this.tick(next));
   }
   pose(){
     const step=this.track[Math.floor(this.cursor)],data=step?.clip||this.data,rec=data?.recording;

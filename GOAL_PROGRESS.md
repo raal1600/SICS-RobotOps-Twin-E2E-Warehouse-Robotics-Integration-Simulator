@@ -1,5 +1,38 @@
 # Goal Progress
 Last updated: 2026-10-05 UTC
+Current revision: delete removes a test completely; clear resets that same test for reuse.
+Base: `4da22d75bded35452f4bca1db03c57da5e9eb957` (clean).
+
+## In progress: test deletion, reset and reusable numbering
+
+The owner's explicit 2026-10-05 correction supersedes ADR 0011's permanent
+deleted-test rows and lifetime display numbering. Delete must purge the test's
+world, evidence and catalog entry; new tests use the first available number,
+starting at 1 when empty. Clear retains the test identity/number/cell and resets
+its data for another run. Temporary cleanup intent and anonymous request digests
+must still protect interrupted operations and delayed retries without retaining
+deleted test records. Robot command/reconciliation semantics are unchanged.
+
+Verification uses disposable roots only; the owner's current tests are untouched.
+Catalog migration, digest guards, fresh-world revisions, cached hosts, API and UI
+are implemented. Targeted results: 49 lifecycle integration tests and 139 total
+JavaScript checks pass. Confirmation/cancel, archive reuse, lost responses,
+locked files, interrupted reset, old-catalog migration and stale writes are covered.
+All four actual browser lifecycle cases pass in both runtimes/viewports. Browser
+verification exposed display-rate CPU rendering contention and stale polls
+after deletion; presentation now draws at 24 fps and suspends those polls during
+management. No runtime timeout, render quality or robot assertion was relaxed.
+Earlier failures, final targeted results and screenshots are retained in
+[development evidence](docs/evidence/test-reset-development/README.md).
+The publication rebuild, security scan, lint/typecheck and drift check pass.
+Next: clean-source repeated acceptance and exact-source remote checks.
+
+ADR 0013 and affected API contracts, plan/handoff, operator/persistence/playback
+guides, all three reports and architecture caption are synchronized. Robot wire
+schemas and research provenance are unchanged. Prior acceptance below is historical.
+
+## Previous accepted implementation
+
 Audited implementation: `7b9f0a656cdd077106ab4b7ee7ade82335e11f26`.
 Implementation baseline: `0db6168b71bc4b500894fe7695ce082384c777b2`.
 

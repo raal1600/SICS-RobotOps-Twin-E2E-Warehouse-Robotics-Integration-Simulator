@@ -87,3 +87,10 @@ the five browser cases run in each complete suite. The evidence keeps the earlie
 failed label assertion and its correction, rather than hiding it. The visual
 assessment remains an implementer review; independent novice, touch-device and
 screen-reader studies have not been performed.
+
+For another attempt with the same test, choose **Manage test data → Clear test and
+retry**. Confirmation discards that test's old evidence, restores products and
+keeps its number/cell and your scenario choices. **Delete selected test** removes
+the test entirely. Reused display numbers are labels; technical test/job/command
+UUIDs still distinguish independent evidence. Clearing invalidates old inspection
+and replay context before loading the restored world (ADR 0013).

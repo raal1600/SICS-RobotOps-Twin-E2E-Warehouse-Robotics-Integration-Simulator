@@ -78,8 +78,14 @@ Implement and verify destructive actions using disposable temporary data roots.
 Do not delete the owner's tests while developing or validating this feature.
 Deletion requires an explicit data-management request and UI confirmation; it
 is never triggered by replay, navigation, startup, scenario changes or new-test
-creation. Preserve tombstones, request identity, bounded cleanup and the catalog
-lock. Removing the active test leaves no active world and never promotes history.
+creation. ADR 0013 supersedes permanent tombstones and lifetime numbering at the
+owner's explicit request: completed deletion removes the test row/files and frees
+its number; an empty workspace restarts at Test 1. Keep only anonymous request
+digests after cleanup. Clear test retains its identity/number/cell and initializes
+an empty scene for retry, with durable revision/intent and stale-write guards.
+Preserve request identity, bounded cleanup and the catalog lock. Removing the
+active test leaves no active world and never promotes history; explicitly clearing
+an archive activates only its freshly reset world.
 Unknown/intervention outcomes are not resolved by deleting their test evidence.
 The original 110 MUSTs remain normative; prior acceptance is historical evidence
 for its exact source, not a pass for this lifecycle change.

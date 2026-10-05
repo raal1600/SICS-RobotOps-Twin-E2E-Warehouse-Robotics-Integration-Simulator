@@ -7,10 +7,12 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from apps.api.cell_profiles import CellProfiles, cell_profiles
 from apps.api.playback import deliveries, delivery_playback, playback, visual_scene
 from apps.api.test_sessions import (
+    ClearTestRequest,
     ClearTestsRequest,
     DeleteTestRequest,
     SimulationTest,
     StartTestRequest,
+    TestClearing,
     TestDeletion,
     TestHistory,
     TestRegistry,
@@ -90,13 +92,18 @@ def create_app(
         def available_cells() -> CellProfiles:
             return cell_profiles()
 
-        @app.post("/simulation-tests/clear", response_model=TestDeletion)
+        @app.post("/simulation-tests/delete-all", response_model=TestDeletion)
+        @app.post("/simulation-tests/clear", response_model=TestDeletion, deprecated=True)
         def clear_tests(request: ClearTestsRequest) -> TestDeletion:
             return registry.delete(request.request_id, expected_test_ids=request.expected_test_ids)
 
         @app.post("/simulation-tests/{test_id}/delete", response_model=TestDeletion)
         def delete_test(test_id: str, request: DeleteTestRequest) -> TestDeletion:
             return registry.delete(request.request_id, test_id=test_id)
+
+        @app.post("/simulation-tests/{test_id}/clear", response_model=TestClearing)
+        def clear_test(test_id: str, request: ClearTestRequest) -> TestClearing:
+            return registry.clear(request.request_id, test_id, request.expected_revision)
 
     @app.exception_handler(Conflict)
     async def conflict_handler(request: Request, exc: Conflict) -> JSONResponse:

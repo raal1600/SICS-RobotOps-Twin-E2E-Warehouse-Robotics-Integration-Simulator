@@ -375,3 +375,98 @@ def test_app_request_failure_does_not_become_simulated_outcome(server, browser_p
     assert not errors
     assert console_errors and all("503" in error for error in console_errors)
     screenshot(page, directory, "app-error-separate-from-simulation")
+
+
+@pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+@pytest.mark.parametrize(
+    "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+)
+def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+    origin, registry = server
+    page, directory, errors, console_errors, requests = browser_page
+    open_ready(page, origin, viewport)
+    uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+    assert uncertain["state"] == "UNKNOWN_OUTCOME"
+    assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+    epoch = registry.engine("original").runtime.world().scene_epoch
+    page.locator(".manage-data > summary").click()
+    page.locator("#clear-test").click()
+    expect(page.locator("#delete-test-title")).to_have_text("Clear Test 1 and retry?")
+    screenshot(page, directory, "clear-same-test-confirmation")
+    page.locator("#cancel-delete-test").click()
+    assert (
+        registry.engine("original").store.job(uncertain["job_id"]).state.value == "UNKNOWN_OUTCOME"
+    )
+    page.locator("#clear-test").click()
+    write_count = len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
+    page.locator("#confirm-delete-test").click()
+    expect(page.locator("#delete-test-dialog")).not_to_be_visible()
+    expect(page.locator("#message")).to_contain_text("Test 1 cleared")
+    expect(page.locator("#test-history")).to_have_value("original")
+    expect(page.locator("#create")).to_be_enabled()
+    expect(page.locator("#scenario")).to_have_value("DROP_ACK_AFTER_EFFECT")
+    assert (
+        len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
+        == write_count
+    )
+    history = get(page, origin + "/simulation-tests")
+    assert len(history["tests"]) == 1
+    assert (
+        history["tests"][0]["number"],
+        history["tests"][0]["revision"],
+        history["tests"][0]["order_count"],
+    ) == (1, 2, 0)
+    assert registry.engine("original").runtime.world().scene_epoch != epoch
+    fixtures = get(page, origin + "/fixtures")
+    assert len(fixtures["inventory"]) == 6
+    assert all(
+        p["location_id"] == fixtures["product_sources"][p["product_id"]]
+        for p in fixtures["inventory"]
+    )
+    assert page.request.get(origin + f"/jobs/{uncertain['job_id']}/evidence").status == 404
+    screenshot(page, directory, "same-test-ready-again")
+    repeated = choose_pick(page)
+    assert repeated["state"] == "COMPLETED"
+    assert repeated["command_id"] != uncertain["command_id"]
+    assert registry.engine("original").runtime.journal(repeated["command_id"]).effect_count == 1
+    page.locator("#delete-test").click()
+    page.locator("#cancel-delete-test").click()
+    assert registry.exists("original")
+    page.locator("#delete-test").click()
+    page.locator("#confirm-delete-test").click()
+    expect(page.locator("#empty-workspace")).to_be_visible()
+    expect(page.locator("#delete-test-dialog")).not_to_be_visible()
+    assert not (registry.data_dir / "workflow.db").exists()
+    assert not (registry.data_dir / "runtime.db").exists()
+    with registry.connect() as db:
+        assert not db.execute("SELECT 1 FROM tests").fetchone()
+    page.locator("#empty-new-test").click()
+    page.locator("#create-test").click()
+    expect(page.locator("#new-test-dialog")).not_to_be_visible()
+    expect(page.locator("#message")).to_contain_text("Test 1 created")
+    expect(page.locator("#create")).to_be_enabled()
+    fresh = get(page, origin + "/simulation-tests")
+    assert len(fresh["tests"]) == 1 and fresh["tests"][0]["number"] == 1
+    assert fresh["tests"][0]["test_id"] != "original"
+    assert fresh["tests"][0]["order_count"] == 0
+    screenshot(page, directory, "deleted-then-new-test-one")
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    assert not errors, errors
+    assert not console_errors, console_errors
+    (directory / "lifecycle-result.json").write_text(
+        json.dumps(
+            {
+                "runtime": registry.runtime_type.__name__,
+                "viewport": viewport,
+                "cleared_test_id": "original",
+                "cleared_number": 1,
+                "revision_after_clear": 2,
+                "deleted_test_row_and_world_files": True,
+                "new_test": fresh["tests"][0],
+                "clear_dispatched_no_pick": True,
+                "subsequent_explicit_pick_effects": 1,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )

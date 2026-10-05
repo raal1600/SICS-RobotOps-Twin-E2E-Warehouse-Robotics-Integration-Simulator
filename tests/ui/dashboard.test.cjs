@@ -3,21 +3,22 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 
-async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null}={}){
+async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,afterManagement=null}={}){
   const hkmCatalogue=JSON.parse(fs.readFileSync('robotops/robotics/catalogue-v1.json','utf8'));
   const registeredProfiles=profiles||[{cell_profile_id:'hkm_inspired_v1',display_name:'HKM1800-inspired warehouse cell',description:'Six product families and six interchangeable tools.',selectable:true,product_count:6,tool_count:6},{cell_profile_id:'legacy_cartesian_v1',display_name:'Legacy Cartesian cell',description:'Saved historical tests only.',selectable:false,product_count:3,tool_count:1}];
-  const elements=new Map(),posts=[],requests=[],worlds=new Map(),failures=[],managementResults=new Map();
-  let active=empty?null:'original',sequence=0,worldNumber=0;
+  const elements=new Map(),posts=[],requests=[],worlds=new Map(),failures=[],managementResults=new Map(),timers=[];
+  let active=empty?null:'original',sequence=0;
+  const availableNumber=()=>{let n=1;while([...worlds.values()].some(w=>w.number===n))n++;return n;};
   const makeWorld=(id,profile=hkm?'hkm_inspired_v1':'legacy_cartesian_v1')=>{
     const catalogue=profile==='legacy_cartesian_v1'?null:hkmCatalogue;
     const sources=catalogue?Object.fromEntries(catalogue.products.map(p=>['product-'+p.sku+'-01',catalogue.layout.sources[p.sku].location_id])):{};
-    return {id,number:++worldNumber,cell_profile_id:profile,cell_display_name:profile==='legacy_cartesian_v1'?'Legacy Cartesian cell':registeredProfiles.find(p=>p.cell_profile_id===profile)?.display_name,
+    return {id,number:availableNumber(),revision:1,cell_profile_id:profile,cell_display_name:profile==='legacy_cartesian_v1'?'Legacy Cartesian cell':registeredProfiles.find(p=>p.cell_profile_id===profile)?.display_name,
       catalogue,sources,destination:catalogue?.layout.destination.location_id||'destination',orders:[],groups:[{delivery_id:id+'-scene-1',started_at:'2026-10-03T14:00:00Z',current:true,executions:[]}],epoch:1,cellMode:'READY',blocked:null,
       inventory:catalogue?catalogue.products.map(p=>({product_id:'product-'+p.sku+'-01',location_id:sources['product-'+p.sku+'-01']})):['red','blue','green'].map(color=>({product_id:'product-'+color,location_id:'source'}))};
   };
   if(active)worlds.set(active,makeWorld(active));
   const initial=active?worlds.get(active):{orders:[],groups:[],inventory:[]};
-  const history=()=>({active_test_id:active,tests:[...worlds.values()].map(w=>({test_id:w.id,number:w.number,active:w.id===active,order_count:w.orders.length,outcomes:w.orders.map(o=>o.status),cell_profile_id:w.cell_profile_id,cell_display_name:w.cell_display_name}))});
+  const history=()=>({active_test_id:active,tests:[...worlds.values()].map(w=>({test_id:w.id,number:w.number,revision:w.revision,clearing:false,active:w.id===active,order_count:w.orders.length,outcomes:w.orders.map(o=>o.status),cell_profile_id:w.cell_profile_id,cell_display_name:w.cell_display_name}))});
   const makeElement=id=>({value:id==='replay-scope'?'delivery':'',textContent:'',disabled:false,hidden:false,open:false,options:[],children:[],
     add(option){this.options.push(option);if(this.options.length===1)this.value=option.value;},
     replaceChildren(...nodes){this.options=[];this.children=[];this.value='';for(const node of nodes){if('value' in node&&'text' in node)this.add(node);else this.children.push(node);}},
@@ -29,7 +30,7 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null}={}
   const reply=(data,status=200)=>({ok:status<400,status,json:async()=>JSON.parse(JSON.stringify(data))});
   async function fetch(path,options={}){
     const body=options.body?JSON.parse(options.body):null,originalPath=path;
-    requests.push({path,method:options.method||'GET',body});
+    requests.push({path,method:options.method||'GET',body,headers:options.headers||{}});
     if(options.method==='POST')posts.push({path,body});
     const failIndex=failures.findIndex(f=>f.path===path),failure=failIndex<0?null:failures.splice(failIndex,1)[0];
     if(failure&&!failure.afterCommit)return reply({reason:failure.reason},failure.status);
@@ -43,15 +44,29 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null}={}
       active=body.request_id;worlds.set(active,makeWorld(active,body.cell_profile_id));
       const result=history().tests.find(t=>t.test_id===active);managementResults.set(key,result);return respond(result);
     }
+    const clearing=path.match(/^\/simulation-tests\/([^/]+)\/clear$/);
+    if(clearing){
+      const key=path+':'+body.request_id;
+      if(managementResults.has(key))return respond(managementResults.get(key));
+      const old=worlds.get(clearing[1]);
+      if(old.revision!==body.expected_revision)return reply({reason:'TEST_REVISION_CHANGED'},409);
+      const fresh=makeWorld(old.id,old.cell_profile_id);
+      fresh.number=old.number;fresh.revision=old.revision+1;fresh.epoch=old.epoch+1;
+      fresh.groups[0].delivery_id=old.id+'-scene-'+fresh.epoch;
+      worlds.set(old.id,fresh);active=old.id;
+      const result={test_id:old.id,cleanup_pending:false,history:history()};managementResults.set(key,result);
+      await afterManagement?.();return respond(result);
+    }
     const deletion=path.match(/^\/simulation-tests\/([^/]+)\/delete$/);
-    if(path==='/simulation-tests/clear'||deletion){
+    if(path==='/simulation-tests/delete-all'||deletion){
       const key=path+':'+body.request_id;
       if(managementResults.has(key))return respond(managementResults.get(key));
       const ids=deletion?[deletion[1]]:[...worlds.keys()];
       if(!deletion&&JSON.stringify([...body.expected_test_ids].sort())!==JSON.stringify([...worlds.keys()].sort()))return reply({reason:'TEST_HISTORY_CHANGED'},409);
       if(ids.some(id=>!worlds.has(id)))return reply({reason:'TEST_NOT_FOUND'},404);
       ids.forEach(id=>worlds.delete(id));if(ids.includes(active))active=null;
-      const result={deleted_test_ids:ids,cleanup_pending:false,history:history()};managementResults.set(key,result);return respond(result);
+      const result={deleted_test_ids:ids,cleanup_pending:false,history:history()};managementResults.set(key,result);
+      await afterManagement?.();return respond(result);
     }
     let data,status=200;
     const match=path.match(/^\/simulation-tests\/([^/]+)(\/.*)$/),id=match?match[1]:'original';
@@ -59,6 +74,7 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null}={}
     const world=worlds.get(id);
     if(!world)return reply({reason:'TEST_NOT_FOUND'},404);
     const {orders,groups,inventory,catalogue,sources}=world;
+    if(body&&options.headers?.['X-Test-Revision']&&Number(options.headers['X-Test-Revision'])!==world.revision)return reply({reason:'TEST_REVISION_CHANGED'},409);
     if(body&&id!==active)return reply({reason:'TEST_ARCHIVED_READ_ONLY'},409);
     const scene=()=>({scene_epoch:id+'-scene-'+world.epoch,source:'CURRENT_WORLD_REFERENCE',objects:[]});
     const fixture=()=>({runtime:'headless',scene_epoch:scene().scene_epoch,source_id:catalogue?sources[inventory[0].product_id]:'source',destination_id:world.destination,
@@ -107,19 +123,40 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null}={}
   }
   const context=vm.createContext({document:{getElementById:el,createElement:tag=>makeElement(tag)},
     Option:class{constructor(text,value){this.text=text;this.value=value;}},MotionPlayer:class{constructor(){return player;}},
-    fetch,crypto:{randomUUID:()=>String(++sequence)},setInterval(){},console});
+    fetch,crypto:{randomUUID:()=>String(++sequence)},setInterval(fn){timers.push(fn);},console});
   vm.runInContext(fs.readFileSync('apps/erp_ui/workflow-guide.js','utf8'),context);
   vm.runInContext(fs.readFileSync('apps/erp_ui/app.js','utf8'),context);
   await new Promise(setImmediate);
-  return {el,posts,requests,...initial,player,worlds,profiles:registeredProfiles,
+  return {el,posts,requests,timers,...initial,player,worlds,profiles:registeredProfiles,
     evidence:data=>{context.evidence=data;vm.runInContext('roboticsEvidence(evidence)',context);},
     current:()=>worlds.get(active),activeId:()=>active,refresh:()=>vm.runInContext('refresh()',context),
     poll:()=>vm.runInContext('(async()=>{await refreshHistory();await refresh();})()',context),
     block:reason=>{worlds.get(active).blocked=reason;},
     failNext:(path,{afterCommit=false,status=503,reason='SIMULATED_RESPONSE_FAILURE'}={})=>failures.push({path,afterCommit,status,reason}),
     serverDelete:id=>{worlds.delete(id);if(active===id)active=null;},
+    serverClear:id=>{const old=worlds.get(id),fresh=makeWorld(id,old.cell_profile_id);fresh.number=old.number;fresh.revision=old.revision+1;fresh.epoch=old.epoch+1;fresh.groups[0].delivery_id=id+'-scene-'+fresh.epoch;worlds.set(id,fresh);active=id;},
     serverStart:()=>{active='external-'+(++sequence);worlds.set(active,makeWorld(active,'hkm_inspired_v1'));return active;}};
 }
+
+test('background polling pauses across committed clear or delete until its response is applied',async()=>{
+  for(const button of ['clear-test','delete-test']){
+    let release,committed;
+    const waiting=new Promise(resolve=>{release=resolve;}),serverCommitted=new Promise(resolve=>{committed=resolve;});
+    const {el,requests,timers,current}=await dashboard({afterManagement:async()=>{committed();await waiting;}});
+    await el('create').onclick();el(button).onclick();
+    const operation=el('confirm-delete-test').onclick();await serverCommitted;
+    const before=requests.length;
+    for(const timer of timers)timer();
+    await new Promise(setImmediate);
+    assert.equal(requests.length,before,'polls must not read a removed or partially cleared world');
+    release();await operation;
+    if(button==='clear-test')assert.equal(current().orders.length,0);
+    else assert.equal(current(),undefined);
+    for(const timer of timers)timer();
+    await new Promise(setImmediate);
+    assert.ok(requests.length>before,'normal history polling resumes');
+  }
+});
 
 test('three product clicks build one delivery; scenario selection is pure configuration and explicit restock preserves playback',async()=>{
   const {el,posts,orders,groups,inventory,player}=await dashboard();
@@ -479,7 +516,7 @@ test('tool and uncertainty inspector reads persisted decision and observation wi
 });
 
 
-const worldRequests=items=>items.filter(({path})=>!['/cell-profiles','/simulation-tests','/simulation-tests/clear'].includes(path)&&!/^\/simulation-tests\/[^/]+\/delete$/.test(path));
+const worldRequests=items=>items.filter(({path})=>!['/cell-profiles','/simulation-tests','/simulation-tests/delete-all'].includes(path)&&!/^\/simulation-tests\/[^/]+\/delete$/.test(path));
 async function createSelectedTest(ui,profile){
   await ui.el('new-test').onclick();
   if(profile){ui.el('cell-profile').value=profile;await ui.el('cell-profile').onchange();}
@@ -567,7 +604,7 @@ test('clear-all confirmation submits exactly the displayed test IDs and cancella
   assert.match(ui.el('delete-test-detail').textContent,/2/);assert.equal(ui.posts.length,start);
   await ui.el('cancel-delete-test').onclick();assert.equal(JSON.stringify([...ui.worlds.values()]),saved);
   await ui.el('clear-tests').onclick();const reads=ui.requests.length;await ui.el('confirm-delete-test').onclick();
-  assert.equal(ui.posts.at(-1).path,'/simulation-tests/clear');
+  assert.equal(ui.posts.at(-1).path,'/simulation-tests/delete-all');
   assert.deepEqual(ui.posts.at(-1).body.expected_test_ids,ids);assert.ok(ui.posts.at(-1).body.request_id);
   assert.equal(ui.posts.length,start+1);assert.equal(ui.worlds.size,0);assert.equal(ui.activeId(),null);
   assert.deepEqual(worldRequests(ui.requests.slice(reads)),[]);assert.equal(ui.el('empty-workspace').hidden,false);
@@ -608,7 +645,7 @@ test('deletion response loss retries the same original test identity after histo
 
 test('retrying clear after a lost reply retains its request and expected IDs and cannot delete a later test',async()=>{
   const ui=await dashboard();await createSelectedTest(ui);await ui.el('clear-tests').onclick();
-  ui.failNext('/simulation-tests/clear',{afterCommit:true});await ui.el('confirm-delete-test').onclick();
+  ui.failNext('/simulation-tests/delete-all',{afterCommit:true});await ui.el('confirm-delete-test').onclick();
   assert.equal(ui.el('delete-test-dialog').open,true);assert.equal(ui.worlds.size,0);
   const first=structuredClone(ui.posts.at(-1)),later=ui.serverStart();await ui.poll();
   await ui.el('confirm-delete-test').onclick();assert.deepEqual(ui.posts.at(-1),first);
@@ -637,4 +674,65 @@ test('polling after external deletion clears stale selection without activating 
   ui.el('test-history').value='original';await ui.el('test-history').onchange();
   assert.equal(ui.el('test-workspace').hidden,false);assert.equal(ui.el('create').disabled,true);
   assert.match(ui.el('test-status').textContent,/read-only/);assert.equal(ui.activeId(),null);
+});
+
+test('clear keeps the test number and cell, restores products and preserves choices without another pick',async()=>{
+  const ui=await dashboard({hkm:true});ui.el('scenario').value='DROP_ACK_AFTER_EFFECT';
+  ui.el('observation').value='CONTRADICTORY_OBSERVATION';await ui.el('create').onclick();
+  const before=JSON.stringify(ui.current()),start=ui.posts.length;
+  await ui.el('clear-test').onclick();assert.match(ui.el('delete-test-title').textContent,/Clear Test 1 and retry/);
+  assert.match(ui.el('delete-test-detail').textContent,/Keep Test 1/);
+  await ui.el('cancel-delete-test').onclick();assert.equal(JSON.stringify(ui.current()),before);
+  assert.equal(ui.posts.length,start);
+  await ui.el('clear-test').onclick();await ui.el('confirm-delete-test').onclick();
+  assert.deepEqual(ui.posts.slice(start).map(r=>r.path),['/simulation-tests/original/clear']);
+  assert.equal(ui.posts.at(-1).body.expected_revision,1);
+  assert.equal(ui.worlds.size,1);assert.equal(ui.activeId(),'original');assert.equal(ui.current().number,1);
+  assert.equal(ui.current().cell_profile_id,'hkm_inspired_v1');assert.equal(ui.current().revision,2);
+  assert.equal(ui.current().orders.length,0);assert.equal(ui.player.selected,'delivery:original-scene-2');assert.equal(ui.player.data.jobs.length,0);
+  assert.equal(ui.current().inventory.length,6);assert.ok(ui.current().inventory.every(p=>p.location_id===ui.current().sources[p.product_id]));
+  assert.equal(ui.el('scenario').value,'DROP_ACK_AFTER_EFFECT');assert.equal(ui.el('observation').value,'CONTRADICTORY_OBSERVATION');
+  assert.equal(ui.el('create').disabled,false);assert.equal(ui.el('review-panel').open,false);
+  assert.match(ui.el('message').textContent,/Test 1 cleared/);
+  await ui.el('create').onclick();
+  assert.equal(ui.requests.filter(r=>r.path.endsWith('/run')).at(-1).headers['X-Test-Revision'],'2');
+});
+
+test('clearing a selected archive restores that same test for retry and keeps the other test intact',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();await createSelectedTest(ui);
+  const newer=ui.activeId(),saved=JSON.stringify(ui.worlds.get(newer));
+  ui.el('test-history').value='original';await ui.el('test-history').onchange();
+  await ui.el('clear-test').onclick();await ui.el('confirm-delete-test').onclick();
+  assert.equal(ui.activeId(),'original');assert.equal(ui.el('test-history').value,'original');
+  assert.equal(ui.current().number,1);assert.equal(ui.current().orders.length,0);assert.equal(ui.worlds.size,2);
+  assert.equal(JSON.stringify(ui.worlds.get(newer)),saved);assert.equal(ui.el('create').disabled,false);
+});
+
+test('delete then create reuses Test 1 with fresh identity and no saved orders',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();
+  await ui.el('delete-test').onclick();await ui.el('confirm-delete-test').onclick();
+  await createSelectedTest(ui);
+  assert.equal(ui.current().number,1);assert.notEqual(ui.activeId(),'original');
+  assert.equal(ui.worlds.size,1);assert.equal(ui.current().orders.length,0);
+  assert.match(ui.el('test-status').textContent,/Test 1/);assert.equal(ui.current().inventory.length,6);
+});
+
+test('retrying a clear after a lost response preserves the request and does not erase later work',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();await ui.el('clear-test').onclick();
+  ui.failNext('/simulation-tests/original/clear',{afterCommit:true});await ui.el('confirm-delete-test').onclick();
+  assert.equal(ui.el('delete-test-dialog').open,true);assert.equal(ui.current().revision,2);
+  const original=structuredClone(ui.posts.at(-1));
+  await ui.el('create').onclick();
+  await ui.el('confirm-delete-test').onclick();
+  assert.deepEqual(ui.posts.at(-1),original);assert.equal(ui.current().orders.length,1);
+  assert.equal(ui.current().revision,2);assert.equal(ui.el('delete-test-dialog').open,false);
+  assert.match(ui.el('message').textContent,/Newer orders and results have been kept/);
+});
+
+test('external clear invalidates stale replay and inspection without sending any command',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();await ui.el('inspect-selected').onclick();
+  assert.equal(ui.el('investigation-dialog').open,true);
+  const posts=ui.posts.length;ui.serverClear('original');await ui.poll();
+  assert.equal(ui.el('investigation-dialog').open,false);assert.equal(ui.player.selected,'delivery:original-scene-2');assert.equal(ui.player.data.jobs.length,0);
+  assert.equal(ui.posts.length,posts);assert.equal(ui.current().number,1);assert.equal(ui.el('orders').children.length,0);
 });

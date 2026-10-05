@@ -1,5 +1,10 @@
 # ADR 0011: Cell selection and explicit test-data deletion
 
+Retention/numbering semantics below are historical. The owner's correction in
+[ADR 0013](0013-reusable-test-lifecycle.md) supersedes permanent deleted rows and
+monotonic display numbering, adds same-test clearing, and renames bulk deletion.
+Profile selection, bounded cleanup and concurrency protections remain applicable.
+
 Accepted design, 2026-10-04. Implementation verification is recorded separately
 in GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md. The earlier HKM acceptance at
 `ca7798798f916c8130e1833cf16b4d4d3f10d546` does not attest this change.

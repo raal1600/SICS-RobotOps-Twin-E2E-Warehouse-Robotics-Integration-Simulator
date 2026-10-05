@@ -2,6 +2,19 @@
 
 Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain normative.
 
+## Test deletion and same-test clearing correction (ADR 0013)
+
+- [x] Record clean baseline 4da22d7 and preserve its existing acceptance evidence.
+- [x] Remove completed deleted-test rows; replace raw receipts with request digests.
+- [x] Reuse available test numbers and restart at Test 1 when empty.
+- [x] Clear the same test with new world/revision, retained cell and no pick.
+- [x] Test interruption/retry, neighboring history, stale writes and cached hosts.
+- [x] Verify actual clear/retry/delete/create journeys in both runtimes/viewports.
+- [x] Synchronize contracts/docs/diagrams and rebuild publication.
+- [ ] Finish repeated full regression and exact-source CI/publication gates.
+
+Previous accepted checklists below describe their named historical revisions.
+
 ## Investigation workflow revision
 
 - [x] Archive clean baseline `0db6168` and earlier acceptance without relabelling it.

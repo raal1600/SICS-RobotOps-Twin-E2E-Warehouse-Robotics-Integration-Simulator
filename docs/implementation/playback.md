@@ -28,10 +28,21 @@ one delivery with six segments; each retains its own command and outcome.
 Earlier delivered products use their saved positions in later clips. Preparing
 a fresh scene preserves the earlier delivery; starting a new test retains that
 world's deliveries under Test history. Explicit **Delete selected test** or
-**Clear all test data** can remove that evidence after confirmation (ADR 0011).
+**Delete all tests** removes that evidence after confirmation. **Clear test and
+retry** instead retains the test number/cell but removes its old recordings and
+restores a fresh scene. Revision changes invalidate old replay/inspection context
+(ADR 0013).
 Those catalog actions are separate from playback; replay, camera selection,
 scrubbing and opening history remain read-only. Deleting the active test leaves
 no active world and clears its displayed replay instead of promoting an archive.
+
+Animation drawing is capped at the recording's 24 fps, independently of display
+refresh rate. The playback cursor still uses elapsed presentation time and the
+selected speed. This bounds CPU-renderer contention with Blender during a live
+pick; it does not change recording frames, render quality, execution deadlines or
+the conservative outcome of a real timeout. Explicit scrub/step actions redraw
+immediately. Background world polling pauses while a test is being cleared or
+deleted, then resumes after the returned test/revision has been selected.
 
 An uncertain pick pauses the entire cell, including picks of different products.
 The Run button says **Next pick paused — reconcile first**, with a named-product

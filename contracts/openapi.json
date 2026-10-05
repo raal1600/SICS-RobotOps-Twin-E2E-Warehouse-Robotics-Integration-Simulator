@@ -319,6 +319,34 @@
         "title": "CellState",
         "type": "object"
       },
+      "ClearTestRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "minimum": 1.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision"
+        ],
+        "title": "ClearTestRequest",
+        "type": "object"
+      },
       "ClearTestsRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1967,6 +1995,11 @@
             "title": "Cell Profile Id",
             "type": "string"
           },
+          "clearing": {
+            "default": false,
+            "title": "Clearing",
+            "type": "boolean"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -1986,6 +2019,12 @@
             },
             "title": "Outcomes",
             "type": "array"
+          },
+          "revision": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Revision",
+            "type": "integer"
           },
           "schema_version": {
             "const": "1.0",
@@ -2040,6 +2079,42 @@
           "request_id"
         ],
         "title": "StartTestRequest",
+        "type": "object"
+      },
+      "TestClearing": {
+        "additionalProperties": false,
+        "properties": {
+          "cleanup_pending": {
+            "title": "Cleanup Pending",
+            "type": "boolean"
+          },
+          "history": {
+            "$ref": "#/components/schemas/TestHistory"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "test_id": {
+            "title": "Test Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "test_id",
+          "cleanup_pending",
+          "history"
+        ],
+        "title": "TestClearing",
         "type": "object"
       },
       "TestDeletion": {
@@ -4271,6 +4346,7 @@
     },
     "/simulation-tests/clear": {
       "post": {
+        "deprecated": true,
         "operationId": "clear_tests_simulation_tests_clear_post",
         "requestBody": {
           "content": {
@@ -4305,6 +4381,93 @@
           }
         },
         "summary": "Clear Tests"
+      }
+    },
+    "/simulation-tests/delete-all": {
+      "post": {
+        "operationId": "clear_tests_simulation_tests_delete_all_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClearTestsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestDeletion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear Tests"
+      }
+    },
+    "/simulation-tests/{test_id}/clear": {
+      "post": {
+        "operationId": "clear_test_simulation_tests__test_id__clear_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "test_id",
+            "required": true,
+            "schema": {
+              "title": "Test Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClearTestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestClearing"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear Test"
       }
     },
     "/simulation-tests/{test_id}/delete": {

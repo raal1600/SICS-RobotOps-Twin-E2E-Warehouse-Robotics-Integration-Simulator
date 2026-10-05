@@ -4,6 +4,8 @@ const player = new MotionPlayer();
 let selectedJob = null, selectedDelivery = null, fixture = null, deliveries = [], busy = false, refreshing = false, pollingMotion = false;
 let orderSignature = "", productSignature = "", deliverySignature = "", nextMotionPoll = 0, cellMode = "READY", refreshVersion = 0;
 let selectedTest = "original", activeTest = "original", testHistory = [], historySignature = "", viewVersion = 0;
+let selectedRevision = 1;
+let managingTests = false;
 let guideEvidence = null, guideJob = null, guidance = null;
 let cellProfiles = [], newTestRequest = null, deletionRequest = null, historyVersion = 0;
 let selectedEvidence = null, selectedEvents = [], knownOrders = [], inspection = null, inspectionVersion = 0, timelineSignature = "";
@@ -87,7 +89,8 @@ async function openInspection(evidence, events=null) {
     catch(error){if(version===inspectionVersion){text("inspection-error","Event records could not be loaded: "+error.message);inspection.loading=true;}}
   }
 }
-const readOnly = () => !selectedTest || selectedTest !== activeTest;
+const clearingTest = () => !!testHistory.find(item=>item.test_id===selectedTest)?.clearing;
+const readOnly = () => !selectedTest || selectedTest !== activeTest || clearingTest();
 const testPath = path => (selectedTest === "original" ? "" : `/simulation-tests/${selectedTest}`) + path;
 const sourceFor = product => fixture?.product_sources?.[product] || fixture?.source_id;
 const atSource = item => (item.location_id??item.location) === sourceFor(item.product_id);
@@ -98,14 +101,17 @@ function testControls() {
   byId("empty-new-test").disabled=busy;
   byId("test-history").disabled=busy||!testHistory.length;
   byId("delete-test").disabled=busy||!current;
+  byId("clear-test").disabled=busy||!current;
   byId("clear-tests").disabled=busy||!testHistory.length;
   byId("return-current").hidden=!activeTest||selectedTest===activeTest;byId("return-current").disabled=busy;
   byId("empty-workspace").hidden=!!selectedTest;
-  byId("test-workspace").hidden=!selectedTest;
-  byId("test-workflow-steps").hidden=!selectedTest;
+  byId("test-workspace").hidden=!selectedTest||clearingTest();
+  byId("test-workflow-steps").hidden=!selectedTest||clearingTest();
   text("test-status",!current
     ? (testHistory.length?"No test selected. Saved tests are available for review, or create a new test.":"No test data. Start a new test and choose a robot cell.")
-    : `Test ${current.number} · ${current.cell_display_name} · `+(readOnly()
+    : `Test ${current.number} · ${current.cell_display_name} · `+(current.clearing
+      ? "Clear is unfinished. Retry the confirmed clear, or reopen the app to finish restoring this test."
+      : readOnly()
       ? "saved history, read-only. Return to the current test or start a new one."
       : "current test. Start new test creates a separate world; previous results stay in history."));
   if(selectedTest)byId("metrics-link").href=testPath("/metrics");
@@ -124,6 +130,8 @@ async function refreshHistory() {
     historySignature=signature;
   }
   if(selectedTest&&!testHistory.some(item=>item.test_id===selectedTest))await selectTest(null);
+  const current=testHistory.find(item=>item.test_id===selectedTest);
+  if(current&&(current.revision??1)!==selectedRevision)await selectTest(selectedTest);
   byId("test-history").value=selectedTest||"";testControls();
 }
 async function selectTest(identity) {
@@ -132,6 +140,7 @@ async function selectTest(identity) {
   byId("inspect-selected").disabled=true;text("selected-result","Loading the selected test…");
   if(byId("investigation-dialog").open)byId("investigation-dialog").close();
   selectedTest=identity||null;selectedJob=null;selectedDelivery=null;fixture=null;deliveries=[];
+  selectedRevision=testHistory.find(item=>item.test_id===selectedTest)?.revision??1;
   guideEvidence=null;guideJob=null;
   byId("setup-panel").open=true;byId("review-panel").open=false;
   orderSignature=productSignature=deliverySignature="";nextMotionPoll=0;
@@ -253,13 +262,16 @@ async function refreshGuide(selectedEvidence, version) {
 function selectReplay() {
   player.select(byId("replay-scope").value==="delivery"&&selectedDelivery?"delivery:"+selectedDelivery:selectedJob);
 }
-async function request(path, body) {
+async function request(path, body, revision) {
   const options = body === undefined ? {cache:"no-store"} : {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)};
+  if(body!==undefined&&revision!==undefined)options.headers["X-Test-Revision"]=String(revision);
   const response = await fetch(path, options), data = await response.json();
   if (!response.ok) {
     const explanations={
       TEST_OPERATION_IN_PROGRESS:"A test operation is still running. Wait for it to finish, then try again.",
-      TEST_HISTORY_CHANGED:"The test list changed. Cancel and review Clear all test data again before deleting.",
+      TEST_HISTORY_CHANGED:"The test list changed. Cancel and review Delete all tests again before deleting.",
+      TEST_REVISION_CHANGED:"This test was cleared elsewhere. Cancel and review the restored test before trying again.",
+      TEST_CLEAR_PENDING:"The clear could not finish. Retry the confirmed clear or reopen the app. No pick can run until the test is ready.",
       CELL_PROFILE_NOT_AVAILABLE:"This robot cell is no longer available. Cancel and choose an available cell.",
       CELL_PROFILE_STATE_MISMATCH:"Saved data for this request belongs to a different robot cell. Cancel and create a new test; the existing data was kept.",
       TEST_REQUEST_CONFLICT:"This request conflicts with an earlier operation. Cancel and review the test list before trying again.",
@@ -273,7 +285,7 @@ async function request(path, body) {
 async function api(path, body) {
   if(!selectedTest)throw new Error("Create or select a simulation test first.");
   if(body!==undefined&&readOnly())throw new Error("Saved tests are read-only. Return to the current test or start a new one.");
-  return request(testPath(path),body);
+  return request(testPath(path),body,selectedRevision);
 }
 function text(id, value) { if(byId(id).textContent!==value)byId(id).textContent = value; }
 function appError(error){
@@ -309,7 +321,7 @@ function roboticsEvidence(evidence){
   }
 }
 async function refresh(preferred, preferredDelivery) {
-  if(!selectedTest)return;
+  if(!selectedTest||clearingTest())return;
   if (refreshing && !preferred && !preferredDelivery) return;
   const version=++refreshVersion;
   refreshing = true;
@@ -387,6 +399,7 @@ async function refresh(preferred, preferredDelivery) {
   } finally {if(version===refreshVersion)refreshing=false;}
 }
 async function refreshMotion(force=false) {
+  if(clearingTest())return;
   const full=byId("replay-scope").value==="delivery";
   if(!(full?selectedDelivery:selectedJob) || pollingMotion || !force && Date.now()<nextMotionPoll) return;
   pollingMotion=true;
@@ -479,7 +492,9 @@ byId("empty-new-test").onclick=()=>byId("new-test").onclick();
 byId("cell-profile").onchange=cellDescription;
 async function manageTests(dialogId,errorId,operation){
   if(busy)return;
-  busy=true;fixtureControls();
+  busy=true;managingTests=true;
+  ++historyVersion;++refreshVersion;++viewVersion;refreshing=false;
+  fixtureControls();
   byId("message").removeAttribute("data-kind");byId("message").setAttribute("role","status");
   for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=true;
   text(errorId,"");
@@ -491,6 +506,7 @@ async function manageTests(dialogId,errorId,operation){
     busy=false;
     for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=false;
     try{await refreshHistory();await refresh();await refreshMotion(true);}catch(error){appError(error);}
+    managingTests=false;
     fixtureControls();
   }
 }
@@ -508,10 +524,11 @@ function confirmDeletion(all){
   if(busy)return;
   const targets=all?testHistory:testHistory.filter(item=>item.test_id===selectedTest);
   if(!targets.length)return;
-  deletionRequest={path:all?"/simulation-tests/clear":`/simulation-tests/${selectedTest}/delete`,
+  deletionRequest={path:all?"/simulation-tests/delete-all":`/simulation-tests/${selectedTest}/delete`,
     body:{request_id:crypto.randomUUID(),...(all?{expected_test_ids:targets.map(item=>item.test_id)}:{})}};
-  text("delete-test-title",all?"Clear all test data?":"Delete simulation test?");
-  text("confirm-delete-test",all?"Clear all test data":"Delete test");
+  text("delete-test-title",all?"Delete all tests?":"Delete simulation test?");
+  text("confirm-delete-test",all?"Delete all tests":"Delete test");
+  text("test-data-warning","The selected tests, orders, evidence and replay files will be permanently removed. Their test numbers become available again. This does not run the robot or resolve uncertain outcomes.");
   const uncertain=targets.some(item=>item.outcomes.some(state=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(state)));
   text("delete-test-detail",(all?`${targets.length} tests with ${targets.reduce((total,item)=>total+item.order_count,0)} orders will be deleted.`
     :`Test ${targets[0].number} · ${targets[0].cell_display_name} · ${targets[0].order_count} orders will be deleted.`)
@@ -521,11 +538,29 @@ function confirmDeletion(all){
 }
 byId("delete-test").onclick=()=>confirmDeletion(false);
 byId("clear-tests").onclick=()=>confirmDeletion(true);
+byId("clear-test").onclick=()=>{
+  const current=testHistory.find(item=>item.test_id===selectedTest);
+  if(busy||!current)return;
+  deletionRequest={path:`/simulation-tests/${selectedTest}/clear`,clearTestId:selectedTest,
+    body:{request_id:crypto.randomUUID(),expected_revision:current.revision??1}};
+  text("delete-test-title",`Clear Test ${current.number} and retry?`);
+  text("confirm-delete-test","Clear test");
+  text("delete-test-detail",`Keep Test ${current.number} · ${current.cell_display_name}. Remove its orders and results, restore every product and make this the current test, ready to run again.`);
+  text("test-data-warning","This removes this test's previous evidence and recordings, including unresolved outcomes. Other tests and your scenario choices stay unchanged. No pick is performed.");
+  text("delete-test-error","");byId("delete-test-dialog").showModal();byId("cancel-delete-test").focus();
+};
 byId("confirm-delete-test").onclick=()=>{
   if(!deletionRequest||!byId("delete-test-dialog").open)return;
   return manageTests("delete-test-dialog","delete-test-error",async()=>{
     const result=await request(deletionRequest.path,deletionRequest.body);
     await refreshHistory();
+    if(deletionRequest.clearTestId){
+      if(result.cleanup_pending)throw new Error("The clear could not finish. Keep this dialog open and retry Clear test, or reopen the app.");
+      await selectTest(deletionRequest.clearTestId);
+      const current=testHistory.find(item=>item.test_id===deletionRequest.clearTestId);
+      if(current.order_count)return `Test ${current.number} was already cleared. Newer orders and results have been kept.`;
+      return `Test ${current.number} cleared. Products restored; your scenario choices are kept. Ready to run again.`;
+    }
     return result.cleanup_pending?"Test data removed from history. Some files are still in use; cleanup will retry when the app restarts.":"Test data deleted. Create a new test or review another saved test.";
   });
 };
@@ -603,6 +638,6 @@ for(const kind of ["scenario","observation"]){
 (async()=>{try{
   await refreshHistory();await selectTest(activeTest);
   text("runtime",fixture?.runtime === "blender"?"Blender · CPU · synthetic world":"Deterministic headless world");
-  setInterval(()=>refreshHistory().then(()=>refresh()).catch(appError),1000);
-  setInterval(()=>refreshMotion(),250);
+  setInterval(()=>{if(!managingTests)refreshHistory().then(()=>{if(!managingTests)return refresh();}).catch(appError);},1000);
+  setInterval(()=>{if(!managingTests)refreshMotion();},250);
 }catch(error){appError(error);}})();

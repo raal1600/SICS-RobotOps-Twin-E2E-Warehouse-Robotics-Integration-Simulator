@@ -198,13 +198,22 @@ new behavior.
 
 Verification includes the one selectable HKM cell, nonselectable legacy history,
 durable per-test profile metadata, explicit confirmed deletion, stale clear-all
-snapshot rejection, idempotent retries, tombstones, no-active-test restart,
+snapshot rejection, idempotent retries, pending cleanup, no-active-test restart,
 in-flight operation guards and confined cleanup. Cancellation and navigation
 leave data intact. Clear retries cannot delete later-created tests. Deletion
 never fabricates a business verdict, sends a pick or promotes an archived world;
 retained tests preserve their original outcomes and read-only replay semantics.
 These destructive-action checks use isolated disposable data, not user history.
 Full source-specific acceptance and publication remain governed by the rules below.
+
+The owner's 2026-10-05 correction (ADR 0013) additionally requires complete
+catalog/world removal after deletion, reusable positive display numbers (Test 1
+when empty), and explicit same-test clearing that retains identity/number/cell
+while discarding old execution data and restoring products. Verification covers
+revision fencing, cached hosts, pending-clear restart, digest-only retry guards,
+old-tombstone cleanup, intact neighboring tests and real browser clear/delete
+journeys. An earlier expectation of monotonic labels or permanent deleted rows
+is intentionally superseded; robot-effect and evidence assertions are unchanged.
 
 ## Investigation workflow revision (2026-10-05)
 

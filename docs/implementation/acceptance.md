@@ -88,7 +88,7 @@ The cell-selection and explicit deletion revision (ADR 0011) is tested by
 `tests/integration/test_test_management.py` and the mandatory dashboard suite.
 Coverage includes saved legacy profiles, selected-cell validation, confirmation
 and cancellation, deletion without archive activation, empty-workspace restart,
-durable tombstones, interrupted cleanup, bounded paths, cross-process execution
+durable cleanup intent, interrupted cleanup, bounded paths, cross-process execution
 and download races, and request retries after a lost response. These checks extend
 the existing persistence and demonstration evidence mappings without changing any
 MUST threshold. The previous HKM acceptance is preserved in
@@ -102,3 +102,14 @@ zero failures, errors or skips. [The remote evidence archive](../evidence/test-m
 retains the original CI manifest, including its unrefreshed remote placeholders,
 alongside successful workflow and public-publication checks. The final status
 and evidence successor still needs its own exact-SHA CI and Pages attestation.
+
+## Delete versus clear correction (ADR 0013)
+
+The clean baseline is 4da22d7. Its source-specific acceptance remains preserved.
+The owner's correction deliberately replaces the old monotonic-label/permanent-row
+expectations: deletion now removes the catalog row and frees its number; clear
+retains that same test for a new run. New regressions inspect filesystem/catalog
+removal, same-test restoration, revision guards, cached hosts, stale retries,
+interrupted reset and legacy receipt migration. Four real browser cases exercise
+clear/retry and delete/create Test 1 with both runtimes at desktop/compact sizes.
+No physical-effect, uncertainty, verification or coverage assertion is weakened.

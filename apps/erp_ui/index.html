@@ -8,7 +8,7 @@
   <div class="test-picker"><label for="test-history">Simulation test</label><select id="test-history"></select></div>
   <button id="return-current" class="secondary" hidden>Return to current test</button>
   <button id="new-test" class="secondary" disabled>Start new test</button>
-  <details class="manage-data"><summary>Manage test data</summary><button id="delete-test" class="secondary danger" disabled>Delete selected test</button><button id="clear-tests" class="secondary danger" disabled>Clear all test data</button></details>
+  <details class="manage-data"><summary>Manage test data</summary><button id="clear-test" class="secondary" disabled>Clear test and retry</button><button id="delete-test" class="secondary danger" disabled>Delete selected test</button><button id="clear-tests" class="secondary danger" disabled>Delete all tests</button><p class="muted">Clear keeps the test and restores its starting scene. Delete removes the test completely.</p></details>
   <p id="test-status" class="muted" role="status">Loading test history.</p>
 </section>
 <dialog id="new-test-dialog" aria-labelledby="new-test-title">
@@ -23,7 +23,7 @@
 <dialog id="delete-test-dialog" aria-labelledby="delete-test-title">
   <h2 id="delete-test-title">Delete simulation test?</h2>
   <p id="delete-test-detail"></p>
-  <p class="muted">Orders, evidence, recordings and rendered artifacts in this selection will be permanently removed. This does not run the robot or resolve uncertain outcomes. Saved tests are never activated automatically.</p>
+  <p id="test-data-warning" class="muted"></p>
   <p id="delete-test-error" class="dialog-error" role="alert"></p>
   <div class="dialog-actions"><button id="cancel-delete-test" class="secondary">Cancel</button><button id="confirm-delete-test" class="danger">Delete test</button></div>
 </dialog>

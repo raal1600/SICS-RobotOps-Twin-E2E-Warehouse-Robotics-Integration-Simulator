@@ -4,6 +4,16 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
+### Delete versus clear correction (2026-10-05)
+
+ADR 0013 implements the owner's updated lifecycle semantics: delete purges the
+test entry/world and releases its number; clear keeps that test for a fresh run.
+Pending cleanup/reset and anonymous request digests preserve safe retries.
+Current verification is separate from the accepted historical revisions below.
+API/contracts, operator guides, all three reports and the architecture caption
+are synchronized; rebuild generated Pages/PDFs through the normal process.
+External source entries and provenance classifications are unchanged.
+
 ### Accepted investigation workflow revision (2026-10-05)
 
 Clean source `7b9f0a656cdd077106ab4b7ee7ade82335e11f26` passes all 118 MUSTs.
@@ -90,7 +100,7 @@ CI använder Ubuntu-paketen ovan. PDF-sidantal kan skilja mellan plattformarnas
 typsnittsversioner; manifestet redovisar det verkliga sidantalet och filhasharna.
 Basgranskningen av källor gjordes 1 oktober 2026; HKM-kompletteringen granskades
 4 oktober. Varje registerpost behåller sitt eget kontrolldatum och sin
-proveniensklass. Publikationsrevisionen är 1.3 från 5 oktober 2026; implementationens
+proveniensklass. Publikationsrevisionen är 1.4 från 5 oktober 2026; implementationens
 verifiering och aktuell acceptans visas separat i den gemensamma statusrutan.
 
 ## Utdata

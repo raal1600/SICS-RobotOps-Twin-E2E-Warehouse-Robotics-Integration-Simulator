@@ -157,6 +157,19 @@ test('camera selection, frame stepping and 4x speed change only presentation',()
   assert.equal(JSON.stringify(data),before);assert.equal(data.job_state,'UNKNOWN_OUTCOME');
 });
 
+test('display refresh is bounded without slowing replay time or changing evidence',()=>{
+  for(const displayHz of [60,144]){
+    for(const speed of [0.25,1,4]){
+      const {player:p}=setup();p.select('j1');const data=clip(250,true);p.update(data);p.speed=speed;
+      const before=JSON.stringify(data);let drawings=0;p.view.render=()=>{drawings++;};
+      for(let i=0;i<=displayHz;i++)p.tick(i*1000/displayHz);
+      assert.ok(drawings>=24&&drawings<=25,`${displayHz} Hz rendered ${drawings} times`);
+      assert.ok(Math.abs(p.cursor-24*speed)<1e-8,'one second still advances by the selected replay speed');
+      assert.equal(JSON.stringify(data),before);
+    }
+  }
+});
+
 test('opening an investigation can freeze a replay without losing its frame or sending a command',()=>{
   const {player:p,el}=setup();p.select('j1');p.update(clip(20));p.cursor=8.5;
   p.pause();assert.equal(p.playing,false);assert.equal(p.manualPause,true);

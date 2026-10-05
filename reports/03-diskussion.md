@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Investigation workflow accepted at audited source 7b9f0a6: all 118 MUSTs PASS, 665 tests twice, 132 UI checks, five real-browser cases and eight Blender demos. Exact-source CI and publication verified. Functional tests do not replace first-time usability research. Status: DONE.
+> **Implementation status, 2026-10-05:** Test lifecycle correction implemented: delete purges test data and reuses available numbers; clear restores the same test for retry. New revision verification is in progress. Previous investigation acceptance remains scoped to audited source 7b9f0a6. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -258,7 +258,7 @@ Förbered en ärlig statusruta med implementerat, simulerat, testat och återst�
 
 Om programmet fungerar: skapa ordern live, följ ID:t genom systemet och visa Blender-effekten. Visa sedan kvittensbortfall och ett oavgjort fall. Om programmet inte är färdigt: använd diagrammen och säg att det är designgranskning. En inspelad sekvens ska tydligt presenteras som inspelad.
 
-För nästa oberoende försök: välj ”Start new test”, granska ”Robot cell” och bekräfta ”Create test”. Endast den HKM-inspirerade cellen erbjuds för nya försök; äldre celler identifieras i historiken. Spara de körningar du vill kunna granska. ”Delete selected test” tar efter bekräftelse bort det valda försöket och ”Clear all test data” den bekräftade samlingen. Dessa åtgärder avgör inte ett osäkert plock. Efter radering av det aktiva försöket behöver du uttryckligen skapa ett nytt; ett arkiv blir inte automatiskt körbart. Använd separat demodata när du visar raderingsflödet (ADR 0011).
+För ett nytt oberoende försök: välj ”Start new test”, granska ”Robot cell” och bekräfta ”Create test”. För att köra om samma försök: välj ”Manage test data → Clear test and retry”. Bekräftelsen kasserar gamla resultat/evidens och återställer produkter, men behåller numret, cellen och scenariovalet. ”Delete selected test” tar bort försöket helt; ”Delete all tests” den bekräftade samlingen. Efter en helt tömd lista får nästa nya försök nummer 1. Dessa åtgärder avgör inte ett osäkert plock. Ett arkiv blir bara aktivt efter ett uttryckligt val att rensa och återanvända det. Använd separat demodata när du visar raderings-/rensningsflödet (ADR 0013).
 
 Ha en reservversion av rapporterna som PDF. Börja inte installera nya drivrutiner eller flytta runtime till en okänd miljö precis före presentationen. Det är en praktisk rekommendation för denna demo, inte en uppgift om SICS interna rutiner.
 

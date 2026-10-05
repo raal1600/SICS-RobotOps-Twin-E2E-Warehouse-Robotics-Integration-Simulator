@@ -216,7 +216,7 @@ def test_deleting_active_does_not_activate_or_recover_uncertain_archive(tmp_path
     assert other.get("/simulation-tests").json()["active_test_id"] == new
 
 
-def test_delete_last_test_leaves_empty_usable_workspace_and_monotonic_test_numbers(tmp_path):
+def test_delete_last_test_leaves_empty_usable_workspace_and_restarts_at_test_one(tmp_path):
     registry, client = workspace(tmp_path)
     response = delete(client, "original")
     assert response.status_code == 200
@@ -230,7 +230,9 @@ def test_delete_last_test_leaves_empty_usable_workspace_and_monotonic_test_numbe
     for route in ("/", "/ui/app.js", "/cell-profiles", "/health"):
         assert other.get(route).status_code == 200
     identity = start(other)
-    assert other.get("/simulation-tests").json()["tests"][0]["number"] == 2
+    assert other.get("/simulation-tests").json()["tests"][0]["number"] == 1
+    with registry.connect() as db:
+        assert db.execute("SELECT 1 FROM tests WHERE id='original'").fetchone() is None
     assert (registry.root / identity).exists()
 
 
@@ -342,12 +344,7 @@ def test_partial_cleanup_failure_stays_hidden_and_retry_removes_remaining_files(
     assert delete(client, "original", request_id).json()["cleanup_pending"] is False
     assert not (tmp_path / "runtime.db").exists()
     with registry.connect() as db:
-        assert (
-            db.execute("SELECT deleted,cleanup_pending FROM tests WHERE id='original'").fetchone()[
-                1
-            ]
-            == 0
-        )
+        assert db.execute("SELECT 1 FROM tests WHERE id='original'").fetchone() is None
 
 
 @pytest.mark.parametrize("kind", ["symlink", "junction", "escape"])
@@ -565,3 +562,249 @@ def test_pending_cleanup_defers_on_live_response_and_later_restart_finishes_it(
         assert (tmp_path / "runtime.db").exists()
     create_workspace_app(tmp_path, recover=False)
     assert not (tmp_path / "runtime.db").exists()
+
+
+def reset_test(client, identity="original", *, request_id=None, revision=1):
+    return client.post(
+        f"/simulation-tests/{identity}/clear",
+        json={"request_id": str(request_id or uuid4()), "expected_revision": revision},
+    )
+
+
+def test_deleted_numbers_are_reused_without_renumbering_survivors_or_retaining_test_data(tmp_path):
+    registry, client = workspace(tmp_path)
+    second = start(client)
+    third = start(client)
+    assert delete(client, second).status_code == 200
+    replacement = start(client)
+    history = client.get("/simulation-tests").json()["tests"]
+    assert [(item["test_id"], item["number"]) for item in history] == [
+        ("original", 1),
+        (replacement, 2),
+        (third, 3),
+    ]
+    assert replacement != second and not (registry.root / second).exists()
+    with registry.connect() as db:
+        assert db.execute("SELECT * FROM tests WHERE id=?", (second,)).fetchone() is None
+        # Retry protection keeps only digests, not a hidden test or raw payload/ID.
+        dump = "\n".join(db.iterdump())
+        assert second not in dump
+        assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='requests'").fetchone()
+    assert delete(client, "original").status_code == 200
+    assert delete(client, third).status_code == 200
+    assert delete(client, replacement).status_code == 200
+    reopened, other = workspace(tmp_path)
+    assert other.get("/simulation-tests").json()["tests"] == []
+    fresh = start(other)
+    assert reopened.history().tests[0].number == 1
+    assert fresh not in {second, third, replacement}
+
+
+@pytest.mark.parametrize("identity_kind", ["original", "new"])
+@pytest.mark.parametrize("fault", [None, Fault.DROP_ACK_AFTER_EFFECT, Fault.LOGICAL_ESTOP])
+def test_clear_keeps_identity_number_profile_and_restores_an_empty_runnable_test(
+    tmp_path, identity_kind, fault
+):
+    registry, client = workspace(tmp_path)
+    identity = "original" if identity_kind == "original" else start(client)
+    prefix = "" if identity == "original" else f"/simulation-tests/{identity}"
+    old_job = run(client, prefix, fault=fault)
+    if fault == Fault.DROP_ACK_AFTER_EFFECT:
+        review = client.post(
+            prefix + f"/jobs/{old_job['job_id']}/reconcile",
+            json={"fault": "CONTRADICTORY_OBSERVATION"},
+        )
+        assert review.json()["state"] == "REQUIRES_INTERVENTION"
+    before = next(test for test in registry.history().tests if test.test_id == identity)
+    old_epoch = registry.engine(identity).runtime.world().scene_epoch
+    other_registry, other = workspace(tmp_path)
+    assert other.get(prefix + "/orders").json()
+    artifact = registry.directory(identity) / "blender-artifacts" / "old-motion.json"
+    artifact.parent.mkdir(exist_ok=True)
+    artifact.write_text("old test evidence")
+    response = reset_test(client, identity)
+    assert response.status_code == 200, response.text
+    assert response.json()["cleanup_pending"] is False
+    after = next(test for test in registry.history().tests if test.test_id == identity)
+    assert (after.test_id, after.number, after.created_at, after.cell_profile_id) == (
+        before.test_id,
+        before.number,
+        before.created_at,
+        before.cell_profile_id,
+    )
+    assert after.revision == 2 and not after.clearing and after.active
+    assert not after.outcomes and after.order_count == 0 and not artifact.exists()
+    assert registry.engine(identity).runtime.world().scene_epoch != old_epoch
+    for viewer in (client, other):
+        assert viewer.get(prefix + "/orders").json() == []
+        assert viewer.get(prefix + f"/jobs/{old_job['job_id']}/evidence").status_code == 404
+        fixtures = viewer.get(prefix + "/fixtures").json()
+        assert all(
+            item["location_id"] == fixtures["product_sources"][item["product_id"]]
+            for item in fixtures["inventory"]
+        )
+        assert viewer.get(prefix + "/cell").json()["mode"] == "READY"
+    assert other_registry.engine(identity).runtime.journal(old_job["command_id"]) is None
+    again = run(other, prefix)
+    assert again["state"] == "COMPLETED" and again["command_id"] != old_job["command_id"]
+    assert other_registry.engine(identity).runtime.journal(again["command_id"]).effect_count == 1
+
+
+def test_clear_selected_archive_activates_only_its_fresh_run_and_preserves_other_test(tmp_path):
+    registry, client = workspace(tmp_path)
+    old = run(client, fault=Fault.DROP_ACK_AFTER_EFFECT)
+    newer = start(client)
+    newer_job = run(client, f"/simulation-tests/{newer}")
+    preserved = registry.engine(newer).evidence(newer_job["job_id"]).model_dump_json()
+    response = reset_test(client)
+    assert response.status_code == 200, response.text
+    assert registry.active_id() == "original"
+    assert client.get("/orders").json() == []
+    assert client.get(f"/jobs/{old['job_id']}").status_code == 404
+    assert registry.engine(newer).evidence(newer_job["job_id"]).model_dump_json() == preserved
+    assert client.post(f"/simulation-tests/{newer}/cell/reset").status_code == 409
+
+
+def test_clear_retries_and_stale_requests_cannot_erase_or_execute_a_new_run(tmp_path):
+    registry, client = workspace(tmp_path)
+    request_id = uuid4()
+    assert reset_test(client, request_id=request_id).status_code == 200
+    job = run(client)
+    original = registry.engine("original").evidence(job["job_id"]).model_dump_json()
+    assert reset_test(client, request_id=request_id).status_code == 200
+    assert registry.engine("original").evidence(job["job_id"]).model_dump_json() == original
+    assert reset_test(client, revision=1).json()["reason"] == "TEST_REVISION_CHANGED"
+    assert (
+        reset_test(client, request_id=request_id, revision=2).json()["reason"]
+        == "TEST_REQUEST_CONFLICT"
+    )
+    blocked = client.post("/cell/reset", headers={"X-Test-Revision": "1"})
+    assert blocked.status_code == 409 and blocked.json()["reason"] == "TEST_REVISION_CHANGED"
+    assert reset_test(client, revision=2).status_code == 200
+    new_job = run(client)
+    assert reset_test(client, request_id=request_id).status_code == 200
+    assert registry.engine("original").store.job(new_job["job_id"]).state.value == "COMPLETED"
+
+
+def test_clear_crash_resumes_reset_on_restart_without_recovering_discarded_command(
+    tmp_path, monkeypatch
+):
+    registry, client = workspace(tmp_path)
+    old = run(client, fault=Fault.DROP_ACK_AFTER_EFFECT)
+    request_id = uuid4()
+    with monkeypatch.context() as patch:
+
+        def crash(identity):
+            raise RuntimeError("exit after durable clear intent")
+
+        patch.setattr(registry, "_finish_clear", crash)
+        with pytest.raises(RuntimeError, match="durable clear intent"):
+            reset_test(client, request_id=request_id)
+    assert client.get("/orders").json()["reason"] == "TEST_CLEAR_PENDING"
+    assert registry.history().tests[0].clearing
+    reopened, other = workspace(tmp_path)
+    assert other.get("/orders").json() == []
+    assert reopened.history().tests[0].revision == 2
+    assert not reopened.history().tests[0].clearing
+    assert reopened.engine("original").runtime.journal(old["command_id"]) is None
+    job = run(other)
+    assert reset_test(other, request_id=request_id).status_code == 200
+    assert reopened.engine("original").store.job(job["job_id"]).state.value == "COMPLETED"
+
+
+def test_clear_locked_files_remains_explicitly_pending_until_same_request_finishes(
+    tmp_path, monkeypatch
+):
+    registry, client = workspace(tmp_path)
+    run(client)
+    request_id = uuid4()
+    with monkeypatch.context() as patch:
+        patch.setattr(registry, "_remove_world", lambda identity: False)
+        result = reset_test(client, request_id=request_id)
+    assert result.status_code == 200 and result.json()["cleanup_pending"]
+    assert registry.history().tests[0].clearing
+    assert client.post("/cell/reset").status_code == 409
+    result = reset_test(client, request_id=request_id)
+    assert result.status_code == 200 and not result.json()["cleanup_pending"]
+    assert client.get("/orders").json() == []
+    assert run(client)["state"] == "COMPLETED"
+
+
+@pytest.mark.parametrize("guard", ["lease", "planning", "maintenance"])
+def test_clear_refuses_active_work_even_when_clearing_an_archive(tmp_path, guard):
+    registry, client = workspace(tmp_path)
+    new = start(client)
+    active = registry.engine(new)
+    if guard == "maintenance":
+        active.store.begin_scene_reset()
+    else:
+        job = run(client, f"/simulation-tests/{new}", fault=Fault.DROP_ACK_AFTER_EFFECT)
+        if guard == "lease":
+            assert active.store.claim(job["job_id"], "worker", 120, reconcile=True)
+        else:
+            with active.store.transaction() as db:
+                db.execute("UPDATE jobs SET state='PLANNING'")
+    response = reset_test(client)
+    assert response.status_code == 409 and response.json()["reason"] == "TEST_OPERATION_IN_PROGRESS"
+    assert registry.history().tests[0].revision == 1
+    assert registry.active_id() == new
+
+
+def test_old_deleted_catalog_rows_are_purged_on_upgrade_without_touching_survivors(tmp_path):
+    registry, client = workspace(tmp_path)
+    kept = start(client)
+    snapshot = registry.engine(kept).runtime.world().model_dump_json()
+    # Reproduce the former completed-tombstone and raw request-receipt storage.
+    with registry.connect() as db:
+        db.execute(
+            "UPDATE tests SET deleted='2026-10-05T00:00:00Z',cleanup_pending=0 WHERE id='original'"
+        )
+        db.execute(
+            "CREATE TABLE requests(id TEXT PRIMARY KEY,payload TEXT NOT NULL,targets TEXT NOT NULL)"
+        )
+        request_id = str(uuid4())
+        db.execute(
+            "INSERT INTO requests VALUES (?,?,?)",
+            (request_id, '["delete", "original"]', '["original"]'),
+        )
+    reopened, other = workspace(tmp_path)
+    with reopened.connect() as db:
+        assert db.execute("SELECT 1 FROM tests WHERE id='original'").fetchone() is None
+        assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='requests'").fetchone()
+    assert not (tmp_path / "runtime.db").exists()
+    assert reopened.engine(kept).runtime.world().model_dump_json() == snapshot
+    assert delete(other, "original", request_id).status_code == 200
+    replacement = start(other)
+    assert next(t for t in reopened.history().tests if t.test_id == replacement).number == 1
+
+
+def test_delete_migrated_test_without_old_profile_or_receipt_cannot_resurrect_it(tmp_path):
+    registry, client = workspace(tmp_path)
+    request_id = uuid4()
+    identity = start(client, request_id)
+    with registry.connect() as db:
+        db.execute("UPDATE tests SET cell_profile_id=NULL WHERE id=?", (identity,))
+        db.execute("DELETE FROM request_guards")
+    reopened, client = workspace(tmp_path)
+    assert delete(client, identity).status_code == 200
+    response = client.post(
+        "/simulation-tests",
+        json={"request_id": str(request_id), "cell_profile_id": "hkm_inspired_v1"},
+    )
+    assert response.status_code == 409 and response.json()["reason"] == "TEST_DELETED"
+    assert not reopened.directory(identity).exists()
+
+
+def test_pending_clear_can_resume_with_new_confirmation_without_extra_revision(
+    tmp_path, monkeypatch
+):
+    registry, client = workspace(tmp_path)
+    run(client)
+    with monkeypatch.context() as patch:
+        patch.setattr(registry, "_remove_world", lambda identity: False)
+        assert reset_test(client).json()["cleanup_pending"]
+    result = reset_test(client, revision=2)
+    assert result.status_code == 200 and not result.json()["cleanup_pending"]
+    assert registry.history().tests[0].revision == 2
+    assert client.get("/orders").json() == []
+    assert run(client)["state"] == "COMPLETED"

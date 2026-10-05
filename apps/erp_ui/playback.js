@@ -43,6 +43,7 @@ class MotionPlayer {
     requestAnimationFrame(time=>this.tick(time));this.controls();
   }
   previewScene(scene){this.preview=scene;if(!this.job){this.scene=scene;this.byId("motion-state").textContent="3D cell ready";this.controls();this.draw();}}
+  pause(){this.playing=false;this.manualPause=true;this.controls();}
   select(job){
     if(this.job===job)return;
     this.job=job;this.recording=null;this.scene=this.preview;this.data=null;this.delivery=null;this.track=[];

@@ -27,11 +27,11 @@ from weasyprint import HTML
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / '_site'
-DATE = '2026-10-04'
+DATE = '2026-10-05'
 BASE_SOURCE_DATE = '2026-10-01'
-VERSION = '1.2.0'
-DISPLAY_VERSION = '1.2'
-DISPLAY_DATE = '4 oktober 2026'
+VERSION = '1.3.0'
+DISPLAY_VERSION = '1.3'
+DISPLAY_DATE = '5 oktober 2026'
 REPO = 'raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator'
 REPO_URL = 'https://github.com/' + REPO
 REPORTS = [

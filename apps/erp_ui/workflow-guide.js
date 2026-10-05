@@ -149,7 +149,7 @@ const SimulationGuide = (() => {
     if (pending) {
       const again = pending.state === "REQUIRES_INTERVENTION";
       return result(2, "attention", again ? `${product}: your review is needed` : `${product}: outcome uncertain`,
-        again ? `${evidenceSummary(evidence).decision} Choose another observation in Review evidence to continue investigating this same pick.`
+        again ? `${evidenceSummary(evidence).decision} Open the investigation and choose another sensor report to check this same pick.`
           : "The pick has no confirmed outcome. Review the original command and collect an observation. The next pick waits for this result.",
         "review", `Review ${product}`);
     }
@@ -159,10 +159,66 @@ const SimulationGuide = (() => {
     if (state === "COMPLETED") return result(3, "success", "Pick verified — continue when ready", "Choose the next product and scenario below, then run the next order. Use Start new test above for an independent combination with fresh products.", "configure", "Set up next pick");
     if (state === "FAILED") return result(3, "attention", "This pick did not complete", evidence?.command
       ? `${evidenceSummary(evidence).decision} Review the result, then choose the next scenario and run a new order explicitly.`
-      : "Planning or validation stopped this order before a robot command was created. Review the causal timeline for the rejection, then choose the next scenario or repeat this test.", "configure", "Choose next scenario");
+      : "Planning or validation stopped this order before a robot command was created. Open Investigate this pick for the rejection evidence, then choose the next scenario or repeat this test.", "configure", "Choose next scenario");
     return result(0, "neutral", "Ready for your first pick", "Choose a product and execution scenario below. Run the order, watch the cell, then follow the next step shown here.", "configure", "Choose product & scenario");
   }
-  return {describe, evidenceSummary, explain,
+  function inspect(evidence, events = []) {
+    const job = evidence?.job, command = evidence?.command, journal = evidence?.journal;
+    const related = job ? events.filter(event => event.job_id === job.job_id ||
+      (!event.job_id && event.order_id === job.order_id)) : [];
+    const latest = evidence?.verifications?.at(-1);
+    const review = latest && evidence.reconciliations?.find(item => item.verification.verification_id === latest.verification_id);
+    const assessed = latest && (evidence.observations?.find(item => item.observation_id === latest.observation_id) || review?.observation);
+    const summary = evidenceSummary(evidence);
+    const pending = ["UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION"].includes(job?.state);
+    const symptom = {
+      UNKNOWN_OUTCOME: "The app has no confirmed result for this pick, so it paused the next one.",
+      REQUIRES_INTERVENTION: "The last check could not establish the outcome. The next pick is still paused.",
+      COMPLETED: "The workflow recorded this pick as completed.",
+      FAILED: command ? "This order did not complete. Inspect the recorded reason before starting a different order." : "The order stopped before a robot command was recorded.",
+      EXECUTING: "The original command is being executed. Its final outcome is not yet known.",
+      VERIFYING: "The system is checking the result of the original command.",
+      RECONCILING: "The system is checking the original journal and collecting another sensor report."
+    }[job?.state] || "This order has not reached a final result yet.";
+    const finding = latest ? summary.decision : !command ? "No robot command is present in this evidence response. Inspect the planning events for the rejection reason."
+      : journal ? `The robot's saved log reports ${journal.status === "SUCCEEDED" ? "completion" : journal.status} and records ${journal.effect_count} product move${journal.effect_count === 1 ? "" : "s"}. The system has not assessed a position check after this pick yet.`
+      : "The command identity is saved, but its controller journal is unavailable in this response.";
+    const limit = pending ? "The robot's log or a visible movement does not prove the box arrived. We need a fresh, reliable sensor report that agrees with the original log."
+      : latest ? "This finding belongs to the recorded simulator evidence. It does not validate real hardware or prove that a later pick succeeded."
+      : "The missing assessment does not prove where the product is. Do not infer a result from the animation or the selected test scenario.";
+    const hypothesis = pending && !latest ? "A missing reply or an unavailable result check can leave the workflow uncertain. Compare the journal, sensor report and events to distinguish them."
+      : latest?.verdict === "INCONCLUSIVE" ? "The sensor report or journal may be incomplete or inconsistent. The exact recorded reason is in Verification; a different cause must not be assumed."
+      : "No additional root cause is inferred. Use the event records and input/output data to assess another explanation.";
+    const productId = command?.product_id || job?.line?.product_id;
+    const objects = assessed?.objects?.filter(item => item.product_id === productId) || [];
+    const observation = !assessed ? "No assessed sensor report is available. A planning capture is not a post-pick check."
+      : `Product detections: ${objects.length ? objects.map(item => `${item.location_id} (${Math.round(item.confidence * 100)}% confidence)`).join("; ") : "none"}. Model ${assessed.model_version}; calibration ${assessed.calibration_version}.`;
+    const boundary = related.findIndex(event => ["UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION", "COMPLETED", "FAILED"].includes(event.state_after));
+    const initialFault = related.slice(0, boundary < 0 ? related.length : boundary).find(event => event.job_id === job?.job_id && event.event_type === "FAULT_INJECTED")?.reason || null;
+    return {symptom, finding, limit, hypothesis, observation, assessed, latest, related, initialFault, summary,
+      next: pending ? "Next: inspect the records below, then request another sensor report if the outcome remains uncertain." : "Next: inspect the evidence or tool decision, then return to the simulation when ready.",
+      sources: [
+        ["robotops/workflow/engine.py", "Planning, dispatch and reconciliation sequence"],
+        ["robotops/robot_gateway/gateway.py", "Original command delivery and communication errors"],
+        ["robotops/observation/model.py", "How the synthetic sensor report is created or degraded"],
+        ["robotops/observation/quality.py", "Freshness, confidence and evidence-quality checks"],
+        ["robotops/verification/verifier.py", "How observations establish or fail to establish the outcome"],
+        ["robotops/config.py", "Thresholds and execution settings; saved worlds retain their own configuration"]
+      ]};
+  }
+  const brief = value => ({
+    "": ["Normal pick: move the product, receive the reply and check its new position.", "The product reaches the output tote and the job becomes COMPLETED."],
+    DROP_ACK_AFTER_EFFECT: ["The product moves, but the robot's completion reply is deliberately lost.", "Movement can finish while the workflow still says UNKNOWN_OUTCOME."],
+    DROP_ACK_BEFORE_EFFECT: ["The pick never starts, and the controller's reply is deliberately lost.", "The product stays still, but the workflow still needs evidence to know that."],
+    CONTRADICTORY_OBSERVATION: ["The pick moves the product. Its first sensor report gives conflicting locations.", "Movement finishes, but the result cannot be trusted yet."],
+    LOW_CONFIDENCE_OBSERVATION: ["The pick moves the product. Its first sensor report is deliberately unreliable.", "Movement finishes, but the confidence check prevents completion."],
+    STALE_OBSERVATION: ["The pick moves the product. Its first sensor report is deliberately too old.", "Movement finishes, but old evidence cannot confirm the result."],
+    LOGICAL_ESTOP: ["A simulated stop request blocks the pick before movement.", "The cell becomes ESTOP_LOGICAL and the product stays still."],
+    CELL_FAULT: ["A simulated controller error blocks the pick before movement.", "The cell becomes FAULTED and the product stays still."],
+    BRAIN_INVALID_OUTPUT: ["The pick planner returns an invalid plan, which validation rejects.", "The order fails before a robot command is created."],
+    BRAIN_TIMEOUT: ["The pick planner misses its deadline.", "The order fails before a robot command is created."]
+  }[value] || ["Choose a supported scenario.", "No behavior is defined for this selection."]);
+  return {describe, evidenceSummary, explain, inspect, brief,
     choices: kind => Object.entries(catalog(kind)).map(([value, info]) => ({value, ...info})),
     scenario: value => explain("scenario", value).expected,
     observation: value => explain("observation", value).expected};

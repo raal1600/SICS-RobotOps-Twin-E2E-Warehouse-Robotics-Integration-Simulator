@@ -2,9 +2,12 @@
 
 The embedded dashboard uses dark mode and includes
 [full 3D cell and per-scenario replay](playback.md). A persistent Next step guide
-leads through Prepare, Run, Review and Continue. Jobs needing human attention
-open Review evidence automatically, with a plain-language journal/observation/
-decision summary and the next explicit action together (ADR 0009).
+leads through Set up, Watch, Investigate and Continue. Jobs needing attention
+highlight **Investigate this pick**; the cell remains visible until you open it.
+The bounded panel separates symptom, confirmed evidence and possible explanation,
+with Evidence and Manual inspection tabs. The timeline stays collapsed/bounded;
+returning preserves your replay selection/frame. See the
+[investigation walkthrough](investigation.md) and ADR 0012.
 Both selectors also explain what each choice simulates, where it acts, and its
 key difference from similar choices. Expand the comparison panels to read all
 options in the same window. Execution choices apply to a new order; observation
@@ -27,7 +30,7 @@ default Full delivery replay spans all products already executed in that scene;
 use Delivery replay to revisit a previous scene or select individual execution
 details to inspect one product.
 
-**Delete selected test** asks you to confirm removal of that test's orders,
+Under **Manage test data**, **Delete selected test** asks you to confirm removal of that test's orders,
 observations, journal evidence and replay. The dialog identifies its test and
 cell. **Clear all test data** identifies the current test count and confirms
 removal of that displayed set. Cancel either dialog to keep everything unchanged.
@@ -42,7 +45,7 @@ Interrupted file cleanup is reported as pending and safely retried; a repeated
 clear request cannot remove later-created tests. Closing/reopening the app does
 not itself authorize deletion or recreate an empty active world. See
 [data ownership and recovery](../adr/0011-cell-selection-and-test-data-lifecycle.md).
-Lost acknowledgement pauses the next pick for every product. The **Review evidence** panel names the uncertain product and offers Reconcile [product]; choose Normal
+Lost acknowledgement pauses the next pick for every product. The investigation panel names the uncertain product and offers Reconcile [product]; choose Normal
 observation to check the original command before creating another order. If the
 evidence requires intervention, the panel offers **Observe again: [product]**.
 Choose an observation mode and collect another assessment in the same test. Run stays

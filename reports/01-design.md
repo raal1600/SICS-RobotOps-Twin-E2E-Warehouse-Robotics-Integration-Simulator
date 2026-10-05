@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-04:** Test deletion, clear-all, empty restart and registered robot-cell selection accepted at b1c374ae76144309cc4476392dec681292f0e3a7: all 110 MUSTs pass; 659 tests twice, 119 UI checks, eight Blender demos and exact-source CI/publication verified. Only the HKM-inspired profile is currently selectable. Evidence/status successors receive their own workflow attestation. Status: DONE.
+> **Implementation status, 2026-10-05:** Run, notice and investigate UI redesign in progress from accepted baseline 0db6168. Existing HKM and test-lifecycle evidence remains historical; the new user journey needs browser and source-specific acceptance. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -435,3 +435,16 @@ Det finns risk för gemensamma modellfel mellan simulator och verifierare. Scena
 **Slutsatsen är att projektet är motiverat som ett avgränsat integrations- och återhämtningstest, inte som en kopia av SICS AI:s robotbrain.** En liten demo med ärlig osäkerhet, spårbara beslut och reproducerbara fel är vetenskapligt mer användbar än en större animation som ger sken av verifierad fysisk förmåga.
 
 Den fortsatta diskussionen bör pröva designens antaganden: var den verkliga plattformens gränser går, vilka fel som är vanligast och vilken evidens som krävs för att ett plock ska räknas som lyckat. Den aktuella publikationsrevisionen länkar verifierad simulator-evidens via ACCEPTANCE_REPORT.md. Den redovisar inga experimentella resultat för fysisk robotprestanda eller generell intelligens.
+
+## Implementerat undersökningsflöde (2026-10-05)
+
+Arbetsytan prioriterar körning, synligt resultat och en uttrycklig undersökning.
+En kort scenariobeskrivning säger vad operatören ska titta efter. Avvikande resultat
+markeras utan att automatiskt täcka cellen. Panelen skiljer symptom, innehållet i
+sparade bevis och möjliga förklaringar. Den bedömda observationen väljs med dess ID;
+animationen och den aktuella felväljaren får inte ersätta evidens. Tidslinjen är
+sekundär och höjdbegränsad. API-anrop, JSON-export och riktiga kod-/loggsökvägar
+stöder fortsatt teknisk undersökning. Återgång bevarar uppspelningens sammanhang.
+Detta är egen SIMULATOR_DESIGN, inte ett nytt påstående om SICS AI:s produkt.
+
+{{figure:investigation}}

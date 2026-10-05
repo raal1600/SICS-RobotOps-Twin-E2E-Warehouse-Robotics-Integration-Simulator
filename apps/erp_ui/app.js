@@ -6,7 +6,87 @@ let orderSignature = "", productSignature = "", deliverySignature = "", nextMoti
 let selectedTest = "original", activeTest = "original", testHistory = [], historySignature = "", viewVersion = 0;
 let guideEvidence = null, guideJob = null, guidance = null;
 let cellProfiles = [], newTestRequest = null, deletionRequest = null, historyVersion = 0;
-const attentionSeen = new Set();
+let selectedEvidence = null, selectedEvents = [], knownOrders = [], inspection = null, inspectionVersion = 0, timelineSignature = "";
+const inspectionPanes = ["findings", "evidence", "manual"];
+function showInspectionPane(name) {
+  for(const pane of inspectionPanes){
+    byId(`pane-${pane}`).hidden=pane!==name;
+    byId(`tab-${pane}`).setAttribute("aria-selected",String(pane===name));
+    byId(`tab-${pane}`).setAttribute("tabindex",pane===name?"0":"-1");
+  }
+}
+function renderInspectionTimeline(model) {
+  const important = event => event.state_after || /FAULT|TIMEOUT|RECONCIL|VERIF|COMMAND|EFFECT|REJECT|ERROR/.test(event.event_type);
+  const events=byId("timeline-filter").value==="all"?model.related:model.related.filter(important);
+  text("timeline-summary",`Event timeline · ${events.length} of ${model.related.length} relevant events`);
+  const signature=JSON.stringify([inspection?.evidence.job.job_id,byId("timeline-filter").value,events]);
+  if(signature===timelineSignature)return;
+  timelineSignature=signature;byId("timeline").replaceChildren();
+  for(const event of events){
+    const row=document.createElement("tr");
+    for(const value of [event.timestamp.slice(11,23)+" / "+event.component,event.event_type+(event.state_after?" → "+event.state_after:""),event.reason]){
+      const cell=document.createElement("td");
+      if(value===event.reason){const button=document.createElement("button");button.className="text-button";button.textContent=value||"Inspect event";
+        button.onclick=()=>{text("event-record",JSON.stringify(event,null,2));byId("event-details").open=true;};cell.append(button);
+      }else cell.textContent=value;
+      row.append(cell);
+    }
+    byId("timeline").append(row);
+  }
+}
+function renderInspection() {
+  if(!inspection||inspection.testId!==selectedTest)return;
+  const evidence=inspection.evidence,model=SimulationGuide.inspect(evidence,inspection.events),job=evidence.job;
+  const test=testHistory.find(item=>item.test_id===inspection.testId);
+  const sku=fixture?.products.find(item=>item.product_id===(job.line?.product_id||evidence.command?.product_id))?.sku||job.line?.product_id||"Product";
+  const plainState={UNKNOWN_OUTCOME:"Result uncertain",REQUIRES_INTERVENTION:"More evidence needed",COMPLETED:"Pick confirmed",FAILED:"Pick not completed",EXECUTING:"Pick running",VERIFYING:"Checking the result",RECONCILING:"Checking again"}[job.state]||job.state;
+  text("investigation-title",`${sku} · ${plainState}`);
+  text("inspection-context",`Test ${test?.number??inspection.testId} · ${job.state} · Job ${job.job_id}`);
+  text("review-identity",`Order ${job.order_id||"not included"} · Job ${job.job_id} · original command ${evidence.command?.command_id||"not created"}`);
+  text("review-label",readOnly()?"Saved test · read-only":"Recorded result for this pick");
+  for(const [id,value] of Object.entries({"inspection-symptom":model.symptom,"inspection-finding":model.finding,"inspection-limit":model.limit,"inspection-hypothesis":model.hypothesis,"inspection-next":model.next,"inspection-observation":model.observation,"review-journal":model.summary.journal,"review-observation":model.summary.observation,"review-decision":model.summary.decision,"review-attempts":model.summary.attempts}))text(id,value);
+  text("journal-record",JSON.stringify({command:evidence.command,journal:evidence.journal},null,2));
+  text("observation-record",model.assessed?JSON.stringify(model.assessed,null,2):"No assessed observation available.");
+  text("decision-record",JSON.stringify({verifications:evidence.verifications,reconciliations:evidence.reconciliations},null,2));
+  text("evidence",JSON.stringify(evidence,null,2));
+  const canCheck=!readOnly()&&["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(job.state);
+  byId("observation-controls").hidden=!canCheck;
+  byId("next-step").hidden=!canCheck;
+  byId("view-evidence").disabled=false;
+  roboticsEvidence(evidence);
+  text("order-state",knownOrders.find(order=>order.order_id===job.order_id)?.status||"Not loaded");
+  text("job-state",job.state);
+  text("verdict",model.latest?`${model.latest.verdict} · ${model.latest.reason}`:"No verification result yet.");
+  text("command",evidence.command?`Original command: ${evidence.command.command_id} · Journal: ${evidence.journal?.status||"unavailable"}`:"No robot command dispatched.");
+  const origin=globalThis.location?.origin||"http://127.0.0.1:<port>";
+  const path=(inspection.testId==="original"?"":`/simulation-tests/${encodeURIComponent(inspection.testId)}`);
+  const urls=[`${origin}${path}/jobs/${encodeURIComponent(job.job_id)}/evidence`,`${origin}${path}/orders/${encodeURIComponent(job.order_id||"")}/timeline`];
+  text("manual-identity",`Test ${test?.number??inspection.testId} · ${job.job_id} · command ${evidence.command?.command_id||"none"}`);
+  text("manual-requests",urls.map(url=>`Invoke-RestMethod '${url.replaceAll("'","%27")}' | ConvertTo-Json -Depth 100`).join("\n\n"));
+  text("manual-reproduce",`Use a new ${test?.cell_display_name||"matching cell"} test and product ${sku}. `+(model.initialFault?`The execution log records an injected ${model.initialFault} fault (${SimulationGuide.explain("scenario",model.initialFault).label}). Select that scenario and run the order.`:"No injected execution fault is recorded before the first outcome. Use the event log to establish the original setup; the current dropdown is not historical evidence."));
+  text("manual-storage",inspection.testId==="original"?"This is the original test: its world files are directly under the configured data root.":`This test's world is under simulation-tests/${inspection.testId} inside the configured data root.`);
+  byId("manual-sources").replaceChildren();
+  for(const [path,reason] of model.sources){const item=document.createElement("li"),code=document.createElement("code"),detail=document.createElement("span");code.textContent=path;detail.textContent=` — ${reason}`;item.append(code,detail);byId("manual-sources").append(item);}
+  byId("download-evidence").disabled=inspection.loading;
+  renderInspectionTimeline(model);
+}
+async function openInspection(evidence, events=null) {
+  if(!evidence||!selectedTest)return;
+  const version=++inspectionVersion,testId=selectedTest,job=evidence.job;
+  const same=inspection?.testId===testId&&inspection?.evidence.job.job_id===job.job_id;
+  inspection={testId,evidence,events:events||[],loading:events===null};timelineSignature="";
+  if(!same){showInspectionPane("findings");byId("timeline-panel").open=false;byId("evidence-details").open=false;byId("event-details").open=false;text("event-record","Select an event above.");}
+  player.pause();
+  byId("review-panel").open=true;text("inspection-error","");
+  if(!byId("investigation-dialog").open)byId("investigation-dialog").showModal();
+  renderInspection();
+  const pane=inspectionPanes.find(name=>!byId(`pane-${name}`).hidden)||"findings";
+  byId(pane==="findings"?"review-heading":`tab-${pane}`).focus({preventScroll:true});
+  if(events===null){
+    try{const loaded=await api(`/orders/${job.order_id}/timeline`);if(version!==inspectionVersion||testId!==selectedTest)return;inspection.events=loaded;inspection.loading=false;renderInspection();}
+    catch(error){if(version===inspectionVersion){text("inspection-error","Event records could not be loaded: "+error.message);inspection.loading=true;}}
+  }
+}
 const readOnly = () => !selectedTest || selectedTest !== activeTest;
 const testPath = path => (selectedTest === "original" ? "" : `/simulation-tests/${selectedTest}`) + path;
 const sourceFor = product => fixture?.product_sources?.[product] || fixture?.source_id;
@@ -48,6 +128,9 @@ async function refreshHistory() {
 }
 async function selectTest(identity) {
   ++viewVersion;++refreshVersion;refreshing=false;
+  ++inspectionVersion;inspection=null;selectedEvidence=null;selectedEvents=[];knownOrders=[];
+  byId("inspect-selected").disabled=true;text("selected-result","Loading the selected test…");
+  if(byId("investigation-dialog").open)byId("investigation-dialog").close();
   selectedTest=identity||null;selectedJob=null;selectedDelivery=null;fixture=null;deliveries=[];
   guideEvidence=null;guideJob=null;
   byId("setup-panel").open=true;byId("review-panel").open=false;
@@ -105,7 +188,7 @@ function fixtureControls() {
   byId("tool-showcase").disabled=busy||readOnly()||!!blocker||cellMode!=="READY";
   byId("reset").disabled=busy||readOnly();byId("motion-import").disabled=busy||readOnly();
   text("inventory-status", blocker==="SCENE_RESET_IN_PROGRESS" ? "Preparing a fresh scene. Previous orders and recordings are being retained."
-    : pending ? `Next pick blocked by ${productName} (${pending.state}). Open Review evidence to continue.`
+    : pending ? `Next pick blocked by ${productName} (${pending.state}). Open Investigate this pick to continue.`
     : blocker ? "An active job must finish before another pick can start."
     : readOnly() ? "Saved test: use the replay and evidence controls to review it."
     : !anyAvailable ? "Delivery finished. Start new test for another combination, or start another delivery in this test. The full delivery replay stays saved."
@@ -118,6 +201,9 @@ function guideExecution() {
   return pendingExecution()||deliveries.find(group=>group.current)?.executions.at(-1);
 }
 function focusPanel(id, focusId) {
+  if(id==="review-panel"){
+    openInspection(guideEvidence,guideJob===selectedJob?selectedEvents:null);return;
+  }
   const panel=byId(id);panel.open=true;
   panel.scrollIntoView({block:"start",behavior:"auto"});
   byId(focusId).focus({preventScroll:true});
@@ -141,6 +227,8 @@ function renderGuidance() {
     text(`${kind}-phase`,info.phase);text(`${kind}-meaning`,info.meaning);
     text(`${kind}-difference`,info.difference);text(`${kind}-help`,info.expected);
   }
+  const brief=SimulationGuide.brief(byId("scenario").value);
+  text("scenario-brief",brief[0]);text("scenario-watch",brief[1]);
   const summary=SimulationGuide.evidenceSummary(evidence);
   text("review-journal",summary.journal);text("review-observation",summary.observation);
   text("review-decision",summary.decision);text("review-attempts",summary.attempts);
@@ -151,13 +239,10 @@ function renderGuidance() {
   byId("use-normal").hidden=!byId("observation").value;
   byId("use-normal").disabled=busy||readOnly();
   byId("review-panel").classList.toggle("review-attention",!!pending&&!readOnly());
-  // Open and focus once per job needing attention, not on every poll or repeat
-  // observation. This navigation never captures evidence or dispatches a pick.
-  const key=`${selectedTest}:${pending?.job_id}`;
-  if(pending&&!readOnly()&&!busy&&evidence&&!attentionSeen.has(key)){
-    attentionSeen.add(key);byId("setup-panel").open=false;
-    focusPanel("review-panel","review-heading");
-  }
+  // The attention banner and cell result invite investigation. Keep the scene
+  // visible until the operator opens the panel; polling never steals focus.
+  if(inspection?.testId===selectedTest&&inspection.evidence.job.job_id===evidence?.job.job_id)inspection.evidence=evidence;
+  renderInspection();
 }
 async function refreshGuide(selectedEvidence, version) {
   const execution=guideExecution();
@@ -191,16 +276,20 @@ async function api(path, body) {
   return request(testPath(path),body);
 }
 function text(id, value) { if(byId(id).textContent!==value)byId(id).textContent = value; }
+function appError(error){
+  text("message","App request problem — "+error.message+". This message is separate from the recorded simulation outcome.");
+  byId("message").setAttribute("data-kind","error");byId("message").setAttribute("role","alert");
+}
 function roboticsEvidence(evidence){
-  const command=evidence?.command,observation=evidence?.observations?.at(-1),decision=command?.tool_selection;
+  const assessment=evidence?.verifications?.at(-1);
+  const command=evidence?.command,observation=assessment?SimulationGuide.inspect(evidence).assessed:evidence?.observations?.at(-1),decision=command?.tool_selection;
   const product=fixture?.products.find(item=>item.product_id===(evidence?.job?.line?.product_id||command?.product_id));
   const observed=observation?.objects?.filter(item=>item.product_id===product?.product_id)||[];
   const tool=observation?.machine_telemetry?.tool_state.active_tool_id;
   const name=id=>fixture?.catalogue?.tools.find(item=>item.tool_id===id)?.display_name||id;
   text("status-product",product?`${product.sku} / ${product.product_id}`:"No order selected");
   text("status-tool",tool?name(tool):"Not observed yet");
-  const assessment=evidence?.verifications?.at(-1);
-  text("status-observation",observation?`${observed.length?Math.round(Math.min(...observed.map(item=>item.confidence))*100)+"% confidence":"No product evidence"} / ${assessment?.reason||"Awaiting assessment"} / ${observation.model_version}`:"Not captured");
+  text("status-observation",observation?`${observed.length?Math.round(Math.min(...observed.map(item=>item.confidence))*100)+"% confidence":"No product evidence"} / ${assessment?.reason||"Unassessed capture; not a verified result"} / ${observation.model_version}`:assessment?"Assessed observation not available":"Not captured");
   text("status-calibration",observation?.calibration_version||"Not observed");
   text("business-identity",evidence?`Order ${evidence.job.order_id} / Job ${evidence.job.job_id}`:"");
   text("status-job",evidence?`${evidence.job.state} / ${evidence.job.job_id}`:"No job selected");
@@ -227,8 +316,10 @@ async function refresh(preferred, preferredDelivery) {
   try {
     const [orders, cell, currentFixture, groups] = await Promise.all([api("/orders"), api("/cell"),api("/fixtures"),api("/deliveries")]);
     if(version!==refreshVersion)return;
+    knownOrders=orders;
     deliveries=groups;
     fixture=currentFixture;cellMode=cell.mode;fixtureControls();
+    text("cell-summary",`Cell: ${cell.mode}`);
     const wantedDelivery=preferredDelivery||byId("delivery").value||fixture.scene_epoch;
     selectedDelivery=groups.find(group=>group.delivery_id===wantedDelivery)?.delivery_id||fixture.scene_epoch;
     const group=groups.find(item=>item.delivery_id===selectedDelivery);
@@ -242,7 +333,8 @@ async function refresh(preferred, preferredDelivery) {
     }
     byId("delivery").value=selectedDelivery;
     const selectedExecution=byId("orders").value;
-    const keepExecution=byId("replay-scope").value==="product"||group?.executions.some(item=>item.job_id===selectedExecution);
+    const keepExecution=byId("replay-scope").value==="product"||group?.executions.some(item=>item.job_id===selectedExecution)
+      ||busy&&orders.some(order=>order.job_ids.includes(selectedExecution));
     const selection=preferred ?? (keepExecution?selectedExecution:group?.executions.at(-1)?.job_id||"");
     const signature = JSON.stringify([orders.map(order=>[order.order_id,order.status]),group?.executions]);
     if (signature !== orderSignature && (document.activeElement !== byId("orders") || preferred)) {
@@ -259,6 +351,7 @@ async function refresh(preferred, preferredDelivery) {
     if (!order) {
       const scene=await api("/cell/scene");if(version!==refreshVersion)return;
       selectedJob=null;selectReplay();player.previewScene(scene);
+      selectedEvidence=null;selectedEvents=[];byId("inspect-selected").disabled=true;text("selected-result","No pick selected. Run an order or choose a saved execution.");
       byId("visual-panel").hidden=true;byId("reconcile").disabled=true;
       text("order-state","No order selected");text("job-state","Ready for a new order");
       text("verdict","Select a saved order to inspect its verification.");text("command","");
@@ -271,6 +364,10 @@ async function refresh(preferred, preferredDelivery) {
     const job = selectedJob;
     const [evidence, events] = await Promise.all([api(`/jobs/${job}/evidence`),api(`/orders/${order.order_id}/timeline`)]);
     if (version!==refreshVersion || selectedJob !== job || byId("orders").value !== job) return;
+    selectedEvidence=evidence;selectedEvents=events;byId("inspect-selected").disabled=false;
+    text("selected-result",`${order.lines.find(line=>line.product_id===evidence.command?.product_id)?.product_id||evidence.job.line?.product_id||"Selected pick"} · ${evidence.job.state}`);
+    byId("inspect-selected").setAttribute("data-attention",String(["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION","FAILED"].includes(evidence.job.state)));
+    if(inspection?.testId===selectedTest&&inspection.evidence.job.job_id===job){inspection.evidence=evidence;inspection.events=events;inspection.loading=false;}
     text("order-state",order.status);text("job-state",evidence.job.state);
     byId("reconcile").disabled=busy || readOnly() || !["UNKNOWN_OUTCOME","EXECUTING","VERIFYING","RECONCILING","REQUIRES_INTERVENTION"].includes(evidence.job.state);
     text("reconcile",evidence.job.state==="REQUIRES_INTERVENTION"?"Observe again and reconcile":"Reconcile selected job");
@@ -281,11 +378,9 @@ async function refresh(preferred, preferredDelivery) {
     roboticsEvidence(evidence);
     await refreshGuide(evidence,version);
     if(version!==refreshVersion)return;
-    byId("timeline").replaceChildren();
-    events.forEach(event => {const tr=document.createElement("tr");
-      [event.timestamp.slice(11,23)+" / "+event.component,event.event_type+(event.state_after?" → "+event.state_after:""),event.reason]
-        .forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.append(td);});byId("timeline").append(tr);});
-    if(fixture.runtime === "blender" && !["RECEIVED","EXECUTING"].includes(evidence.job.state)) {
+    renderInspection();
+    if(fixture.runtime === "blender" && evidence.command && evidence.journal?.status==="SUCCEEDED"
+      &&["COMPLETED","UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(evidence.job.state)) {
       const url=testPath(`/jobs/${job}/artifact.png`);
       if(byId("visual").getAttribute("src")!==url) byId("visual").src=url;
     }
@@ -310,10 +405,15 @@ async function action(fn, message="Running… live motion and status update belo
   if(busy)return;
   if(readOnly()&&!allowArchived){text("message","Saved tests are read-only. Return to the current test or start a new one.");return;}
   busy=true;fixtureControls();byId("reconcile").disabled=true;
+  byId("message").removeAttribute("data-kind");byId("message").setAttribute("role","status");
   text("message",message);
   try {await fn();text("message","Updated from persisted evidence. Replay only changes the view.");}
-  catch(error){text("message",error.message);}
-  finally {busy=false;await refreshHistory();await refresh();await refreshMotion(true);fixtureControls();}
+  catch(error){appError(error);}
+  finally {
+    busy=false;
+    try{await refreshHistory();await refresh();await refreshMotion(true);}catch(error){appError(error);}
+    fixtureControls();
+  }
 }
 async function freshDelivery(){
   const scene=await api("/fixtures/fresh-scene",{});
@@ -321,7 +421,8 @@ async function freshDelivery(){
   player.previewScene(scene);await refresh("",scene.scene_epoch);await refreshMotion(true);
 }
 byId("create").addEventListener("click",()=>action(async()=>{
-  if(fixture.scene_reset_blocked_reason)throw new Error("The previous job must be resolved before another pick. Open Review evidence to continue.");
+  byId("motion-panel").scrollIntoView({block:"start",behavior:"auto"});
+  if(fixture.scene_reset_blocked_reason)throw new Error("The previous job must be resolved before another pick. Open Investigate this pick to continue.");
   const product=byId("product").value, fault=byId("scenario").value||null;
   if(!fixture.inventory.some(item=>item.product_id===product&&atSource(item)))await freshDelivery();
   byId("replay-scope").value="delivery";
@@ -332,6 +433,7 @@ byId("create").addEventListener("click",()=>action(async()=>{
   await api(`/jobs/${order.job_ids[0]}/run`,{fault});
 }));
 byId("tool-showcase").onclick=()=>action(async()=>{
+  byId("motion-panel").scrollIntoView({block:"start",behavior:"auto"});
   if(!fixture.catalogue||fixture.scene_reset_blocked_reason)throw new Error("Resolve the current job before starting the showcase.");
   if(!fixture.inventory.every(atSource))await freshDelivery();
   byId("scenario").value="";byId("replay-scope").value="delivery";
@@ -371,23 +473,24 @@ byId("new-test").onclick=async()=>{
     newTestRequest={request_id:crypto.randomUUID()};
     byId("cell-profile").disabled=false;text("new-test-error","");cellDescription();
     byId("new-test-dialog").showModal();
-  }catch(error){text("message",error.message);}
+  }catch(error){appError(error);}
 };
 byId("empty-new-test").onclick=()=>byId("new-test").onclick();
 byId("cell-profile").onchange=cellDescription;
 async function manageTests(dialogId,errorId,operation){
   if(busy)return;
   busy=true;fixtureControls();
+  byId("message").removeAttribute("data-kind");byId("message").setAttribute("role","status");
   for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=true;
   text(errorId,"");
   try{
     const message=await operation();
     byId(dialogId).close();text("message",message);
-  }catch(error){text(errorId,error.message);text("message",error.message);}
+  }catch(error){text(errorId,error.message);appError(error);}
   finally{
     busy=false;
     for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=false;
-    try{await refreshHistory();await refresh();await refreshMotion(true);}catch(error){text("message",error.message);}
+    try{await refreshHistory();await refresh();await refreshMotion(true);}catch(error){appError(error);}
     fixtureControls();
   }
 }
@@ -439,19 +542,29 @@ byId("guide-action").onclick=async()=>{
   if(busy)return;
   if(guidance.action==="review"){
     const pending=pendingExecution();if(!pending)return;
-    const group=deliveries.find(item=>item.executions.some(run=>run.job_id===pending.job_id));
-    await refresh(pending.job_id,group?.delivery_id);await refreshMotion(true);
-    focusPanel("review-panel","review-heading");
+    await openInspection(guideEvidence,guideJob===selectedJob?selectedEvents:null);
   }else if(guidance.action==="configure")focusPanel("setup-panel",guideExecution()?.state==="FAILED"?"scenario":"product");
   else if(guidance.action==="reset")await byId("reset").onclick();
   else if(guidance.action==="new-test")await byId("new-test").onclick();
   else if(guidance.action==="current")await byId("return-current").onclick();
 };
-byId("view-evidence").onclick=async()=>{
-  const execution=guideExecution();if(busy||!execution)return;
-  const group=deliveries.find(item=>item.executions.some(run=>run.job_id===execution.job_id));
-  await refresh(execution.job_id,group?.delivery_id);
-  byId("evidence-details").open=true;focusPanel("timeline-panel","timeline-panel");
+byId("view-evidence").onclick=()=>{if(!inspection)return;showInspectionPane("evidence");byId("journal-details").open=true;byId("observation-details").open=true;byId("tab-evidence").focus();};
+byId("inspect-selected").onclick=()=>openInspection(selectedEvidence,selectedEvents);
+byId("return-simulation").onclick=()=>byId("investigation-dialog").close();
+byId("investigation-dialog").addEventListener("close",()=>{byId("inspect-selected").focus({preventScroll:true});});
+for(const pane of inspectionPanes){
+  byId(`tab-${pane}`).onclick=()=>showInspectionPane(pane);
+  byId(`tab-${pane}`).addEventListener("keydown",event=>{
+    const index=inspectionPanes.indexOf(pane),next=event.key==="ArrowRight"?(index+1)%3:event.key==="ArrowLeft"?(index+2)%3:event.key==="Home"?0:event.key==="End"?2:null;
+    if(next===null)return;event.preventDefault();showInspectionPane(inspectionPanes[next]);byId(`tab-${inspectionPanes[next]}`).focus();
+  });
+}
+byId("timeline-filter").onchange=renderInspection;
+byId("download-evidence").onclick=()=>{
+  if(!inspection||inspection.loading)return;
+  const payload={format:"robotops-investigation-1",test_id:inspection.testId,evidence:inspection.evidence,order_events:inspection.events};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),link=document.createElement("a");
+  link.href=url;link.download=`investigation-${inspection.evidence.job.job_id}.json`;link.click();URL.revokeObjectURL(url);
 };
 byId("observation").onchange=renderGuidance;
 byId("use-normal").onclick=()=>{
@@ -462,10 +575,12 @@ byId("use-normal").onclick=()=>{
 byId("product").onchange=fixtureControls;
 byId("orders").onchange=async()=>{
   const job=byId("orders").value,group=deliveries.find(item=>item.executions.some(run=>run.job_id===job));
+  selectedEvidence=null;selectedEvents=[];byId("inspect-selected").disabled=true;
   byId("replay-scope").value="product";await refresh(job,group?.delivery_id);await refreshMotion(true);
 };
 byId("delivery").onchange=async()=>{
   const id=byId("delivery").value,group=deliveries.find(item=>item.delivery_id===id);
+  selectedEvidence=null;selectedEvents=[];byId("inspect-selected").disabled=true;
   byId("replay-scope").value="delivery";await refresh(group?.executions.at(-1)?.job_id||"",id);await refreshMotion(true);
 };
 byId("replay-scope").onchange=()=>{selectReplay();refreshMotion(true);};
@@ -488,6 +603,6 @@ for(const kind of ["scenario","observation"]){
 (async()=>{try{
   await refreshHistory();await selectTest(activeTest);
   text("runtime",fixture?.runtime === "blender"?"Blender · CPU · synthetic world":"Deterministic headless world");
-  setInterval(()=>refreshHistory().then(()=>refresh()).catch(error=>text("message",error.message)),1000);
+  setInterval(()=>refreshHistory().then(()=>refresh()).catch(appError),1000);
   setInterval(()=>refreshMotion(),250);
-}catch(error){text("message",error.message);}})();
+}catch(error){appError(error);}})();

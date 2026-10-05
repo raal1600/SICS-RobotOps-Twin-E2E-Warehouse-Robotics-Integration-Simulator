@@ -157,6 +157,14 @@ test('camera selection, frame stepping and 4x speed change only presentation',()
   assert.equal(JSON.stringify(data),before);assert.equal(data.job_state,'UNKNOWN_OUTCOME');
 });
 
+test('opening an investigation can freeze a replay without losing its frame or sending a command',()=>{
+  const {player:p,el}=setup();p.select('j1');p.update(clip(20));p.cursor=8.5;
+  p.pause();assert.equal(p.playing,false);assert.equal(p.manualPause,true);
+  p.update(clip(40));p.tick(100);p.tick(200);
+  assert.equal(p.cursor,8.5);assert.equal(p.job,'j1');
+  el('motion-play').onclick();assert.equal(p.playing,true);assert.equal(p.cursor,8.5);
+});
+
 function realSceneTypes(){
   const context=vm.createContext({fetch(){throw Error('Presentation must not send commands or capture evidence');}});
   vm.runInContext(fs.readFileSync('apps/erp_ui/scene-view.js','utf8')+'\nglobalThis.types={SceneView,SoftwareSceneView};',context);

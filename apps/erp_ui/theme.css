@@ -28,3 +28,49 @@ button.danger:hover:not(:disabled) { background:#4a2630; }
 .empty-workspace { text-align:center;padding:48px 24px; }
 .empty-workspace button { width:auto; }
 #test-workspace[hidden],#empty-workspace[hidden] { display:none; }
+
+/* Investigation is a bounded secondary workspace; the cell owns the main view. */
+.grid{grid-template-columns:290px minmax(0,1fr);gap:18px}
+.test-toolbar{padding:12px 16px}.test-toolbar .test-picker{min-width:240px}.test-toolbar p{font-size:11px}
+.manage-data{position:relative;margin:0;align-self:center}.manage-data summary{padding:10px;color:var(--muted)}
+.manage-data[open]{padding:8px;border:1px solid var(--line);border-radius:8px}.manage-data button{display:block;margin:6px 0;width:100%}
+.workflow-steps{margin-bottom:12px}.workflow-steps li{padding:5px 10px}
+.guide{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 22px;padding:14px 18px;margin-bottom:16px}
+.guide .eyebrow{grid-column:1}.guide>div:nth-child(2){grid-column:1}.guide h2{font-size:18px;margin:2px 0 5px}
+.guide p{font-size:12px;max-width:900px}.guide button{grid-column:2;grid-row:1/3;width:auto;max-width:245px;align-self:center;margin:0}
+.cell-task{color:var(--muted);font-size:12px;line-height:1.5;margin:0 4px 12px}
+.scenario-brief,.watch-for{font-size:13px;line-height:1.55}.watch-for{color:#c1d6dd;font-size:12px;border-left:2px solid var(--accent);padding-left:10px}
+#setup-panel>label{margin-top:12px}#inventory-status{font-size:11px;line-height:1.5}
+.more-controls summary,.viewer-details summary{color:var(--muted);font-size:12px}
+#motion-panel{padding:16px}.motion-heading h2{font-size:17px}.selected-incident{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.selected-incident p{font-size:12px;margin:8px 0}.selected-incident button{width:auto;white-space:nowrap;margin:0;min-height:34px;font-size:12px;padding:7px 10px}
+#motion-canvas{height:clamp(260px,42vh,460px);aspect-ratio:auto}.scene-stage{margin-top:8px}
+#motion-event{min-height:42px;padding:9px 12px;font-size:12px}#motion-scenario{font-size:11px;margin:4px 0}#motion-state{font-size:11px;margin:4px 0}
+.motion-controls{gap:6px}.motion-controls button{min-height:32px;padding:7px 10px;font-size:12px}.motion-controls select{min-height:32px;font-size:12px}
+.camera-controls{margin-top:10px;gap:6px}.camera-controls button{margin:0;min-height:32px;padding:6px 10px;font-size:12px}
+#motion-phase,#motion-tool{display:inline-block;margin:8px 12px 8px 0;font-size:12px}#motion-detail{margin:8px 0 0}
+#investigation-dialog{width:min(820px,calc(100vw - 32px));height:calc(100dvh - 32px);max-height:calc(100dvh - 32px);margin:16px 16px 16px auto;padding:0;overflow:hidden;grid-template-rows:auto auto auto minmax(0,1fr)}
+#investigation-dialog[open]{display:grid}body:has(#investigation-dialog[open]){overflow:hidden}
+.inspection-header{padding:16px 20px;align-items:start;background:#142331;gap:12px}.inspection-header h2{font-size:17px;margin:4px 0}.inspection-header p{font-size:11px;margin:0;max-width:100%}
+.inspection-header button{width:auto;min-width:115px;max-width:150px;margin:0;min-height:36px;font-size:12px;padding:8px}
+.inspection-tabs{display:flex;border-bottom:1px solid var(--line);padding:0 14px;gap:6px;background:#101923}
+.inspection-tabs button{flex:1;min-width:0;margin:0;padding:13px 8px;border-radius:0;background:transparent;color:var(--muted);border-bottom:3px solid transparent;font-size:13px}
+.inspection-tabs [aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.inspection-body{min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px 22px}
+#inspection-error{padding:0 22px;margin:0;font-size:13px}#inspection-error:empty{display:none}
+.inspection-body p,.inspection-body li{font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.inspection-body details{border:1px solid var(--line);padding:12px;border-radius:7px;margin:0 0 12px;background:#101923}
+.inspection-body details details{margin-top:12px;background:#0d1620}.inspection-body summary{font-weight:600}
+.inspection-body pre{max-height:270px;margin-bottom:0}.inspection-body h3{font-size:12px;color:#a8c3d5;margin:12px 0 5px}
+.finding{padding-bottom:10px;border-bottom:1px solid var(--line)}.finding p{margin:0}.inspection-next{border-left:3px solid var(--accent);padding-left:12px}
+#review-panel{border:0;padding:0;background:transparent}#review-heading{font-size:16px}#review-label{font-size:11px;color:var(--accent);margin-bottom:4px}#review-identity{font-size:11px;margin-top:0}
+.inspection-body #next-step{display:none}.inspection-body #observation-controls{padding-top:8px}#observation-controls>label{margin-top:6px}
+.inspection-body .operator-status{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.operator-status dd{font-size:12px}
+.timeline-scroll{max-height:260px;overflow:auto;overscroll-behavior:contain;border:1px solid var(--line);margin-top:12px}
+.timeline-scroll thead{position:sticky;top:0;background:#172433}.timeline-scroll table{table-layout:fixed}.timeline-scroll td,.timeline-scroll th{overflow-wrap:anywhere;font-size:11px;padding:8px}
+.timeline-scroll button{font-size:11px;min-height:28px;line-height:1.4}.inspection-body code{font-size:11px;overflow-wrap:anywhere}
+#manual-sources{padding-left:18px}#manual-sources li{margin-bottom:9px}#manual-requests{max-height:210px}
+#message[data-kind=error]{padding:12px;border:1px solid #b06c78;background:#3a202b;color:#ffc4cb;border-radius:8px}
+.inspection-notices>p{margin:7px 20px;font-size:11px}.selected-incident button[data-attention=true]{border-color:#be9754;color:#ffdda0;background:#352c1d}
+@media(max-width:1000px){.grid{grid-template-columns:260px minmax(0,1fr)}.guide button{max-width:190px}.motion-controls button{font-size:11px;padding:6px}}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.guide{grid-template-columns:1fr}.guide button{grid-column:1;grid-row:auto;max-width:none;width:100%;margin-top:8px}.test-toolbar .test-picker{min-width:100%}.manage-data{flex:1}.cell-task{margin:0 0 10px}.selected-incident{align-items:start}.selected-incident p{max-width:55%}.selected-incident button{white-space:normal;max-width:42%}#motion-canvas{height:310px}.camera-controls button{flex:1}#investigation-dialog{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;border-radius:0;border:0}.inspection-header{padding:12px}.inspection-header button{min-width:88px;max-width:100px}.inspection-tabs{padding:0 5px;gap:2px}.inspection-tabs button{font-size:12px;padding:10px 5px}.inspection-body{padding:14px}.inspection-body .operator-status{grid-template-columns:1fr}.timeline-scroll{max-height:230px}.workflow-steps li{font-size:11px}}

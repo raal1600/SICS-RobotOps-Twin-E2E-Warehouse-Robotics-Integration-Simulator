@@ -155,10 +155,12 @@ The dark guided workspace keeps the full-delivery 3D view as default. Expand
 Choose delivery or product replay to inspect another recording. The Next step
 card uses persisted workflow/evidence and points to the active unresolved job even
 while an older recording is selected. It never uses the visible scene or replay
-poses as verification. Review evidence opens once when attention is needed; the
-scene, journal and sensor-observation provenance remain separate (ADR 0009).
+poses as verification. Attention highlights an explicit investigation action;
+the cell is not automatically covered. Opening the bounded inspector pauses only
+replay and preserves its frame/selection on return. Play resumes explicitly.
+Scene, journal and sensor-observation provenance remain separate (ADR 0012).
 
-The status strip identifies the selected order, job, original command, product,
+The Evidence tab's expandable status details identify the inspected order, job, original command, product,
 cell, observed tool and observation confidence/version/calibration. The replay
 phase/tool label describes the viewed frame, which may be an earlier product in
 the full delivery. **Why this tool?** reads the persisted selection candidates,

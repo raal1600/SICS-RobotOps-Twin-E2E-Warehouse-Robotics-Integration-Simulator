@@ -35,6 +35,26 @@ Do not begin architecture-changing implementation before understanding the norma
 
 ## Execution loop
 
+### Investigation workflow revision
+
+ADR 0012 adapts the accepted UI at `0db6168` around run, notice and investigate.
+Eight additive UI-INV MUSTs bring the total to 118; retain every original SC/HKM
+requirement. Preserve the archived baseline report and current source attribution.
+Inspectors derive statements from JobEvidence and relevant events, never scene
+truth/current dropdowns. Resolve the exact assessed observation by ID. Keep
+symptom, confirmed finding and possible explanation separate. Navigation and
+downloads cannot run/reconcile a command; re-observation remains explicit.
+
+The result and guide highlight attention without auto-opening over the cell.
+The bounded inspector pins test/job independently of replay; pause presentation
+on open and retain its frame on return. Test changes invalidate delayed reads.
+Manual guidance must identify real endpoints, files and inputs. Keep the timeline
+bounded and secondary. Playwright journeys are mandatory, including actual
+Blender, desktop/compact layouts, downloads and separate app-error handling.
+Install its pinned Chromium during setup/CI; do not skip missing browsers. Record
+functional results separately from first-time usability uncertainty. No schema or
+business-state change is authorized merely to simplify this presentation work.
+
 ### Accepted cell selection and test-data lifecycle revision
 
 ADR 0011 adds registry-backed cell selection for a new test and explicit deletion

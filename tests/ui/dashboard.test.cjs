@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 
-async function dashboard({hkm=false,empty=false,profiles=null}={}){
+async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null}={}){
   const hkmCatalogue=JSON.parse(fs.readFileSync('robotops/robotics/catalogue-v1.json','utf8'));
   const registeredProfiles=profiles||[{cell_profile_id:'hkm_inspired_v1',display_name:'HKM1800-inspired warehouse cell',description:'Six product families and six interchangeable tools.',selectable:true,product_count:6,tool_count:6},{cell_profile_id:'legacy_cartesian_v1',display_name:'Legacy Cartesian cell',description:'Saved historical tests only.',selectable:false,product_count:3,tool_count:1}];
   const elements=new Map(),posts=[],requests=[],worlds=new Map(),failures=[],managementResults=new Map();
@@ -25,7 +25,7 @@ async function dashboard({hkm=false,empty=false,profiles=null}={}){
     attributes:{},classList:{toggle(){}},focus(){this.focusCount=(this.focusCount||0)+1;},
     append(...nodes){this.children.push(...nodes);},setAttribute(key,value){this.attributes[key]=value;},getAttribute(key){return this.attributes[key]||'';},removeAttribute(key){delete this.attributes[key];},closest(){return this;},scrollIntoView(){this.scrolled=true;}});
   const el=id=>{if(!elements.has(id))elements.set(id,makeElement(id));return elements.get(id);};
-  const player={select(id){this.selected=id;},previewScene(scene){this.scene=scene;},update(data){this.data=data;},updateDelivery(data){this.data=data;}};
+  const player={pause(){this.paused=true;},select(id){this.selected=id;},previewScene(scene){this.scene=scene;},update(data){this.data=data;},updateDelivery(data){this.data=data;}};
   const reply=(data,status=200)=>({ok:status<400,status,json:async()=>JSON.parse(JSON.stringify(data))});
   async function fetch(path,options={}){
     const body=options.body?JSON.parse(options.body):null,originalPath=path;
@@ -80,6 +80,7 @@ async function dashboard({hkm=false,empty=false,profiles=null}={}){
     }else if(path.startsWith('/jobs/')){
       const order=orders.find(item=>path.includes('/'+item.job_ids[0]+'/'));
       if(path.endsWith('/run')){
+        if(beforeRun)await beforeRun(order);
         order.fault=body.fault;
         order.status=body.fault?.startsWith('DROP_ACK_')||body.fault?.includes('OBSERVATION')?'UNKNOWN_OUTCOME':['LOGICAL_ESTOP','CELL_FAULT','BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'].includes(body.fault)?'FAILED':'COMPLETED';
         if(body.fault==='LOGICAL_ESTOP')world.cellMode='ESTOP_LOGICAL';
@@ -95,7 +96,7 @@ async function dashboard({hkm=false,empty=false,profiles=null}={}){
         data={state:order.status};
       }else if(path.endsWith('/evidence')){
         const planned=!['BRAIN_INVALID_OUTPUT','BRAIN_TIMEOUT'].includes(order.fault);
-        data={job:{job_id:order.job_ids[0],state:order.status},verifications:[],observations:[],reconciliations:[],
+        data={job:{job_id:order.job_ids[0],order_id:order.order_id,line:order.lines[0],state:order.status},verifications:[],observations:[],reconciliations:[],
           command:planned?{command_id:'command-'+order.job_ids[0],product_id:order.lines[0].product_id}:null,
           journal:planned?{status:order.fault==='DROP_ACK_BEFORE_EFFECT'?'FAILED':'SUCCEEDED',effect_count:order.fault==='DROP_ACK_BEFORE_EFFECT'?0:1}:null};
       }
@@ -281,17 +282,21 @@ test('guide directs attention once; choosing evidence and inspecting it never su
   await el('create').onclick();
   assert.match(el('guide-title').textContent,/product-red: outcome uncertain/);
   assert.equal(el('stage-2').getAttribute('aria-current'),'step');
-  assert.equal(el('review-panel').open,true);assert.equal(el('setup-panel').open,false);
-  assert.equal(el('review-heading').focusCount,1);
+  assert.equal(el('investigation-dialog').open,false);
+  assert.equal(el('review-heading').focusCount,undefined);
+  assert.equal(el('inspect-selected').getAttribute('data-attention'),'true');
   assert.match(el('review-journal').textContent,/1 pick effect/);
   assert.match(el('review-observation').textContent,/No post-pick observation has been assessed/);
   const start=posts.length;
   el('observation').value='CONTRADICTORY_OBSERVATION';el('observation').onchange();
   assert.match(el('observation-help').textContent,/conflicting evidence/);
-  await refresh();await refresh();assert.equal(el('review-heading').focusCount,1);
-  await el('guide-action').onclick();assert.equal(el('review-heading').focusCount,2);
-  await el('view-evidence').onclick();assert.equal(el('evidence-details').open,true);
-  assert.equal(el('timeline-panel').focusCount,1);
+  await refresh();await refresh();assert.equal(el('review-heading').focusCount,undefined);
+  await el('guide-action').onclick();assert.equal(el('review-heading').focusCount,1);
+  assert.equal(el('investigation-dialog').open,true);
+  await el('view-evidence').onclick();assert.equal(el('pane-evidence').hidden,false);
+  assert.equal(el('journal-details').open,true);assert.equal(el('observation-details').open,true);
+  assert.equal(el('timeline-panel').open,false);assert.equal(el('evidence-details').open,false);
+  assert.equal(el('tab-evidence').focusCount,1);
   el('use-normal').onclick();assert.equal(el('observation').value,'');
   assert.equal(el('resolve-blocker').focusCount,1);assert.equal(posts.length,start);
   assert.equal(orders[0].status,'UNKNOWN_OUTCOME');
@@ -304,6 +309,7 @@ test('guide directs attention once; choosing evidence and inspecting it never su
 
 test('human review stays available for repeated bad observations without focus stealing',async()=>{
   const {el,posts,refresh}=await dashboard();el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('create').onclick();
+  await el('guide-action').onclick();
   el('observation').value='LOW_CONFIDENCE_OBSERVATION';await el('resolve-blocker').onclick();
   assert.match(el('guide-title').textContent,/your review is needed/);
   assert.equal(el('resolve-blocker').disabled,false);assert.equal(el('review-panel').open,true);
@@ -318,9 +324,56 @@ test('guide review and full evidence target the active blocker while an earlier 
   el('delivery').value=groups[0].delivery_id;await el('delivery').onchange();
   assert.equal(el('orders').value,orders[0].job_ids[0]);assert.match(el('review-identity').textContent,/Job job-1/);
   const start=posts.length;await el('guide-action').onclick();
-  assert.equal(el('orders').value,orders[1].job_ids[0]);assert.equal(posts.length,start);
+  assert.equal(el('orders').value,orders[0].job_ids[0]);assert.equal(posts.length,start);
+  assert.match(el('inspection-context').textContent,/Job job-1/);
+  assert.equal(JSON.parse(el('evidence').textContent).job.job_id,orders[1].job_ids[0]);
   el('delivery').value=groups[0].delivery_id;await el('delivery').onchange();
-  await el('view-evidence').onclick();assert.equal(el('orders').value,orders[1].job_ids[0]);assert.equal(posts.length,start);
+  await el('view-evidence').onclick();assert.equal(el('orders').value,orders[0].job_ids[0]);assert.equal(posts.length,start);
+  assert.equal(JSON.parse(el('evidence').textContent).job.job_id,orders[1].job_ids[0]);
+  assert.equal(el('job-state').textContent,'UNKNOWN_OUTCOME');
+  assert.equal(el('status-command').textContent,'command-job-1');
+  assert.match(el('command').textContent,/command-job-1/);
+});
+
+test('polling during slow planning keeps the newly submitted job before its delivery entry exists',async()=>{
+  const ui=await dashboard({beforeRun:async order=>{
+    await ui.refresh();
+    assert.equal(ui.el('orders').value,order.job_ids[0]);
+    assert.match(ui.el('selected-result').textContent,/RECEIVED/);
+  }});
+  await ui.el('create').onclick();await ui.el('create').onclick();
+  assert.equal(ui.el('orders').value,'job-1');assert.equal(ui.orders.length,2);
+});
+
+test('inspection tabs and return preserve selection and never submit work; changing tests closes old context',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();
+  const selection=ui.el('orders').value,replay=ui.player.selected,start=ui.posts.length;
+  await ui.el('inspect-selected').onclick();assert.equal(ui.player.paused,true);
+  ui.el('tab-manual').onclick();assert.equal(ui.el('pane-manual').hidden,false);
+  assert.match(ui.el('manual-requests').textContent,/\/jobs\/job-0\/evidence/);
+  await ui.refresh();assert.equal(ui.el('pane-manual').hidden,false);
+  ui.el('return-simulation').onclick();assert.equal(ui.el('investigation-dialog').open,false);
+  assert.equal(ui.el('orders').value,selection);assert.equal(ui.player.selected,replay);
+  await ui.el('inspect-selected').onclick();assert.equal(ui.el('pane-manual').hidden,false);
+  assert.equal(ui.el('tab-manual').focusCount,1);assert.equal(ui.posts.length,start);
+  await createSelectedTest(ui);assert.equal(ui.el('investigation-dialog').open,false);
+  assert.equal(ui.el('inspect-selected').disabled,true);assert.equal(ui.el('orders').value,'');
+});
+
+test('request and refresh errors are identified as app problems without rewriting the recorded outcome',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();
+  ui.failNext('/cell/reset');ui.failNext('/orders');await ui.el('reset').onclick();
+  assert.equal(ui.el('message').getAttribute('data-kind'),'error');
+  assert.match(ui.el('message').textContent,/App request problem.*separate from the recorded simulation outcome/);
+  assert.equal(ui.orders[0].status,'COMPLETED');assert.equal(ui.posts.filter(p=>p.path.endsWith('/run')).length,1);
+});
+
+test('technical confidence uses the assessed sensor record, never a later favorable planning capture',async()=>{
+  const ui=await dashboard({hkm:true});
+  const observation=(id,confidence)=>({observation_id:id,model_version:'synthetic-observer-2',calibration_version:'hkm-cal-1',objects:[{product_id:'product-SKU-A-01',confidence}]});
+  ui.evidence({job:{job_id:'a',line:{product_id:'product-SKU-A-01'}},command:{product_id:'product-SKU-A-01'},observations:[observation('assessed',.35),observation('planning',1)],verifications:[{observation_id:'assessed',reason:'LOW_CONFIDENCE'}]});
+  assert.match(ui.el('status-observation').textContent,/35%.*LOW_CONFIDENCE/);
+  assert.doesNotMatch(ui.el('status-observation').textContent,/100%/);
 });
 
 for(const fault of ['LOGICAL_ESTOP','CELL_FAULT'])test(fault+': guide resets the cell explicitly without rerunning',async()=>{

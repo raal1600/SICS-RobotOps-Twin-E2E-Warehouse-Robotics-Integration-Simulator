@@ -6,6 +6,17 @@ strict types, security, eight deterministic Blender scenarios, documentation dri
 checks and publication. Blender and PDF system libraries are required. Installation
 and vulnerability auditing may use the network; runtime tests and demos do not.
 
+The investigation revision adds eight UI-INV MUSTs to the 110 existing criteria.
+The full suite includes `tests/browser/test_investigation.py`: real Chromium,
+real loopback HTTP/SQLite, both synthetic and Blender runtimes, desktop and compact
+journeys, evidence downloads, conservative re-observation and an explicit service
+error. Browser setup installs the locked Playwright browser; a missing executable
+fails rather than skips. Screenshots/traces/request records and results are saved
+under `artifacts/investigation-browser/`, uploaded by CI. The baseline report at
+`docs/evidence/investigation-ui-baseline/` remains historical. Browser pass results
+are functionality evidence, not proof of first-time usability; that assessment is
+recorded separately in the [investigation guide](investigation.md) and final review.
+
 The command writes dated evidence under `docs/evidence/acceptance/` and regenerates
 `ACCEPTANCE_REPORT.md`. The explicit mapping is `docs/acceptance-map.json`. A test
 requirement passes only if its named test was collected and passed in both runs;

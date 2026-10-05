@@ -5,11 +5,10 @@
 <header><div><small>ROBOTOPS TWIN</small><h1>Simulation workspace</h1></div><p>Local &middot; deterministic &middot; synthetic</p></header>
 <main>
 <section class="panel test-toolbar" aria-label="Simulation tests">
-  <div class="test-picker"><label for="test-history">Your simulation tests</label><select id="test-history"></select></div>
+  <div class="test-picker"><label for="test-history">Simulation test</label><select id="test-history"></select></div>
   <button id="return-current" class="secondary" hidden>Return to current test</button>
   <button id="new-test" class="secondary" disabled>Start new test</button>
-  <button id="delete-test" class="secondary danger" disabled>Delete selected test</button>
-  <button id="clear-tests" class="secondary danger" disabled>Clear all test data</button>
+  <details class="manage-data"><summary>Manage test data</summary><button id="delete-test" class="secondary danger" disabled>Delete selected test</button><button id="clear-tests" class="secondary danger" disabled>Clear all test data</button></details>
   <p id="test-status" class="muted" role="status">Loading test history.</p>
 </section>
 <dialog id="new-test-dialog" aria-labelledby="new-test-title">
@@ -33,21 +32,24 @@
   <button id="empty-new-test">Start new test</button>
 </section>
 <ol class="workflow-steps" id="test-workflow-steps" aria-label="Test workflow">
-  <li id="stage-0" aria-current="step"><span>1</span> Prepare</li><li id="stage-1"><span>2</span> Run</li>
-  <li id="stage-2"><span>3</span> Review</li><li id="stage-3"><span>4</span> Continue</li>
-</ol>
+<li id="stage-0" aria-current="step"><span>1</span> Set up</li><li id="stage-1"><span>2</span> Watch</li><li id="stage-2"><span>3</span> Investigate</li><li id="stage-3"><span>4</span> Continue</li></ol>
 <p id="message" role="status" aria-live="polite"></p>
-<div class="grid" id="test-workspace"><aside aria-label="Guided test controls">
+<div id="test-workspace">
 <section class="panel guide" id="workflow-guide" data-tone="neutral" aria-labelledby="guide-title">
   <div class="eyebrow" id="guide-label">NEXT STEP</div>
   <div aria-live="polite" aria-atomic="true"><h2 id="guide-title">Loading your test</h2><p id="guide-detail">Reading the saved workflow state.</p></div>
   <button id="guide-action" class="secondary" disabled>Loading…</button>
 </section>
+<div class="grid"><aside aria-label="Run a simulation">
+<p class="cell-task">Move one product from its source box to the output tote. A normal pick ends with a reliable check that it arrived.</p>
 <details class="panel control-panel" id="setup-panel" open>
-  <summary>Set up a pick <span class="muted">Product &amp; scenario</span></summary>
+  <summary>Run a pick</summary>
   <label for="product">Product</label><select id="product"></select>
   <label for="scenario">Execution scenario</label><select id="scenario" aria-describedby="scenario-scope scenario-meaning scenario-difference scenario-help"><option value="">Happy path</option><option value="DROP_ACK_AFTER_EFFECT">Lose acknowledgement after effect</option><option value="DROP_ACK_BEFORE_EFFECT">Lose acknowledgement before effect</option><option value="CONTRADICTORY_OBSERVATION">Contradictory observation</option><option value="LOW_CONFIDENCE_OBSERVATION">Low-confidence observation</option><option value="STALE_OBSERVATION">Stale observation</option><option value="LOGICAL_ESTOP">Logical E-stop</option><option value="CELL_FAULT">Cell fault</option><option value="BRAIN_INVALID_OUTPUT">Invalid Brain output</option><option value="BRAIN_TIMEOUT">Brain timeout</option></select>
-  <p id="scenario-scope" class="muted selector-scope">Applied when you create and run a new order. Observation faults here affect that order's first check after the pick.</p>
+  <p id="scenario-brief" class="scenario-brief"></p>
+  <p class="watch-for"><strong>Watch for:</strong> <span id="scenario-watch"></span></p>
+  <button id="create" disabled>Create and run order</button><p id="inventory-status" class="muted" role="status">Checking product availability.</p>
+  <details class="more-controls"><summary>More about this scenario &amp; test controls</summary>  <p id="scenario-scope" class="muted selector-scope">Applied when you create and run a new order. Observation faults here affect that order's first check after the pick.</p>
   <div class="choice-explanation">
     <p id="scenario-phase" class="choice-phase"></p>
     <h3>What this simulates</h3><p id="scenario-meaning"></p>
@@ -58,25 +60,47 @@
     <div class="comparison-scroll" tabindex="0" role="region" aria-label="Execution scenario comparison"><table><thead><tr><th scope="col">Scenario</th><th scope="col">What changes</th></tr></thead><tbody id="scenario-comparisons"></tbody></table></div>
     <p class="muted">Descriptions assume the standard test settings. The recorded evidence determines the actual outcome.</p>
   </details>
-  <button id="create" disabled>Create and run order</button><p id="inventory-status" class="muted" role="status">Checking product availability.</p>
   <button id="tool-showcase" class="secondary" hidden disabled>Run six-tool showcase (happy path)</button>
   <details><summary>Restock this test</summary><button id="fresh-scene" class="secondary" disabled>Start fresh scene</button><p class="muted">Restock this world after all jobs are resolved. Start new test above gives you an independent combination and preserves this result in history.</p></details>
+  </details>
 </details>
-<details class="panel control-panel" id="review-panel">
-  <summary id="review-heading">Review evidence <span id="review-label" class="muted">Original pick</span></summary>
-  <p id="review-identity" class="muted"></p>
-  <div id="next-step" class="next-step" hidden><h3 id="next-step-title"></h3><p id="next-step-detail"></p></div>
-  <dl class="evidence-summary">
-    <dt>Controller journal</dt><dd id="review-journal">No pick yet.</dd>
-    <dt>Observation</dt><dd id="review-observation">No assessment yet.</dd>
-    <dt>Decision</dt><dd id="review-decision">Run an order to begin.</dd>
-  </dl>
-  <p id="review-attempts" class="muted"></p>
-  <button id="view-evidence" class="text-button" disabled>Inspect full evidence &amp; timeline</button>
-  <div id="observation-controls">
-    <label for="observation">Observation for this review</label><select id="observation" aria-describedby="observation-scope observation-meaning observation-difference observation-help"><option value="">Normal observation</option><option value="CONTRADICTORY_OBSERVATION">Contradictory evidence</option><option value="LOW_CONFIDENCE_OBSERVATION">Low confidence</option><option value="STALE_OBSERVATION">Stale evidence</option><option value="MISSING_OBSERVATION">Missing evidence</option></select>
-    <p id="observation-scope" class="muted selector-scope">Applied when you Reconcile or Observe again. It changes only the new evidence for the original pick; it never sends another pick.</p>
-    <div class="choice-explanation">
+<details class="panel control-panel" id="cell-tools">
+  <summary>Cell &amp; diagnostics</summary><button class="secondary" id="reset">Reset logical cell state</button>
+  <p class="muted">Reset clears a logical stop or fault. It preserves products and uncertain jobs.</p>
+  <p id="runtime" class="muted"></p><a id="metrics-link" href="/metrics" target="_blank">Open metrics</a> &middot; <a href="/docs" target="_blank">API contract</a>
+  <p class="muted">Blender is synthetic test state, not validated robot dynamics. Logical E-stop is not safety-rated.</p>
+</details>
+</aside><div class="workspace">
+<section class="panel" id="motion-panel">
+<div class="motion-heading"><h2>The robotic cell</h2><span id="cell-summary" class="muted">Cell: loading</span><span class="motion-badge" id="motion-outcome">No job selected</span></div>
+<div class="selected-incident"><p id="selected-result" class="muted">Ready for your first pick.</p><button id="inspect-selected" class="secondary" disabled>Investigate this pick</button></div>
+<p id="motion-scenario" class="muted">Choose an execution scenario on the left.</p><p id="motion-state" class="muted" role="status">Loading 3D cell</p><div class="scene-stage"><canvas id="motion-canvas" width="1000" height="600" tabindex="0" role="img" aria-label="Recorded Blender motion">Animated illustration of the recorded Blender scene. The current phase is also shown below.</canvas><div id="motion-event" role="status">Loading environment</div></div><p id="motion-phase">Cell ready</p><p id="motion-tool" class="muted"></p><div class="motion-controls"><button id="motion-play" disabled>Play</button><button id="motion-replay" class="secondary" disabled>Replay</button><button id="motion-step-back" class="secondary" disabled aria-label="Step backward">Previous frame</button><button id="motion-step-forward" class="secondary" disabled aria-label="Step forward">Next frame</button><input id="motion-scrub" type="range" min="0" max="99" value="0" aria-label="Scenario replay position" disabled><label for="motion-speed">Speed</label><select id="motion-speed" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="motion-import" hidden>Load saved animation</button><p id="motion-detail" class="muted">The environment stays visible in every scenario.</p><div class="camera-controls" role="group" aria-label="Presentation camera"><button id="camera-operator" class="secondary">Operator</button><button id="camera-overhead" class="secondary">Overhead</button><button id="camera-side" class="secondary">Side inspection</button><button id="camera-follow" class="secondary">Follow TCP</button></div><details class="viewer-details"><summary>Camera, replay selection &amp; illustration details</summary><div class="view-controls"><button id="motion-rotate" class="secondary">Rotate</button><button id="motion-zoom-in" class="secondary" aria-label="Zoom in">+</button><button id="motion-zoom-out" class="secondary" aria-label="Zoom out">&minus;</button><button id="motion-home" class="secondary">Reset camera</button><span id="motion-renderer">3D viewer</span></div><p class="muted">Drag to orbit &middot; scroll to zoom &middot; right-drag or Shift-drag to pan.</p><details class="replay-options"><summary>Choose delivery or product replay</summary><label for="delivery">Delivery replay</label><select id="delivery"></select><label for="replay-scope">Replay scope</label><select id="replay-scope"><option value="delivery">Full delivery (all products)</option><option value="product">Selected product execution</option></select><label for="orders">Product execution details</label><select id="orders"><option value="">No orders yet</option></select></details><p class="muted legend motion-note">The 3D view shows recorded simulator movement. It is not the sensor report used to confirm a pick. Replay never sends a command.</p></details></section>
+<details class="panel control-panel" id="simulation-boundaries"><summary>Simulation boundaries</summary><p>HKM1800-inspired visualization built from original procedural geometry. Not Cognibotics CAD or validated HKM1800 kinematics. Not validated robot dynamics or safety-certified. Not SICS AI proprietary software.</p><p>Synthetic observations come from a deterministic observation model; camera images are not analyzed by computer vision. Workspace and collision preflight are conservative simulation logic. Motion timings are presentation timings, not measured robot performance.</p><p>Camera controls and replay change only the view. A visible product movement does not prove business completion; verification requires the observation contract.</p></details>
+<details class="panel control-panel" id="visual-panel" hidden><summary>Technical details <span class="muted">Saved Blender snapshot</span></summary><h3>Saved Blender snapshot for this order</h3><img id="visual" alt="Saved Blender snapshot for the selected order"><p class="muted">Static checkpoint for reference. Use the 3D view above to replay what happened. Verification uses the observation contract, not this image.</p></details>
+</div></div></div>
+<dialog id="investigation-dialog" aria-labelledby="investigation-title">
+  <header class="inspection-header"><div><small>INVESTIGATION</small><h2 id="investigation-title">Inspect this pick</h2><p id="inspection-context" class="muted"></p></div><button id="return-simulation" class="secondary">Back to simulation</button></header>
+  <nav class="inspection-tabs" role="tablist" aria-label="Investigation views">
+    <button id="tab-findings" role="tab" aria-controls="pane-findings" aria-selected="true">What happened</button>
+    <button id="tab-evidence" role="tab" aria-controls="pane-evidence" aria-selected="false" tabindex="-1">Evidence</button>
+    <button id="tab-manual" role="tab" aria-controls="pane-manual" aria-selected="false" tabindex="-1">Manual inspection</button>
+  </nav>
+  <div class="inspection-notices"><p class="muted">Replay paused while you inspect. Returning keeps your view; press Play to continue the replay.</p><p id="inspection-error" class="dialog-error" role="alert"></p></div>
+  <div class="inspection-body">
+  <section id="pane-findings" role="tabpanel" aria-labelledby="tab-findings">
+    <details id="review-panel" open><summary id="review-heading">What happened?</summary>
+      <p id="review-label" class="muted"></p><details><summary>Order and command identifiers</summary><p id="review-identity" class="muted"></p></details>
+      <div class="finding"><h3>Observed symptom</h3><p id="inspection-symptom">Select a pick to inspect its saved result.</p></div>
+      <div class="finding"><h3>Confirmed in the records</h3><p id="inspection-finding"></p></div>
+      <div class="finding"><h3>What this does not tell us</h3><p id="inspection-limit"></p></div>
+      <details><summary>Possible explanation · not a finding</summary><p id="inspection-hypothesis"></p></details>
+      <p class="inspection-next" id="inspection-next"></p>
+      <button id="view-evidence" class="secondary" disabled>Inspect the supporting evidence</button>
+      <div id="next-step" class="next-step" hidden><h3 id="next-step-title"></h3><p id="next-step-detail"></p></div>
+        <div id="observation-controls">
+    <label for="observation">Sensor report for the next check</label><select id="observation" aria-describedby="observation-scope observation-meaning observation-difference observation-help"><option value="">Normal observation</option><option value="CONTRADICTORY_OBSERVATION">Contradictory evidence</option><option value="LOW_CONFIDENCE_OBSERVATION">Low confidence</option><option value="STALE_OBSERVATION">Stale evidence</option><option value="MISSING_OBSERVATION">Missing evidence</option></select>
+    <p id="observation-scope" class="muted selector-scope">Choose how clearly the simulated sensors can see the box. Then check its position again. The robot does not move.</p>
+    <details class="sensor-explanation"><summary>What does this report choice mean?</summary><div class="choice-explanation">
       <p id="observation-phase" class="choice-phase"></p>
       <h3>What this simulates</h3><p id="observation-meaning"></p>
       <h3>Key difference</h3><p id="observation-difference"></p>
@@ -86,23 +110,39 @@
       <div class="comparison-scroll" tabindex="0" role="region" aria-label="Observation mode comparison"><table><thead><tr><th scope="col">Observation</th><th scope="col">What changes</th></tr></thead><tbody id="observation-comparisons"></tbody></table></div>
       <p class="muted">These modes alter the observation contract, not the products in the scene. Expected assessments assume the standard test settings.</p>
     </details>
+    </details>
     <button id="use-normal" class="text-button" hidden>Use normal observation</button>
     <button id="resolve-blocker" disabled hidden>Reconcile previous pick</button><button id="reconcile" disabled>Reconcile selected job</button>
     <p class="muted legend">This checks the original pick without picking again. If evidence is still insufficient, you can change the observation and review again here. Viewing evidence alone does not resolve a pick.</p>
   </div>
-</details>
-<details class="panel control-panel" id="cell-tools">
-  <summary>Cell &amp; diagnostics</summary><button class="secondary" id="reset">Reset logical cell state</button>
-  <p class="muted">Reset clears a logical stop or fault. It preserves products and uncertain jobs.</p>
-  <p id="runtime" class="muted"></p><a id="metrics-link" href="/metrics" target="_blank">Open metrics</a> &middot; <a href="/docs" target="_blank">API contract</a>
-  <p class="muted">Blender is synthetic test state, not validated robot dynamics. Logical E-stop is not safety-rated.</p>
-</details>
-</aside><div class="workspace">
-<section class="panel" id="motion-panel"><div class="motion-heading"><h2>Live cell &amp; replay</h2><span class="motion-badge" id="motion-outcome">No job selected</span></div><dl class="operator-status" id="operator-status"><div><dt>Selected order</dt><dd id="status-order">No order selected</dd></div><div><dt>Selected job</dt><dd id="status-job">No job selected</dd></div><div><dt>Original command</dt><dd id="status-command">Not dispatched</dd></div><div><dt>Cell state</dt><dd id="status-cell">Loading</dd></div><div><dt>Product / SKU</dt><dd id="status-product">No order selected</dd></div><div><dt>Active tool telemetry</dt><dd id="status-tool">Not observed yet</dd></div><div><dt>Observation</dt><dd id="status-observation">Not captured</dd></div><div><dt>Calibration</dt><dd id="status-calibration">Not observed</dd></div></dl><details class="replay-options"><summary>Choose delivery or product replay</summary><label for="delivery">Delivery replay</label><select id="delivery"></select><label for="replay-scope">Replay scope</label><select id="replay-scope"><option value="delivery">Full delivery (all products)</option><option value="product">Selected product execution</option></select><label for="orders">Product execution details</label><select id="orders"><option value="">No orders yet</option></select></details><p id="motion-scenario" class="muted">Choose an execution scenario on the left.</p><p id="motion-state" class="muted" role="status">Loading 3D cell</p><div class="scene-stage"><canvas id="motion-canvas" width="1000" height="600" tabindex="0" role="img" aria-label="Recorded Blender motion">Animated illustration of the recorded Blender scene. The current phase is also shown below.</canvas><div id="motion-event" role="status">Loading environment</div></div><div class="camera-controls" role="group" aria-label="Presentation camera"><button id="camera-operator" class="secondary">Operator</button><button id="camera-overhead" class="secondary">Overhead</button><button id="camera-side" class="secondary">Side inspection</button><button id="camera-follow" class="secondary">Follow TCP</button></div><div class="view-controls"><button id="motion-rotate" class="secondary">Rotate</button><button id="motion-zoom-in" class="secondary" aria-label="Zoom in">+</button><button id="motion-zoom-out" class="secondary" aria-label="Zoom out">&minus;</button><button id="motion-home" class="secondary">Reset camera</button><span id="motion-renderer">3D viewer</span></div><p class="muted">Drag to orbit &middot; scroll to zoom &middot; right-drag or Shift-drag to pan.</p><p id="motion-phase">Cell ready</p><p id="motion-tool" class="muted"></p><div class="motion-controls"><button id="motion-play" disabled>Play</button><button id="motion-replay" class="secondary" disabled>Replay</button><button id="motion-step-back" class="secondary" disabled aria-label="Step backward">Previous frame</button><button id="motion-step-forward" class="secondary" disabled aria-label="Step forward">Next frame</button><input id="motion-scrub" type="range" min="0" max="99" value="0" aria-label="Scenario replay position" disabled><label for="motion-speed">Speed</label><select id="motion-speed" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="motion-import" hidden>Load saved animation</button><p id="motion-detail" class="muted">The environment stays visible in every scenario.</p><p class="muted legend motion-note">Scene and recorded Blender poses are illustration, not sensor evidence. Events replay in order at a readable pace; their original timestamps remain in the causal timeline. Replay never sends a pick. A visible move does not resolve uncertainty.</p></section>
-<section class="panel" id="robot-decision"><h2>Why this tool?</h2><p id="tool-decision">Run a pick to inspect the persisted selection.</p><div class="table-wrap"><table><thead><tr><th>Tool</th><th>Score / decision</th><th>Constraints and reasons</th></tr></thead><tbody id="tool-candidates"></tbody></table></div><p class="muted">Compatibility, mass and geometry rules are synthetic fixture constraints. Selection uses observed cell telemetry.</p></section>
-<section class="panel"><h2>Order and cell status</h2><div class="statuses"><div class="status"><small>ERP ORDER</small><strong id="order-state">—</strong></div><div class="status"><small>PICK JOB</small><strong id="job-state">—</strong></div><div class="status"><small>CELL</small><strong id="cell-state">—</strong></div></div><p id="business-identity" class="muted"></p><p id="knowledge-state" class="knowledge-state"></p><h3>Verification</h3><p id="verdict" class="muted">Create an order to begin.</p><p id="command" class="muted"></p></section>
-<section class="panel" id="timeline-panel" tabindex="-1"><h2>Causal timeline</h2><div class="table-wrap"><table><thead><tr><th>Time / component</th><th>Event / transition</th><th>Reason</th></tr></thead><tbody id="timeline"></tbody></table></div><details id="evidence-details"><summary>Inspect command, observation and reconciliation evidence</summary><pre id="evidence">No evidence yet.</pre></details></section>
-<details class="panel control-panel" id="simulation-boundaries"><summary>Simulation boundaries</summary><p>HKM1800-inspired visualization built from original procedural geometry. Not Cognibotics CAD or validated HKM1800 kinematics. Not validated robot dynamics or safety-certified. Not SICS AI proprietary software.</p><p>Synthetic observations come from a deterministic observation model; camera images are not analyzed by computer vision. Workspace and collision preflight are conservative simulation logic. Motion timings are presentation timings, not measured robot performance.</p><p>Camera controls and replay change only the view. A visible product movement does not prove business completion; verification requires the observation contract.</p></details>
-<details class="panel control-panel" id="visual-panel" hidden><summary>Technical details <span class="muted">Saved Blender snapshot</span></summary><h3>Saved Blender snapshot for this order</h3><img id="visual" alt="Saved Blender snapshot for the selected order"><p class="muted">Static checkpoint for reference. Use the 3D view above to replay what happened. Verification uses the observation contract, not this image.</p></details>
-</div></div><footer>Local simulation only. No external model account, GPU or real industrial hardware required.</footer></main>
+
+    </details>
+  </section>
+  <section id="pane-evidence" role="tabpanel" aria-labelledby="tab-evidence" hidden>
+    <p class="muted">Records for this pick. Expand any source to inspect its exact values and causal IDs.</p>
+    <details id="journal-details"><summary>1. Original command &amp; controller journal</summary><p id="review-journal"></p><pre id="journal-record"></pre></details>
+    <details id="observation-details"><summary>2. Sensor report used for the latest decision</summary><p id="review-observation"></p><p id="inspection-observation"></p><pre id="observation-record"></pre></details>
+    <details id="decision-details"><summary>3. Verification &amp; earlier review attempts</summary><p id="review-decision"></p><p id="review-attempts" class="muted"></p><pre id="decision-record"></pre></details>
+    <details id="robot-decision"><summary>Why this tool? · recorded planning decision</summary><p id="tool-decision">Run a pick to inspect the persisted selection.</p><div class="table-wrap"><table><thead><tr><th>Tool</th><th>Score / decision</th><th>Constraints and reasons</th></tr></thead><tbody id="tool-candidates"></tbody></table></div><p class="muted">Compatibility, mass and geometry rules are synthetic fixture constraints. Selection uses observed cell telemetry.</p></details>
+<details id="technical-status"><summary>Exact workflow state and identifiers</summary><dl class="operator-status" id="operator-status"><div><dt>Selected order</dt><dd id="status-order">No order selected</dd></div><div><dt>Selected job</dt><dd id="status-job">No job selected</dd></div><div><dt>Original command</dt><dd id="status-command">Not dispatched</dd></div><div><dt>Cell state</dt><dd id="status-cell">Loading</dd></div><div><dt>Product / SKU</dt><dd id="status-product">No order selected</dd></div><div><dt>Active tool telemetry</dt><dd id="status-tool">Not observed yet</dd></div><div><dt>Observation</dt><dd id="status-observation">Not captured</dd></div><div><dt>Calibration</dt><dd id="status-calibration">Not observed</dd></div></dl><div class="statuses"><div class="status"><small>ERP ORDER</small><strong id="order-state">—</strong></div><div class="status"><small>PICK JOB</small><strong id="job-state">—</strong></div><div class="status"><small>CELL</small><strong id="cell-state">—</strong></div></div><p id="business-identity" class="muted"></p><p id="knowledge-state" class="knowledge-state"></p><h3>Verification</h3><p id="verdict" class="muted">Create an order to begin.</p><p id="command" class="muted"></p></details>
+
+    <details id="timeline-panel" tabindex="-1"><summary id="timeline-summary">Event timeline</summary><p class="muted">Events for this job and shared order events. Select a row for its full record.</p>
+      <label for="timeline-filter">Show events</label><select id="timeline-filter"><option value="attention">Important changes</option><option value="all">All events for this job</option></select>
+      <div class="timeline-scroll" tabindex="0" role="region" aria-label="Bounded event timeline"><table><thead><tr><th>Time / component</th><th>Event / transition</th><th>Reason</th></tr></thead><tbody id="timeline"></tbody></table></div>
+      <details id="event-details"><summary>Selected event · full record</summary><pre id="event-record">Select an event above.</pre></details>
+    </details>
+    <details id="evidence-details"><summary>All structured evidence · JSON</summary><pre id="evidence">No evidence yet.</pre></details>
+  </section>
+  <section id="pane-manual" role="tabpanel" aria-labelledby="tab-manual" hidden>
+    <h3>Continue the investigation outside this panel</h3><p class="muted">These read-only requests target the same saved test and job. They do not run or reconcile a pick.</p>
+    <p id="manual-identity"></p><pre id="manual-requests"></pre>
+    <button id="download-evidence" class="secondary" disabled>Download evidence &amp; events (JSON)</button>
+    <h3>Reproduce the test</h3><p id="manual-reproduce"></p><p class="muted">Create a separate test; do not retry an uncertain command to reproduce a fault. Earlier sensor-review faults are listed in the downloaded events.</p>
+    <h3>Where to look in the repository</h3><ul id="manual-sources"></ul>
+    <h3>Local files</h3><p class="muted">The API JSON above is the simplest way to inspect the persisted records. On the desktop, the default data root is <code>%LOCALAPPDATA%\RobotOpsTwin\data</code>. For the CLI, use the directory passed to <code>--data-dir</code>.</p><p id="manual-storage" class="muted"></p>
+    <p class="muted">Workflow events are stored in <code>workflow.db</code> (events table); the controller journal and world configuration are in <code>runtime.db</code>. Custom database names may differ. Blender artifacts are under <code>blender-artifacts</code>. Desktop process logs are under <code>%LOCALAPPDATA%\RobotOpsTwin\sessions</code>; CLI process logs go to its terminal. Inspect a copy of databases; avoid editing a running test.</p>
+  </section>
+  </div>
+</dialog>
+<footer>Local simulation only. No external model account, GPU or real industrial hardware required.</footer></main>
 <script src="/ui/scene-view.js"></script><script src="/ui/playback.js"></script><script src="/ui/workflow-guide.js"></script><script src="/ui/app.js"></script></body></html>

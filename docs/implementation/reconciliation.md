@@ -22,7 +22,7 @@ dependency and runtime type tests prohibit truth substitution.
 
 Before acknowledgement loss is reconciled, the job remains UNKNOWN_OUTCOME.
 The whole cell pauses further picks, including other products. The dashboard
-names this blocking product in **Review evidence** and offers Reconcile [product].
+names this blocking product in the investigation panel and offers Reconcile [product].
 With Normal observation selected, this queries that original job even if another
 execution is selected for viewing. A resolved job unlocks the next explicit order;
 an inconclusive result keeps the cell blocked and offers **Observe again**.

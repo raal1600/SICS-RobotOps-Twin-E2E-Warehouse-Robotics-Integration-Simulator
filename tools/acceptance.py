@@ -94,6 +94,16 @@ SYNC_FILES = [
     "contracts/schemas/ClearTestsRequest.json",
     "contracts/schemas/TestDeletion.json",
     "docs/evidence/test-lifecycle-baseline/README.md",
+    "SUCCESS_CRITERIA.md",
+    "HANDOFF.md",
+    "docs/adr/0012-evidence-driven-investigation.md",
+    "docs/implementation/investigation.md",
+    "docs/evidence/investigation-ui-baseline/provenance.json",
+    "docs/evidence/investigation-ui-development/README.md",
+    "Makefile",
+    "pyproject.toml",
+    "uv.lock",
+    ".github/workflows/ci.yml",
 ]
 
 
@@ -329,13 +339,19 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
         "",
         "The cell, machine and products remain visible for every scenario. Immutable starting scenes and audit events cover no-motion orders; evaluated Blender poses cover actual movement. Replay is read-only and cannot resolve uncertainty. [Scenario behavior](docs/implementation/playback.md), [browser evidence](docs/evidence/3d-scenarios.json) and [ADR 0004](docs/adr/0004-full-3d-scenario-replay.md) document the presentation boundary, offline renderer/fallback, Windows file publication and aligned native drain budgets. Scene history, every execution fault, carried-product poses and immutable replay are exercised by the mandatory suite.",
         "",
+        "## Investigation workflow revision",
+        "",
+        "ADR 0012 keeps run/scenario guidance and the cell central, highlights unusual outcomes and provides a bounded What happened / Evidence / Manual inspection panel. Symptoms, confirmed record contents and possible explanations stay separate. Exact assessed observations are linked by ID; current selectors, replay and private world truth never establish a verdict. Inspection preserves test/job/replay context, pauses only presentation and keeps the event timeline secondary. Scoped API requests and JSON downloads support manual investigation without writes. Slow-planning selection and premature snapshot requests are guarded.",
+        "",
+        "The eight UI-INV criteria are additive to all 110 prior MUSTs. Actual Chromium journeys with both synthetic and Blender runtimes exercise normal picks, lost replies, contradictory then normal re-observation, evidence/download/manual inspection, return and saved history at desktop and compact viewports. An intentional service failure checks app-error separation. Screenshots, traces and browser/semantic records are under artifacts/investigation-browser in the CI artifact. [Operator guide and usability limits](docs/implementation/investigation.md) distinguish functional automation from first-time comprehension. [The baseline report](docs/evidence/investigation-ui-baseline/README.md) preserves earlier acceptance; it does not attest this revision.",
+        "",
         "## Documentation drift and synchronization",
         "Test management (ADR 0011): Start new test selects a registered robot-cell profile; only the implemented HKM-inspired cell is currently selectable. Explicit selected-test deletion and clear-all use confirmation, durable request identities and tombstones, bounded file cleanup and response-lifetime locks. An empty workspace survives restart without recreating deleted databases or activating archived uncertain work. Profile metadata, management schemas/OpenAPI, UI, architecture, operations and publication sources are synchronized. [Lifecycle development evidence](docs/evidence/test-management-local/README.md) and [exact-source CI/publication evidence](docs/evidence/test-management-final/README.md) retain their own source attribution; this report's manifest identifies its audited implementation.",
         "Selector explanations: each execution scenario and observation mode includes a definition, affected stage, key difference and expected behavior, with expandable comparisons. Execution selection affects the next order; observation selection affects only a subsequent review capture for the original command. The same selected descriptions feed the comparison tables. Reading help, comparing options and changing selections cannot dispatch or reconcile. [Definitions](docs/implementation/scenarios.md) and [local UI follow-up evidence](docs/evidence/scenario-help-local.json) record the presentation-only change and its separately scoped validation; no fault, state, API or verification rule changed.",
         "",
         "Explicit re-observation (ADR 0008): intervention now permits another operator-requested reconciliation of the same original command. The unchanged verifier governs every result; bad evidence still pauses motion. Fresh observations, causal transitions and previous assessments persist, and restart never automatically clears intervention. State/reconciliation diagrams, normative flow, API contract, UI guidance and operational documents are synchronized. Regressions verify repeated degradations, missing journals, restart, concurrent claims, unchanged effect counts and continuation of the same delivery with real Blender. [Browser/native preservation evidence](docs/evidence/reobservation-local.json) also records the final documentation-only checks against unchanged application/test file hashes.",
         "",
-        "Guided dark workspace (ADR 0009): a persistent next-step card derives from persisted job/evidence state and prioritizes the active unresolved pick over historical replay. Review opens and receives focus once; polling and repeated bad observations preserve focus. Journal, exact assessed observation and latest decision are explained beside explicit re-observation. Pre-pick planning captures and scene truth cannot substitute for assessed evidence. Normal observation selection and viewing full evidence are read-only; no automatic retry or success override exists. Resolved, stopped-cell, depleted-delivery and archived-test states have explicit next actions. UI action/guide tests, confined asset/OpenAPI checks, local browser evidence and native history preservation are recorded in [guided-workflow evidence](docs/evidence/guided-workflow-local.json).",
+        "Historical guided workspace (ADR 0009): a persistent next-step card derives from persisted job/evidence state and prioritizes the active unresolved pick over historical replay. Its automatic review opening is superseded by ADR 0012; polling and repeated bad observations preserve focus. Journal, exact assessed observation and latest decision are explained beside explicit re-observation. Pre-pick planning captures and scene truth cannot substitute for assessed evidence. Normal observation selection and viewing full evidence are read-only; no automatic retry or success override exists. Resolved, stopped-cell, depleted-delivery and archived-test states have explicit next actions. UI action/guide tests, confined asset/OpenAPI checks, local browser evidence and native history preservation are recorded in [guided-workflow evidence](docs/evidence/guided-workflow-local.json).",
         "",
         "Independent tests: Start new test works for every execution/observation combination, retaining selections and preserving prior outcomes/evidence in read-only history. A durable catalog isolates worlds, serializes writes and creation, and recovers only the active test (ADR 0007). Evidence GETs use pure persisted receipts; they cannot complete pending Blender checkpoints. Scenario selection is configuration only, superseding automatic restock. API/schema, architecture and all operational guides are synchronized. Full-delivery replay still concatenates original product clips (ADR 0006); archived playback never changes uncertainty. Browser, combination and native-history evidence: [local verification](docs/evidence/test-lifecycle-local.json). Local execution alone does not attest remote workflows or publication.",
         "",
@@ -402,6 +418,7 @@ def main() -> None:
                 "weasyprint",
                 "bandit",
                 "pip-audit",
+                "playwright",
             )
         },
         "lock_sha256": hashlib.sha256((ROOT / "uv.lock").read_bytes()).hexdigest(),
@@ -444,6 +461,7 @@ def main() -> None:
     python = sys.executable
     uv = shutil.which("uv") or str(Path.home() / ".local/bin/uv.exe")
     run("setup", [uv, "sync", "--locked", "--all-groups"])
+    run("browser_setup", [python, "-m", "playwright", "install", "chromium", "--only-shell"])
     try:
         run("blender_version", [executable(), "--version"])
     except FileNotFoundError as exc:

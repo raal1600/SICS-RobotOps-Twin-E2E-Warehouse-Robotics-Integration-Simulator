@@ -110,3 +110,14 @@ def test_criterion_registry_accepts_both_revisions_without_dropping_legacy_ids(t
     assert {ident for ident in actual if ident.startswith("HKM-")} == {
         f"HKM-VIS-MUST-{number:03d}" for number in range(1, 26)
     }
+
+
+def test_investigation_criteria_are_additive_and_required_by_registry(tmp_path):
+    (tmp_path / "SUCCESS_CRITERIA.md").write_text(
+        "**SC-ARCH-001 MUST**\n**HKM-VIS-MUST-025 MUST**\n**UI-INV-MUST-001 MUST**\n",
+        encoding="utf-8",
+    )
+    assert criterion_ids(tmp_path) == {"SC-ARCH-001", "HKM-VIS-MUST-025", "UI-INV-MUST-001"}
+    assert {ident for ident in criterion_ids() if ident.startswith("UI-INV-")} == {
+        f"UI-INV-MUST-{number:03d}" for number in range(1, 9)
+    }

@@ -1,8 +1,56 @@
 # Goal Progress
-Last updated: 2026-10-04 UTC
+Last updated: 2026-10-05 UTC
 Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
 
-## Current phase: test lifecycle and robot-cell selection accepted at audited source
+## Current phase: investigation workflow redesign (in progress)
+
+Baseline/current source: `0db6168b71bc4b500894fe7695ce082384c777b2`.
+The active goal adds an intuitive run -> notice -> investigate journey. Prior
+110-MUST acceptance remains archived and does not prove this UI revision.
+Baseline browser review confirms a 2,421 px ready page at 1440x1000, with raw
+evidence beginning below 2,220 px before any execution. The motion panel alone
+is 1,304 px tall. All 119 existing Node UI checks pass. Exact baseline report and
+objective hash are preserved in `docs/evidence/investigation-ui-baseline/`.
+
+Implemented: concise setup and central cell; explicit highlighted investigation;
+bounded What happened / Evidence / Manual inspection panel; exact assessed
+observation attribution, pinned test/job context and preserved paused replay;
+collapsed/filtered timeline, scoped GET commands and evidence/event downloads.
+Sensor-report choices explain that the robot does not move during another check.
+Runtime/API/wire schemas, verifier and command/reconciliation rules are unchanged.
+
+Browser findings fixed: slow planning could select an earlier delivery job;
+the optional checkpoint image was requested too early; switching saved tests could
+leave the investigation button clickable before its evidence loaded. Each was
+fixed and rerun, not hidden behind changed outcome assertions. Attention no longer
+automatically covers the cell; the guide and result invite explicit investigation.
+ADR 0012 records this change to ADR 0009's presentation behavior.
+
+Evidence: five actual Chromium cases pass, with both synthetic/Blender runtimes
+and desktop/compact layouts, one-effect conservative reconciliation, independent
+test ownership, archive review, read-only downloads and separate app-error handling.
+The mandatory Node wrapper passes all 132 checks. Affected contracts/API/playback
+passed 141 tests; lint, strict types, security, drift and publication build pass.
+[Development evidence and visual assessment](docs/evidence/investigation-ui-development/README.md)
+retain source hashes, logs, JUnit, screenshots and the limits of this usability
+review. No user test data was changed or deleted.
+
+Eight additive UI-INV MUSTs bring the current total to 118. No full MUST pass is
+claimed yet for this revision: the current acceptance report marks missing full
+and remote gates as FAIL. Historical accepted results remain separately archived.
+Synchronized plan, handoff, checklist, criteria/mapping, README, operator/scenario/
+desktop/playback/contracts/acceptance guides, ADRs, reports, architecture plus new
+investigation diagram, dependency/setup/CI docs and publication 1.3 metadata.
+Source registry classifications were reviewed and unchanged: this is simulator
+presentation work, not new HKM/SICS research. Generated Pages/PDFs were rebuilt,
+never edited manually. The UI is not independently user-tested.
+
+Next milestone: commit the coherent implementation, run clean full acceptance
+twice, publish and verify exact-source CI/Pages/PDFs, then finalize current evidence
+and status with the successor's own exact-SHA gates. The enhancement is NOT DONE
+until all 118 MUSTs and final remote attestations pass.
+
+## Historical accepted phase: test lifecycle and robot-cell selection accepted at audited source
 
 Implementation baseline: `ae6d5d85c813e47aea042aea2a87236b5a8bc204`.
 Audited source: `b1c374ae76144309cc4476392dec681292f0e3a7`, clean at the

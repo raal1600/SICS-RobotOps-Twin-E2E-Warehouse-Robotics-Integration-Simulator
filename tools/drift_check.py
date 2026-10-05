@@ -9,7 +9,7 @@ from urllib.parse import unquote, urlsplit
 from markdown_it import MarkdownIt
 
 ROOT = Path(__file__).resolve().parents[1]
-CRITERION_PATTERN = r"(?:SC-[A-Z]+-\d{3}|HKM-VIS-MUST-\d{3})"
+CRITERION_PATTERN = r"(?:SC-[A-Z]+-\d{3}|HKM-VIS-MUST-\d{3}|UI-INV-MUST-\d{3})"
 
 
 def criterion_ids(root: Path = ROOT, level: str = "MUST") -> set[str]:

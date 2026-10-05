@@ -2,6 +2,19 @@
 
 Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain normative.
 
+## Investigation workflow revision
+
+- [x] Archive clean baseline `0db6168` and earlier acceptance without relabelling it.
+- [x] Inspect real UI, evidence contracts, scenario semantics and browser tooling.
+- [x] Implement short run guidance and explicit attention-to-investigation navigation.
+- [x] Separate symptom, record findings, limits and hypotheses; preserve exact observation IDs.
+- [x] Keep evidence/manual access direct and the event timeline collapsed/bounded.
+- [x] Preserve test/job/replay context; fix slow-planning selection and snapshot request races.
+- [x] Exercise real browser normal/fault/evidence/download/return/archive journeys in both runtimes and viewports.
+- [x] Complete visual clarity assessment and archive screenshots/results with source provenance.
+- [ ] Pass all 118 MUSTs through repeated clean suites and exact-SHA CI/publication.
+- [ ] Finalize current acceptance, documentation drift scan and Pages/PDF verification.
+
 ## Accepted cell selection and test-data lifecycle revision
 
 The accepted HKM revision below is historical evidence. ADR 0011 adds UI/API

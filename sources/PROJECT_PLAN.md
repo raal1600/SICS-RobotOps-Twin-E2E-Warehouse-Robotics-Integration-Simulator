@@ -430,6 +430,17 @@ Implementation/exit milestones:
    acceptance twice with the additive browser suite and unchanged quality gates,
    then verify exact-SHA CI/Pages/PDFs and current acceptance provenance.
 
+These implementation milestones are accepted at clean source
+`7b9f0a656cdd077106ab4b7ee7ade82335e11f26`, with all 118 MUSTs passing.
+[Acceptance](docs/evidence/acceptance/20261005T014537/manifest.json) and
+[the exact-source archive](docs/evidence/investigation-ui-final/README.md)
+record the repeated Windows/Linux suites, actual browser journeys, eight Blender
+demos and publication checks. The first clean attempt's outdated dashboard-label
+assertion is preserved, corrected to the intended UI, and followed by complete
+fresh runs. No mandatory outcome, test level or threshold was weakened.
+Evidence/status successors receive separate exact-SHA attestations (ADR 0002).
+First-time usability research and the optional model Brain remain non-blocking.
+
 ## Knowledge-base synchronization protocol
 
 Before every milestone commit:

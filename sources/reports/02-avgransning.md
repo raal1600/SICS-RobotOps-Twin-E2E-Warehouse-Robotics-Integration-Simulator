@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Run, notice and investigate UI redesign in progress from accepted baseline 0db6168. Existing HKM and test-lifecycle evidence remains historical; the new user journey needs browser and source-specific acceptance. Status: NOT DONE.
+> **Implementation status, 2026-10-05:** Investigation workflow accepted at audited source 7b9f0a6: all 118 MUSTs PASS, 665 tests twice, 132 UI checks, five real-browser cases and eight Blender demos. Exact-source CI and publication verified. Functional tests do not replace first-time usability research. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

@@ -1,69 +1,84 @@
 # Goal Progress
 Last updated: 2026-10-05 UTC
-Previously released audited implementation: `488db3efc124901ad57b20f7aaa4e472c7314b9f`.
+Audited implementation: `7b9f0a656cdd077106ab4b7ee7ade82335e11f26`.
+Implementation baseline: `0db6168b71bc4b500894fe7695ce082384c777b2`.
 
-## Current phase: investigation workflow redesign (in progress)
+## Current phase: accepted investigation implementation and final attestation
 
-Baseline source: `0db6168b71bc4b500894fe7695ce082384c777b2`.
-Implementation milestone: `fd47d3277132cb12554751ea223dc6af20d24d6f`.
-The active goal adds an intuitive run -> notice -> investigate journey. Prior
-110-MUST acceptance remains archived and does not prove this UI revision.
-Baseline browser review confirms a 2,421 px ready page at 1440x1000, with raw
-evidence beginning below 2,220 px before any execution. The motion panel alone
-is 1,304 px tall. All 119 existing Node UI checks pass. Exact baseline report and
-objective hash are preserved in `docs/evidence/investigation-ui-baseline/`.
+All 118 MUSTs pass for clean audited source 7b9f0a6. The eight UI-INV criteria are
+additive to the original 110; no threshold, physical outcome or evidence boundary
+was weakened. [The refreshed acceptance manifest](docs/evidence/acceptance/20261005T014537/manifest.json)
+and [exact-source archive](docs/evidence/investigation-ui-final/README.md) provide
+inspectable results. This report does not attest an untested later commit.
 
-Implemented: concise setup and central cell; explicit highlighted investigation;
-bounded What happened / Evidence / Manual inspection panel; exact assessed
-observation attribution, pinned test/job context and preserved paused replay;
-collapsed/filtered timeline, scoped GET commands and evidence/event downloads.
-Sensor-report choices explain that the robot does not move during another check.
-Runtime/API/wire schemas, verifier and command/reconciliation rules are unchanged.
+The workspace follows Set up, Watch, Investigate and Continue. The cell stays
+central, with concise scenario purpose and behavior to watch. Attention opens an
+explicit bounded inspector for symptoms, recorded findings, limits and possible
+explanations. Evidence and manual inspection include the exact assessed observation,
+original command/journal, review history, tool decision, scoped GET examples,
+real code/config/log paths and downloadable JSON. The timeline is collapsed,
+job-filtered and bounded. Test/job selection and paused replay context survive
+navigation; sensor re-observation remains an explicit original-command assessment.
 
-Browser findings fixed: slow planning could select an earlier delivery job;
-the optional checkpoint image was requested too early; switching saved tests could
-leave the investigation button clickable before its evidence loaded. Each was
-fixed and rerun, not hidden behind changed outcome assertions. Attention no longer
-automatically covers the cell; the guide and result invite explicit investigation.
-ADR 0012 records this change to ADR 0009's presentation behavior.
+No robot/API wire contract, runtime state machine or database migration changed.
+The presentation download wrapper is `robotops-investigation-1`. Actual HTTP errors
+remain separate from simulated outcomes. All old test lifecycle, cell-selection,
+uncertainty, restart, exact-one-effect and read-only replay behavior is retained.
 
-Evidence: five actual Chromium cases pass, with both synthetic/Blender runtimes
-and desktop/compact layouts, one-effect conservative reconciliation, independent
-test ownership, archive review, read-only downloads and separate app-error handling.
-The mandatory Node wrapper passes all 132 checks. Affected contracts/API/playback
-passed 141 tests; lint, strict types, security, drift and publication build pass.
-[Development evidence and visual assessment](docs/evidence/investigation-ui-development/README.md)
-retain source hashes, logs, JUnit, screenshots and the limits of this usability
-review. No user test data was changed or deleted.
+## Current evidence
 
-Eight additive UI-INV MUSTs bring the current total to 118. No full MUST pass is
-claimed yet for this revision: the current acceptance report marks missing full
-and remote gates as FAIL. Historical accepted results remain separately archived.
-Synchronized plan, handoff, checklist, criteria/mapping, README, operator/scenario/
-desktop/playback/contracts/acceptance guides, ADRs, reports, architecture plus new
-investigation diagram, dependency/setup/CI docs and publication 1.3 metadata.
-Source registry classifications were reviewed and unchanged: this is simulator
-presentation work, not new HKM/SICS research. Generated Pages/PDFs were rebuilt,
-never edited manually. The UI is not independently user-tested.
+- Windows: 665 tests twice, identical case identities, zero failures/errors/skips,
+  91.71597633136095% coverage in both runs and all 20 local gates passing.
+- Linux CI: 665 tests twice, zero failures/errors/skips, 91.6596224288532% coverage
+  in both runs and all 20 local gates passing. Exact run 37252672023 succeeded;
+  its digest-verified original artifact and local-only remote placeholders are preserved.
+- The mandatory suite includes 132 Node checks and five actual Chromium cases:
+  synthetic/Blender at desktop/compact viewports, plus an intentional service error.
+  Both repeats retain screenshots, requests, source hashes, downloads and traces.
+- Eight real Blender demos pass on both platforms. Read-only audits prove one
+  original command/transfer after lost reply and restart, conservative ambiguous
+  evidence and six products using all six preferred tools. No replay issues a pick.
+- Exact-source native workflow 37252672189 passes six actual window/ownership
+  checks with the explicit synthetic adapter. Blender coverage is recorded separately.
+- Exact-source publication workflow 37252672013 and Pages pass. Public review checks
+  51 resources, 374 relative links/fragments, 65 PDF pages, 209 internal PDF
+  destinations, 30 sources, 12 diagrams and the canonical 36-cell tool matrix.
+  Public Markdown matches Git; byte-identical PDF/diagram comparison preserves the
+  original fd47 visual review attribution rather than relabelling it.
 
-The first clean full attempt at fd47 passed 664 of 665 tests. The older restart
-dashboard smoke test expected the deliberately renamed `Causal timeline` label.
-The failure and original manifest/JUnit are retained in
-[the failed attempt](docs/evidence/acceptance/20261005T012342/README.md).
-The second suite was interrupted before source changed. The correction preserves
-all metrics, restart and exact-one-effect checks, updates the label to `Event
-timeline`, and additionally verifies the collapsed timeline and real investigation
-controls. No production semantics or acceptance thresholds were changed.
-All 19 affected restart, UI-wrapper and governance checks now pass, as do lint and
-the 118-criterion drift scan. The scoped rerun used a fresh fixture directory
-because this machine's default pytest temporary directory denied access.
+The first clean fd47 attempt passed 664 of 665 tests; its older dashboard smoke
+test expected the renamed Causal timeline label. [Failure evidence](docs/evidence/acceptance/20261005T012342/README.md)
+remains unchanged. The correction kept all metrics, restart and exact-one-effect
+assertions and added structural inspector/timeline checks. Complete clean runs
+followed at 7b9. Browser-discovered slow-planning selection, premature snapshot
+requests and saved-test evidence loading races were fixed and rerun earlier in
+this same implementation. No user test data was changed or deleted.
 
-The fd47 publication and Windows launcher workflows passed; its public PDFs and
-links were checked against that source. These do not attest the corrected source.
-Next milestone: commit the regression-check correction, rerun clean full acceptance
-twice and exact-source CI/Pages, then finalize evidence and status with the
-successor's own gates. The enhancement remains NOT DONE until all 118 MUSTs and
-final remote attestations pass.
+## Decisions and knowledge-base synchronization
+
+ADR 0012 supersedes ADR 0009's automatic review opening with explicit investigation,
+while preserving its state-based guide and recovery rules. The visual/functional
+review is an implementer assessment, not independent first-time user research.
+Compact layout checks are not touch-device or screen-reader studies.
+SC-BRAIN-005 remains the documented non-blocking SHOULD for an optional model Brain.
+
+Synchronized: plan, handoff, checklist, MUST registry/mapping, acceptance, README,
+operator/scenario/desktop/playback/contracts/reconciliation/dependency guides,
+ADRs, source setup/CI instructions, reports, architecture and investigation diagrams,
+publication 1.3 metadata and citation. The lifecycle addendum's historical 110-MUST
+count now explicitly precedes the eight new criteria. Research provenance and
+control dates remain unchanged; this is simulator presentation work, not a new
+HKM/SICS performance claim. Generated Pages/PDFs are rebuilt through the publication
+workflow and never manually edited.
+
+## Final-source gate and next milestone
+
+The evidence/status successor must receive its own complete CI and Pages checks
+before this goal is closed. Its exact source is recorded by the CI artifact and
+public build.json, following ADR 0002's self-reference rule. Earlier source results
+never attest a later SHA. After that gate, independent first-time usability research
+and an optional model adapter are non-blocking follow-up work; no further mandatory
+feature implementation is outstanding.
 
 ## Historical accepted phase: test lifecycle and robot-cell selection accepted at audited source
 

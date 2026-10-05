@@ -3,11 +3,19 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** Run, notice and investigate UI redesign in progress from accepted baseline 0db6168. Existing HKM and test-lifecycle evidence remains historical; the new user journey needs browser and source-specific acceptance. **NOT DONE**.
+**Aktuell status:** Investigation workflow accepted at audited source 7b9f0a6: all 118 MUSTs PASS, 665 tests twice, 132 UI checks, five real-browser cases and eight Blender demos. Exact-source CI and publication verified. Functional tests do not replace first-time usability research. **DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
 [Agent handoff](HANDOFF.md) · [Checklist](CODEX_GOAL_CHECKLIST.md)
+
+The workspace now follows **Run a pick → notice its result → Investigate this pick**.
+The investigation keeps the selected test/job and replay frame, separates symptoms
+from confirmed records and possible explanations, and provides direct evidence,
+manual inspection and a collapsed event timeline.
+[Screenshots, repeated tests and release evidence](docs/evidence/investigation-ui-final/README.md)
+and [the operator walkthrough](docs/implementation/investigation.md) show the flow.
+Close and reopen the desktop app to load the updated UI; saved tests remain intact.
 
 The implemented cell contains an original **HKM1800-inspired hybrid-kinematic
 manipulator**, six distinct product families, six interchangeable tools, a tool

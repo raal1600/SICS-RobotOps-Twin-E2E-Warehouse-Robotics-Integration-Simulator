@@ -1,0 +1,114 @@
+{
+  "started_at_utc": "2026-10-05T22:37:23.109681+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.15",
+  "sqlite_version": "3.53.1",
+  "probe_root": "C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\final-evidence-pack\\dfb06bc\\watcher-handle-correction\\sqlite-lifetime-wrdfauwr",
+  "original_helper_sha256": "ae06dea0ebe15425f2565cd806a2756238753a6dc55f3ddc7abd17db4d36cd94",
+  "fixed_helper_sha256": "7bc11b35236f5194aadbb594615c7e985b8332d0c487cfad37e521cf3dc93955",
+  "scope": "Disposable databases constructed under this ignored evidence directory only. Exact helper AST function bodies executed; watcher main/poll never imported or run. No application fixture, browser, product test or service used.",
+  "gc_control": "Automatic cyclic GC disabled during each observation, making delayed resource lifetime reproducible; explicit gc.collect only at stated old-helper release step.",
+  "original_helper": {
+    "returned_journal_facts": 2,
+    "after_return_before_gc": {
+      "runtime.db": {
+        "removed": false,
+        "exception": "PermissionError",
+        "winerror": 32,
+        "errno": 13
+      },
+      "plc.db": {
+        "removed": false,
+        "exception": "PermissionError",
+        "winerror": 32,
+        "errno": 13
+      }
+    },
+    "explicit_gc_collected": 34,
+    "after_explicit_gc": {
+      "runtime.db": {
+        "removed": true
+      },
+      "plc.db": {
+        "removed": true
+      }
+    }
+  },
+  "fixed_helper": {
+    "returned_journal_facts": 2,
+    "after_return_without_gc": {
+      "runtime.db": {
+        "removed": true
+      },
+      "plc.db": {
+        "removed": true
+      }
+    }
+  },
+  "fixed_exception_path": {
+    "exception_type": "JSONDecodeError",
+    "connection_events": [
+      {
+        "event": "transaction_exit",
+        "exception_type": "JSONDecodeError",
+        "in_transaction_after_exit": false,
+        "query_only": 1
+      },
+      {
+        "event": "close"
+      }
+    ],
+    "after_exception_without_gc": {
+      "runtime.db": {
+        "removed": true
+      },
+      "plc.db": {
+        "removed": true
+      }
+    }
+  },
+  "fixed_success_context_order": {
+    "connection_events": [
+      {
+        "event": "transaction_exit",
+        "exception_type": null,
+        "in_transaction_after_exit": false,
+        "query_only": 1
+      },
+      {
+        "event": "close"
+      },
+      {
+        "event": "transaction_exit",
+        "exception_type": null,
+        "in_transaction_after_exit": false,
+        "query_only": 1
+      },
+      {
+        "event": "close"
+      }
+    ],
+    "after_return_without_gc": {
+      "runtime.db": {
+        "removed": true
+      },
+      "plc.db": {
+        "removed": true
+      }
+    }
+  },
+  "checks": {
+    "original_return_keeps_both_files_locked": true,
+    "explicit_gc_releases_original_files": true,
+    "fixed_return_releases_both_without_gc": true,
+    "fixed_exception_releases_without_gc": true,
+    "fixed_error_rolls_back_then_closes": true,
+    "fixed_success_commits_then_closes_each": true
+  },
+  "all_checks_passed": true,
+  "limits": [
+    "Controlled reproduction establishes the original helper's resource-lifetime defect. Exact historical acceptance locker ownership requires root's separate before/after process-handle evidence.",
+    "Disabling automatic GC exposes the indefinite-until-GC lifetime; normal GC scheduling can release handles earlier but is not a correctness guarantee."
+  ],
+  "finished_at_utc": "2026-10-05T22:37:23.427718+00:00"
+}

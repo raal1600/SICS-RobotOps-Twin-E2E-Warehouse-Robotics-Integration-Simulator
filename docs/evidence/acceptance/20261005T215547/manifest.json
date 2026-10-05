@@ -1,0 +1,92 @@
+{
+  "started_at": "2026-10-05T21:55:47.109453+00:00",
+  "source": {
+    "commit": "dfb06bcda710f3603951a3bb79ec778c08d5a493",
+    "dirty": false,
+    "source_sha256": "74ce2b64e6b379da8e4bc8f1532a1ffc10465a159d33e64b8de00bc99aef7577"
+  },
+  "environment": {
+    "python": "3.13.15 (main, Sep  1 2026, 14:16:48) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "dependencies": {
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "pytest": "9.1.1",
+      "ruff": "0.16.10",
+      "mypy": "2.4.0",
+      "weasyprint": "70.0",
+      "bandit": "1.9.4",
+      "pip-audit": "2.10.1",
+      "playwright": "1.63.0"
+    },
+    "lock_sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1"
+  },
+  "gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\.local\\bin\\uv.EXE",
+        "sync",
+        "--locked",
+        "--all-groups"
+      ],
+      "seconds": 0.032710300001781434,
+      "log": "docs/evidence/acceptance/20261005T215547/setup.log"
+    },
+    "browser_setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "playwright",
+        "install",
+        "chromium",
+        "--only-shell"
+      ],
+      "seconds": 0.34937949999584816,
+      "log": "docs/evidence/acceptance/20261005T215547/browser_setup.log"
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+        "--version"
+      ],
+      "seconds": 0.10968130000401288,
+      "log": "docs/evidence/acceptance/20261005T215547/blender_version.log"
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "security"
+      ],
+      "seconds": 8.021877599996515,
+      "log": "docs/evidence/acceptance/20261005T215547/security.log"
+    },
+    "tests_1": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-m_88nhx2/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261005T215547\\tests-1.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261005T215547\\coverage-1.json",
+        "--cov-report=term"
+      ],
+      "seconds": 2301.8569704999973,
+      "log": "docs/evidence/acceptance/20261005T215547/tests_1.log"
+    }
+  }
+}

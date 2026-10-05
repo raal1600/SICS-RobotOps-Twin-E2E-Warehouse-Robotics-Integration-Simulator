@@ -1,0 +1,31 @@
+﻿{
+    "source_commit":  "dfb06bcda710f3603951a3bb79ec778c08d5a493",
+    "source_sha256":  "74ce2b64e6b379da8e4bc8f1532a1ffc10465a159d33e64b8de00bc99aef7577",
+    "source_dirty":  false,
+    "acceptance":  "docs/evidence/acceptance/20261005T215547",
+    "tests_1":  {
+                    "passed":  799,
+                    "failed":  0,
+                    "junit":  "docs/evidence/acceptance/20261005T215547/tests-1.xml",
+                    "errors":  0,
+                    "skipped":  0,
+                    "coverage_percent":  91.439834803829541,
+                    "seconds":  2300.346
+                },
+    "tests_2":  "NOT_STARTED",
+    "acceptance_exit":  1,
+    "acceptance_end":  "2026-10-05T22:34:18.1884628Z",
+    "failure":  "TemporaryDirectory cleanup raised Windows sharing error 32 for first lab happy plc.db after the successful full suite.",
+    "diagnosis":  "The ignored evidence watcher did not explicitly close SQLite read connections. Isolated probe reproduced the same sharing error and verified the fix. Historical live locker at acceptance failure was not captured; later exclusive read succeeded before and after stopping watcher.",
+    "correction":  "Ignored watcher wraps read-only connections with contextlib.closing around transaction context. Commit/rollback then explicit close, including exception paths. No product or acceptance-runner changes.",
+    "probe":  "watcher-correction/probe-result.json",
+    "lab_browser_cases":  {
+                              "DUPLICATE_DELIVERY":  "PASSED",
+                              "each_original_command_effect_count":  1,
+                              "happy":  "PASSED",
+                              "DROP_ACK_AFTER_EFFECT":  "PASSED",
+                              "WMS_UNAVAILABLE":  "PASSED"
+                          },
+    "remaining":  "New clean full two-pass acceptance, final manual loop, final publication/PDF review, documentation completion, explicit publication approval and exact-source remote gates",
+    "goal_status":  "NOT ACHIEVED"
+}

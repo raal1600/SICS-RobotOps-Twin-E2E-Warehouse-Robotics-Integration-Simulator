@@ -66,7 +66,21 @@ separate-process Blender lab happy path then passed: **3 passed, 5 deselected in
 targeted the changed cleanup paths and does not replace the full suite.
 [The correction record](docs/evidence/lab-f00ad15/summary.json) preserves source
 hashes, failed/interrupted results, the probe limitation and passing rerun.
-A new clean two-pass acceptance campaign remains required.
+The clean campaign on `dfb06bc` then passed the complete first suite:
+**799 passed, zero failures, errors or skips in 2300.346 seconds**, with
+**91.44% coverage**. All four separate-process lab browser cases passed and their
+captured runtime/PLC journals retain the original command with one effect.
+The acceptance runner subsequently exited during temporary-fixture cleanup with
+Windows sharing error 32, before starting the second pass. The ignored evidence
+watcher had used SQLite's transaction context without explicitly closing its
+connections. An isolated Windows probe reproduced that handle-retention mechanism
+and verified that explicit close releases both databases immediately, including
+the exception path. The historical locker was not identified at the failure
+instant; a later exclusive-read probe already found the file unlocked. This is a
+probable watcher cause, not a demonstrated product failure. No production code,
+acceptance cleanup rule or test assertion was changed. The watcher is corrected;
+a new clean full two-pass campaign is required. [The retained record](docs/evidence/lab-dfb06bc/summary.json)
+keeps the successful suite distinct from the incomplete acceptance runner.
 
 Required next evidence: complete a clean full acceptance campaign, execute the
 final clean-lab browser/reload/duplicate/recovery

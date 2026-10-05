@@ -1,0 +1,1350 @@
+{
+  "reviewed_at_utc": "2026-10-05T22:33:45.106117+00:00",
+  "acceptance_pass": 1,
+  "campaign": "docs/evidence/acceptance/20261005T215547",
+  "source": {
+    "commit": "dfb06bcda710f3603951a3bb79ec778c08d5a493",
+    "dirty": false,
+    "source_sha256": "74ce2b64e6b379da8e4bc8f1532a1ffc10465a159d33e64b8de00bc99aef7577"
+  },
+  "verdict": "FOUR_CASES_FORMALLY_PASSED_CAMPAIGN_INCOMPLETE_CLEANUP_FAILURE",
+  "case_count": 4,
+  "formal_test_claim": "All four saved pass-1 lab cases match terminal tests-1.xml PASSED with no failure/error/skipped elements. This does not imply overall acceptance success.",
+  "method": "Bounded read-only inspection of four watcher JSON captures, their exact saved input hashes, source fingerprints, the happy motion JSON, and screenshot hashes. Did not reopen DBs, run tests, launch application/service/browser/Blender processes, extract ZIPs or alter watcher/source. Formal update only: matched terminal JUnit by exact class/name and refreshed hashes of watcher snapshots after their formal-status fields changed.",
+  "issues": [],
+  "cases": [
+    {
+      "case": "happy",
+      "input": "artifacts/final-evidence-pack/dfb06bc/pass-1/happy.json",
+      "input_sha256": "5386bac76ee6f906c010ab70428c3909811be18870c417bb0cb8aa60d226a802",
+      "captured_at_utc": "2026-10-05T22:28:11.172034+00:00",
+      "artifact_directory": "artifacts/lab-browser/20261005T222713201979/happy",
+      "runtime": "blender",
+      "session": {
+        "session_id": "2fa6d577-d56b-5632-a7a0-7c0559fd346e",
+        "correlation_id": "a7c68505-906e-52f9-8ae7-86aeed89101e",
+        "order_id": "order-aa0afb63-d426-46ed-bf39-640c76965de4",
+        "job_id": "249134b5-8093-5c2d-bed6-87c751893ae8",
+        "command_id": "fd381624-fd66-5fa4-8ea3-71fc2b3c4a9b",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "updated_at": "2026-10-05T22:28:04.604359Z"
+      },
+      "checks": {
+        "captured_complete": true,
+        "final_stage_22_completed": true,
+        "one_runtime_command_and_one_plc_command_result": true,
+        "original_command_and_job_in_all_final_receipts": true,
+        "same_payload_hash_in_all_final_receipts": true,
+        "all_final_receipts_one_effect": true,
+        "controller_receipts_succeeded": true,
+        "source_checks_match_at_capture": true,
+        "recorded_sources_match_at_review": true,
+        "saved_input_hashes_match_at_review": true,
+        "truth_stage_classifications_consistent": true,
+        "distinct_saved_service_process_ids": true,
+        "saved_opcua_is_edge_process": true,
+        "no_recorded_browser_errors": true,
+        "no_watcher_secret_findings": true
+      },
+      "source_check_count": 35,
+      "source_mismatches": [],
+      "original_input_hash_checks": [
+        {
+          "path": "artifacts/lab-browser/20261005T222713201979/happy/stack.json",
+          "sha256": "b2fa2e03b0ee14a901551075bc1272bd8389b4788d1177c74a790ed7109f5a5a",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222713201979/happy/session.json",
+          "sha256": "c4cdab1c25f4302158bdb06cdfe608f145410c62d9abee14d2e11aee8ba99fa5",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222713201979/happy/browser.json",
+          "sha256": "23178aec428cbdf1dc4db724c860bee629b76fd7daba75005bf62aa1de7c3f5a",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222713201979/happy/source-hashes.json",
+          "sha256": "89c54d7d37389b91ff0f29dce53de3220c4c18892d3a74a03898a6b9f53bf549",
+          "matches_at_review": true
+        }
+      ],
+      "journal_facts": {
+        "runtime_journal_rows": 1,
+        "runtime_receipt": {
+          "command_id": "fd381624-fd66-5fa4-8ea3-71fc2b3c4a9b",
+          "job_id": "249134b5-8093-5c2d-bed6-87c751893ae8",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "dd9a92d5ec6d203147c06277e837162d7b30bbe780eda8c1453720773b166049",
+          "journal_durable": true
+        },
+        "runtime_robot_event_count": 20,
+        "robot_event_count_meaning": "All retained robot_event rows; not a count of physical effects.",
+        "plc_command_rows": 1,
+        "plc_result_rows": 1,
+        "plc_state": "SUCCEEDED",
+        "plc_result_sequence": 1,
+        "plc_result_row_sequence": 1,
+        "plc_acknowledged": false,
+        "plc_acknowledged_meaning": "Persisted PLC result acknowledgement flag; separate from AMQP consumer ACK and WMS ACK.",
+        "database_hashes_at_capture": {
+          "runtime.db": "7d65548dad3d6b2c1e330eec6774a32b95238c224b56e35fd1fe9b323d04807d",
+          "plc.db": "aa8156c3a6968ab08139d7d6b740856b3502e5c0f94d1f268f04191e727021b8"
+        },
+        "scope": "Previously saved read-only watcher journal facts; no database reopened for this review."
+      },
+      "truth": {
+        "stack_label": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+        "stage_classifications": {
+          "1": [
+            "SIMULATED SYSTEM"
+          ],
+          "2": [
+            "SIMULATED SYSTEM"
+          ],
+          "3": [
+            "REAL CODE"
+          ],
+          "4": [
+            "REAL CODE"
+          ],
+          "5": [
+            "SYNTHETIC SENSOR"
+          ],
+          "6": [
+            "REAL CODE"
+          ],
+          "7": [
+            "REAL CODE"
+          ],
+          "8": [
+            "REAL CODE"
+          ],
+          "9": [
+            "REAL CODE"
+          ],
+          "10": [
+            "REAL PROTOCOL"
+          ],
+          "11": [
+            "REAL PROTOCOL"
+          ],
+          "12": [
+            "REAL PROTOCOL"
+          ],
+          "13": [
+            "REAL PROTOCOL"
+          ],
+          "14": [
+            "REAL PROTOCOL"
+          ],
+          "15": [
+            "REAL CODE"
+          ],
+          "16": [
+            "SIMULATED ROBOT"
+          ],
+          "17": [
+            "REAL PROTOCOL"
+          ],
+          "18": [
+            "SYNTHETIC SENSOR"
+          ],
+          "19": [
+            "REAL CODE"
+          ],
+          "20": [
+            "REAL PROTOCOL"
+          ],
+          "21": [
+            "SIMULATED SYSTEM"
+          ],
+          "22": [
+            "REAL CODE"
+          ]
+        },
+        "processes": {
+          "api": 10292,
+          "wms": 9432,
+          "edge": 22772,
+          "plc": 27688
+        },
+        "opcua_client_component": "edge-adapter",
+        "opcua_server_process_id": 27688,
+        "opcua_edge_process_id": 22772,
+        "simulated_system_label": "SIMULATED SYSTEM",
+        "interpretation": "Real PostgreSQL/AMQP/OPC UA/REST lab protocol evidence with simulated WMS/PLC/robot/sensors; runtime choice retained explicitly."
+      },
+      "secrets": {
+        "watcher_potential_findings": [],
+        "scope": "Stored case/session/browser/stack JSON and service logs only. Trace ZIP review is deferred until the full suites finish to avoid competing workload. No guarantee of exhaustive secret absence.",
+        "assessment": "No watcher findings; this review does not rescan ZIPs or certify exhaustive secret absence."
+      },
+      "recorded_browser_errors": [],
+      "recorded_console_errors": [],
+      "physical_transition_count": 1,
+      "verification": [
+        {
+          "sequence": 19,
+          "state_before": "VERIFYING",
+          "state_after": "COMPLETED",
+          "output": {
+            "schema_version": "1.0",
+            "run_id": "6ee9bc6a-23c0-477e-a8dc-3255672ce146",
+            "correlation_id": "a7c68505-906e-52f9-8ae7-86aeed89101e",
+            "causation_id": "d43fafeb-56d7-4b86-af93-45c0a744a848",
+            "timestamp": "2026-10-05T22:27:59.598561Z",
+            "verification_id": "a040613c-1802-4620-b88a-99826bc8a64d",
+            "job_id": "249134b5-8093-5c2d-bed6-87c751893ae8",
+            "command_id": "fd381624-fd66-5fa4-8ea3-71fc2b3c4a9b",
+            "observation_id": "d43fafeb-56d7-4b86-af93-45c0a744a848",
+            "verdict": "VERIFIED_SUCCESS",
+            "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+            "workflow_state": "COMPLETED",
+            "reconciliation_required": false,
+            "recovered_verification": false
+          }
+        }
+      ],
+      "wms_outputs": [
+        {
+          "stage": 20,
+          "sequence": 20,
+          "status": "COMPLETED",
+          "classification": "REAL PROTOCOL",
+          "output": {
+            "command_id": "fd381624-fd66-5fa4-8ea3-71fc2b3c4a9b",
+            "job_id": "249134b5-8093-5c2d-bed6-87c751893ae8",
+            "physical_retry": false,
+            "verified_outcome": "COMPLETED",
+            "wire": {
+              "acknowledgement_id": "wms:fd381624-fd66-5fa4-8ea3-71fc2b3c4a9b",
+              "attempts": 1,
+              "classification": "REAL PROTOCOL",
+              "command_id": "fd381624-fd66-5fa4-8ea3-71fc2b3c4a9b",
+              "http_status": 200,
+              "job_id": "249134b5-8093-5c2d-bed6-87c751893ae8",
+              "payload_hash": "a03d083ca1d57345d5754d5225ecd86ed2c5b439db0b095c48405a7081ce9735",
+              "physical_retry": false,
+              "protocol": "REST/JSON",
+              "schema_version": "1.0",
+              "system": "SIMULATED WMS",
+              "verified_outcome": "COMPLETED",
+              "wms_acknowledged": true
+            },
+            "wms_acknowledged": true
+          }
+        }
+      ],
+      "erp_completion": [
+        {
+          "stage": 21,
+          "sequence": 21,
+          "status": "COMPLETED",
+          "classification": "SIMULATED SYSTEM",
+          "output": {
+            "order_id": "order-aa0afb63-d426-46ed-bf39-640c76965de4",
+            "business_status": "COMPLETED",
+            "wms_acknowledged": true,
+            "wms_acknowledgement_ids": [
+              "3d1079e3-eed6-578a-8d0e-bd3bdef1fc0e"
+            ]
+          }
+        }
+      ],
+      "motion": {
+        "input": "artifacts/lab-browser/20261005T222713201979/happy/blender-motion.json",
+        "sha256": "880911fa3dd16e2086961b98596972bb558cbefb07607468ad93f1d409eb8dbb",
+        "recording": {
+          "source": "BLENDER_EVALUATED_SCENE",
+          "complete": true,
+          "command_id": "fd381624-fd66-5fa4-8ea3-71fc2b3c4a9b",
+          "frames": 133,
+          "total_frames": 133,
+          "motion_steps": 133,
+          "robot_poses": 118,
+          "product_name": "Products/product-SKU-A-01",
+          "product_start": [
+            1.0800000429153442,
+            -0.6800000071525574,
+            0.20249998569488525
+          ],
+          "product_finish": [
+            -0.3799999952316284,
+            0.9399999976158142,
+            0.20249998569488525
+          ],
+          "moving_cursor": 85
+        },
+        "before": {
+          "cursor": 85,
+          "pose": {
+            "position": [
+              0,
+              -0.6000000238418579,
+              1.1579999923706055
+            ],
+            "quaternion_xyzw": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1.000000238418579,
+              1.000000238418579,
+              1
+            ],
+            "visible": true
+          },
+          "rendered": [
+            0,
+            -0.6000000238418579,
+            1.1579999923706055
+          ]
+        },
+        "after": {
+          "cursor": 85.79919999999998,
+          "playing": true,
+          "pose": {
+            "position": [
+              0.007695999938249442,
+              -0.6005700842380524,
+              1.1579999923706055
+            ],
+            "quaternion_xyzw": [
+              0,
+              0,
+              -7.443129129036521e-10,
+              1
+            ],
+            "scale": [
+              1.0000001431465149,
+              1.0000001431465149,
+              1
+            ],
+            "visible": true
+          },
+          "rendered": [
+            0.003836444413661637,
+            -0.6002841980934143,
+            1.1579999923706055
+          ]
+        },
+        "rendered_position_changed": true,
+        "scope": "Saved automated-browser evaluated-scene/playback measurements, not a new visual/manual run."
+      },
+      "initial_observation": {
+        "reviewed_at_utc": "2026-10-05T22:33:45.106117+00:00",
+        "formal_test_status": "PENDING_JUNIT",
+        "snapshot_sha256": "5f95ec7450d21efb64e9edd89be3f91b2e3abc4877e6d3ba001dd04576b21cde"
+      },
+      "formal_test_status": "PASSED",
+      "formal_test_result": {
+        "junit": "docs/evidence/acceptance/20261005T215547/tests-1.xml",
+        "junit_sha256": "00582581025c6937b7db9acb207998bce46d19e72483d50cedb5c2a89e09b2d0",
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[]",
+        "seconds": 57.982
+      }
+    },
+    {
+      "case": "drop_ack_after_effect",
+      "input": "artifacts/final-evidence-pack/dfb06bc/pass-1/drop_ack_after_effect.json",
+      "input_sha256": "01196f632321fcc06090c54fbaa12821d45ea831d04779c870a4b5783de784ed",
+      "captured_at_utc": "2026-10-05T22:29:11.295797+00:00",
+      "artifact_directory": "artifacts/lab-browser/20261005T222811262454/DROP_ACK_AFTER_EFFECT",
+      "runtime": "synthetic",
+      "session": {
+        "session_id": "6590e388-cee5-5c9e-9fbe-18544289759b",
+        "correlation_id": "72337b4a-89cc-5a15-a8cb-01773faff429",
+        "order_id": "order-f95d95ba-98bf-4976-a5d1-50be46cbd59c",
+        "job_id": "3d3cd4db-83b4-576d-8448-36bc3cc06f92",
+        "command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-05T22:28:51.941974Z"
+      },
+      "checks": {
+        "captured_complete": true,
+        "final_stage_22_completed": true,
+        "one_runtime_command_and_one_plc_command_result": true,
+        "original_command_and_job_in_all_final_receipts": true,
+        "same_payload_hash_in_all_final_receipts": true,
+        "all_final_receipts_one_effect": true,
+        "controller_receipts_succeeded": true,
+        "source_checks_match_at_capture": true,
+        "recorded_sources_match_at_review": true,
+        "saved_input_hashes_match_at_review": true,
+        "truth_stage_classifications_consistent": true,
+        "distinct_saved_service_process_ids": true,
+        "saved_opcua_is_edge_process": true,
+        "no_recorded_browser_errors": true,
+        "no_watcher_secret_findings": true
+      },
+      "source_check_count": 35,
+      "source_mismatches": [],
+      "original_input_hash_checks": [
+        {
+          "path": "artifacts/lab-browser/20261005T222811262454/DROP_ACK_AFTER_EFFECT/stack.json",
+          "sha256": "66480e01174ba287e80f991afbbb2afd550889fa4a9662b40ae94d7e47d64008",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222811262454/DROP_ACK_AFTER_EFFECT/session.json",
+          "sha256": "36e2c025722c106c7ff846e609d138abe19351d7ca7a3d9606d281cac86b264d",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222811262454/DROP_ACK_AFTER_EFFECT/browser.json",
+          "sha256": "ab5c86a58bcf4b18476c840f27938b578ab4eaa5f7e8bdd710a3f6231e52996f",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222811262454/DROP_ACK_AFTER_EFFECT/source-hashes.json",
+          "sha256": "89c54d7d37389b91ff0f29dce53de3220c4c18892d3a74a03898a6b9f53bf549",
+          "matches_at_review": true
+        }
+      ],
+      "journal_facts": {
+        "runtime_journal_rows": 1,
+        "runtime_receipt": {
+          "command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+          "job_id": "3d3cd4db-83b4-576d-8448-36bc3cc06f92",
+          "status": "SUCCEEDED",
+          "reason": "PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "1c42b61561e6003089eac7260ed46fe20af71aec79dab9a418420e209c5ff90e",
+          "journal_durable": true
+        },
+        "runtime_robot_event_count": 21,
+        "robot_event_count_meaning": "All retained robot_event rows; not a count of physical effects.",
+        "plc_command_rows": 1,
+        "plc_result_rows": 1,
+        "plc_state": "SUCCEEDED",
+        "plc_result_sequence": 1,
+        "plc_result_row_sequence": 1,
+        "plc_acknowledged": false,
+        "plc_acknowledged_meaning": "Persisted PLC result acknowledgement flag; separate from AMQP consumer ACK and WMS ACK.",
+        "database_hashes_at_capture": {
+          "runtime.db": "7c08007212cb0452b31644a2fba7d414940a6908a66285e9ec8260f6542a7689",
+          "plc.db": "5030f902bb551f403e42b82db0d21271b2ed13bab20c78d6227398e4b92d053c"
+        },
+        "scope": "Previously saved read-only watcher journal facts; no database reopened for this review."
+      },
+      "truth": {
+        "stack_label": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+        "stage_classifications": {
+          "1": [
+            "SIMULATED SYSTEM"
+          ],
+          "2": [
+            "SIMULATED SYSTEM"
+          ],
+          "3": [
+            "REAL CODE"
+          ],
+          "4": [
+            "REAL CODE"
+          ],
+          "5": [
+            "SYNTHETIC SENSOR"
+          ],
+          "6": [
+            "REAL CODE"
+          ],
+          "7": [
+            "REAL CODE"
+          ],
+          "8": [
+            "REAL CODE"
+          ],
+          "9": [
+            "REAL CODE"
+          ],
+          "10": [
+            "REAL PROTOCOL"
+          ],
+          "11": [
+            "REAL PROTOCOL"
+          ],
+          "12": [
+            "REAL PROTOCOL"
+          ],
+          "13": [
+            "REAL PROTOCOL"
+          ],
+          "14": [
+            "REAL PROTOCOL"
+          ],
+          "15": [
+            "REAL CODE"
+          ],
+          "16": [
+            "SIMULATED ROBOT"
+          ],
+          "17": [
+            "REAL PROTOCOL"
+          ],
+          "18": [
+            "SYNTHETIC SENSOR"
+          ],
+          "19": [
+            "REAL CODE"
+          ],
+          "20": [
+            "REAL PROTOCOL"
+          ],
+          "21": [
+            "SIMULATED SYSTEM"
+          ],
+          "22": [
+            "REAL CODE"
+          ]
+        },
+        "processes": {
+          "api": 28840,
+          "wms": 14944,
+          "edge": 34064,
+          "plc": 25280
+        },
+        "opcua_client_component": "edge-adapter",
+        "opcua_server_process_id": 25280,
+        "opcua_edge_process_id": 34064,
+        "simulated_system_label": "SIMULATED SYSTEM",
+        "interpretation": "Real PostgreSQL/AMQP/OPC UA/REST lab protocol evidence with simulated WMS/PLC/robot/sensors; runtime choice retained explicitly."
+      },
+      "secrets": {
+        "watcher_potential_findings": [],
+        "scope": "Stored case/session/browser/stack JSON and service logs only. Trace ZIP review is deferred until the full suites finish to avoid competing workload. No guarantee of exhaustive secret absence.",
+        "assessment": "No watcher findings; this review does not rescan ZIPs or certify exhaustive secret absence."
+      },
+      "recorded_browser_errors": [],
+      "recorded_console_errors": [],
+      "physical_transition_count": 1,
+      "verification": [
+        {
+          "sequence": 19,
+          "state_before": "UNKNOWN_OUTCOME",
+          "state_after": "UNKNOWN_OUTCOME",
+          "output": {
+            "schema_version": "1.0",
+            "run_id": "ffec9410-2d31-44db-b183-ed4416c9f8d8",
+            "correlation_id": "72337b4a-89cc-5a15-a8cb-01773faff429",
+            "causation_id": "53e46641-8344-4526-9d88-1aaa05b90206",
+            "timestamp": "2026-10-05T22:28:43.996093Z",
+            "verification_id": "4d3bfcda-7436-4b1e-9353-afe13f6e125b",
+            "job_id": "3d3cd4db-83b4-576d-8448-36bc3cc06f92",
+            "command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+            "observation_id": "53e46641-8344-4526-9d88-1aaa05b90206",
+            "verdict": "VERIFIED_SUCCESS",
+            "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+            "workflow_state": "UNKNOWN_OUTCOME",
+            "reconciliation_required": true,
+            "recovered_verification": false
+          }
+        },
+        {
+          "sequence": 20,
+          "state_before": "UNKNOWN_OUTCOME",
+          "state_after": "COMPLETED",
+          "output": {
+            "schema_version": "1.0",
+            "run_id": "ffec9410-2d31-44db-b183-ed4416c9f8d8",
+            "correlation_id": "72337b4a-89cc-5a15-a8cb-01773faff429",
+            "causation_id": "03cd8bd8-abd5-4914-a88e-87ac77016ebe",
+            "timestamp": "2026-10-05T22:28:47.121551Z",
+            "verification_id": "06f7f629-8585-45e9-b889-24a1c74baa1a",
+            "job_id": "3d3cd4db-83b4-576d-8448-36bc3cc06f92",
+            "command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+            "observation_id": "03cd8bd8-abd5-4914-a88e-87ac77016ebe",
+            "verdict": "VERIFIED_SUCCESS",
+            "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+          }
+        }
+      ],
+      "wms_outputs": [
+        {
+          "stage": 20,
+          "sequence": 21,
+          "status": "COMPLETED",
+          "classification": "REAL PROTOCOL",
+          "output": {
+            "command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+            "job_id": "3d3cd4db-83b4-576d-8448-36bc3cc06f92",
+            "physical_retry": false,
+            "verified_outcome": "COMPLETED",
+            "wire": {
+              "acknowledgement_id": "wms:a1619749-05e3-556f-84f6-cc7491c1231f",
+              "attempts": 1,
+              "classification": "REAL PROTOCOL",
+              "command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+              "http_status": 200,
+              "job_id": "3d3cd4db-83b4-576d-8448-36bc3cc06f92",
+              "payload_hash": "46ffb2833a700e6c31657937f6ce9a756dbc4cd333b01511b9fe3be54356663c",
+              "physical_retry": false,
+              "protocol": "REST/JSON",
+              "schema_version": "1.0",
+              "system": "SIMULATED WMS",
+              "verified_outcome": "COMPLETED",
+              "wms_acknowledged": true
+            },
+            "wms_acknowledged": true
+          }
+        }
+      ],
+      "erp_completion": [
+        {
+          "stage": 21,
+          "sequence": 22,
+          "status": "COMPLETED",
+          "classification": "SIMULATED SYSTEM",
+          "output": {
+            "order_id": "order-f95d95ba-98bf-4976-a5d1-50be46cbd59c",
+            "business_status": "COMPLETED",
+            "wms_acknowledged": true,
+            "wms_acknowledgement_ids": [
+              "c3a78c1e-bd7b-59ba-899d-8efa49bf1293"
+            ]
+          }
+        }
+      ],
+      "recovery": {
+        "physical_stage": {
+          "stage": 16,
+          "sequence": 16,
+          "status": "COMPLETED",
+          "classification": "SIMULATED ROBOT",
+          "output": {
+            "command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+            "receipt": null,
+            "status": "UNKNOWN_OUTCOME",
+            "interface": "simulated controller interface",
+            "playback_url": "/jobs/3d3cd4db-83b4-576d-8448-36bc3cc06f92/playback"
+          }
+        },
+        "controller_status_at_stage_17": {
+          "runtime_receipt_status": "SUCCEEDED",
+          "runtime_receipt_command_id": "a1619749-05e3-556f-84f6-cc7491c1231f",
+          "plc_wire_state": "EXECUTING",
+          "plc_wire_result_sequence": 0
+        },
+        "verification_transitions": [
+          {
+            "stage": 19,
+            "sequence": 19,
+            "status": "COMPLETED",
+            "summary": "Verification",
+            "state_before": "UNKNOWN_OUTCOME",
+            "state_after": "UNKNOWN_OUTCOME",
+            "classification": "REAL CODE",
+            "protocol": "Python"
+          },
+          {
+            "stage": 19,
+            "sequence": 20,
+            "status": "COMPLETED",
+            "summary": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+            "state_before": "UNKNOWN_OUTCOME",
+            "state_after": "COMPLETED",
+            "classification": "REAL CODE",
+            "protocol": "controller + sensor"
+          }
+        ],
+        "interpretation": "Stage16 records UNKNOWN_OUTCOME with no returned receipt. Stage17 reads the original successful runtime receipt while PLC wire still says EXECUTING/sequence0. Ordinary verification preserves UNKNOWN_OUTCOME; the next explicit reconciliation changes the original job to COMPLETED. Final saved runtime and PLC receipts agree at one effect/sequence1. Earlier and final PLC snapshots are distinct times, not conflicting final results."
+      },
+      "initial_observation": {
+        "reviewed_at_utc": "2026-10-05T22:33:45.106117+00:00",
+        "formal_test_status": "PENDING_JUNIT",
+        "snapshot_sha256": "c930d85c4977d5928fd6daff72443c5c71750167546d589a8a38b918fcf5442b"
+      },
+      "formal_test_status": "PASSED",
+      "formal_test_result": {
+        "junit": "docs/evidence/acceptance/20261005T215547/tests-1.xml",
+        "junit_sha256": "00582581025c6937b7db9acb207998bce46d19e72483d50cedb5c2a89e09b2d0",
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]",
+        "seconds": 46.213
+      }
+    },
+    {
+      "case": "duplicate_delivery",
+      "input": "artifacts/final-evidence-pack/dfb06bc/pass-1/duplicate_delivery.json",
+      "input_sha256": "f1d5e2cb705dd1052bc3580541943538cc2bd9da40409f786946803a4eb4ce24",
+      "captured_at_utc": "2026-10-05T22:30:11.402748+00:00",
+      "artifact_directory": "artifacts/lab-browser/20261005T222857416036/DUPLICATE_DELIVERY",
+      "runtime": "synthetic",
+      "session": {
+        "session_id": "5d4ceba4-33f0-54dc-abdf-4d6b6c5873c4",
+        "correlation_id": "8dc0b3ae-f195-58b4-8a3a-3e63a1fbced0",
+        "order_id": "order-485842c0-78c6-47c1-9c19-27ba7ebd3e34",
+        "job_id": "ed73cb9d-58da-5098-beba-26fbf4c8911c",
+        "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "updated_at": "2026-10-05T22:29:32.952789Z"
+      },
+      "checks": {
+        "captured_complete": true,
+        "final_stage_22_completed": true,
+        "one_runtime_command_and_one_plc_command_result": true,
+        "original_command_and_job_in_all_final_receipts": true,
+        "same_payload_hash_in_all_final_receipts": true,
+        "all_final_receipts_one_effect": true,
+        "controller_receipts_succeeded": true,
+        "source_checks_match_at_capture": true,
+        "recorded_sources_match_at_review": true,
+        "saved_input_hashes_match_at_review": true,
+        "truth_stage_classifications_consistent": true,
+        "distinct_saved_service_process_ids": true,
+        "saved_opcua_is_edge_process": true,
+        "no_recorded_browser_errors": true,
+        "no_watcher_secret_findings": true
+      },
+      "source_check_count": 35,
+      "source_mismatches": [],
+      "original_input_hash_checks": [
+        {
+          "path": "artifacts/lab-browser/20261005T222857416036/DUPLICATE_DELIVERY/stack.json",
+          "sha256": "34927d90aa3db3c82d403471843742a6336dd104a110ba65216ad383246ed498",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222857416036/DUPLICATE_DELIVERY/session.json",
+          "sha256": "3533e61066d59d404b71af458215c08cc06b62afe3eb9edfca7cc4be3272fe1e",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222857416036/DUPLICATE_DELIVERY/browser.json",
+          "sha256": "d8238d91bb49b4c3630234affde87c3a73b27f2a7a3b12777b1fab60cf524669",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222857416036/DUPLICATE_DELIVERY/source-hashes.json",
+          "sha256": "89c54d7d37389b91ff0f29dce53de3220c4c18892d3a74a03898a6b9f53bf549",
+          "matches_at_review": true
+        }
+      ],
+      "journal_facts": {
+        "runtime_journal_rows": 1,
+        "runtime_receipt": {
+          "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+          "job_id": "ed73cb9d-58da-5098-beba-26fbf4c8911c",
+          "status": "SUCCEEDED",
+          "reason": "PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "b2aad26500cd2b3ca12afb1b523bb007aed111bf55f9e7c2c6367f9430cc1544",
+          "journal_durable": true
+        },
+        "runtime_robot_event_count": 20,
+        "robot_event_count_meaning": "All retained robot_event rows; not a count of physical effects.",
+        "plc_command_rows": 1,
+        "plc_result_rows": 1,
+        "plc_state": "SUCCEEDED",
+        "plc_result_sequence": 1,
+        "plc_result_row_sequence": 1,
+        "plc_acknowledged": false,
+        "plc_acknowledged_meaning": "Persisted PLC result acknowledgement flag; separate from AMQP consumer ACK and WMS ACK.",
+        "database_hashes_at_capture": {
+          "runtime.db": "01f761af3833f0365e1825571f06d1cee1ef3460695a78913daede840ce5877a",
+          "plc.db": "ae68d9ec6225660fc5dd7dd08127ca9007bb2515ddba9e4cff96a0428f6b67f5"
+        },
+        "scope": "Previously saved read-only watcher journal facts; no database reopened for this review."
+      },
+      "truth": {
+        "stack_label": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+        "stage_classifications": {
+          "1": [
+            "SIMULATED SYSTEM"
+          ],
+          "2": [
+            "SIMULATED SYSTEM"
+          ],
+          "3": [
+            "REAL CODE"
+          ],
+          "4": [
+            "REAL CODE"
+          ],
+          "5": [
+            "SYNTHETIC SENSOR"
+          ],
+          "6": [
+            "REAL CODE"
+          ],
+          "7": [
+            "REAL CODE"
+          ],
+          "8": [
+            "REAL CODE"
+          ],
+          "9": [
+            "REAL CODE"
+          ],
+          "10": [
+            "REAL PROTOCOL"
+          ],
+          "11": [
+            "REAL PROTOCOL"
+          ],
+          "12": [
+            "REAL PROTOCOL"
+          ],
+          "13": [
+            "REAL PROTOCOL"
+          ],
+          "14": [
+            "REAL PROTOCOL"
+          ],
+          "15": [
+            "REAL CODE"
+          ],
+          "16": [
+            "SIMULATED ROBOT"
+          ],
+          "17": [
+            "REAL PROTOCOL"
+          ],
+          "18": [
+            "SYNTHETIC SENSOR"
+          ],
+          "19": [
+            "REAL CODE"
+          ],
+          "20": [
+            "REAL PROTOCOL"
+          ],
+          "21": [
+            "SIMULATED SYSTEM"
+          ],
+          "22": [
+            "REAL CODE"
+          ]
+        },
+        "processes": {
+          "api": 33712,
+          "wms": 26672,
+          "edge": 33672,
+          "plc": 24352
+        },
+        "opcua_client_component": "edge-adapter",
+        "opcua_server_process_id": 24352,
+        "opcua_edge_process_id": 33672,
+        "simulated_system_label": "SIMULATED SYSTEM",
+        "interpretation": "Real PostgreSQL/AMQP/OPC UA/REST lab protocol evidence with simulated WMS/PLC/robot/sensors; runtime choice retained explicitly."
+      },
+      "secrets": {
+        "watcher_potential_findings": [],
+        "scope": "Stored case/session/browser/stack JSON and service logs only. Trace ZIP review is deferred until the full suites finish to avoid competing workload. No guarantee of exhaustive secret absence.",
+        "assessment": "No watcher findings; this review does not rescan ZIPs or certify exhaustive secret absence."
+      },
+      "recorded_browser_errors": [],
+      "recorded_console_errors": [],
+      "physical_transition_count": 1,
+      "verification": [
+        {
+          "sequence": 19,
+          "state_before": "VERIFYING",
+          "state_after": "COMPLETED",
+          "output": {
+            "schema_version": "1.0",
+            "run_id": "8df72c2e-982d-41c9-82ac-1e266226baac",
+            "correlation_id": "8dc0b3ae-f195-58b4-8a3a-3e63a1fbced0",
+            "causation_id": "bd845ff4-47c4-48ea-9d92-6b3a13f7fbb7",
+            "timestamp": "2026-10-05T22:29:28.959601Z",
+            "verification_id": "451b758a-c63e-44d7-a8b1-76bf672b2c92",
+            "job_id": "ed73cb9d-58da-5098-beba-26fbf4c8911c",
+            "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+            "observation_id": "bd845ff4-47c4-48ea-9d92-6b3a13f7fbb7",
+            "verdict": "VERIFIED_SUCCESS",
+            "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+            "workflow_state": "COMPLETED",
+            "reconciliation_required": false,
+            "recovered_verification": false
+          }
+        }
+      ],
+      "wms_outputs": [
+        {
+          "stage": 20,
+          "sequence": 20,
+          "status": "COMPLETED",
+          "classification": "REAL PROTOCOL",
+          "output": {
+            "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+            "job_id": "ed73cb9d-58da-5098-beba-26fbf4c8911c",
+            "physical_retry": false,
+            "verified_outcome": "COMPLETED",
+            "wire": {
+              "acknowledgement_id": "wms:2638ae5f-218f-5ec0-8284-d7e5aa659037",
+              "attempts": 1,
+              "classification": "REAL PROTOCOL",
+              "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+              "http_status": 200,
+              "job_id": "ed73cb9d-58da-5098-beba-26fbf4c8911c",
+              "payload_hash": "f88a02558bb5c2857920c197e78c09def9bc9888d94fd92746f5595305dff4d1",
+              "physical_retry": false,
+              "protocol": "REST/JSON",
+              "schema_version": "1.0",
+              "system": "SIMULATED WMS",
+              "verified_outcome": "COMPLETED",
+              "wms_acknowledged": true
+            },
+            "wms_acknowledged": true
+          }
+        }
+      ],
+      "erp_completion": [
+        {
+          "stage": 21,
+          "sequence": 21,
+          "status": "COMPLETED",
+          "classification": "SIMULATED SYSTEM",
+          "output": {
+            "order_id": "order-485842c0-78c6-47c1-9c19-27ba7ebd3e34",
+            "business_status": "COMPLETED",
+            "wms_acknowledged": true,
+            "wms_acknowledgement_ids": [
+              "95b596ce-6892-5388-95aa-c6ab269918f5"
+            ]
+          }
+        }
+      ],
+      "duplicate_delivery": {
+        "first": {
+          "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+          "payload_hash": "b2aad26500cd2b3ca12afb1b523bb007aed111bf55f9e7c2c6367f9430cc1544",
+          "deliveries": 1,
+          "redelivered": false,
+          "consumer_ack_sent": true,
+          "durable_inbox_committed": true,
+          "ack_policy": "manual ACK after PostgreSQL inbox commit",
+          "protocol": "AMQP 0-9-1",
+          "classification": "REAL PROTOCOL",
+          "redelivery": {
+            "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+            "payload_hash": "b2aad26500cd2b3ca12afb1b523bb007aed111bf55f9e7c2c6367f9430cc1544",
+            "deliveries": 2,
+            "redelivered": false,
+            "consumer_ack_sent": true,
+            "durable_inbox_committed": true,
+            "ack_policy": "manual ACK after PostgreSQL inbox commit",
+            "protocol": "AMQP 0-9-1",
+            "classification": "REAL PROTOCOL",
+            "duplicate_publish": {
+              "command_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+              "message_id": "2638ae5f-218f-5ec0-8284-d7e5aa659037",
+              "exchange": "robotops.commands",
+              "routing_key": "test.705e656b21d24b04a45b940a3d3254a1",
+              "publisher_confirm": true,
+              "consumer_ack": "separate edge stage",
+              "protocol": "AMQP 0-9-1",
+              "classification": "REAL PROTOCOL",
+              "delivery_mode": 2,
+              "mandatory": true
+            }
+          }
+        },
+        "same_command": true,
+        "same_payload_hash": true,
+        "deliveries": [
+          1,
+          2
+        ],
+        "broker_redelivered": [
+          false,
+          false
+        ],
+        "interpretation": "Confirmed duplicate publication with two inbox deliveries of the same command/hash. Both broker redelivered flags are false; do not call this observed broker redelivery."
+      },
+      "initial_observation": {
+        "reviewed_at_utc": "2026-10-05T22:33:45.106117+00:00",
+        "formal_test_status": "PENDING_JUNIT",
+        "snapshot_sha256": "7f5b147996d5c9aa700e608895c26ef19d211d36aa014af47c54ca44e359988b"
+      },
+      "formal_test_status": "PASSED",
+      "formal_test_result": {
+        "junit": "docs/evidence/acceptance/20261005T215547/tests-1.xml",
+        "junit_sha256": "00582581025c6937b7db9acb207998bce46d19e72483d50cedb5c2a89e09b2d0",
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]",
+        "seconds": 40.246
+      }
+    },
+    {
+      "case": "wms_unavailable",
+      "input": "artifacts/final-evidence-pack/dfb06bc/pass-1/wms_unavailable.json",
+      "input_sha256": "97117762bf5e57f921c32dc058a2a866f8bea74720c4d87b7c76675f647a2d3a",
+      "captured_at_utc": "2026-10-05T22:31:11.518945+00:00",
+      "artifact_directory": "artifacts/lab-browser/20261005T222937799290/WMS_UNAVAILABLE",
+      "runtime": "synthetic",
+      "session": {
+        "session_id": "017418f3-5503-5d5a-84ca-ec6781d45a15",
+        "correlation_id": "07e7c399-8d9b-59a8-9d99-503d12bff5aa",
+        "order_id": "order-e9026175-de1a-46a0-9cbe-7c47f77fc871",
+        "job_id": "44e9f225-b6f4-5fc7-9de4-830ce2dab605",
+        "command_id": "146f2aed-77eb-5e8e-a2f1-8e55fd554c14",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-05T22:30:12.756066Z"
+      },
+      "checks": {
+        "captured_complete": true,
+        "final_stage_22_completed": true,
+        "one_runtime_command_and_one_plc_command_result": true,
+        "original_command_and_job_in_all_final_receipts": true,
+        "same_payload_hash_in_all_final_receipts": true,
+        "all_final_receipts_one_effect": true,
+        "controller_receipts_succeeded": true,
+        "source_checks_match_at_capture": true,
+        "recorded_sources_match_at_review": true,
+        "saved_input_hashes_match_at_review": true,
+        "truth_stage_classifications_consistent": true,
+        "distinct_saved_service_process_ids": true,
+        "saved_opcua_is_edge_process": true,
+        "no_recorded_browser_errors": true,
+        "no_watcher_secret_findings": true
+      },
+      "source_check_count": 35,
+      "source_mismatches": [],
+      "original_input_hash_checks": [
+        {
+          "path": "artifacts/lab-browser/20261005T222937799290/WMS_UNAVAILABLE/stack.json",
+          "sha256": "cee45be9a3b6ca307b75c86e2e4910db1030193ed1cb35a94a8fa978137901a7",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222937799290/WMS_UNAVAILABLE/session.json",
+          "sha256": "37d87321f4c02768858c2c061dcb9a3bc65c2bb9064b9fdb2c4301556d6afc03",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222937799290/WMS_UNAVAILABLE/browser.json",
+          "sha256": "9282a3df041d9228123450d8a45aa25c15b39ac2cc6a95424c1f72e65f5c4fd2",
+          "matches_at_review": true
+        },
+        {
+          "path": "artifacts/lab-browser/20261005T222937799290/WMS_UNAVAILABLE/source-hashes.json",
+          "sha256": "89c54d7d37389b91ff0f29dce53de3220c4c18892d3a74a03898a6b9f53bf549",
+          "matches_at_review": true
+        }
+      ],
+      "journal_facts": {
+        "runtime_journal_rows": 1,
+        "runtime_receipt": {
+          "command_id": "146f2aed-77eb-5e8e-a2f1-8e55fd554c14",
+          "job_id": "44e9f225-b6f4-5fc7-9de4-830ce2dab605",
+          "status": "SUCCEEDED",
+          "reason": "PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "66ff5e513246282690516ce8b27481ee1a557a9e58992dd30c936fba942dbd69",
+          "journal_durable": true
+        },
+        "runtime_robot_event_count": 20,
+        "robot_event_count_meaning": "All retained robot_event rows; not a count of physical effects.",
+        "plc_command_rows": 1,
+        "plc_result_rows": 1,
+        "plc_state": "SUCCEEDED",
+        "plc_result_sequence": 1,
+        "plc_result_row_sequence": 1,
+        "plc_acknowledged": false,
+        "plc_acknowledged_meaning": "Persisted PLC result acknowledgement flag; separate from AMQP consumer ACK and WMS ACK.",
+        "database_hashes_at_capture": {
+          "runtime.db": "b96fcf2ed27c24bed7ec6a6983c35ae60d83953a8b562c44511bb59ea638c786",
+          "plc.db": "61a36de7f5857cbf321d320031a67e6c0dd477cff12c546c46e982c3687ea4a6"
+        },
+        "scope": "Previously saved read-only watcher journal facts; no database reopened for this review."
+      },
+      "truth": {
+        "stack_label": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+        "stage_classifications": {
+          "1": [
+            "SIMULATED SYSTEM"
+          ],
+          "2": [
+            "SIMULATED SYSTEM"
+          ],
+          "3": [
+            "REAL CODE"
+          ],
+          "4": [
+            "REAL CODE"
+          ],
+          "5": [
+            "SYNTHETIC SENSOR"
+          ],
+          "6": [
+            "REAL CODE"
+          ],
+          "7": [
+            "REAL CODE"
+          ],
+          "8": [
+            "REAL CODE"
+          ],
+          "9": [
+            "REAL CODE"
+          ],
+          "10": [
+            "REAL PROTOCOL"
+          ],
+          "11": [
+            "REAL PROTOCOL"
+          ],
+          "12": [
+            "REAL PROTOCOL"
+          ],
+          "13": [
+            "REAL PROTOCOL"
+          ],
+          "14": [
+            "REAL PROTOCOL"
+          ],
+          "15": [
+            "REAL CODE"
+          ],
+          "16": [
+            "SIMULATED ROBOT"
+          ],
+          "17": [
+            "REAL PROTOCOL"
+          ],
+          "18": [
+            "SYNTHETIC SENSOR"
+          ],
+          "19": [
+            "REAL CODE"
+          ],
+          "20": [
+            "REAL PROTOCOL"
+          ],
+          "21": [
+            "SIMULATED SYSTEM"
+          ],
+          "22": [
+            "REAL CODE"
+          ]
+        },
+        "processes": {
+          "api": 14708,
+          "wms": 33392,
+          "edge": 38316,
+          "plc": 22672
+        },
+        "opcua_client_component": "edge-adapter",
+        "opcua_server_process_id": 22672,
+        "opcua_edge_process_id": 38316,
+        "simulated_system_label": "SIMULATED SYSTEM",
+        "interpretation": "Real PostgreSQL/AMQP/OPC UA/REST lab protocol evidence with simulated WMS/PLC/robot/sensors; runtime choice retained explicitly."
+      },
+      "secrets": {
+        "watcher_potential_findings": [],
+        "scope": "Stored case/session/browser/stack JSON and service logs only. Trace ZIP review is deferred until the full suites finish to avoid competing workload. No guarantee of exhaustive secret absence.",
+        "assessment": "No watcher findings; this review does not rescan ZIPs or certify exhaustive secret absence."
+      },
+      "recorded_browser_errors": [],
+      "recorded_console_errors": [],
+      "physical_transition_count": 1,
+      "verification": [
+        {
+          "sequence": 19,
+          "state_before": "VERIFYING",
+          "state_after": "COMPLETED",
+          "output": {
+            "schema_version": "1.0",
+            "run_id": "49ee016b-edd6-427b-a701-6e66e1ace834",
+            "correlation_id": "07e7c399-8d9b-59a8-9d99-503d12bff5aa",
+            "causation_id": "91bb2bd1-a067-45bd-a7bd-aff19fec1c43",
+            "timestamp": "2026-10-05T22:30:07.070674Z",
+            "verification_id": "3991e420-597e-467c-93d9-38267a48ed85",
+            "job_id": "44e9f225-b6f4-5fc7-9de4-830ce2dab605",
+            "command_id": "146f2aed-77eb-5e8e-a2f1-8e55fd554c14",
+            "observation_id": "91bb2bd1-a067-45bd-a7bd-aff19fec1c43",
+            "verdict": "VERIFIED_SUCCESS",
+            "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+            "workflow_state": "COMPLETED",
+            "reconciliation_required": false,
+            "recovered_verification": false
+          }
+        }
+      ],
+      "wms_outputs": [
+        {
+          "stage": 20,
+          "sequence": 20,
+          "status": "FAILED",
+          "classification": "REAL PROTOCOL",
+          "output": {
+            "error": "WMS_HTTP_503_RETRY_BUSINESS_ACK_ONLY",
+            "retry_permitted": true,
+            "protocol_evidence_confirmed": true,
+            "network_attempted": true,
+            "http_response": {
+              "method": "POST",
+              "path": "/v1/wms/acknowledgements",
+              "status_code": 503
+            },
+            "wms_acknowledged": false,
+            "physical_retry": false
+          }
+        },
+        {
+          "stage": 20,
+          "sequence": 21,
+          "status": "COMPLETED",
+          "classification": "REAL PROTOCOL",
+          "output": {
+            "command_id": "146f2aed-77eb-5e8e-a2f1-8e55fd554c14",
+            "job_id": "44e9f225-b6f4-5fc7-9de4-830ce2dab605",
+            "physical_retry": false,
+            "verified_outcome": "COMPLETED",
+            "wire": {
+              "acknowledgement_id": "wms:146f2aed-77eb-5e8e-a2f1-8e55fd554c14",
+              "attempts": 2,
+              "classification": "REAL PROTOCOL",
+              "command_id": "146f2aed-77eb-5e8e-a2f1-8e55fd554c14",
+              "http_status": 200,
+              "job_id": "44e9f225-b6f4-5fc7-9de4-830ce2dab605",
+              "payload_hash": "090a21b8dbec4b888038f3c0915de3656f0f37d0dd28935a0cd40c203362a92e",
+              "physical_retry": false,
+              "protocol": "REST/JSON",
+              "schema_version": "1.0",
+              "system": "SIMULATED WMS",
+              "verified_outcome": "COMPLETED",
+              "wms_acknowledged": true
+            },
+            "wms_acknowledged": true
+          }
+        }
+      ],
+      "erp_completion": [
+        {
+          "stage": 21,
+          "sequence": 22,
+          "status": "COMPLETED",
+          "classification": "SIMULATED SYSTEM",
+          "output": {
+            "order_id": "order-e9026175-de1a-46a0-9cbe-7c47f77fc871",
+            "business_status": "COMPLETED",
+            "wms_acknowledged": true,
+            "wms_acknowledgement_ids": [
+              "7ead216f-67e5-53f6-90c6-5b1915cb3183"
+            ]
+          }
+        }
+      ],
+      "wms_retry": {
+        "http_statuses": [
+          503,
+          200
+        ],
+        "stage_statuses": [
+          "FAILED",
+          "COMPLETED"
+        ],
+        "first_network_attempted": true,
+        "first_protocol_evidence_confirmed": true,
+        "request": {
+          "method": "POST",
+          "path": "/v1/wms/acknowledgements",
+          "status_code": 503
+        },
+        "final_ack_attempts": 2,
+        "physical_retry_flags": [
+          false,
+          false
+        ],
+        "interpretation": "Expected persisted business-ack failure HTTP503 followed by HTTP200; one physical effect remains. FAILED is an intermediate stage fact, not a terminal test failure."
+      },
+      "initial_observation": {
+        "reviewed_at_utc": "2026-10-05T22:33:45.106117+00:00",
+        "formal_test_status": "PENDING_JUNIT",
+        "snapshot_sha256": "c81a66cf1794228c0fadde6c3e851343dc2c8bebee087cdd31194474672efb52"
+      },
+      "formal_test_status": "PASSED",
+      "formal_test_result": {
+        "junit": "docs/evidence/acceptance/20261005T215547/tests-1.xml",
+        "junit_sha256": "00582581025c6937b7db9acb207998bce46d19e72483d50cedb5c2a89e09b2d0",
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]",
+        "seconds": 40.184
+      }
+    }
+  ],
+  "root_saved_screenshot_review": [
+    {
+      "path": "artifacts/lab-browser/20261005T222713201979/happy/physical-gate.png",
+      "sha256": "52e8e258be5489cdb22fa70b01694bf9690ac8039ec45f8c05c970261e829425",
+      "bytes": 371784,
+      "reviewed_by": "root agent; observations supplied in collaboration message",
+      "observations": [
+        "WAITING_AUTHORIZATION revision28; stage15 explicit yellow Authorize Robot Execution control.",
+        "OPC/PLC current map; viewer says robot execution not authorized with static scene/disabled-playback wording.",
+        "Stage14 REAL PROTOCOL OPC UA inspector; lab profile header real AMQP/OPC UA plus simulated systems.",
+        "No overlap or truncation observed."
+      ],
+      "scope": "Saved automated-test screenshot review, not a fresh manual walkthrough; formal JUnit evidence is recorded separately."
+    },
+    {
+      "path": "artifacts/lab-browser/20261005T222713201979/happy/completed.png",
+      "sha256": "4612cc557a14fbf4a98c22cf45ab42e0c5bacdea8b7a51ed4e117f8990700bf2",
+      "bytes": 415993,
+      "reviewed_by": "root agent; observations supplied in collaboration message",
+      "observations": [
+        "COMPLETED revision44; pending card hidden; Business current map; neutral review banner.",
+        "SIMULATED ROBOT / READ-ONLY REPLAY; actual OPC UA DataChangeNotification events visible.",
+        "No overlap or truncation observed."
+      ],
+      "scope": "Saved automated-test screenshot review, not a fresh manual walkthrough; formal JUnit evidence is recorded separately."
+    }
+  ],
+  "gated_playback_evidence": {
+    "test_source": "tests/lab/test_browser_lab.py",
+    "source_sha256": "33c29e6d16136b3b97a5d5446579ed9ec223a2381c51089a901291cfc435daa4",
+    "anchors": [
+      "assert_waiting_without_playback lines51-75 checks executionGated, six disabled controls, no recording/motion, stopped unchanged pose.",
+      "lines221-245 check gates<=15, no receipt/effect before authorization, reload same session/revision at10, and one receipt/effect after physical authorization.",
+      "lines248-266 record evaluated Blender movement and replay the exact physical authorization request, requiring unchanged revision and effect1.",
+      "session.json is written at line327 after final scenario-body assertions; body evidence is separate from fixture teardown/terminal JUnit."
+    ],
+    "direct_snapshot_limit": "Watcher case snapshots preserve terminal steps and final journals, not structured before-gate no-effect/pose measurements. Gate screenshot review and matched test-source assertion order provide additional bounded evidence; exact final manual gate proof remains pending."
+  },
+  "limitations": [
+    "Database hashes are main-file capture hashes and do not independently hash potential SQLite WAL contents; saved queried receipt rows are the preserved journal evidence.",
+    "No per-command PICK_EFFECT event breakdown was retained by watcher, only complete runtime receipt and total robot_event count.",
+    "No new visual inspection performed by this subagent; screenshot observations are attributed to root.",
+    "Trace ZIP redaction/truth review, manual final loop/inspectors, exact CLI and remote gates remain separate.",
+    "Pass1 is terminalPASSED, but the campaign failed cleanup before pass2; full acceptance and GOAL remain unachieved."
+  ],
+  "goal_status": "NOT_ACHIEVED",
+  "all_capture_source_identities_match": true,
+  "formal_update_at_utc": "2026-10-05T22:38:49.992457+00:00",
+  "reviewed_at_utc_meaning": "Original JSON/screenshot-context review timestamp, preserved; formal JUnit update occurred separately.",
+  "tests_1_terminal": {
+    "junit": "docs/evidence/acceptance/20261005T215547/tests-1.xml",
+    "sha256": "00582581025c6937b7db9acb207998bce46d19e72483d50cedb5c2a89e09b2d0",
+    "seconds": 2300.346,
+    "tests": 799,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 799,
+    "status": "PASSED"
+  },
+  "overall_acceptance": {
+    "status": "INCOMPLETE_NONZERO_EXIT",
+    "owner_exit_code": 1,
+    "failure": "TemporaryDirectory cleanup failed with WinError32 on pass-1 fixture plc.db after successful799-case suite; pass2 did not start.",
+    "evidence": "artifacts/final-evidence-pack/dfb06bc/watcher-handle-correction/summary.json",
+    "tests_2": "NOT_STARTED",
+    "source_product_code_changed": false
+  }
+}

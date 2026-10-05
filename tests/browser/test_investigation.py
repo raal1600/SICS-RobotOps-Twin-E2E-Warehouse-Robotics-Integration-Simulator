@@ -102,7 +102,11 @@ def browser_page(request):
                 encoding="utf-8",
             )
             context.tracing.stop(path=str(directory / "trace.zip"))
-            browser.close()
+            # Close pages/sockets gracefully before the browser's force-close.
+            try:
+                context.close()
+            finally:
+                browser.close()
 
 
 def get(page, url):
@@ -126,6 +130,8 @@ def open_ready(page, origin, viewport):
 
 
 def continue_guided(page, prefix, identity):
+    # Creation and authorization responses precede the UI's evidence refresh.
+    page.wait_for_function("() => !busy && !integration.busy")
     for _ in range(30):
         session = get(page, f"{prefix}/integration/sessions/{identity}")
         if session["status"] in {"COMPLETED", "UNKNOWN_OUTCOME", "FAILED"}:
@@ -143,9 +149,7 @@ def continue_guided(page, prefix, identity):
             expect(page.locator("#integration-pending-title")).to_have_text(
                 "Controller result", timeout=180_000
             )
-        expect(page.locator("#integration-advance")).not_to_have_text(
-            "Executing bounded stage?", timeout=180_000
-        )
+        page.wait_for_function("() => !busy && !integration.busy")
         expect(page.locator("#integration-error")).to_be_empty()
     pytest.fail("Guided workflow did not settle")
 

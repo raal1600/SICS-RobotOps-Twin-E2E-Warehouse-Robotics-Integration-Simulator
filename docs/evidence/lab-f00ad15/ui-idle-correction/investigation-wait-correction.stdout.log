@@ -1,0 +1,48 @@
+...E.............                                                        [100%]
+=================================== ERRORS ====================================
+_ ERROR at teardown of test_run_notice_investigate_and_return[blender-desktop] _
+
+tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/pytest-investigation-wait-correction/test_run_notice_investigate_an2')
+request = <SubRequest 'server' for <Function test_run_notice_investigate_and_return[blender-desktop]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        runtime_type = getattr(request, "param", SyntheticRuntime)
+        app = create_workspace_app(
+            tmp_path / "worlds", runtime_type=runtime_type, settings=Settings.hkm()
+        )
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            service = uvicorn.Server(uvicorn.Config(app, log_level="warning", access_log=False))
+            thread = threading.Thread(target=service.run, kwargs={"sockets": [listener]}, daemon=True)
+            thread.start()
+            deadline = time.monotonic() + 20
+            while not service.started and thread.is_alive() and time.monotonic() < deadline:
+                time.sleep(0.02)
+            assert service.started, "Local browser-test API failed to start"
+            try:
+                yield f"http://127.0.0.1:{listener.getsockname()[1]}", app.state.test_registry
+            finally:
+                service.should_exit = True
+                thread.join(timeout=20)
+>               assert not thread.is_alive(), "Browser-test API did not shut down"
+E               AssertionError: Browser-test API did not shut down
+E               assert not True
+E                +  where True = is_alive()
+E                +    where is_alive = <Thread(Thread-5 (run), started daemon 18692)>.is_alive
+
+tests\browser\test_investigation.py:46: AssertionError
+---------------------------- Captured log teardown ----------------------------
+ERROR    asyncio:base_events.py:1890 Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\ramis\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramis\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 166, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+=========================== short test summary info ===========================
+ERROR tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-desktop]
+16 passed, 1 error in 647.79s (0:10:47)

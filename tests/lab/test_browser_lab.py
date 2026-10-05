@@ -340,7 +340,11 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                     encoding="utf-8",
                 )
                 context.tracing.stop(path=str(evidence / "trace.zip"))
-                browser.close()
+                # Close pages/sockets gracefully before the browser's force-close.
+                try:
+                    context.close()
+                finally:
+                    browser.close()
     finally:
         stack.stop()
         for path in stack.directory.glob("*.log"):

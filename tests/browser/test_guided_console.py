@@ -26,6 +26,7 @@ def start_guided(page, origin, fault=""):
     with page.expect_response(lambda response: response.url.endswith("/v1/wms/tasks")) as response:
         page.locator("#create").click()
     assert response.value.status == 202, response.value.text()
+    page.wait_for_function("() => !busy && !integration.busy")
     expect(page.locator("#integration-console")).to_be_visible()
     state = session(page, origin)
     assert state["current_stage"] == 1
@@ -51,6 +52,7 @@ def advance(page, origin):
         expect(page.locator("#integration-state")).not_to_have_text(
             f"{state['status']} · revision {state['revision']}"
         )
+    page.wait_for_function("() => !busy && !integration.busy")
     expect(page.locator("#integration-error")).to_be_empty()
     return session(page, origin)
 
@@ -182,6 +184,7 @@ def test_guided_lost_ack_reconciles_original_command_without_second_effect(serve
     with page.expect_response(lambda response: response.url.endswith("/reconcile")) as response:
         page.locator("#integration-reconcile").click()
     assert response.value.ok, response.value.text()
+    page.wait_for_function("() => !busy && !integration.busy")
     expect(page.locator("#integration-pending-title")).to_have_text("WMS reconciliation")
     final = finish(page, origin)
     assert final["command_id"] == command

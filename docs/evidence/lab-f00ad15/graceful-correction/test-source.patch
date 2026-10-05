@@ -1,0 +1,82 @@
+diff --git a/tests/browser/test_guided_console.py b/tests/browser/test_guided_console.py
+index 4b35e0f..041d7e6 100644
+--- a/tests/browser/test_guided_console.py
++++ b/tests/browser/test_guided_console.py
+@@ -26,6 +26,7 @@ def start_guided(page, origin, fault=""):
+     with page.expect_response(lambda response: response.url.endswith("/v1/wms/tasks")) as response:
+         page.locator("#create").click()
+     assert response.value.status == 202, response.value.text()
++    page.wait_for_function("() => !busy && !integration.busy")
+     expect(page.locator("#integration-console")).to_be_visible()
+     state = session(page, origin)
+     assert state["current_stage"] == 1
+@@ -51,6 +52,7 @@ def advance(page, origin):
+         expect(page.locator("#integration-state")).not_to_have_text(
+             f"{state['status']} · revision {state['revision']}"
+         )
++    page.wait_for_function("() => !busy && !integration.busy")
+     expect(page.locator("#integration-error")).to_be_empty()
+     return session(page, origin)
+ 
+@@ -182,6 +184,7 @@ def test_guided_lost_ack_reconciles_original_command_without_second_effect(serve
+     with page.expect_response(lambda response: response.url.endswith("/reconcile")) as response:
+         page.locator("#integration-reconcile").click()
+     assert response.value.ok, response.value.text()
++    page.wait_for_function("() => !busy && !integration.busy")
+     expect(page.locator("#integration-pending-title")).to_have_text("WMS reconciliation")
+     final = finish(page, origin)
+     assert final["command_id"] == command
+diff --git a/tests/browser/test_investigation.py b/tests/browser/test_investigation.py
+index a46a0bc..bd3f16e 100644
+--- a/tests/browser/test_investigation.py
++++ b/tests/browser/test_investigation.py
+@@ -102,7 +102,11 @@ def browser_page(request):
+                 encoding="utf-8",
+             )
+             context.tracing.stop(path=str(directory / "trace.zip"))
+-            browser.close()
++            # Close pages/sockets gracefully before the browser's force-close.
++            try:
++                context.close()
++            finally:
++                browser.close()
+ 
+ 
+ def get(page, url):
+@@ -126,6 +130,8 @@ def open_ready(page, origin, viewport):
+ 
+ 
+ def continue_guided(page, prefix, identity):
++    # Creation and authorization responses precede the UI's evidence refresh.
++    page.wait_for_function("() => !busy && !integration.busy")
+     for _ in range(30):
+         session = get(page, f"{prefix}/integration/sessions/{identity}")
+         if session["status"] in {"COMPLETED", "UNKNOWN_OUTCOME", "FAILED"}:
+@@ -143,9 +149,7 @@ def continue_guided(page, prefix, identity):
+             expect(page.locator("#integration-pending-title")).to_have_text(
+                 "Controller result", timeout=180_000
+             )
+-        expect(page.locator("#integration-advance")).not_to_have_text(
+-            "Executing bounded stage?", timeout=180_000
+-        )
++        page.wait_for_function("() => !busy && !integration.busy")
+         expect(page.locator("#integration-error")).to_be_empty()
+     pytest.fail("Guided workflow did not settle")
+ 
+diff --git a/tests/lab/test_browser_lab.py b/tests/lab/test_browser_lab.py
+index 59cc49e..939da2f 100644
+--- a/tests/lab/test_browser_lab.py
++++ b/tests/lab/test_browser_lab.py
+@@ -340,7 +340,11 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
+                     encoding="utf-8",
+                 )
+                 context.tracing.stop(path=str(evidence / "trace.zip"))
+-                browser.close()
++                # Close pages/sockets gracefully before the browser's force-close.
++                try:
++                    context.close()
++                finally:
++                    browser.close()
+     finally:
+         stack.stop()
+         for path in stack.directory.glob("*.log"):

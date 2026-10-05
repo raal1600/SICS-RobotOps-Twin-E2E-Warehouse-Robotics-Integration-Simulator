@@ -1,0 +1,62 @@
+{
+  "run": {
+    "junit": "artifacts/investigation-wait-correction.xml",
+    "stdout": "artifacts/investigation-wait-correction.stdout.log",
+    "exit": "artifacts/investigation-wait-correction-exit.json",
+    "test_bodies_passed": 16,
+    "teardown_errors": 1,
+    "failures": 0,
+    "skips": 0,
+    "duration_seconds": 647.79,
+    "overall_exit_code": 1
+  },
+  "case": {
+    "classname": "tests.browser.test_investigation",
+    "name": "test_run_notice_investigate_and_return[blender-desktop]",
+    "time": "124.838"
+  },
+  "error": "failed on teardown with \"AssertionError: Browser-test API did not shut down\nassert not True\n +  where True = is_alive()\n +    where is_alive = <Thread(Thread-5 (run), started daemon 18692)>.is_alive\"",
+  "traceback": "tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/pytest-investigation-wait-correction/test_run_notice_investigate_an2')\nrequest = <SubRequest 'server' for <Function test_run_notice_investigate_and_return[blender-desktop]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        runtime_type = getattr(request, \"param\", SyntheticRuntime)\n        app = create_workspace_app(\n            tmp_path / \"worlds\", runtime_type=runtime_type, settings=Settings.hkm()\n        )\n        with socket.socket() as listener:\n            listener.bind((\"127.0.0.1\", 0))\n            service = uvicorn.Server(uvicorn.Config(app, log_level=\"warning\", access_log=False))\n            thread = threading.Thread(target=service.run, kwargs={\"sockets\": [listener]}, daemon=True)\n            thread.start()\n            deadline = time.monotonic() + 20\n            while not service.started and thread.is_alive() and time.monotonic() < deadline:\n                time.sleep(0.02)\n            assert service.started, \"Local browser-test API failed to start\"\n            try:\n                yield f\"http://127.0.0.1:{listener.getsockname()[1]}\", app.state.test_registry\n            finally:\n                service.should_exit = True\n                thread.join(timeout=20)\n>               assert not thread.is_alive(), \"Browser-test API did not shut down\"\nE               AssertionError: Browser-test API did not shut down\nE               assert not True\nE                +  where True = is_alive()\nE                +    where is_alive = <Thread(Thread-5 (run), started daemon 18692)>.is_alive\n\ntests\\browser\\test_investigation.py:46: AssertionError",
+  "browser_artifact_directory": "artifacts/investigation-browser/20261005T213101497453/test_run_notice_investigate_and_return[blender-desktop]",
+  "trace_sha256": "dd78378636372b6e4d74ad2b237f3eb33c053bb93f08b0c555e5c6ad316cfc73",
+  "body_result": {
+    "runtime": "BlenderRuntime",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "job_id": "514ac74d-28c6-514f-bdb6-afbc0dce0a45",
+    "command_id": "6d6ae232-35b8-5976-b92f-cc9c3c3977a8",
+    "effect_count": 1,
+    "review_states": [
+      "UNKNOWN_OUTCOME",
+      "REQUIRES_INTERVENTION",
+      "COMPLETED"
+    ]
+  },
+  "page_errors": [],
+  "console_errors": [],
+  "test_source_hash": "0ca99be5127f9062a3616d0923b88d0b74919f03adcb8849666a634d028a9643",
+  "captured_cleanup_error": {
+    "callback": "_ProactorBasePipeTransport._call_connection_lost",
+    "exception": "ConnectionResetError [WinError 10054] An existing connection was forcibly closed by the remote host",
+    "source": "CPython3.13.15 asyncio/proactor_events.py:166",
+    "operation": "self._sock.shutdown(socket.SHUT_RDWR)"
+  },
+  "supported_mechanism": {
+    "certainty": "Code-supported inference; no blocked server/task stack was captured in this run.",
+    "facts": [
+      "The callback calls protocol.connection_lost first, then enters a finally block.",
+      "The observed shutdown exception occurs before socket.close(), asyncio server._detach(self), and _called_connection_lost=True.",
+      "asyncio.Server.wait_closed waits for closed server and all client transports to detach.",
+      "Uvicorn server._wait_tasks_to_complete awaits each asyncio server.wait_closed.",
+      "The installed Uvicorn default on Windows uses asyncio.ProactorEventLoop."
+    ],
+    "inference": "The observed transport callback exception can leave an attached asyncio transport and prevent graceful server shutdown even after the protocol-level connection was removed."
+  },
+  "limits": [
+    "Do not claim an application/WebSocket/SQLite lock leak from this evidence.",
+    "All16 test bodies passing does not make the run a pass; teardown error makes exit1.",
+    "No timeout relaxation, cleanup-error suppression, test run or source edit was performed during this diagnosis."
+  ]
+}

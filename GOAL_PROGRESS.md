@@ -1,9 +1,9 @@
-# Goal Progress ? Integration Lab
+# Goal Progress - Integration Lab
 
 Current objective: root [GOAL.md](GOAL.md), introduced at `814979d`.
 Status: **NOT ACHIEVED**. Earlier simulator acceptance remains historical.
 
-Milestones A?D are implemented on `feat/integration-lab`: bounded persisted stages
+Milestones A-D are implemented on `feat/integration-lab`: bounded persisted stages
 and revision-guarded authorization, the guided console and shared automatic
 handlers, PostgreSQL/outbox durability, RabbitMQ and durable edge inbox, actual
 OPC UA traffic and retained PLC command identity, separate WMS HTTP acknowledgement,
@@ -43,6 +43,30 @@ failing browser journeys (271.94 seconds), repository lint/formatting, strict my
 for 66 source files, and the 169-MUST documentation drift check.
 [Corrective results](docs/evidence/lab-f78985b/corrections/summary.json) identify
 the changed source bytes; these checks do not replace full acceptance.
+
+The next clean campaign on `f00ad15` was intentionally interrupted after a saved
+Playwright trace confirmed another investigation-test helper error. Its busy-label
+check used a literal question mark instead of the UI ellipsis, so it returned
+before the action completed; the next five-second enabled assertion expired
+after successful WMS reconciliation. The trace then showed the enabled Continue
+button. No backend error, extra physical effect, or connection reset was observed.
+The correction waits for the actual UI action to become idle within the helper's
+existing timeout budget. The incomplete campaign is not a full-suite result;
+[its interruption record](docs/evidence/acceptance/20261005T210653/interruption.json)
+preserves that distinction. The corrective run then passed all 16 scenario bodies
+across both browser files, but exited with one Blender-desktop server teardown
+error. Cleanup logged Windows Proactor `ConnectionResetError` before the unchanged
+20-second server shutdown assertion failed. A separate 48-case real TCP probe did
+not reproduce that exact callback race. The fixtures now explicitly close their
+Playwright contexts before closing the browser, following the documented graceful
+cleanup order. No event-loop replacement, exception suppression, or shutdown
+deadline increase was applied. Both Blender investigation layouts and the actual
+separate-process Blender lab happy path then passed: **3 passed, 5 deselected in
+381.80 seconds**, with no failures or teardown errors. The selection deliberately
+targeted the changed cleanup paths and does not replace the full suite.
+[The correction record](docs/evidence/lab-f00ad15/summary.json) preserves source
+hashes, failed/interrupted results, the probe limitation and passing rerun.
+A new clean two-pass acceptance campaign remains required.
 
 Required next evidence: complete a clean full acceptance campaign, execute the
 final clean-lab browser/reload/duplicate/recovery

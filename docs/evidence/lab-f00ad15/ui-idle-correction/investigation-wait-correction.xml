@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="16" time="647.739" timestamp="2026-10-05T23:28:48.986002+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[synthetic-desktop]" time="70.612" /><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[synthetic-compact]" time="60.970" /><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[blender-desktop]" time="124.838"><error message="failed on teardown with &quot;AssertionError: Browser-test API did not shut down&#10;assert not True&#10; +  where True = is_alive()&#10; +    where is_alive = &lt;Thread(Thread-5 (run), started daemon 18692)&gt;.is_alive&quot;">tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/pytest-investigation-wait-correction/test_run_notice_investigate_an2')
+request = &lt;SubRequest 'server' for &lt;Function test_run_notice_investigate_and_return[blender-desktop]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        runtime_type = getattr(request, "param", SyntheticRuntime)
+        app = create_workspace_app(
+            tmp_path / "worlds", runtime_type=runtime_type, settings=Settings.hkm()
+        )
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            service = uvicorn.Server(uvicorn.Config(app, log_level="warning", access_log=False))
+            thread = threading.Thread(target=service.run, kwargs={"sockets": [listener]}, daemon=True)
+            thread.start()
+            deadline = time.monotonic() + 20
+            while not service.started and thread.is_alive() and time.monotonic() &lt; deadline:
+                time.sleep(0.02)
+            assert service.started, "Local browser-test API failed to start"
+            try:
+                yield f"http://127.0.0.1:{listener.getsockname()[1]}", app.state.test_registry
+            finally:
+                service.should_exit = True
+                thread.join(timeout=20)
+&gt;               assert not thread.is_alive(), "Browser-test API did not shut down"
+E               AssertionError: Browser-test API did not shut down
+E               assert not True
+E                +  where True = is_alive()
+E                +    where is_alive = &lt;Thread(Thread-5 (run), started daemon 18692)&gt;.is_alive
+
+tests\browser\test_investigation.py:46: AssertionError</error></testcase><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[blender-compact]" time="81.872" /><testcase classname="tests.browser.test_investigation" name="test_app_request_failure_does_not_become_simulated_outcome" time="1.860" /><testcase classname="tests.browser.test_investigation" name="test_active_readonly_watch_closes_on_clear_and_delete" time="3.125" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]" time="20.013" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]" time="67.476" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-SyntheticRuntime]" time="21.976" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-BlenderRuntime]" time="53.786" /><testcase classname="tests.browser.test_guided_console" name="test_guided_happy_reload_gate_trace_and_business_completion[synthetic]" time="22.076" /><testcase classname="tests.browser.test_guided_console" name="test_guided_happy_reload_gate_trace_and_business_completion[blender]" time="38.424" /><testcase classname="tests.browser.test_guided_console" name="test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly[BROKER_TRANSIENT-synthetic]" time="9.438" /><testcase classname="tests.browser.test_guided_console" name="test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly[DUPLICATE_DELIVERY-synthetic]" time="10.249" /><testcase classname="tests.browser.test_guided_console" name="test_guided_lost_ack_reconciles_original_command_without_second_effect[synthetic]" time="21.346" /><testcase classname="tests.browser.test_guided_console" name="test_guided_lost_ack_reconciles_original_command_without_second_effect[blender]" time="38.916" /></testsuite></testsuites>

@@ -354,6 +354,10 @@ for(const fault of ['DROP_ACK_AFTER_EFFECT','DROP_ACK_BEFORE_EFFECT'])test(fault
   await el('resolve-blocker').onclick();
   assertReconcile(posts.slice(start),null);await finishGuided(el);
   assert.equal(orders[0].status,fault==='DROP_ACK_BEFORE_EFFECT'?'FAILED':'COMPLETED');
+  assert.match(el('integration-state').textContent,/^COMPLETED/);
+  assert.equal(el('integration-pending').hidden,true);
+  assert.equal(el('integration-advance').disabled,true);
+  assert.equal(el('integration-live-state').textContent,'Execution session completed. Review the recorded controller result, verification and business reconciliation.');
   assert.equal(el('create').disabled,false);assert.equal(el('next-step').hidden,true);
   assert.equal(el('product').value,'product-blue');await runGuided(el);
   assert.equal(orders.length,2);assert.equal(orders[1].lines[0].product_id,'product-blue');
@@ -438,6 +442,7 @@ for(const execution of executions)for(const observation of observations)test(`in
 test('unreconciled test can be archived without reconciliation, then reviewed unchanged',async()=>{
   const {el,orders,posts}=await dashboard();
   el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
+  assert.equal(el('integration-pending').hidden,false);
   assert.match(el('integration-pending-title').textContent,/Outcome unproven/);
   assert.match(el('integration-pending-detail').textContent,/original command journal and fresh observation/);
   assert.match(el('integration-pending-detail').textContent,/does not issue a new pick/);
@@ -565,6 +570,9 @@ for(const fault of ['LOGICAL_ESTOP','CELL_FAULT'])test(fault+': guide resets the
 
 for(const fault of ['BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'])test(fault+': guide explains rejection and focuses configuration without dispatch',async()=>{
   const {el,posts}=await dashboard();el('scenario').value=fault;await runGuided(el);
+  assert.match(el('integration-state').textContent,/^FAILED/);
+  assert.equal(el('integration-pending').hidden,true);
+  assert.equal(el('integration-advance').disabled,true);
   assert.match(el('guide-detail').textContent,/before a robot command was created/);
   const start=posts.length;await el('guide-action').onclick();
   assert.equal(el('scenario').focusCount,1);assert.equal(posts.length,start);
@@ -887,4 +895,14 @@ test('Create only persists a guided session; every boundary requires an explicit
   assert.equal(ui.orders.length,0);assert.equal(ui.current().sessions[0].current_stage,2);
   assert.equal(ui.posts.filter(physicalPost).length,0);
   assert.equal(ui.posts.at(-1).body.stage,1);assert.equal(ui.posts.at(-1).body.expected_revision,0);
+  await finishGuided(ui.el);
+  assert.equal(ui.el('integration-error').textContent,'');
+  assert.equal(ui.el('integration-pending').hidden,true);
+  const completed=JSON.stringify(ui.current().sessions[0]),posts=ui.posts.length;
+  await ui.el('create').onclick();
+  assert.equal(ui.posts.length,posts+1);assert.equal(ui.posts.at(-1).path,'/v1/wms/tasks');
+  assert.equal(JSON.stringify(ui.current().sessions[0]),completed);
+  assert.equal(ui.current().sessions[1].current_stage,1);
+  assert.equal(ui.el('integration-pending').hidden,false);
+  assert.equal(ui.el('integration-advance').disabled,false);
 });

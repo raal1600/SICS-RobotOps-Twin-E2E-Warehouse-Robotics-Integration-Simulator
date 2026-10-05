@@ -3,6 +3,7 @@
 import hashlib
 import json
 import sqlite3
+from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -16,7 +17,7 @@ pytestmark = pytest.mark.lab_integration
 
 def read_journal(stack, command_id):
     uri = (stack.directory / "runtime.db").as_uri() + "?mode=ro"
-    with sqlite3.connect(uri, uri=True) as db:
+    with closing(sqlite3.connect(uri, uri=True)) as db:
         row = db.execute(
             "SELECT receipt FROM controller_journal WHERE id=?", (command_id,)
         ).fetchone()

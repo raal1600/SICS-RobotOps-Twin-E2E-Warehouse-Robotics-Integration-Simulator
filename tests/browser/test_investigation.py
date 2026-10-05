@@ -106,7 +106,9 @@ def browser_page(request):
 
 
 def get(page, url):
-    response = page.request.get(url)
+    # Retry one ECONNRESET on this read-only test observation. Playwright does
+    # not retry HTTP status failures; mutation requests never use this helper.
+    response = page.request.get(url, max_retries=1)
     assert response.ok, response.text()
     return response.json()
 
@@ -306,6 +308,7 @@ def test_run_notice_investigate_and_return(server, browser_page, viewport):
     ) as review:
         page.locator("#resolve-blocker").click()
     assert review.value.json()["context"]["reconciliation"]["status"] == "REQUIRES_INTERVENTION"
+    page.wait_for_function("() => !busy && !integration.busy")
     expect(page.locator("#inspection-context")).to_contain_text("REQUIRES_INTERVENTION")
     expect(page.locator("#inspection-symptom")).to_contain_text("could not establish")
     page.locator("#tab-evidence").click()
@@ -325,6 +328,7 @@ def test_run_notice_investigate_and_return(server, browser_page, viewport):
     ) as resolved:
         page.locator("#resolve-blocker").click()
     assert resolved.value.json()["context"]["reconciliation"]["status"] == "COMPLETED"
+    page.wait_for_function("() => !busy && !integration.busy")
     expect(page.locator("#investigation-title")).to_contain_text("Pick confirmed")
     expect(page.locator("#observation-controls")).not_to_be_visible()
     after = get(page, f"{origin}/jobs/{job_id}/evidence")

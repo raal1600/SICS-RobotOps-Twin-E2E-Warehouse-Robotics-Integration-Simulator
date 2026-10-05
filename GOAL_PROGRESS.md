@@ -1,33 +1,56 @@
 # Goal Progress ? Integration Lab
 
-Current objective: root GOAL.md, introduced at `814979d`. Status: **NOT ACHIEVED**.
-The older simulator acceptance below is historical and does not prove this upgrade.
+Current objective: root [GOAL.md](GOAL.md), introduced at `814979d`.
+Status: **NOT ACHIEVED**. Earlier simulator acceptance remains historical.
 
-Milestones A?D are implemented incrementally on `feat/integration-lab`: persisted
-bounded sessions and authorizations, the console and shared core handlers,
-PostgreSQL durability, RabbitMQ outbox/inbox, real OPC UA and retained PLC identity,
-separate WMS HTTP acknowledgement, failure fixtures, and inspectable trace evidence.
-Recovery and final full-stack verification are still in progress.
+Milestones A?D are implemented on `feat/integration-lab`: bounded persisted stages
+and revision-guarded authorization, the guided console and shared automatic
+handlers, PostgreSQL/outbox durability, RabbitMQ and durable edge inbox, actual
+OPC UA traffic and retained PLC command identity, separate WMS HTTP acknowledgement,
+conservative recovery, Blender handoff, source/payload inspectors and telemetry.
+The requirement registry contains 169 MUSTs, including all 51 root GOAL checkboxes.
 
-Development evidence already executed (not final acceptance):
+## Final-loop evidence and corrections in progress
 
-- Baseline deterministic unit/workflow/integration run: 529 passed.
-- Guided local Chromium happy/reload/physical-gate and lost-ACK paths: 2 passed.
-- The same two guided browser paths with actual Blender: 2 passed.
-- Initial complete real-service lab suite: 13 passed (PostgreSQL, RabbitMQ,
-  edge, OPC UA, WMS HTTP and restart); later telemetry changes require a rerun.
-- Guided interrupted-stage recovery and original-command reconciliation tests pass.
-- Automatic REST demo driver tests: 2 passed, including no motion without explicit
-  physical consent and lost-ACK reconciliation with one persisted effect.
-- Contract/governance checks: 75 passed; requirement registry now contains 169 MUSTs,
-  including all 51 new GOAL.md checkboxes. Strict mypy passed for 64 source files.
+The complete first acceptance suite on frozen implementation `f78985b` executed
+**799 tests: 796 passed, 3 failed, no skips**, with **91.44% coverage**. Setup,
+headless browser installation, Blender availability and configured security checks
+passed. All four separate-process lab browser cases passed: real Blender happy
+path, lost ACK after effect, duplicate delivery and WMS HTTP 503 recovery. Each
+retained the original command with one effect; Blender produced 133 evaluated
+frames, 118 distinct robot poses and visible rendered motion. These individual
+passes do not turn the failed full suite into accepted evidence.
 
-Required next evidence: finish the business-acknowledgement and live-protocol
-checks, run the full suite and configured lint/type/security gates on stable source,
-start the complete clean lab through its native supervisor, execute the mandatory
-browser/reload/duplicate/recovery loop, inspect every requirement and evidence item,
-and record the final commit and limitations. No criterion may be waived just because
-it lacks a test. See [the complete checklist](docs/integration-lab-requirements.md).
+[The retained failure record](docs/evidence/lab-f78985b/summary.json) and
+[original acceptance manifest](docs/evidence/acceptance/20261005T195412/manifest.json)
+identify the exact source and commands. The second pass was deliberately stopped
+after the first failed, so it is explicitly interrupted, not passed. Original
+JUnit, coverage and logs remain unchanged.
+
+The synthetic guided browser failure repeatedly encountered observations older
+than the unchanged five-second freshness limit before any command existed.
+Two Blender investigation failures exposed test observation issues: one asserted
+the title before the actual UI action finished loading confirmed evidence; another
+read-only test GET received ECONNRESET while the server remained responsive.
+Corrections wait for the existing action completion, allow one bounded reset retry
+on test GETs only, and close the lab browser helper's SQLite readers. No robot
+operation, freshness limit, physical retry rule or outcome assertion is relaxed.
+Terminal console wording is also corrected so completed sessions invite review
+instead of incorrectly asking for further verification.
+
+Scoped correction verification passed: 109 dashboard tests, all three previously
+failing browser journeys (271.94 seconds), repository lint/formatting, strict mypy
+for 66 source files, and the 169-MUST documentation drift check.
+[Corrective results](docs/evidence/lab-f78985b/corrections/summary.json) identify
+the changed source bytes; these checks do not replace full acceptance.
+
+Required next evidence: complete a clean full acceptance campaign, execute the
+final clean-lab browser/reload/duplicate/recovery
+loop and documented CLI demos, inspect logs and rendered publication, then update
+the final report and all requirement evidence. Exact-source CI, publication and
+Pages verification remain mandatory. Remote publication requires explicit approval
+following the earlier automatic approval rejection; no remote action is inferred
+from local results. See [the complete checklist](docs/integration-lab-requirements.md).
 
 ## Historical pre-lab progress
 

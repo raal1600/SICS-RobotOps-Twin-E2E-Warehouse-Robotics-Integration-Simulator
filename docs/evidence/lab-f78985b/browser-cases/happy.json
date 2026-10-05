@@ -1,0 +1,836 @@
+{
+  "source_directory": "artifacts/lab-browser/20261005T203514161749/happy",
+  "case": "happy",
+  "formal_test_status": "PASSED in terminal tests_1 JUnit; overall tests_1 FAILED on three other browser cases",
+  "runtime": "blender",
+  "identity": {
+    "session_id": "5feaebbc-71a5-56c1-af4e-bf3d853c571b",
+    "correlation_id": "e48dcdc6-8658-5487-9ddf-8f2546669419",
+    "order_id": "order-16f22ece-c059-49f5-811a-5d47e7ed3438",
+    "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+    "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac"
+  },
+  "final": {
+    "status": "COMPLETED",
+    "current_stage": 22,
+    "revision": 44,
+    "updated_at": "2026-10-05T20:36:28.264207Z"
+  },
+  "physical_effect_count": 1,
+  "runtime_journal_command_count": 1,
+  "journal_capture": "happy-journals.json",
+  "stack": {
+    "status": "healthy",
+    "api": "http://127.0.0.1:58089",
+    "wms": "http://127.0.0.1:58090",
+    "opcua": "opc.tcp://127.0.0.1:58091/robotops/",
+    "edge": "http://127.0.0.1:58092",
+    "queue": "robotops.test.e2767ea9180d4e4bbaec79b8c566fef6",
+    "runtime": "blender",
+    "data_directory": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-f1qqgyk9\\fixtures\\test_full_lab_browser_authoriz0\\process-stack",
+    "processes": {
+      "api": 35188,
+      "wms": 3192,
+      "edge": 19508,
+      "plc": 30080
+    },
+    "launcher_processes": {
+      "plc": 37492,
+      "edge": 11440,
+      "wms": 33528,
+      "api": 37460
+    },
+    "truth": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors"
+  },
+  "transitions": [
+    {
+      "stage": 1,
+      "sequence": 1,
+      "status": "COMPLETED",
+      "summary": "DEMAND_CREATED",
+      "state_before": "NOT_INTAKEN",
+      "state_after": "NOT_INTAKEN",
+      "classification": "SIMULATED SYSTEM",
+      "protocol": "SQL",
+      "duration_ms": 158.81379999336787
+    },
+    {
+      "stage": 2,
+      "sequence": 2,
+      "status": "COMPLETED",
+      "summary": "TASK_CREATED",
+      "state_before": "NOT_INTAKEN",
+      "state_after": "NOT_INTAKEN",
+      "classification": "SIMULATED SYSTEM",
+      "protocol": "SQL",
+      "duration_ms": 38.873800018336624
+    },
+    {
+      "stage": 3,
+      "sequence": 3,
+      "status": "COMPLETED",
+      "summary": "API intake",
+      "state_before": "NOT_INTAKEN",
+      "state_after": "NOT_INTAKEN",
+      "classification": "REAL CODE",
+      "protocol": "REST",
+      "duration_ms": 42.8818000073079
+    },
+    {
+      "stage": 4,
+      "sequence": 4,
+      "status": "COMPLETED",
+      "summary": "Durable intake",
+      "state_before": "NOT_INTAKEN",
+      "state_after": "VALIDATED",
+      "classification": "REAL CODE",
+      "protocol": "SQL",
+      "duration_ms": 495.55180000606924
+    },
+    {
+      "stage": 5,
+      "sequence": 5,
+      "status": "COMPLETED",
+      "summary": "Fresh observation",
+      "state_before": "VALIDATED",
+      "state_after": "PLANNING",
+      "classification": "SYNTHETIC SENSOR",
+      "protocol": "sensor",
+      "duration_ms": 585.6895000033546
+    },
+    {
+      "stage": 6,
+      "sequence": 6,
+      "status": "COMPLETED",
+      "summary": "Planning",
+      "state_before": "PLANNING",
+      "state_after": "PLANNING",
+      "classification": "REAL CODE",
+      "protocol": "Python",
+      "duration_ms": 325.63749997643754
+    },
+    {
+      "stage": 7,
+      "sequence": 7,
+      "status": "COMPLETED",
+      "summary": "Plan validation",
+      "state_before": "PLANNING",
+      "state_after": "PLANNING",
+      "classification": "REAL CODE",
+      "protocol": "Python",
+      "duration_ms": 434.4252000155393
+    },
+    {
+      "stage": 8,
+      "sequence": 8,
+      "status": "COMPLETED",
+      "summary": "Immutable RobotCommand persisted",
+      "state_before": "PLANNING",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL CODE",
+      "protocol": "SQL",
+      "duration_ms": 474.90030000335537
+    },
+    {
+      "stage": 9,
+      "sequence": 9,
+      "status": "COMPLETED",
+      "summary": "Transactional outbox",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL CODE",
+      "protocol": "SQL",
+      "duration_ms": 330.2370999881532
+    },
+    {
+      "stage": 10,
+      "sequence": 10,
+      "status": "COMPLETED",
+      "summary": "Dispatch publication",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL PROTOCOL",
+      "protocol": "AMQP",
+      "duration_ms": 459.55549998325296
+    },
+    {
+      "stage": 11,
+      "sequence": 11,
+      "status": "COMPLETED",
+      "summary": "Edge delivery",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL PROTOCOL",
+      "protocol": "AMQP",
+      "duration_ms": 265.74479998089373
+    },
+    {
+      "stage": 12,
+      "sequence": 12,
+      "status": "COMPLETED",
+      "summary": "Controller session",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL PROTOCOL",
+      "protocol": "OPC UA",
+      "duration_ms": 271.3752999843564
+    },
+    {
+      "stage": 13,
+      "sequence": 13,
+      "status": "COMPLETED",
+      "summary": "PLC SubmitJob",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL PROTOCOL",
+      "protocol": "OPC UA",
+      "duration_ms": 350.1914000080433
+    },
+    {
+      "stage": 14,
+      "sequence": 14,
+      "status": "COMPLETED",
+      "summary": "PLC operational preconditions",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL PROTOCOL",
+      "protocol": "OPC UA",
+      "duration_ms": 467.13000000454485
+    },
+    {
+      "stage": 15,
+      "sequence": 15,
+      "status": "COMPLETED",
+      "summary": "READY FOR PHYSICAL EXECUTION",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "classification": "REAL CODE",
+      "protocol": "REST",
+      "duration_ms": 168.8175000017509
+    },
+    {
+      "stage": 16,
+      "sequence": 16,
+      "status": "COMPLETED",
+      "summary": "SUCCEEDED",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "EXECUTING",
+      "classification": "SIMULATED ROBOT",
+      "protocol": "controller",
+      "duration_ms": 18965.818099997705
+    },
+    {
+      "stage": 17,
+      "sequence": 17,
+      "status": "COMPLETED",
+      "summary": "Controller result",
+      "state_before": "EXECUTING",
+      "state_after": "VERIFYING",
+      "classification": "REAL PROTOCOL",
+      "protocol": "OPC UA",
+      "duration_ms": 2475.197800027672
+    },
+    {
+      "stage": 18,
+      "sequence": 18,
+      "status": "COMPLETED",
+      "summary": "Fresh post-execution observation",
+      "state_before": "VERIFYING",
+      "state_after": "VERIFYING",
+      "classification": "SYNTHETIC SENSOR",
+      "protocol": "sensor",
+      "duration_ms": 226.5639000106603
+    },
+    {
+      "stage": 19,
+      "sequence": 19,
+      "status": "COMPLETED",
+      "summary": "Verification",
+      "state_before": "VERIFYING",
+      "state_after": "COMPLETED",
+      "classification": "REAL CODE",
+      "protocol": "Python",
+      "duration_ms": 551.3089000014588
+    },
+    {
+      "stage": 20,
+      "sequence": 20,
+      "status": "COMPLETED",
+      "summary": "WMS reconciliation",
+      "state_before": "COMPLETED",
+      "state_after": "COMPLETED",
+      "classification": "REAL PROTOCOL",
+      "protocol": "REST",
+      "duration_ms": 257.6947000052314
+    },
+    {
+      "stage": 21,
+      "sequence": 21,
+      "status": "COMPLETED",
+      "summary": "ERP business completion",
+      "state_before": "RECONCILING",
+      "state_after": "COMPLETED",
+      "classification": "SIMULATED SYSTEM",
+      "protocol": "SQL",
+      "duration_ms": 339.3066999851726
+    },
+    {
+      "stage": 22,
+      "sequence": 22,
+      "status": "COMPLETED",
+      "summary": "Final correlated trace",
+      "state_before": "COMPLETED",
+      "state_after": "COMPLETED",
+      "classification": "REAL CODE",
+      "protocol": "SQL",
+      "duration_ms": 350.4059000115376
+    }
+  ],
+  "important_outputs": [
+    {
+      "stage": 10,
+      "sequence": 10,
+      "status": "COMPLETED",
+      "classification": "REAL PROTOCOL",
+      "output": {
+        "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+        "message_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+        "exchange": "robotops.commands",
+        "routing_key": "test.0aba7daba8604dababf4022c109dea9e",
+        "publisher_confirm": true,
+        "consumer_ack": "separate edge stage",
+        "protocol": "AMQP 0-9-1",
+        "classification": "REAL PROTOCOL",
+        "delivery_mode": 2,
+        "mandatory": true
+      }
+    },
+    {
+      "stage": 11,
+      "sequence": 11,
+      "status": "COMPLETED",
+      "classification": "REAL PROTOCOL",
+      "output": {
+        "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+        "payload_hash": "e4e08d02194c9d39f4ea4ffce2a896d4eea3d86b902665bf751302020714fea7",
+        "deliveries": 1,
+        "redelivered": false,
+        "consumer_ack_sent": true,
+        "durable_inbox_committed": true,
+        "ack_policy": "manual ACK after PostgreSQL inbox commit",
+        "protocol": "AMQP 0-9-1",
+        "classification": "REAL PROTOCOL"
+      }
+    },
+    {
+      "stage": 12,
+      "sequence": 12,
+      "status": "COMPLETED",
+      "classification": "REAL PROTOCOL",
+      "output": {
+        "state": "IDLE",
+        "server_process_id": 30080,
+        "protocol": "OPC UA",
+        "classification": "REAL PROTOCOL",
+        "system": "SIMULATED SYSTEM",
+        "method": "Browse/Subscribe",
+        "namespace": "urn:robotops:integration-lab:cell-1",
+        "browsed_children": 10,
+        "subscription_created": true,
+        "subscription_notifications": [
+          "IDLE"
+        ],
+        "security_mode": "None (isolated development lab)",
+        "opcua_client_component": "edge-adapter",
+        "edge_process_id": 19508,
+        "edge_control_protocol": "REST/JSON"
+      }
+    },
+    {
+      "stage": 16,
+      "sequence": 16,
+      "status": "COMPLETED",
+      "classification": "SIMULATED ROBOT",
+      "output": {
+        "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+        "receipt": {
+          "schema_version": "2.0",
+          "run_id": "67d6e444-8c60-4b28-8249-fbb771f145e8",
+          "correlation_id": "e48dcdc6-8658-5487-9ddf-8f2546669419",
+          "causation_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+          "timestamp": "2026-10-05T20:36:01.076045Z",
+          "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+          "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+          "scene_epoch": "c422c832-0ec1-4191-a909-299ae3296583",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "e4e08d02194c9d39f4ea4ffce2a896d4eea3d86b902665bf751302020714fea7",
+          "journal_durable": true,
+          "active_tool_id": "EE_VAC_SINGLE",
+          "tool_change_performed": false,
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "runtime_profile_version": "hkm_inspired_v1"
+        },
+        "status": "SUCCEEDED",
+        "interface": "simulated controller interface",
+        "playback_url": "/jobs/1c67cb18-53d1-5bfd-81d0-c25e51eeea25/playback"
+      }
+    },
+    {
+      "stage": 17,
+      "sequence": 17,
+      "status": "COMPLETED",
+      "classification": "REAL PROTOCOL",
+      "output": {
+        "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+        "receipt": {
+          "schema_version": "2.0",
+          "run_id": "67d6e444-8c60-4b28-8249-fbb771f145e8",
+          "correlation_id": "e48dcdc6-8658-5487-9ddf-8f2546669419",
+          "causation_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+          "timestamp": "2026-10-05T20:36:01.076045Z",
+          "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+          "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+          "scene_epoch": "c422c832-0ec1-4191-a909-299ae3296583",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "e4e08d02194c9d39f4ea4ffce2a896d4eea3d86b902665bf751302020714fea7",
+          "journal_durable": true,
+          "active_tool_id": "EE_VAC_SINGLE",
+          "tool_change_performed": false,
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "runtime_profile_version": "hkm_inspired_v1"
+        },
+        "journal_query_only": true,
+        "wire": {
+          "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+          "payload_hash": "e4e08d02194c9d39f4ea4ffce2a896d4eea3d86b902665bf751302020714fea7",
+          "state": "SUCCEEDED",
+          "result_sequence": 1,
+          "result": {
+            "active_tool_id": "EE_VAC_SINGLE",
+            "causation_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+            "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+            "correlation_id": "e48dcdc6-8658-5487-9ddf-8f2546669419",
+            "effect_count": 1,
+            "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+            "journal_durable": true,
+            "payload_hash": "e4e08d02194c9d39f4ea4ffce2a896d4eea3d86b902665bf751302020714fea7",
+            "reason": "BLENDER_PICK_APPLIED",
+            "run_id": "67d6e444-8c60-4b28-8249-fbb771f145e8",
+            "runtime_profile_version": "hkm_inspired_v1",
+            "scene_epoch": "c422c832-0ec1-4191-a909-299ae3296583",
+            "schema_version": "2.0",
+            "status": "SUCCEEDED",
+            "timestamp": "2026-10-05T20:36:01.076045Z",
+            "tool_change_performed": false,
+            "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7"
+          },
+          "acknowledged": false,
+          "accepted_boot_id": "8fb14a70-f12e-4420-abff-e65d4ee7a0c3",
+          "validated_boot_id": "8fb14a70-f12e-4420-abff-e65d4ee7a0c3",
+          "boot_id": "8fb14a70-f12e-4420-abff-e65d4ee7a0c3",
+          "protocol": "OPC UA",
+          "classification": "REAL PROTOCOL",
+          "system": "SIMULATED SYSTEM",
+          "method": "GetJobStatus",
+          "namespace": "urn:robotops:integration-lab:cell-1",
+          "browsed_children": 10,
+          "subscription_created": true,
+          "subscription_notifications": [
+            "SUCCEEDED"
+          ],
+          "security_mode": "None (isolated development lab)",
+          "opcua_client_component": "edge-adapter",
+          "edge_process_id": 19508,
+          "edge_control_protocol": "REST/JSON"
+        },
+        "restart": null
+      }
+    },
+    {
+      "stage": 20,
+      "sequence": 20,
+      "status": "COMPLETED",
+      "classification": "REAL PROTOCOL",
+      "output": {
+        "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+        "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+        "physical_retry": false,
+        "verified_outcome": "COMPLETED",
+        "wire": {
+          "acknowledgement_id": "wms:c6d3d746-e1b0-5954-95f0-05feb33450ac",
+          "attempts": 1,
+          "classification": "REAL PROTOCOL",
+          "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+          "http_status": 200,
+          "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+          "payload_hash": "91319b3f9ec5249c9e32cb21579454c2aec44a6db5671d6bd2abf0aa770e58d2",
+          "physical_retry": false,
+          "protocol": "REST/JSON",
+          "schema_version": "1.0",
+          "system": "SIMULATED WMS",
+          "verified_outcome": "COMPLETED",
+          "wms_acknowledged": true
+        },
+        "wms_acknowledged": true
+      }
+    },
+    {
+      "stage": 21,
+      "sequence": 21,
+      "status": "COMPLETED",
+      "classification": "SIMULATED SYSTEM",
+      "output": {
+        "order_id": "order-16f22ece-c059-49f5-811a-5d47e7ed3438",
+        "business_status": "COMPLETED",
+        "wms_acknowledged": true,
+        "wms_acknowledgement_ids": [
+          "908180fe-cd02-53f3-9887-bef602a5f912"
+        ]
+      }
+    },
+    {
+      "stage": 22,
+      "sequence": 22,
+      "status": "COMPLETED",
+      "classification": "REAL CODE",
+      "output": {
+        "acknowledgement_semantics": "HTTP accepted != DB commit != publisher confirm != consumer ACK != PLC acceptance != controller success != verification != WMS ACK != ERP completion",
+        "correlation_id": "e48dcdc6-8658-5487-9ddf-8f2546669419",
+        "event_count": 56,
+        "job_ids": [
+          "1c67cb18-53d1-5bfd-81d0-c25e51eeea25"
+        ],
+        "order_id": "order-16f22ece-c059-49f5-811a-5d47e7ed3438",
+        "session_id": "5feaebbc-71a5-56c1-af4e-bf3d853c571b",
+        "stage_count": 22
+      }
+    }
+  ],
+  "verification": [
+    {
+      "stage": 19,
+      "sequence": 19,
+      "state_before": "VERIFYING",
+      "state_after": "COMPLETED",
+      "output": {
+        "schema_version": "1.0",
+        "run_id": "67d6e444-8c60-4b28-8249-fbb771f145e8",
+        "correlation_id": "e48dcdc6-8658-5487-9ddf-8f2546669419",
+        "causation_id": "ed5c8d12-64af-4d9e-bd4a-42cfb107519d",
+        "timestamp": "2026-10-05T20:36:21.400738Z",
+        "verification_id": "5bc4e711-2860-47c7-b522-7dcc54ffbc22",
+        "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+        "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+        "observation_id": "ed5c8d12-64af-4d9e-bd4a-42cfb107519d",
+        "verdict": "VERIFIED_SUCCESS",
+        "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+        "workflow_state": "COMPLETED",
+        "reconciliation_required": false,
+        "recovered_verification": false
+      }
+    }
+  ],
+  "browser_errors": [],
+  "browser_console_errors": [],
+  "source_files": [
+    {
+      "path": "robotops/lab/api.py",
+      "saved_sha256": "2677fb5058476eeb0fde6491d10f76cdab77488991a6d06dee83e2199bf7f15b",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/business.py",
+      "saved_sha256": "62081f63ca604ffa63e6448258a99d98e550ec126b0016ea1298003ec92759f8",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/config.py",
+      "saved_sha256": "6d33e848e9da217d857c07203136967a6985b13f6fff91f44c78199c5e99f99a",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/edge.py",
+      "saved_sha256": "902094e80d5930ef3ba29867e3e79500106a4f9742d6f30e7e98af31ee6b9339",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/edge_rpc.py",
+      "saved_sha256": "71b2a47f70c20acdc31f4dc33da21e0f19b9b5397d4c4e01eb79ae789e9f03a5",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/journal.py",
+      "saved_sha256": "7ea21a3a31b3fe1ad1b038fedfb5fe451820c7ea57abf06c46610f1558cc5789",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/opcua.py",
+      "saved_sha256": "01a02954c653f77889146ce97b09aeadeae131031d03dc20ed98761c8f2683cd",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/postgres.py",
+      "saved_sha256": "a2c7249955801c86360de389ae245fc14283873cc53abe3d33b4230c03de93d1",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/transport.py",
+      "saved_sha256": "d98a1f9e004f3d81f216711d1ce28316a4704f8596528ec002b24303bfae2bbc",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/__init__.py",
+      "saved_sha256": "9a9a07f6306023dd38aff18711b7fff2eb388ad7eb1bafaf21251c050a25fbcd",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/lab/__main__.py",
+      "saved_sha256": "cb8dcf2a1211e0a6c6b6a693e277a54180b1e4bf9e448014df8fa72172bf8e3f",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/integration/engine.py",
+      "saved_sha256": "f1ca6c9db8e3ba7152875c98eb3f85c541f11b26b614739edd246b1ec9a77433",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/integration/models.py",
+      "saved_sha256": "96f3565013597118373bd5a5f82e30455a9f68b6972d36f7cf5c3acdab932e16",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/integration/store.py",
+      "saved_sha256": "e25024c23dae400dec501cef5326bacc892d752df058f11c3271f8ddd7c2bc80",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/integration/__init__.py",
+      "saved_sha256": "e90d871d8216caf1e8f882299c98b57a9a70e4ac926c6dbf65552e5673da4f62",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "saved_sha256": "c1cfa650069e8390c56a479f7a3e8ac01d7fbc0d15ed24942bf64f79ead71588",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/blender/visualization.py",
+      "saved_sha256": "9f9b8de5892e295d7cba17cf7d2a4e8654224fb1ecd43400ceea1a6a5884ec5d",
+      "matches_current_file": true
+    },
+    {
+      "path": "robotops/blender/__init__.py",
+      "saved_sha256": "044ecd93d0183e5ebd0c1d674fda67c593b25c072ba374f6b22fb41de99692ce",
+      "matches_current_file": true
+    },
+    {
+      "path": "blender/scripts/hkm_runtime.py",
+      "saved_sha256": "dce97a7c7314dec863cf2f81dd5db50056252077c69eb4cad2db580ec2abfa9b",
+      "matches_current_file": true
+    },
+    {
+      "path": "blender/scripts/hkm_scene.py",
+      "saved_sha256": "70bd0913b8523052ec1ca98b5c1531e1fe95b634aa087237567ed7c039d87b26",
+      "matches_current_file": true
+    },
+    {
+      "path": "blender/scripts/runtime.py",
+      "saved_sha256": "4adb88fc21e73d0987752c4b8e6ca9a0afc8187a3121e782e32cafea12777baa",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/api/app.py",
+      "saved_sha256": "af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/api/cell_profiles.py",
+      "saved_sha256": "b29f753b5edb128663a2e64611a0438dcdad3d3b3faa1fb9a4d663c381264cf8",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/api/guided.py",
+      "saved_sha256": "c38c1858ee6946b27e64654e434c2d33bf2cefcece043b568dd68d33c28a855e",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/api/playback.py",
+      "saved_sha256": "a99e48eae6ca63413b9ce13e1dd654ec8609e4dd63497d92db56228ca0237027",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/api/test_sessions.py",
+      "saved_sha256": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/api/__init__.py",
+      "saved_sha256": "7a70cf857c3ce3f47d30ebdbbc22bd2db406bea2e58172ce2118273c6c9d5004",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/api/__main__.py",
+      "saved_sha256": "2554756dd1f968123dafbb218aae684eccd315cd5142549a042772268fe10276",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/app.js",
+      "saved_sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/integration-console.js",
+      "saved_sha256": "b53fe08871df507284b7de4f92f87bd361bd9a68f93cbe98ebf10ef87777c14d",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/playback.js",
+      "saved_sha256": "87c48ca72312a0e6d10b815a95cd1dc3c8469b3646a674a71df087cf3c5b9251",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/scene-view.js",
+      "saved_sha256": "f51ffb0711b8f5b3cb2d5c523a7d7cce1e4c8531deb61248ab89b5c3320be6e3",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/workflow-guide.js",
+      "saved_sha256": "5b412df965a250a8626f260dc2a106305d8cbcfd1c5cc1965cf0e5ff41b85a01",
+      "matches_current_file": true
+    },
+    {
+      "path": "tools/lab_stack.py",
+      "saved_sha256": "abb9c16d20b5aa3ec04a6d29df43066f3156e07b4b0fb7b873664d4ba472e3de",
+      "matches_current_file": true
+    },
+    {
+      "path": "tests/lab/test_browser_lab.py",
+      "saved_sha256": "d1924465e51591569f7e26b3a502e75ea381118279b0a5f522e2987a72a995f8",
+      "matches_current_file": true
+    }
+  ],
+  "all_source_files_match": true,
+  "secret_and_label_review": {
+    "potential_secret_findings": [],
+    "sensitive_network_headers": [],
+    "network_cookie_count": 0,
+    "text_bytes_scanned": 41194399,
+    "trace_text_member_count": 144,
+    "network_resource_count": 576,
+    "literal_ui_fragments": {
+      "Simulates a deliberate stop request, like an operator pressing the simulator's stop control. The cell enters a stopped state and refuses the pick until reset. This is not safety-rated.": 2,
+      "Blender is synthetic test state, not validated robot dynamics. Logical E-stop is not safety-rated.": 2,
+      "SIMULATED ROBOT · READ-ONLY REPLAY": 2,
+      "Integration lab · PostgreSQL · real AMQP / OPC UA · simulated systems": 2,
+      "Blender · CPU · synthetic world": 2,
+      "COMPLETED · SQL · SIMULATED SYSTEM": 128,
+      "COMPLETED · REST · REAL CODE": 77,
+      "{\n  \"summary\": \"API intake\",\n  \"component\": \"api\",\n  \"protocol\": \"REST\",\n  \"classification\": \"REAL CODE\",\n  \"status\": \"COMPLETED\",\n  \"evidence_ids\": [\n    \"de04ca08-87cc-5499-9fb6-f2d32202e42f\"\n  ]\n}": 3,
+      "COMPLETED · SQL · REAL CODE": 137,
+      "{\n  \"summary\": \"Durable intake\",\n  \"component\": \"database\",\n  \"protocol\": \"SQL\",\n  \"classification\": \"REAL CODE\",\n  \"status\": \"COMPLETED\",\n  \"evidence_ids\": [\n    \"ca318428-643d-5c5b-8059-3309f71ecb93\"\n  ]\n}": 3,
+      "COMPLETED · sensor · SYNTHETIC SENSOR": 65,
+      "COMPLETED · Python · REAL CODE": 104,
+      "{\n  \"summary\": \"Immutable RobotCommand persisted\",\n  \"component\": \"database\",\n  \"protocol\": \"SQL\",\n  \"classification\": \"REAL CODE\",\n  \"status\": \"COMPLETED\",\n  \"evidence_ids\": [\n    \"a35a8aec-8e31-59bd-b732-4c0a3883c506\"\n  ]\n}": 3,
+      "{\n  \"summary\": \"Transactional outbox\",\n  \"component\": \"database\",\n  \"protocol\": \"SQL\",\n  \"classification\": \"REAL CODE\",\n  \"status\": \"COMPLETED\",\n  \"evidence_ids\": [\n    \"28ab8d4f-3025-5c51-8d21-613f46e4ddd6\"\n  ]\n}": 4,
+      "COMPLETED · AMQP · REAL PROTOCOL": 67,
+      "COMPLETED · OPC UA · REAL PROTOCOL": 95,
+      "{\n  \"summary\": \"Controller session\",\n  \"component\": \"opcua\",\n  \"protocol\": \"OPC UA\",\n  \"classification\": \"REAL PROTOCOL\",\n  \"status\": \"COMPLETED\",\n  \"evidence_ids\": [\n    \"1051e497-1bf0-5d17-a641-a8a12126a158\"\n  ]\n}": 3,
+      "This permits the original command to change the synthetic world. A lost response must be reconciled using its journal; it must never trigger a fresh pick. This is not a safety function.": 3,
+      "COMPLETED · controller · SIMULATED ROBOT": 19,
+      "COMPLETED · REST · REAL PROTOCOL": 8,
+      "{\n  \"summary\": \"ERP business completion\",\n  \"component\": \"erp\",\n  \"protocol\": \"SQL\",\n  \"classification\": \"SIMULATED SYSTEM\",\n  \"status\": \"COMPLETED\",\n  \"evidence_ids\": [\n    \"aba4eb76-b0ee-5fd8-80bd-308b5d69702c\"\n  ]\n}": 3,
+      "{\n  \"summary\": \"Final correlated trace\",\n  \"component\": \"trace\",\n  \"protocol\": \"SQL\",\n  \"classification\": \"REAL CODE\",\n  \"status\": \"COMPLETED\",\n  \"evidence_ids\": [\n    \"51d5d670-76b5-5d10-b299-af7531b1a704\"\n  ]\n}": 2
+    },
+    "limitation": "Stored UTF-8 text and network metadata review only. Literal differential UI snapshot fragments are not full reconstructed DOM assertions. Pattern scan does not certify absence of every possible secret."
+  },
+  "motion": {
+    "recording": {
+      "source": "BLENDER_EVALUATED_SCENE",
+      "complete": true,
+      "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac",
+      "frames": 133,
+      "total_frames": 133,
+      "motion_steps": 133,
+      "robot_poses": 118,
+      "product_name": "Products/product-SKU-A-01",
+      "product_start": [
+        1.0800000429153442,
+        -0.6800000071525574,
+        0.20249998569488525
+      ],
+      "product_finish": [
+        -0.3799999952316284,
+        0.9399999976158142,
+        0.20249998569488525
+      ],
+      "moving_cursor": 85
+    },
+    "before": {
+      "cursor": 85,
+      "pose": {
+        "position": [
+          0,
+          -0.6000000238418579,
+          1.1579999923706055
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1.000000238418579,
+          1.000000238418579,
+          1
+        ],
+        "visible": true
+      },
+      "rendered": [
+        0,
+        -0.6000000238418579,
+        1.1579999923706055
+      ]
+    },
+    "after": {
+      "cursor": 95.39920000000009,
+      "playing": true,
+      "pose": {
+        "position": [
+          0.8562984459877099,
+          -0.6634295024871832,
+          1.1579999923706055
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "visible": true
+      },
+      "rendered": [
+        0.8562984459877099,
+        -0.6634295024871832,
+        1.1579999923706055
+      ]
+    },
+    "rendered_position_changed": true
+  },
+  "interpretation": "Actual Blender happy path completed all 22 stages; evaluated motion and rendered movement are retained, followed by verification, WMS acknowledgement and ERP completion.",
+  "formal_test_result": {
+    "classname": "tests.lab.test_browser_lab",
+    "name": "test_full_lab_browser_authorization_recovery_and_business_completion[]",
+    "seconds": 84.71,
+    "status": "PASSED"
+  }
+}

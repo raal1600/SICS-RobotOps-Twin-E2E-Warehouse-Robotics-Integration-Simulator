@@ -1,0 +1,64 @@
+{
+  "source_commit": "f78985b3440a1800b4c3e0bccf25663628b05f56",
+  "case": "tests.browser.test_investigation::test_run_notice_investigate_and_return[blender-desktop]",
+  "artifact_directory": "artifacts/investigation-browser/20261005T201251878785/test_run_notice_investigate_and_return[blender-desktop]",
+  "trace_sha256": "42c4beb69fce78272e6536c0d3f21587ee2b19d2142d5c4abf6874229080b94c",
+  "page_errors": [],
+  "console_errors": [],
+  "reconciliation_response": {
+    "started_at": "2026-10-05T20:14:29.822Z",
+    "duration_ms": 2427.4610000000002,
+    "status_code": 200,
+    "session_status": "WAITING_AUTHORIZATION",
+    "reconciliation_status": "COMPLETED",
+    "physical_resend": false,
+    "resource": "resources/41a4d5d46b4b0cafdb79b236c06fac578ff8a500.json"
+  },
+  "completed_evidence_response": {
+    "started_at": "2026-10-05T20:14:31.876Z",
+    "duration_ms": 8780.885999999999,
+    "start_monotonic_ms": 99973.602,
+    "end_monotonic_ms": 108754.488,
+    "resource": "resources/8290e59956150be1d4a2ed2c1006ff43a359248b.json",
+    "job_id": "d6a61d4e-8138-5ee8-a2d2-81212d3ebe46",
+    "job_state": "COMPLETED",
+    "job_revision": 10,
+    "verification_verdicts": [
+      "VERIFIED_SUCCESS",
+      "INCONCLUSIVE",
+      "VERIFIED_SUCCESS"
+    ]
+  },
+  "failed_title_assertion": {
+    "call_id": "call@1103",
+    "start_monotonic_ms": 103079.188,
+    "end_monotonic_ms": 108104.339,
+    "timeout_ms": 5000,
+    "evidence_arrived_after_timeout_ms": 650.149
+  },
+  "resolved_trace_dom_observations": [
+    {
+      "snapshot": "call@1103 after",
+      "monotonic_ms": 108125.709,
+      "title": "SKU-B \u00b7 More evidence needed",
+      "inspection_state": "REQUIRES_INTERVENTION",
+      "create_text": "Operation in progress\u2026",
+      "create_disabled": true,
+      "observation_disabled": true
+    },
+    {
+      "snapshot": "call@1105 before",
+      "monotonic_ms": 109132.897,
+      "title": "SKU-B \u00b7 Pick confirmed",
+      "inspection_state": "COMPLETED",
+      "create_text": "Operation in progress\u2026",
+      "create_disabled": true,
+      "observation_disabled": true
+    }
+  ],
+  "conclusion": "Assertion begins after reconciliation POST but before async UI refresh/action finishes. Completed evidence arrives after the 5-second assertion expires, then saved DOM renders the correct completed title. No persistent stale overwrite or browser error is demonstrated.",
+  "source_contract": "reconcilePick accepts session response; action finally awaits refreshHistory, refresh, refreshMotion and only then clears busy. Inspector title is based on subsequently fetched persisted job evidence.",
+  "proposal": "artifacts/investigation-action-proposal.patch",
+  "proposal_scope": "Two explicit reconciliation points only. Wait for !busy && !integration.busy using the existing page default of 20000ms. Keep all title, evidence, original-command/effect and business assertions unchanged. No robot/freshness clocks changed.",
+  "execution_status": "Read-only diagnosis; ignored proposal only. No tracked edits or tests run."
+}

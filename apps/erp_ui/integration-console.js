@@ -233,6 +233,7 @@ class IntegrationConsole {
       this.el("integration-map").append(item);
     }
     const pending = session.pending_authorization;
+    this.el("integration-pending").hidden = ["COMPLETED", "FAILED"].includes(session.status);
     const current = session.steps?.find(step => step.stage === stage);
     const unproven = ["UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION"].includes(session.status);
     this.el("integration-pending-title").textContent = unproven ? "Outcome unproven · reconciliation required" : pending?.title || current?.title || session.status;
@@ -285,7 +286,9 @@ class IntegrationConsole {
     }
     this.inspect();
     if (stage > 16) {
-      this.el("integration-live-state").textContent = `Recorded controller stage complete · ${session.status}. Continue with fresh observation and business reconciliation.`;
+      this.el("integration-live-state").textContent = session.status === "COMPLETED"
+        ? "Execution session completed. Review the recorded controller result, verification and business reconciliation."
+        : `Recorded controller stage complete · ${session.status}. Continue with fresh observation and business reconciliation.`;
     }
   }
 

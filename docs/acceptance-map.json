@@ -1168,7 +1168,7 @@
       "test_every_combination_can_start_an_independent_test_without_changing_old_evidence",
       "test_cell_selection_is_explicit_persisted_and_legacy_history_is_unchanged",
       "test_delete_archived_world_purges_only_its_evidence_and_blocks_cached_hosts",
-      "test_delete_last_test_leaves_empty_usable_workspace_and_monotonic_test_numbers",
+      "test_delete_last_test_leaves_empty_usable_workspace_and_restarts_at_test_one",
       "test_deletion_refuses_active_work_and_clear_is_atomic",
       "test_two_hosts_refuse_deletion_during_motion_but_keep_live_reads",
       "test_deletion_barrier_covers_deferred_file_response_until_all_bytes_are_sent",
@@ -1177,7 +1177,11 @@
       "test_blender_history_keeps_exact_recording_after_new_test_and_restart",
       "test_playback_controls_never_dispatch_and_preserve_partial_recording_limits",
       "test_reobserve_intervention_and_continue_same_delivery",
-      "test_offline_viewer_assets_have_pinned_integrity_and_confined_routes"
+      "test_offline_viewer_assets_have_pinned_integrity_and_confined_routes",
+      "test_clear_keeps_identity_number_profile_and_restores_an_empty_runnable_test",
+      "test_clear_retries_and_stale_requests_cannot_erase_or_execute_a_new_run",
+      "test_clear_crash_resumes_reset_on_restart_without_recovering_discarded_command",
+      "test_clear_retries_same_test_and_delete_starts_again_at_one"
     ],
     "files": [
       "robotops/observability/metrics.py",
@@ -1207,9 +1211,12 @@
       "docs/adr/0009-guided-simulation-workflow.md",
       "docs/evidence/guided-workflow-local.json",
       "docs/implementation/scenarios.md",
-      "docs/evidence/scenario-help-local.json"
+      "docs/evidence/scenario-help-local.json",
+      "tests/integration/test_test_management.py",
+      "tests/browser/test_investigation.py",
+      "docs/adr/0013-reusable-test-lifecycle.md"
     ],
-    "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained. Desktop close/reopen preserves the original command and reconciles with exactly one pick. Independent test history preserves original outcomes and recordings; only the active world can recover or reconcile. Evidence views use pure persisted journal reads. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue. The dark state-derived guide directs attention to the original pick, explains the exact assessed evidence and keeps repeated review available. Navigation and observation-mode selection do not dispatch or reconcile; historical replay cannot misdirect the pending-job action. Every selectable execution and review mode has a distinct definition, stage, key difference and comparison row. Reading explanations or changing the selected mode cannot mutate command evidence or resolve uncertainty. The later explanation-only validation is scoped separately from the baseline full-system run."
+    "explanation": "Persisted causal IDs, pipeline latency, outcome/duplicate/fault counts; real browser lost-ack/reconcile flow and mobile screenshots retained. Desktop close/reopen preserves the original command and reconciles with exactly one pick. Independent test history preserves original outcomes and recordings; only the active world can recover or reconcile. Evidence views use pure persisted journal reads. Explicit re-observation retains the original command, every assessment and unchanged pick count; repeated bad evidence remains inconclusive, then fresh evidence permits the same delivery to continue. The dark state-derived guide directs attention to the original pick, explains the exact assessed evidence and keeps repeated review available. Navigation and observation-mode selection do not dispatch or reconcile; historical replay cannot misdirect the pending-job action. Every selectable execution and review mode has a distinct definition, stage, key difference and comparison row. Reading explanations or changing the selected mode cannot mutate command evidence or resolve uncertainty. The later explanation-only validation is scoped separately from the baseline full-system run. ADR 0013 follows the explicit delete/clear correction: deletion removes the world and catalog row and releases the number; clear retains the same identity/number/cell while replacing execution data with a fresh revision. Stale requests cannot erase or execute newer work. Real browser clear/retry/delete/create journeys and interrupted-reset checks run in both complete suites."
   },
   "SC-DEMO-004": {
     "gates": [

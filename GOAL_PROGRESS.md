@@ -3,7 +3,25 @@ Last updated: 2026-10-05 UTC
 Current revision: delete removes a test completely; clear resets that same test for reuse.
 Base: `4da22d75bded35452f4bca1db03c57da5e9eb957` (clean).
 
-## In progress: test deletion, reset and reusable numbering
+## Accepted: test deletion, reset and reusable numbering
+
+Audited implementation: `df45c93247551e042f043216ab94d74a0ba34ff3`.
+[The current acceptance manifest](docs/evidence/acceptance/20261005T113952/manifest.json)
+passes all 118 MUSTs: 688 tests twice, 91.66% coverage, 139 JavaScript checks,
+nine actual-browser cases per suite and eight Blender demos. CI, native Windows
+lifecycle and publication all pass for that exact source. The
+[release archive](docs/evidence/test-reset-final/README.md) retains artifact hashes,
+independent effect/browser audits, public-source comparisons and earlier failures.
+
+Final drift findings: the acceptance index retained the old renamed numbering
+test, and citation metadata still named publication 1.3. The index now requires
+the passing number-reuse test plus four additional clear regressions; original
+FAIL evidence is preserved. Citation metadata now matches publication 1.4.
+No assertion or MUST was weakened. Optional model fallback remains a documented
+SHOULD failure; the mandatory deterministic paths pass. The evidence/status
+successor still receives its own full CI and exact deployed-SHA check (ADR 0002).
+
+### Implementation and verification history
 
 The owner's explicit 2026-10-05 correction supersedes ADR 0011's permanent
 deleted-test rows and lifetime display numbering. Delete must purge the test's
@@ -25,14 +43,15 @@ management. No runtime timeout, render quality or robot assertion was relaxed.
 Earlier failures, final targeted results and screenshots are retained in
 [development evidence](docs/evidence/test-reset-development/README.md).
 The publication rebuild, security scan, lint/typecheck and drift check pass.
-Next: clean-source repeated acceptance and exact-source remote checks.
+Those targeted results preceded the complete exact-source acceptance above.
 
 The first implementation commit is `2eddd8a`. Its Windows workflow detected overly
 long archived browser-case paths at checkout, before running the launcher tests.
 The evidence directories were shortened without changing their bytes; the failure
 and path/hash provenance remain archived. Runtime code/tests did not change.
-Local acceptance `20261005T113217` started before that documentation-only relocation;
-use the corrected commit's full CI and publication as its exact-source attestation.
+Local acceptance `20261005T113217` started before that documentation-only relocation
+and was explicitly interrupted as superseded. It does not claim completed suites.
+The corrected commit's full CI and publication supply the exact-source attestation.
 
 ADR 0013 and affected API contracts, plan/handoff, operator/persistence/playback
 guides, all three reports and architecture caption are synchronized. Robot wire

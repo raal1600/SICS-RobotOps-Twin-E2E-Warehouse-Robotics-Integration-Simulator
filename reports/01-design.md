@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Test lifecycle correction implemented: delete purges test data and reuses available numbers; clear restores the same test for retry. New revision verification is in progress. Previous investigation acceptance remains scoped to audited source 7b9f0a6. Status: NOT DONE.
+> **Implementation status, 2026-10-05:** Test lifecycle correction accepted at audited implementation df45c93: all 118 MUSTs PASS, 688 tests twice, 139 UI checks, nine real-browser cases and eight Blender demos. Delete removes the test and frees its number; clear restores the same test for retry. CI, Windows launcher and publication verified; original evidence and mapping correction remain archived. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

@@ -113,3 +113,11 @@ removal, same-test restoration, revision guards, cached hosts, stale retries,
 interrupted reset and legacy receipt migration. Four real browser cases exercise
 clear/retry and delete/create Test 1 with both runtimes at desktop/compact sizes.
 No physical-effect, uncertainty, verification or coverage assertion is weakened.
+
+The df45c93 implementation is accepted with 688 passing tests in each clean CI
+suite, 91.66% coverage and successful native/publication workflows.
+[The release archive](../evidence/test-reset-final/README.md) includes the original
+failed stale-selector report and its mapping correction against actual passed
+JUnit cases. All 118 MUSTs pass in the refreshed report. The interrupted local
+attempt is retained without a completed-run claim; the exact-source CI artifact
+provides both complete suites. Evidence/status successors are verified separately.

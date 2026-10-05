@@ -11,7 +11,12 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 - [x] Test interruption/retry, neighboring history, stale writes and cached hosts.
 - [x] Verify actual clear/retry/delete/create journeys in both runtimes/viewports.
 - [x] Synchronize contracts/docs/diagrams and rebuild publication.
-- [ ] Finish repeated full regression and exact-source CI/publication gates.
+- [x] Pass repeated full regression and exact-source CI/native/publication gates for df45c93.
+- [x] Preserve and correct the stale acceptance selector without weakening any assertion.
+- [x] Archive current acceptance, public-source checks and all earlier failures.
+
+The evidence/status successor receives its own complete CI and deployed-SHA check
+under ADR 0002; the implementation evidence remains scoped to df45c93.
 
 Previous accepted checklists below describe their named historical revisions.
 

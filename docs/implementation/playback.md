@@ -36,12 +36,12 @@ Those catalog actions are separate from playback; replay, camera selection,
 scrubbing and opening history remain read-only. Deleting the active test leaves
 no active world and clears its displayed replay instead of promoting an archive.
 
-Animation drawing is capped at the recording's 24 fps, independently of display
-refresh rate. The playback cursor still uses elapsed presentation time and the
+The display-refresh loop draws at up to 24 fps, matching the recording and
+independent of display refresh rate. The playback cursor still uses elapsed presentation time and the
 selected speed. This bounds CPU-renderer contention with Blender during a live
 pick; it does not change recording frames, render quality, execution deadlines or
-the conservative outcome of a real timeout. Explicit scrub/step actions redraw
-immediately. Background world polling pauses while a test is being cleared or
+the conservative outcome of a real timeout. Incoming evidence and explicit
+scrub/step actions redraw immediately. Background world polling pauses while a test is being cleared or
 deleted, then resumes after the returned test/revision has been selected.
 
 An uncertain pick pauses the entire cell, including picks of different products.

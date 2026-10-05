@@ -94,3 +94,8 @@ keeps its number/cell and your scenario choices. **Delete selected test** remove
 the test entirely. Reused display numbers are labels; technical test/job/command
 UUIDs still distinguish independent evidence. Clearing invalidates old inspection
 and replay context before loading the restored world (ADR 0013).
+
+The accepted df45c93 revision adds four clear/retry/delete/create browser cases
+to those five investigation cases. All nine run twice in full acceptance; the
+[current evidence](../evidence/test-reset-final/README.md) preserves source hashes,
+restored-world assertions and exactly one effect from each explicit retry.

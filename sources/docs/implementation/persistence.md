@@ -63,22 +63,31 @@ operations. A new test selects a registered cell; a saved test's profile is
 durable and resolved from its own world. Legacy tests remain readable, with no
 scene migration or new selectable legacy option.
 
-Selected-test deletion and clear-all persist their original target set and
-tombstones before bounded physical cleanup. Deleted IDs cannot be resurrected by
-late creation retries. The first clear request must match the live inventory it
-confirms; a retry cannot absorb later-created tests. Incomplete file removal is
-reported as `cleanup_pending` and retried on request/restart. Cleanup never
-recovers or executes a deleted world merely to remove its files.
+ADR 0013 supersedes permanent deleted rows. Selected deletion and delete-all
+commit temporary cleanup intent before bounded removal; completed cleanup removes
+the test row and releases its display number. New tests use the lowest free
+positive number, starting at 1 when empty. Surviving labels and UUIDs are stable.
+Request/payload SHA-256 digests preserve duplicate suppression without retaining
+raw deleted IDs, payloads or target lists. Legacy raw receipts are converted,
+and old tombstones are cleaned up; retained worlds are untouched.
+
+Clear keeps the same test identity, number and profile/settings. It commits a
+revision increment and pending reset intent, removes the old world files, creates
+an empty world with a fresh scene epoch, then activates that test. Pending clear
+blocks new execution/creation. Retry/startup finishes that explicit reset without
+recovering a discarded command. Cached engines are invalidated by revision;
+the UI sends X-Test-Revision to fence stale writes. Repeated clears preserve any
+newer orders. Clear is deliberate evidence disposal, not a business verdict.
 
 The active pointer is nullable: deleting its test leaves no active world, including
-after restart. Archives remain archives; only an explicit new-test request creates
-a writable world. A retained active test survives deletion of another test.
+after restart. Archives remain archives unless explicitly cleared for retry; creating a new
+test is the other way to obtain a writable world. A retained active test survives deletion of another test.
 A separate `simulation-tests/access.db` uses SQLite DELETE-journal shared locks
 for the entire HTTP response lifetime, including artifact downloads. Deletion
 requires its exclusive lock before the catalog transaction, so it cannot race
 file use. Live jobs, leases and maintenance prevent deletion. The workspace
-application factory opens the catalog first; a tombstoned original world is not
-initialized merely by starting the app.
+application factory opens the catalog first; a workspace marker prevents an
+empty catalog from recreating the deleted original world.
 
 Only registered application-owned paths are removed. UUID world directories stay
 beneath `simulation-tests`; the original world's known database/artifact paths
@@ -88,7 +97,7 @@ are handled explicitly: its configured workflow/runtime database filenames
 outside the workspace is not an eligible cleanup path. UUID test directories are
 removed in full after validation.
 Reparse points and unsafe paths are rejected. Catalog, access barrier,
-tombstones/deletion receipts, parent directory, other files outside the owned
+anonymous request guards, parent directory, other files outside the owned
 world paths and unrelated launcher/browser data remain. This is retention management, not a secure-erasure
 guarantee or a job-state transition. Ordinary cell reset still never clears history.
-See [ADR 0011](../adr/0011-cell-selection-and-test-data-lifecycle.md).
+See [ADR 0013](../adr/0013-reusable-test-lifecycle.md).

@@ -206,18 +206,25 @@ selectable. Legacy profile metadata labels saved tests without making that cell
 available for new creation. A test's profile is durable and never changed by
 opening it or choosing a new default.
 
-Delete selected test and Clear all test data are explicit confirmed retention
-actions, distinct from physical execution, reconciliation and restocking. A
-clear request names the displayed live test set; stale snapshots are rejected,
-and retries retain their original targets. Removing an active test leaves an
-empty active pointer, with no automatic archive promotion or world recreation.
-Durable tombstones and deletion receipts prevent resurrection and support
-interrupted bounded cleanup. The catalog serializes lifecycle operations with
-reads, writes and downloads; in-flight work blocks deletion. Only registered
-application-owned world files are removed; unrelated data and lifecycle metadata
-remain. Tests validate these operations in temporary roots, never the owner's
-existing data. The 110 existing MUST criteria and physical-effect semantics are
-unchanged; current acceptance must include the new lifecycle regression evidence.
+ADR 0013 implements the owner's correction: Delete selected test removes its
+world/evidence and catalog row completely. Delete all tests targets the confirmed
+live set; stale snapshots are rejected and retries cannot absorb later tests.
+New tests reuse the lowest available positive number; an empty workspace starts
+at Test 1. Retained tests keep their numbers, and UUIDs are never reused.
+
+Clear test and retry keeps the selected test's identity/number/cell/settings,
+discards its prior execution data, restores products and makes the empty test
+current. It preserves scenario/observation selections. Confirmation distinguishes
+this from evidence-preserving restock and logical reset. Neither clear nor delete
+executes or resolves a pick. Clearing an archive explicitly reuses it; deletion
+never promotes an archive. Test revisions fence stale UI writes and invalidate
+cached hosts. Durable pending clear/cleanup intent survives restart; after full
+deletion only anonymous request digests remain, not hidden test entries.
+
+The catalog serializes lifecycle operations with reads, writes and downloads;
+in-flight work blocks clear/deletion. Only registered application-owned files
+are removed. Tests use disposable roots, never the owner's current data. Existing
+robot MUST criteria and uncertainty/idempotency semantics remain unchanged.
 
 ## Test strategy
 

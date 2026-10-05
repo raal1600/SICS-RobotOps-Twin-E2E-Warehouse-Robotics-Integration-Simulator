@@ -30,21 +30,21 @@ default Full delivery replay spans all products already executed in that scene;
 use Delivery replay to revisit a previous scene or select individual execution
 details to inspect one product.
 
-Under **Manage test data**, **Delete selected test** asks you to confirm removal of that test's orders,
-observations, journal evidence and replay. The dialog identifies its test and
-cell. **Clear all test data** identifies the current test count and confirms
-removal of that displayed set. Cancel either dialog to keep everything unchanged.
-These controls do not reconcile uncertain work or run a pick. A running operation
-must finish before deletion. Deleting the active test or clearing all tests leaves
-no active test; **Start new test** is the next explicit action. Retained
-archives are never automatically made active.
+Under **Manage test data**, **Clear test and retry** keeps the same test number,
+cell and scenario choices, removes old orders/results/evidence and restores the
+starting scene. Confirm, then run again in that same test. Other tests remain.
+**Delete selected test** removes its saved world and test entry completely.
+**Delete all tests** removes the confirmed set. New tests reuse available numbers,
+starting at Test 1 when the list is empty; surviving tests are not renumbered.
 
-Clear-all removes registered simulation worlds, not the app installation,
-launcher sessions, browser profile or lifecycle catalog. Unrelated files remain.
-Interrupted file cleanup is reported as pending and safely retried; a repeated
-clear request cannot remove later-created tests. Closing/reopening the app does
-not itself authorize deletion or recreate an empty active world. See
-[data ownership and recovery](../adr/0011-cell-selection-and-test-data-lifecycle.md).
+These actions require confirmation and perform no pick or reconciliation.
+Running work must finish first. Deleted active tests leave no current test;
+clearing a selected archive explicitly makes its restored empty world current.
+Interrupted cleanup/reset is shown as pending and resumes on retry/restart.
+The app installation and unrelated files remain; deleted test data does not.
+Anonymous request digests prevent stale retries from recreating removed tests
+or erasing newer work. See [ADR 0013](../adr/0013-reusable-test-lifecycle.md).
+
 Lost acknowledgement pauses the next pick for every product. The investigation panel names the uncertain product and offers Reconcile [product]; choose Normal
 observation to check the original command before creating another order. If the
 evidence requires intervention, the panel offers **Observe again: [product]**.

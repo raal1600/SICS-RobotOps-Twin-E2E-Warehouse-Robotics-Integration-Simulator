@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Investigation workflow accepted at audited source 7b9f0a6: all 118 MUSTs PASS, 665 tests twice, 132 UI checks, five real-browser cases and eight Blender demos. Exact-source CI and publication verified. Functional tests do not replace first-time usability research. Status: DONE.
+> **Implementation status, 2026-10-05:** Test lifecycle correction implemented: delete purges test data and reuses available numbers; clear restores the same test for retry. New revision verification is in progress. Previous investigation acceptance remains scoped to audited source 7b9f0a6. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -57,7 +57,7 @@ En animation kan vara begriplig utan att dess moment, kontaktkrafter eller ledha
 
 Tabellen beskriver den implementerade simulatoravgränsningen för revision 1.2. Sex verktyg och produktfamiljer verifierades i faktisk Blender vid den accepterade källrevisionen ca7798798f916c8130e1833cf16b4d4d3f10d546. Den historiska acceptansen är arkiverad under docs/evidence/test-lifecycle-baseline; ACCEPTANCE_REPORT.md anger status för senare ändringar. Verktygsbyte under samma journalförda kommando ändrar inte innebörden av effect_count: endast produktförflyttningar räknas. Arbetsområde och konservativ geometrisk kollisionskontroll är egna simulatorregler, inte certifierad robotbanplanering. Små källpositionsfel kan centreras inom en uttrycklig syntetisk grepptolerans; det är ingen modell av riktiga gripkrafter eller uppmätt robotnoggrannhet.
 
-Cellregistret och de uttryckliga raderingsfunktionerna är simulatorns egen datahantering, inte en modell av en kunds lagringspolicy. Nya försök väljer en registrerad cell utan att ändra äldre världar. Bekräftad radering tar bort den valda försöksevidensen men ger inget affärsbeslut och kör inget robotkommando. Applikationens katalog och raderingskvitton behålls för säkra återförsök; funktionen lovar inte säker överskrivning av lagringsmediet. Vanlig navigering, replay och omstart raderar ingenting (ADR 0011).
+Cellregistret och datahanteringen är simulatorns egen design, inte en kunds lagringspolicy. Bekräftad radering tar bort försökets katalogpost och värld/evidens; lediga nummer återanvänds. Bekräftad ”Clear test and retry” behåller numret och cellen men kasserar kördata och återställer startscenen. Bara anonyma begärandedigester behålls efter färdig radering för att stoppa gamla återförsök; ingen dold försökspost sparas. Tillfällig rensningsavsikt finns tills filhanteringen är klar. Funktionen lovar inte säker överskrivning av lagringsmediet och ger inget affärsbeslut. Navigering, replay och vanlig omstart raderar ingenting (ADR 0013).
 
 ### 2.3 PLC, beräkning och drift
 

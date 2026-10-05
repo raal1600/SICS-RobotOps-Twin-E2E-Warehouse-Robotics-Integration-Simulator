@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="133.896" timestamp="2026-10-05T13:03:54.643369+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]" time="6.377" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]" time="38.144" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-SyntheticRuntime]" time="5.983" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-BlenderRuntime]" time="82.215"><failure message="AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'&#10;  &#10;  - COMPLETED&#10;  + UNKNOWN_OUTCOME">server = ('http://127.0.0.1:52001', &lt;apps.api.test_sessions.TestRegistry object at 0x000001DBA3A4BBB0&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:52001/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T110445712387/test_clear_r...l': 'http://127.0.0.1:52001/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:52001/ui/app.js'}, ...])
+viewport = {'width': 390, 'height': 844}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+        epoch = registry.engine("original").runtime.world().scene_epoch
+        page.locator(".manage-data &gt; summary").click()
+        page.locator("#clear-test").click()
+        expect(page.locator("#delete-test-title")).to_have_text("Clear Test 1 and retry?")
+        screenshot(page, directory, "clear-same-test-confirmation")
+        page.locator("#cancel-delete-test").click()
+        assert (
+            registry.engine("original").store.job(uncertain["job_id"]).state.value == "UNKNOWN_OUTCOME"
+        )
+        page.locator("#clear-test").click()
+        write_count = len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
+        page.locator("#confirm-delete-test").click()
+        expect(page.locator("#delete-test-dialog")).not_to_be_visible()
+        expect(page.locator("#message")).to_contain_text("Test 1 cleared")
+        expect(page.locator("#test-history")).to_have_value("original")
+        expect(page.locator("#create")).to_be_enabled()
+        expect(page.locator("#scenario")).to_have_value("DROP_ACK_AFTER_EFFECT")
+        assert (
+            len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
+            == write_count
+        )
+        history = get(page, origin + "/simulation-tests")
+        assert len(history["tests"]) == 1
+        assert (
+            history["tests"][0]["number"],
+            history["tests"][0]["revision"],
+            history["tests"][0]["order_count"],
+        ) == (1, 2, 0)
+        assert registry.engine("original").runtime.world().scene_epoch != epoch
+        fixtures = get(page, origin + "/fixtures")
+        assert len(fixtures["inventory"]) == 6
+        assert all(
+            p["location_id"] == fixtures["product_sources"][p["product_id"]]
+            for p in fixtures["inventory"]
+        )
+        assert page.request.get(origin + f"/jobs/{uncertain['job_id']}/evidence").status == 404
+        screenshot(page, directory, "same-test-ready-again")
+        repeated = choose_pick(page)
+&gt;       assert repeated["state"] == "COMPLETED"
+E       AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'
+E         
+E         - COMPLETED
+E         + UNKNOWN_OUTCOME
+
+tests\browser\test_investigation.py:428: AssertionError</failure></testcase></testsuite></testsuites>

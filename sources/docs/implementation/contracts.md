@@ -91,34 +91,40 @@ world resolves its own persisted execution settings. Historical three-product
 worlds, their commands and recordings are not migrated. Explicit CLI settings
 configure a new world and cannot reinterpret an already saved world.
 
-POST /simulation-tests/{test_id}/delete accepts `request_id: UUID` and explicitly
-removes that registered test. POST /simulation-tests/clear accepts `request_id`
-and `expected_test_ids`: the initially displayed live test set must still match.
-Both return TestDeletion with `request_id`, `deleted_test_ids`, `cleanup_pending`
-and `history: TestHistory`. A retry is tied to its persisted original target set;
-it cannot clear tests created later. UI confirmation precedes these calls; they
-are separate from the archived world's execution routes. They never dispatch,
-reconcile or assign a business verdict.
+POST /simulation-tests/{test_id}/delete accepts `request_id: UUID` and removes
+that registered test. POST /simulation-tests/delete-all accepts `request_id` and
+`expected_test_ids`: the displayed live set must still match on first submission.
+Both return TestDeletion with request identity, deleted IDs, `cleanup_pending`
+and current TestHistory. The old POST /simulation-tests/clear remains a deprecated
+delete-all alias for existing clients. The new UI never uses that ambiguous name.
+Retries cannot absorb later tests; no deletion dispatches/reconciles a command.
 
-Lifecycle conflicts return HTTP 409 with a reason code: `CELL_PROFILE_NOT_AVAILABLE`
-for unknown/nonselectable profiles, `TEST_HISTORY_CHANGED` for a changed clear
-snapshot, `TEST_REQUEST_CONFLICT` for UUID reuse with another payload/operation,
-`CELL_PROFILE_STATE_MISMATCH` when a partial uncatalogued world conflicts with
-the requested cell (its files and the active test are preserved),
-`TEST_DELETED` for creation retries whose test was deleted,
-`TEST_OPERATION_IN_PROGRESS` for busy work or lifecycle access, and
-`TEST_STORAGE_UNSAFE_PATH` for unsafe cleanup paths. Deleted test reads/writes
-return 404. An empty clear snapshot is valid only when no live tests remain.
+POST /simulation-tests/{test_id}/clear instead accepts ClearTestRequest:
+`request_id: UUID`, `expected_revision: int >= 1`. It retains the test ID, number,
+creation time and saved cell/settings, discards prior data and activates an empty
+world with restored products. TestClearing returns request/test identity,
+`cleanup_pending` and history. SimulationTest adds `revision` (default 1) and
+`clearing` (default false) for older schema-1 fixtures. Robot/world/observation
+wire schemas are unchanged. UI world writes include X-Test-Revision; a stale
+revision is rejected before execution. Legacy callers without it remain supported.
 
-Deleting the active test leaves `active_test_id: null`; deleting an archive
-preserves a different active identity. No world is promoted or recreated on
-restart. The UI offers explicit new-test creation in this state. A separate
-SQLite access barrier serializes deletion with reads, writes and downloads;
-catalog transactions serialize lifecycle mutations, and live work prevents
-cleanup. `cleanup_pending` distinguishes logical removal from unfinished bounded
-file removal. ADR 0011 documents scope, tombstones and restart behavior. Lifecycle
-contracts/OpenAPI are generated alongside the existing schemas; business command,
-observation and verification contracts are unchanged by this extension.
+Lifecycle conflicts return HTTP 409: CELL_PROFILE_NOT_AVAILABLE for unavailable
+profiles, TEST_HISTORY_CHANGED for a stale bulk-delete snapshot,
+TEST_REQUEST_CONFLICT for request UUID reuse with changed payload,
+CELL_PROFILE_STATE_MISMATCH for a different saved cell, TEST_DELETED for delayed
+creation of a deleted test, TEST_OPERATION_IN_PROGRESS for live work/access,
+TEST_STORAGE_UNSAFE_PATH for unsafe paths, TEST_REVISION_CHANGED for stale clear
+or world writes, and TEST_CLEAR_PENDING while an explicit reset is unfinished.
+Deleted test reads/writes return 404. Empty bulk deletion is valid only when the
+confirmed live set is empty.
+
+Deletion removes the catalog row after owned file cleanup and releases its number.
+An empty workspace starts new numbering at 1 without recreating a world on startup.
+Survivors keep their numbers. Clear increments revision, persists pending intent,
+then restores the scene before allowing execution. Response-lifetime/cross-host
+locks remain; runtime caches observe the new revision. Interrupted work resumes
+safely. Only anonymous request digests remain after deletion. ADR 0013 specifies
+these semantics. UI confirmation precedes each data-discarding action.
 
 The local dashboard also serves bounded presentation assets at `/ui/theme.css`
 and `/ui/workflow-guide.js`. The guide is a pure presentation of persisted job and

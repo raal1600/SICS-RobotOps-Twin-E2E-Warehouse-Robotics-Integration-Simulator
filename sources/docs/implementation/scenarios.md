@@ -17,12 +17,13 @@ Only the HKM-inspired cell is selectable today. Selecting it does not alter a
 saved test, and legacy Cartesian history remains readable under its own label.
 The same execution/observation combinations apply to the selected supported cell.
 
-**Delete selected test** and **Clear all test data** manage retained experiment
-data after confirmation. They are not execution scenarios or observation modes,
-never send a pick, and never turn uncertainty into success or failure. Cancel
-preserves the data. If the active test is removed, explicitly create a new test
-before running another combination. Retained archives are not promoted. See
-[operator workflow](operations.md) for scope and retry behavior.
+**Clear test and retry** keeps the selected test's number/cell and scenario
+choices, discards its old execution data and restores products for another run.
+**Delete selected test** removes the test completely; **Delete all tests** removes
+the confirmed set. New tests reuse available numbers, starting at Test 1 when
+empty. These are confirmed data-management actions, not fault/observation modes.
+They never send a pick or turn uncertainty into a verdict. Cancel preserves data.
+See [operator workflow](operations.md) for scope and retry behavior.
 
 The main execution selector shows a short purpose and **Watch for** line. Expand
 its explanation or the sensor-report explanation for the stage, **What this

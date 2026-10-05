@@ -22,16 +22,21 @@ The previous test remains unchanged in **Simulation test** history,
 including uncertain/intervention outcomes. Review its evidence and full replay
 in the same window; **Return to current test** resumes the active world.
 Startup recovers only that active world, without replaying uncertain commands.
-Retained archives remain read-only. Under **Manage test data**, explicit **Delete selected test** and
-**Clear all test data** are separate data-management actions. Each confirmation
-names its scope and the evidence that will be removed; cancel changes nothing.
-Deleting the active test leaves no active world. The app offers new-test creation
-without promoting an archive or running a pick. Clear-all confirms the exact
-displayed test set; if it changed, review again. Retrying an accepted clear only
-targets its original set, preserving later tests. Running work blocks deletion,
-and interrupted cleanup remains reported as pending until a safe retry completes.
-[ADR 0011](../adr/0011-cell-selection-and-test-data-lifecycle.md) defines the
-registered-file boundary and retained lifecycle metadata.
+Retained archives remain read-only during ordinary inspection. Under **Manage test
+data**, **Clear test and retry** keeps the selected test's number/cell and your
+scenario choices, removes its old orders/evidence and restores products. It makes
+that fresh test current, including when you explicitly clear an archive.
+**Delete selected test** removes its world and catalog entry completely;
+**Delete all tests** removes the confirmed displayed set. Available numbers are
+reused, starting at Test 1 when empty, without renumbering retained tests.
+
+Confirmation identifies the discarded data; cancellation changes nothing.
+Neither action runs/reconciles a pick. Deletion never promotes an archive.
+Busy work blocks these actions. Durable pending intent resumes after interrupted
+cleanup/reset; duplicate requests cannot erase later runs. The catalog retains
+only anonymous request digests after deletion, not hidden test records. See
+[ADR 0013](../adr/0013-reusable-test-lifecycle.md).
+
 This local demo has no
 production authentication/authorization boundary and binds to loopback only.
 

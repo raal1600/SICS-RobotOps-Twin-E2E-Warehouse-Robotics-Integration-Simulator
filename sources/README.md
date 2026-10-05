@@ -1,9 +1,9 @@
-﻿# RobotOps Twin
+# RobotOps Twin
 
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** Investigation workflow accepted at audited source 7b9f0a6: all 118 MUSTs PASS, 665 tests twice, 132 UI checks, five real-browser cases and eight Blender demos. Exact-source CI and publication verified. Functional tests do not replace first-time usability research. **DONE**.
+**Aktuell status:** Test lifecycle correction implemented: delete purges test data and reuses available numbers; clear restores the same test for retry. New revision verification is in progress. Previous investigation acceptance remains scoped to audited source 7b9f0a6. **NOT DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -154,15 +154,23 @@ intervention; a running operation must finish first. **Test history** opens save
 evidence and replay in the same window, read-only. **Return to current test**
 resumes the active test. Startup recovers only that active world.
 
-**Delete selected test** removes the selected test's orders, evidence and replay
-after confirmation. **Clear all test data** confirms the displayed test set and
-removes those registered worlds. These actions do not run or reconcile a pick.
-Deleting the active test or clearing all tests leaves no active test; choose
-**Start new test** to continue. No archived test is promoted automatically.
-Cancellation changes nothing, and in-flight work blocks deletion. Cleanup that
-cannot finish immediately remains visible as pending and is retried safely.
-[Data scope and recovery](docs/adr/0011-cell-selection-and-test-data-lifecycle.md)
-explain retained catalog metadata and the boundary around application-owned files.
+Under **Manage test data**:
+
+- **Clear test and retry** keeps the selected test's number and cell, removes its
+  old orders/evidence, restores all products and makes it current. Your scenario
+  and observation choices stay selected, ready for another run.
+- **Delete selected test** completely removes its saved world, evidence and test
+  entry. **Delete all tests** removes the confirmed set. The next new test uses
+  the first available number; after deleting everything it starts at **Test 1**.
+
+Both ask for confirmation and perform no pick. Cancel preserves everything.
+Other tests remain unchanged. Running work blocks these actions; interrupted
+cleanup/reset is explicitly pending and resumes on retry or restart. Deleting
+an active test leaves no active world and never promotes an archive. Clearing
+an archive explicitly replaces its old results with a fresh current test.
+[Lifecycle and recovery](docs/adr/0013-reusable-test-lifecycle.md) describe the
+bounded cleanup, revision fencing and anonymous retry guards. No deleted test
+record is retained after cleanup finishes.
 
 Changing **Execution scenario** changes the next order's configuration only.
 **Restock this test → Start fresh scene** restores products within a resolved
@@ -208,7 +216,7 @@ flowchart LR
     ERP[ERP/WMS UI] --> API[Integration API]
     API --> PROFILES[Registered cell profiles]
     API --> TEST[Test catalog: active world / retained history]
-    TEST --> RETAIN[Confirmed deletion / tombstones / bounded cleanup]
+    TEST --> RETAIN[Delete / clear for retry / bounded cleanup]
     API --> WF[Durable workflow]
     WF --> O[ObservationModel]
     WO[WorldObservation] --> B[DeterministicBrain]

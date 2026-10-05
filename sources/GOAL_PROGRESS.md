@@ -73,6 +73,13 @@ workflow and never manually edited.
 
 ## Final-source gate and next milestone
 
+The first evidence/status successor `77a8237` failed Windows checkout before its
+tests could run because imported browser/native evidence paths were too long.
+The original job log is retained in the final archive. Short case/session folders
+now preserve all 117 imports byte-for-byte, with original and prior archive paths
+in the manifest. This packaging correction changes no application behavior or
+test result; the corrected successor must pass all exact-source workflows.
+
 The evidence/status successor must receive its own complete CI and Pages checks
 before this goal is closed. Its exact source is recorded by the CI artifact and
 public build.json, following ADR 0002's self-reference rule. Earlier source results

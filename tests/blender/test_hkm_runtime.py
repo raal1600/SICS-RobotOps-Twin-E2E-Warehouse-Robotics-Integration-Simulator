@@ -30,6 +30,74 @@ from robotops.workflow.store import Conflict, Store, digest
 pytestmark = pytest.mark.blender
 
 
+def test_hkm_visibility_changes_survive_saved_animation(tmp_path):
+    """Unchanged flags avoid graph rebuilds; actual visibility changes stay baked."""
+    runtime = BlenderRuntime(tmp_path / "runtime.db", Settings.hkm())
+    script = tmp_path / "visibility.py"
+    script.write_text(
+        """import copy, json, sys
+from pathlib import Path
+import bpy
+root, directory = map(Path, sys.argv[sys.argv.index('--') + 1:])
+sys.path.insert(0, str(root))
+from blender.scripts.hkm_scene import bake_frame, build_scene, sampled_primitives
+from robotops.hkm_geometry import camera_views, scene_primitives
+from robotops.robotics.catalogue_data import raw_catalogue
+data = json.loads((directory / 'world.json').read_text())
+primitives = scene_primitives(data)
+build_scene(primitives, camera_views(raw_catalogue()))
+name = 'Tools/' + data['tool_state']['active_tool_id']
+visibility = [True, True, False, False, True, True]
+for frame, visible in enumerate(visibility, 1):
+    sample = copy.deepcopy(primitives)
+    next(p for p in sample if p['name'] == name)['visible'] = visible
+    bake_frame(frame, sample)
+    obj = bpy.data.objects[name]
+    assert obj.hide_render == obj.hide_viewport == (not visible)
+    assert next(p for p in sampled_primitives() if p['name'] == name)['visible'] == visible
+scene = directory / 'visibility.blend'
+bpy.ops.wm.save_as_mainfile(filepath=str(scene))
+bpy.ops.wm.open_mainfile(filepath=str(scene), use_scripts=False)
+for frame, visible in enumerate(visibility, 1):
+    bpy.context.scene.frame_set(frame)
+    obj = bpy.data.objects[name]
+    assert obj.hide_render == obj.hide_viewport == (not visible)
+    assert next(p for p in sampled_primitives() if p['name'] == name)['visible'] == visible
+(directory / 'verified.json').write_text(json.dumps(visibility))
+""",
+        encoding="utf-8",
+    )
+    (tmp_path / "world.json").write_text(runtime.world().model_dump_json(), encoding="utf-8")
+    process = subprocess.run(
+        [
+            runtime.executable,
+            "--background",
+            "--factory-startup",
+            "--disable-autoexec",
+            "--python-exit-code",
+            "2",
+            "--python",
+            str(script),
+            "--",
+            str(Path(__file__).resolve().parents[2]),
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=60,
+    )
+    assert process.returncode == 0, process.stdout + process.stderr
+    assert json.loads((tmp_path / "verified.json").read_text()) == [
+        True,
+        True,
+        False,
+        False,
+        True,
+        True,
+    ]
+
+
 def make_engine(path):
     runtime = BlenderRuntime(path / "runtime.db", Settings.hkm())
     return Engine(Store(path / "workflow.db"), runtime, runtime.settings)

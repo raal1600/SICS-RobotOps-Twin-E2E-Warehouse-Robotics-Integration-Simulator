@@ -6,6 +6,42 @@ from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import CommunicationTimeout
 
 
+@pytest.mark.parametrize("system", ["win32", "linux"])
+@pytest.mark.parametrize("record_existing", [False, True])
+def test_blender_qos_is_scoped_to_windows_process_and_preserves_boundary(
+    tmp_path, monkeypatch, system, record_existing
+):
+    monkeypatch.setattr("robotops.blender.adapter.executable", lambda: "blender-not-invoked")
+    monkeypatch.setattr("robotops.blender.adapter.sys.platform", system)
+    runtime = BlenderRuntime(tmp_path / "runtime.db")
+    directory = tmp_path / "exchange"
+    directory.mkdir()
+    original = runtime.world()
+    calls = []
+
+    def run(args, **kwargs):
+        calls.append((args, kwargs))
+        return subprocess.CompletedProcess(args, 0, "completed", "")
+
+    monkeypatch.setattr("robotops.blender.adapter.subprocess.run", run)
+    runtime._invoke(directory, record_existing=record_existing)
+    assert len(calls) == 1
+    args, options = calls[0]
+    assert ("--qos" in args) is (system == "win32")
+    if system == "win32":
+        index = args.index("--qos")
+        assert args[index : index + 2] == ["--qos", "high"]
+        assert index < args.index("--python") < args.index("--")
+    assert "--disable-autoexec" in args
+    assert ("--record-existing" in args) is record_existing
+    assert options["timeout"] == 60
+    assert not options.get("shell", False)
+    assert args[args.index("--") + 1] == str(directory.resolve())
+    assert runtime.world() == original and runtime.events() == []
+    assert runtime.manifest()["cpu_qos"] == ("high" if system == "win32" else "os_default")
+    assert calls[-1][0][1:] == ["--version"]
+
+
 @pytest.mark.parametrize("record_existing", [False, True])
 @pytest.mark.parametrize(
     ("stdout", "stderr", "expected"),

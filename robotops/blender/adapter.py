@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import threading
 from math import dist
 from pathlib import Path
@@ -79,6 +80,11 @@ class BlenderRuntime(SyntheticRuntime):
         ]
         if record_existing:
             args.append("--record-existing")
+        # On Windows hybrid CPUs, a background process can be assigned only
+        # efficiency cores while the browser is active. Use Blender's scoped
+        # QoS option; leave process deadlines, render settings and OS policy alone.
+        if sys.platform == "win32":
+            args[args.index("--python") : args.index("--python")] = ["--qos", "high"]
         try:
             process = subprocess.run(
                 args,
@@ -381,6 +387,7 @@ class BlenderRuntime(SyntheticRuntime):
                 json.dumps(closure, sort_keys=True, separators=(",", ":")).encode()
             ).hexdigest(),
             "gpu_required": False,
+            "cpu_qos": "high" if sys.platform == "win32" else "os_default",
         }
 
     def latest_artifact(self) -> Path | None:

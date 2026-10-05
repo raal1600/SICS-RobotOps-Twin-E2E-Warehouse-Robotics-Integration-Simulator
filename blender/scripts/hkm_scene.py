@@ -195,8 +195,14 @@ def bake_frame(frame_index, primitives):
                 @ desired
             )
         obj.matrix_basis = desired
-        obj.hide_render = not primitive["visible"]
-        obj.hide_viewport = not primitive["visible"]
+        # Visibility changes rebuild Blender's dependency graph. Reassigning an
+        # unchanged flag does the same work for every mesh on every frame.
+        # Keep the full animation, but only invalidate visibility when it changes.
+        hidden = not primitive["visible"]
+        if obj.hide_render != hidden:
+            obj.hide_render = hidden
+        if obj.hide_viewport != hidden:
+            obj.hide_viewport = hidden
     bpy.context.view_layer.update()
     dynamic = [p for p in definitions if "dynamic" in p["semantic_tags"]]
     # Blender matrices are float32. A fixed parent several links away can

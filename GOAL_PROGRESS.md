@@ -3,7 +3,7 @@ Last updated: 2026-10-05 UTC
 Current revision: delete removes a test completely; clear resets that same test for reuse.
 Base: `4da22d75bded35452f4bca1db03c57da5e9eb957` (clean).
 
-## In progress: drain current view reads before test management
+## In progress: final acceptance of read draining and Windows Blender scheduling
 
 The final evidence/status successor `317d4a4` exposed a real timing race in CI
 run 37308097691: suite 1 passed 688 tests; suite 2 passed 687 and failed the
@@ -20,13 +20,27 @@ management request, allowing explicit retry. Backend guards, robot deadlines,
 command identity, schemas and verification are unchanged. Seven new controlled
 network/UI regressions bring the passing JavaScript suite to 146 checks.
 
-All 151 backend lifecycle tests pass. Isolated browser verification is in progress.
-A local Blender browser
-case reached the unchanged 60-second execution deadline while separate suites
-ran concurrently; it stayed uncertain with zero confirmed effects. Preserve that
-failure and run CPU-heavy browser verification in isolation. No assertion is
-relaxed. Next: complete targeted checks, synchronize sources/publication, commit
-the correction, run fresh exact-source full acceptance and attest the final SHA.
+All 151 backend lifecycle tests pass. Isolated browser verification also exposed
+intermittent Blender deadlines, so concurrent suites were not the whole cause.
+The original 60-second deadline and uncertain-outcome behavior remain intact.
+[Local failures and profiling](docs/evidence/test-reset-visibility/README.md) are
+preserved separately from acceptance. Avoiding redundant visibility assignments
+removes unnecessary graph invalidation, and actual hidden/visible keyframes survive
+save/reopen; this optimization alone did not resolve the full browser suite.
+A two-worker diagnostic also timed out and was not adopted. Blender's documented
+Windows hybrid-CPU `--qos high` option passed all nine diagnostic browser journeys.
+The production adapter now selects it on Windows and records `cpu_qos` in its
+manifest; Linux arguments and system scheduling settings are unchanged. Twelve
+production checks pass: all nine browser journeys, saved visibility, exact-one
+lost-ack/restart/read-only replay, and the six-tool showcase. Another 170 unit and
+contract checks pass. No assertion, render setting, motion frame or deadline is
+relaxed. Source S31 records the official CLI documentation; the other provenance
+entries are unchanged. Scene and control/state diagrams need no boundary changes.
+
+CI/native/publication all pass for clean read-drain source `def3d51`; the further
+Windows correction still requires its own full acceptance. Next: synchronize
+sources/publication, commit the correction, run fresh exact-source full acceptance
+and attest the final SHA. Final-source evidence is never inferred from its parent.
 
 ## Previous accepted: test deletion, reset and reusable numbering
 

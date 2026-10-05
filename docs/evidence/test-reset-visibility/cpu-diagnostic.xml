@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="2" skipped="0" tests="9" time="506.981" timestamp="2026-10-05T15:26:47.161979+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[synthetic-desktop]" time="26.010" /><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[synthetic-compact]" time="19.034" /><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[blender-desktop]" time="65.086"><failure message="AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'&#10;  &#10;  - COMPLETED&#10;  + UNKNOWN_OUTCOME">server = ('http://127.0.0.1:63319', &lt;apps.api.test_sessions.TestRegistry object at 0x0000018FD5C61090&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:63319/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T132732955170/test_run_not...l': 'http://127.0.0.1:63319/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:63319/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize(
+        "viewport",
+        [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}],
+        ids=["desktop", "compact"],
+    )
+    @pytest.mark.parametrize(
+        "server",
+        [SyntheticRuntime, pytest.param(BlenderRuntime, marks=pytest.mark.blender)],
+        indirect=True,
+        ids=["synthetic", "blender"],
+    )
+    def test_run_notice_investigate_and_return(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        screenshot(page, directory, "01-ready")
+        happy = choose_pick(page)
+&gt;       assert happy["state"] == "COMPLETED"
+E       AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'
+E         
+E         - COMPLETED
+E         + UNKNOWN_OUTCOME
+
+tests\browser\test_investigation.py:174: AssertionError</failure></testcase><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[blender-compact]" time="168.334" /><testcase classname="tests.browser.test_investigation" name="test_app_request_failure_does_not_become_simulated_outcome" time="22.331"><error message="failed on teardown with &quot;AssertionError: Browser-test API did not shut down&#10;assert not True&#10; +  where True = is_alive()&#10; +    where is_alive = &lt;Thread(Thread-13 (run), started daemon 39396)&gt;.is_alive&quot;">tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/reset-browser-cpu/fixtures/test_app_request_failure_does_0')
+request = &lt;SubRequest 'server' for &lt;Function test_app_request_failure_does_not_become_simulated_outcome&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        runtime_type = getattr(request, "param", SyntheticRuntime)
+        app = create_workspace_app(
+            tmp_path / "worlds", runtime_type=runtime_type, settings=Settings.hkm()
+        )
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            service = uvicorn.Server(uvicorn.Config(app, log_level="warning", access_log=False))
+            thread = threading.Thread(target=service.run, kwargs={"sockets": [listener]}, daemon=True)
+            thread.start()
+            deadline = time.monotonic() + 20
+            while not service.started and thread.is_alive() and time.monotonic() &lt; deadline:
+                time.sleep(0.02)
+            assert service.started, "Local browser-test API failed to start"
+            try:
+                yield f"http://127.0.0.1:{listener.getsockname()[1]}", app.state.test_registry
+            finally:
+                service.should_exit = True
+                thread.join(timeout=20)
+&gt;               assert not thread.is_alive(), "Browser-test API did not shut down"
+E               AssertionError: Browser-test API did not shut down
+E               assert not True
+E                +  where True = is_alive()
+E                +    where is_alive = &lt;Thread(Thread-13 (run), started daemon 39396)&gt;.is_alive
+
+tests\browser\test_investigation.py:46: AssertionError</error></testcase><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]" time="12.161" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]" time="65.388"><failure message="AssertionError: assert 0 == 1&#10; +  where 0 = CommandReceipt(schema_version='2.0', run_id='3993652e-273d-4111-b76a-d541f369ac01', correlation_id='9d824075-617c-5f43...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count&#10; +    where CommandReceipt(schema_version='2.0', run_id='3993652e-273d-4111-b76a-d541f369ac01', correlation_id='9d824075-617c-5f43...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('53a4e5f9-d6bf-56d4-be02-5006effa7273')&#10; +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x0000018FD30863F0&gt;.journal&#10; +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x0000018FD30863F0&gt; = &lt;robotops.workflow.engine.Engine object at 0x0000018FD336D910&gt;.runtime&#10; +          where &lt;robotops.workflow.engine.Engine object at 0x0000018FD336D910&gt; = engine('original')&#10; +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x0000018FD8F3F350&gt;.engine">server = ('http://127.0.0.1:52136', &lt;apps.api.test_sessions.TestRegistry object at 0x0000018FD8F3F350&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:52136/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T133201860551/test_clear_r...l': 'http://127.0.0.1:52136/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:52136/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+&gt;       assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CommandReceipt(schema_version='2.0', run_id='3993652e-273d-4111-b76a-d541f369ac01', correlation_id='9d824075-617c-5f43...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count
+E        +    where CommandReceipt(schema_version='2.0', run_id='3993652e-273d-4111-b76a-d541f369ac01', correlation_id='9d824075-617c-5f43...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('53a4e5f9-d6bf-56d4-be02-5006effa7273')
+E        +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x0000018FD30863F0&gt;.journal
+E        +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x0000018FD30863F0&gt; = &lt;robotops.workflow.engine.Engine object at 0x0000018FD336D910&gt;.runtime
+E        +          where &lt;robotops.workflow.engine.Engine object at 0x0000018FD336D910&gt; = engine('original')
+E        +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x0000018FD8F3F350&gt;.engine
+
+tests\browser\test_investigation.py:390: AssertionError</failure></testcase><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-SyntheticRuntime]" time="10.009" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-BlenderRuntime]" time="117.114" /></testsuite></testsuites>

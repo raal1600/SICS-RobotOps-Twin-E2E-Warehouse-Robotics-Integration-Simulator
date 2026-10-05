@@ -11,17 +11,17 @@
     "path": "robotops/blender/adapter.py",
     "scope": "_invoke",
     "test_id": "B603",
-    "ast_sha256": "c5faea264853c9af8f4c51edf3ee31c089a055b131aae7e6a82460ea250ab9eb",
-    "reviewed": "2026-10-04",
-    "rationale": "Reviewed fixed Blender script invocation with disabled autoexec, unchanged bounded timeout and no shell. Optional literal --record-existing only exports the confined hash-checked original scene. Timeout diagnostics now retain captured process output; validated commands remain JSON data, never code."
+    "ast_sha256": "7c87bab88cc2b24175e08a4e7454c37d7ac5802e595d855ab5bee4cb3e2aec07",
+    "reviewed": "2026-10-05",
+    "rationale": "Reviewed fixed Blender invocation: Windows adds only literal --qos high before the fixed Python entry point. No shell, model-controlled arguments, external code, system-policy changes or deadline extension. Disabled autoexec, bounded process timeout and confined read-only --record-existing export remain intact."
   },
   {
     "path": "robotops/blender/adapter.py",
     "scope": "manifest",
     "test_id": "B603",
-    "ast_sha256": "958e67d7a14155e9cfb94b735d2da7f20a652f264ea0ecce57e1f8d6c9e412b9",
-    "reviewed": "2026-10-04",
-    "rationale": "Only configured local Blender executable and literal --version; no remote/model argument or shell. Closure provenance hashes fixed checked-in files and catalogue data; no executable inputs added."
+    "ast_sha256": "556d235eb3d3a7fab1325d6e625080f33b542fc0cf3d5071064b94f381c71a96",
+    "reviewed": "2026-10-05",
+    "rationale": "The sole process call remains the configured local Blender executable plus literal --version, without a shell. The added cpu_qos field records a platform-selected constant and does not execute code. Existing closure hashes and provenance remain unchanged."
   },
   {
     "path": "robotops/demo.py",

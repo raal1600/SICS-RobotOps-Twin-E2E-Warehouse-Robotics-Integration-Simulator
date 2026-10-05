@@ -1,0 +1,108 @@
+"""Inspect byte-exact browser evidence in a previously digest-verified CI archive."""
+
+import argparse
+import hashlib
+import json
+import subprocess
+import zipfile
+from collections import Counter
+from datetime import datetime, timezone
+from pathlib import Path, PurePosixPath
+
+parser = argparse.ArgumentParser()
+parser.add_argument('archive', type=Path)
+parser.add_argument('--sha', required=True)
+parser.add_argument('--ci-audit', type=Path, required=True)
+parser.add_argument('--out', type=Path, required=True)
+args = parser.parse_args()
+verified = json.loads(args.ci_audit.read_text(encoding='utf8'))
+digest = hashlib.sha256(args.archive.read_bytes()).hexdigest()
+assert verified['artifact_sha256'] == digest
+assert verified['source']['commit'] == args.sha
+assert verified['artifact_digest_verified'] is True
+out = args.out.resolve()
+out.mkdir(parents=True, exist_ok=True)
+repo = Path(__file__).resolve().parents[1]
+source_hashes = {}
+cases = []
+saved = []
+with zipfile.ZipFile(args.archive) as archive:
+    names = archive.namelist()
+    browser_names = sorted(name for name in names if name.startswith('artifacts/investigation-browser/')
+                           and name.endswith('/browser.json'))
+    assert len(browser_names) == 18
+    for name in browser_names:
+        browser = json.loads(archive.read(name))
+        parent = PurePosixPath(name).parent
+        case_name = parent.name
+        assert not browser['page_errors']
+        for original, digest in browser['source_sha256_at_start'].items():
+            canonical = ('tests/browser/test_investigation.py' if original.endswith('/tests/browser/test_investigation.py')
+                         else original)
+            assert canonical.startswith('apps/erp_ui/') or canonical == 'tests/browser/test_investigation.py'
+            if canonical not in source_hashes:
+                blob = subprocess.check_output(['git', 'show', args.sha + ':' + canonical], cwd=repo)
+                source_hashes[canonical] = hashlib.sha256(blob).hexdigest()
+            assert digest == source_hashes[canonical], (case_name, canonical)
+        record = {'case': case_name, 'original_directory': str(parent),
+                  'page_errors': browser['page_errors'], 'console_errors': browser['console_errors'],
+                  'source_hashes_match_commit': True}
+        selected = [name]
+        if case_name.startswith('test_run_notice_investigate_and_return'):
+            assert not browser['console_errors']
+            path = str(parent / 'result.json')
+            result = json.loads(archive.read(path))
+            evidence = result['evidence']
+            command_id = result['command_id']
+            assert result['effect_count'] == evidence['journal']['effect_count'] == 1
+            assert command_id == evidence['command']['command_id'] == evidence['job']['command_id']
+            assert evidence['job']['state'] == 'COMPLETED'
+            assert [r['verification']['verdict'] for r in evidence['reconciliations']] == ['INCONCLUSIVE', 'VERIFIED_SUCCESS']
+            assert all(r['command']['command_id'] == command_id for r in evidence['reconciliations'])
+            assert all(r['verification']['observation_id'] == r['observation']['observation_id']
+                       for r in evidence['reconciliations'])
+            record.update(runtime=result['runtime'], viewport=result['viewport'], command_id=command_id,
+                          effect_count=1, final_state=evidence['job']['state'],
+                          review_verdicts=[r['verification']['verdict'] for r in evidence['reconciliations']])
+            selected.extend([path, str(parent / 'investigation.json')])
+            if result['runtime'] == 'BlenderRuntime':
+                selected.extend(str(parent / image) for image in (
+                    '03-unusual-result.png', '04-evidence.png', '05-manual-inspection.png'))
+        elif case_name.startswith('test_clear_retries_same_test_and_delete_starts_again_at_one'):
+            assert not browser['console_errors']
+            path = str(parent / 'lifecycle-result.json')
+            result = json.loads(archive.read(path))
+            assert result['cleared_test_id'] == 'original'
+            assert result['cleared_number'] == result['new_test']['number'] == 1
+            assert result['revision_after_clear'] == 2
+            assert result['deleted_test_row_and_world_files'] is True
+            assert result['clear_dispatched_no_pick'] is True
+            assert result['new_test']['test_id'] != 'original'
+            assert result['new_test']['order_count'] == 0
+            assert result['subsequent_explicit_pick_effects'] == 1
+            record.update(result)
+            selected.extend([path, str(parent / 'same-test-ready-again.png'), str(parent / 'deleted-then-new-test-one.png')])
+        else:
+            assert case_name == 'test_app_request_failure_does_not_become_simulated_outcome'
+            assert browser['console_errors'] and all('503' in error for error in browser['console_errors'])
+            record['intentional_app_error'] = 503
+        for path in selected:
+            relative = PurePosixPath(f'case-{len(cases)+1:02d}') / PurePosixPath(path).name
+            destination = (out / 'original' / relative).resolve()
+            assert destination.is_relative_to(out)
+            data = archive.read(path)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(data)
+            saved.append({'original_path': path, 'path': destination.relative_to(out).as_posix(),
+                          'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)})
+        cases.append(record)
+counts = Counter(case['case'] for case in cases)
+assert len(counts) == 9 and all(count == 2 for count in counts.values())
+result = {'result': 'PASS', 'source_commit': args.sha,
+          'audited_at_utc': datetime.now(timezone.utc).isoformat(),
+          'artifact_id': verified['artifact_id'], 'artifact_sha256': verified['artifact_sha256'],
+          'case_count': len(cases), 'normal_fault_journeys': 8, 'lifecycle_journeys': 8, 'intentional_app_error_cases': 2,
+          'source_sha256': source_hashes, 'cases': cases, 'files': saved,
+          'limitations': 'Functional automation, not independent first-time usability or device accessibility research. Trace ZIPs remain in the full CI artifact.'}
+(out / 'browser-verification.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf8')
+print(json.dumps({key: result[key] for key in ('result', 'source_commit', 'artifact_id', 'case_count', 'normal_fault_journeys', 'intentional_app_error_cases')}))

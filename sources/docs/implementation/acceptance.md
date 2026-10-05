@@ -121,3 +121,15 @@ failed stale-selector report and its mapping correction against actual passed
 JUnit cases. All 118 MUSTs pass in the refreshed report. The interrupted local
 attempt is retained without a completed-run claim; the exact-source CI artifact
 provides both complete suites. Evidence/status successors are verified separately.
+
+The subsequent full-source run exposed a replay-response/deletion race; local
+browser runs also exposed Windows Blender deadlines. Those original failures
+remain archived. Response-body draining, unchanged-visibility optimization and
+the documented Windows process-local QoS option are accepted at clean source
+`0d03402776cf7ba63710634c5df2a8047501bdfb`: all 118 MUSTs pass, with 693 tests
+twice on each of Windows and Linux, 146 JavaScript checks, nine browser journeys
+per suite and eight Blender demos. [The exact-source archive](../evidence/reset-verified/README.md)
+retains independent audits, original CI remote placeholders, publication checks
+and links to the failures. Robot deadlines, rendering quality, schema boundaries
+and all outcome assertions remain unchanged. The status successor still gets
+its own exact-source workflows and deployed build check under ADR 0002.

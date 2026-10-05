@@ -13,17 +13,17 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
     const catalogue=profile==='legacy_cartesian_v1'?null:hkmCatalogue;
     const sources=catalogue?Object.fromEntries(catalogue.products.map(p=>['product-'+p.sku+'-01',catalogue.layout.sources[p.sku].location_id])):{};
     return {id,number:availableNumber(),revision:1,cell_profile_id:profile,cell_display_name:profile==='legacy_cartesian_v1'?'Legacy Cartesian cell':registeredProfiles.find(p=>p.cell_profile_id===profile)?.display_name,
-      catalogue,sources,destination:catalogue?.layout.destination.location_id||'destination',orders:[],groups:[{delivery_id:id+'-scene-1',started_at:'2026-10-03T14:00:00Z',current:true,executions:[]}],epoch:1,cellMode:'READY',blocked:null,
+      catalogue,sources,destination:catalogue?.layout.destination.location_id||'destination',orders:[],sessions:[],groups:[{delivery_id:id+'-scene-1',started_at:'2026-10-03T14:00:00Z',current:true,executions:[]}],epoch:1,cellMode:'READY',blocked:null,
       inventory:catalogue?catalogue.products.map(p=>({product_id:'product-'+p.sku+'-01',location_id:sources['product-'+p.sku+'-01']})):['red','blue','green'].map(color=>({product_id:'product-'+color,location_id:'source'}))};
   };
   if(active)worlds.set(active,makeWorld(active));
-  const initial=active?worlds.get(active):{orders:[],groups:[],inventory:[]};
+  const initial=active?worlds.get(active):{orders:[],sessions:[],groups:[],inventory:[]};
   const history=()=>({active_test_id:active,tests:[...worlds.values()].map(w=>({test_id:w.id,number:w.number,revision:w.revision,clearing:false,active:w.id===active,order_count:w.orders.length,outcomes:w.orders.map(o=>o.status),cell_profile_id:w.cell_profile_id,cell_display_name:w.cell_display_name}))});
   const makeElement=id=>({value:id==='replay-scope'?'delivery':'',textContent:'',disabled:false,hidden:false,open:false,options:[],children:[],
     add(option){this.options.push(option);if(this.options.length===1)this.value=option.value;},
     replaceChildren(...nodes){this.options=[];this.children=[];this.value='';for(const node of nodes){if('value' in node&&'text' in node)this.add(node);else this.children.push(node);}},
     addEventListener(event,fn){this['on'+event]=fn;},showModal(){this.open=true;this.hidden=false;},close(){this.open=false;this.onclose?.();},
-    attributes:{},classList:{toggle(){}},focus(){this.focusCount=(this.focusCount||0)+1;},
+    attributes:{},dataset:{},classList:{toggle(){}},focus(){this.focusCount=(this.focusCount||0)+1;},
     append(...nodes){this.children.push(...nodes);},setAttribute(key,value){this.attributes[key]=value;},getAttribute(key){return this.attributes[key]||'';},removeAttribute(key){delete this.attributes[key];},closest(){return this;},scrollIntoView(){this.scrolled=true;}});
   const el=id=>{if(!elements.has(id))elements.set(id,makeElement(id));return elements.get(id);};
   const player={pause(){this.paused=true;},select(id){this.selected=id;},previewScene(scene){this.scene=scene;},update(data){this.data=data;},updateDelivery(data){this.data=data;}};
@@ -35,6 +35,7 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
     const failIndex=failures.findIndex(f=>f.path===path),failure=failIndex<0?null:failures.splice(failIndex,1)[0];
     if(failure&&!failure.afterCommit)return reply({reason:failure.reason},failure.status);
     const respond=data=>failure?reply({reason:failure.reason},failure.status):reply(data);
+    if(path==='/health')return reply({status:'ok',capabilities:{test_lifecycle:true}});
     if(path==='/cell-profiles')return reply({default_cell_profile_id:'hkm_inspired_v1',profiles:registeredProfiles});
     if(path==='/simulation-tests'){
       if(!body)return reply(history());
@@ -79,6 +80,50 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
     const scene=()=>({scene_epoch:id+'-scene-'+world.epoch,source:'CURRENT_WORLD_REFERENCE',objects:[]});
     const fixture=()=>({runtime:'headless',scene_epoch:scene().scene_epoch,source_id:catalogue?sources[inventory[0].product_id]:'source',destination_id:world.destination,
       robot_profile_version:catalogue?world.cell_profile_id:null,products:inventory.map(item=>({product_id:item.product_id,sku:catalogue?item.product_id.slice(8,-3):item.product_id})),catalogue,product_sources:sources,inventory,scene_reset_blocked_reason:world.blocked});
+    const pending=session=>({...session,pending_authorization:session.status==='WAITING_AUTHORIZATION'?{stage:session.current_stage,title:session.current_stage===17?'Controller result':`Stage ${session.current_stage}`,expected_revision:session.revision,label:'Continue',mandatory:[3,10,13,15].includes(session.current_stage)}:null});
+    if(path==='/v1/wms/tasks'&&body){
+      const session={session_id:'session-'+body.request_id,order_id:body.request.order_id,request:body.request,fault:body.fault,revision:0,current_stage:1,status:'WAITING_AUTHORIZATION',steps:[],context:{},created_at:'2026-10-03T14:00:00Z'};
+      world.sessions.push(session);return reply(pending(session),202);
+    }
+    if(path==='/integration/sessions')return reply(world.sessions.map(pending));
+    if(path.startsWith('/integration/sessions/')){
+      const session=world.sessions.find(item=>path.split('/')[3]===item.session_id);
+      if(!session)return reply({reason:'NOT_FOUND'},404);
+      if(!body)return reply(pending(session));
+      if(body.expected_revision!==session.revision)return reply({reason:'REVISION_CONFLICT'},409);
+      const stage=session.current_stage;
+      let order=orders.find(item=>item.order_id===session.order_id);
+      if(path.endsWith('/authorize')){
+        if(body.stage!==stage)return reply({reason:'STAGE_CONFLICT'},409);
+        if(stage===4){order={...session.request,job_ids:['job-'+orders.length],status:'VALIDATED',fault:session.fault};orders.push(order);session.job_id=order.job_ids[0];}
+        if(stage===5)order.status='PLANNING';
+        if(stage===6&&['BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'].includes(session.fault)){order.status='FAILED';session.status='FAILED';groups.at(-1).executions.push({job_id:session.job_id,order_id:order.order_id,product_id:order.lines[0].product_id,state:'FAILED'});}
+        if(stage===8){order.commandCreated=true;session.command_id='command-'+session.job_id;order.status='READY_TO_EXECUTE';}
+        if(stage===16){
+          if(beforeRun)await beforeRun(order);
+          order.status=session.fault?.startsWith('DROP_ACK_')?'UNKNOWN_OUTCOME':'EXECUTING';
+          if(session.fault==='LOGICAL_ESTOP')world.cellMode='ESTOP_LOGICAL';
+          else if(session.fault==='CELL_FAULT')world.cellMode='FAULT';
+          else if(session.fault!=='DROP_ACK_BEFORE_EFFECT')inventory.find(item=>item.product_id===order.lines[0].product_id).location_id=world.destination;
+          if(order.status==='UNKNOWN_OUTCOME')world.blocked='SCENE_RESET_BLOCKED_UNRESOLVED_JOBS';
+          groups.at(-1).executions.push({job_id:session.job_id,order_id:order.order_id,product_id:order.lines[0].product_id,state:order.status});
+        }
+        if(stage===19){
+          order.status=session.fault?.startsWith('DROP_ACK_')||session.fault?.includes('OBSERVATION')?'UNKNOWN_OUTCOME':['LOGICAL_ESTOP','CELL_FAULT'].includes(session.fault)?'FAILED':'COMPLETED';
+          groups.flatMap(g=>g.executions).find(item=>item.job_id===session.job_id).state=order.status;
+          if(order.status==='UNKNOWN_OUTCOME'){world.blocked='SCENE_RESET_BLOCKED_UNRESOLVED_JOBS';session.status='UNKNOWN_OUTCOME';}
+        }
+        session.steps.push({step_id:session.session_id+'-'+stage,stage,sequence:session.steps.length+1,title:'Stage '+stage,status:'COMPLETED',protocol:'LOCAL',classification:'SIMULATED SYSTEM'});
+        session.current_stage=Math.min(22,stage+1);if(stage===22)session.status='COMPLETED';
+      }else if(path.endsWith('/reconcile')){
+        order.status=body.fault?'REQUIRES_INTERVENTION':order.fault==='DROP_ACK_BEFORE_EFFECT'?'FAILED':'COMPLETED';
+        groups.flatMap(g=>g.executions).find(item=>item.job_id===session.job_id).state=order.status;
+        if(order.status!=='REQUIRES_INTERVENTION')world.blocked=null;
+        session.status=order.status==='REQUIRES_INTERVENTION'?'UNKNOWN_OUTCOME':'WAITING_AUTHORIZATION';session.current_stage=20;
+        session.context.reconciliation={status:order.status,physical_resend:false};
+      }
+      session.revision+=2;return reply(pending(session));
+    }
     if(path==='/orders'&&body){
       data={...body,job_ids:['job-'+orders.length],status:'RECEIVED'};orders.push(data);
     }else if(path==='/orders')data=orders;
@@ -111,7 +156,7 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
         if(order.status!=='REQUIRES_INTERVENTION')world.blocked=null;
         data={state:order.status};
       }else if(path.endsWith('/evidence')){
-        const planned=!['BRAIN_INVALID_OUTPUT','BRAIN_TIMEOUT'].includes(order.fault);
+        const planned=order.commandCreated||(!world.sessions.some(s=>s.order_id===order.order_id)&&!['BRAIN_INVALID_OUTPUT','BRAIN_TIMEOUT'].includes(order.fault));
         data={job:{job_id:order.job_ids[0],order_id:order.order_id,line:order.lines[0],state:order.status},verifications:[],observations:[],reconciliations:[],
           command:planned?{command_id:'command-'+order.job_ids[0],product_id:order.lines[0].product_id}:null,
           journal:planned?{status:order.fault==='DROP_ACK_BEFORE_EFFECT'?'FAILED':'SUCCEEDED',effect_count:order.fault==='DROP_ACK_BEFORE_EFFECT'?0:1}:null};
@@ -128,6 +173,7 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
       return !options.method&&beforeReadBody?{...response,json:async()=>{await beforeReadBody(path);return response.json();}}:response;
     },crypto:{randomUUID:()=>String(++sequence)},setInterval(fn){timers.push(fn);},setTimeout:scheduleTimeout,clearTimeout:cancelTimeout,console});
   vm.runInContext(fs.readFileSync('apps/erp_ui/workflow-guide.js','utf8'),context);
+  vm.runInContext(fs.readFileSync('apps/erp_ui/integration-console.js','utf8'),context);
   vm.runInContext(fs.readFileSync('apps/erp_ui/app.js','utf8'),context);
   await new Promise(setImmediate);
   return {el,posts,requests,timers,...initial,player,worlds,profiles:registeredProfiles,
@@ -141,11 +187,24 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
     serverStart:()=>{active='external-'+(++sequence);worlds.set(active,makeWorld(active,'hkm_inspired_v1'));return active;}};
 }
 
+async function runGuided(el){
+  for(let i=0;i<30&&el('create').disabled&&!el('integration-advance').disabled;i++)await el('integration-advance').onclick();
+  await el('create').onclick();
+  for(let i=0;i<30&&!el('integration-advance').disabled;i++){
+    await el('integration-advance').onclick();
+    if(el('integration-error').textContent)throw Error(el('integration-error').textContent);
+  }
+  el('replay-scope').value='delivery';el('replay-scope').onchange();await new Promise(setImmediate);
+}
+async function finishGuided(el){for(let i=0;i<30&&!el('integration-advance').disabled;i++)await el('integration-advance').onclick();}
+function assertReconcile(items,fault){assert.equal(items.length,1);assert.match(items[0].path,/^\/integration\/sessions\/[^/]+\/reconcile$/);assert.equal(items[0].body.fault,fault);assert.ok(items[0].body.request_id);assert.equal(typeof items[0].body.expected_revision,'number');}
+const physicalPost=item=>item.path.endsWith('/authorize')&&item.body.stage===16;
+
 for(const operation of ['clear','delete','create'])test(`${operation} waits for the current replay response body before changing test data`,async()=>{
   let armed=false,release,started;
   const held=new Promise(resolve=>{release=resolve;}),reading=new Promise(resolve=>{started=resolve;});
   const ui=await dashboard({beforeReadBody:async path=>{if(armed&&path.endsWith('/playback')){armed=false;started();await held;}}});
-  await ui.el('create').onclick();
+  await runGuided(ui.el);
   armed=true;const replay=ui.motion();await reading;
   const posts=ui.posts.length;
   if(operation==='create')await ui.el('new-test').onclick();else ui.el(operation==='clear'?'clear-test':'delete-test').onclick();
@@ -193,12 +252,12 @@ test('a finished pick keeps management disabled until its final replay refresh c
   let armed=false,release,started;
   const held=new Promise(resolve=>{release=resolve;}),reading=new Promise(resolve=>{started=resolve;});
   const ui=await dashboard({beforeRun:()=>{armed=true;},beforeReadBody:async path=>{if(armed&&path.endsWith('/playback')){armed=false;started();await held;}}});
-  const run=ui.el('create').onclick();await reading;
-  assert.equal(ui.current().orders[0].status,'COMPLETED');
+  const run=runGuided(ui.el);await reading;
+  assert.equal(ui.current().orders[0].status,'EXECUTING');
   assert.equal(ui.el('delete-test').disabled,true);assert.equal(ui.el('new-test').disabled,true);
   ui.el('delete-test').onclick();assert.equal(ui.el('delete-test-dialog').open,false);
   release();await run;
-  assert.equal(ui.el('delete-test').disabled,false);assert.equal(ui.posts.length,2);
+  assert.equal(ui.el('delete-test').disabled,false);assert.equal(ui.posts.filter(physicalPost).length,1);assert.equal(ui.current().orders[0].status,'COMPLETED');
 });
 
 test('management stays exclusive through its final history refresh',async()=>{
@@ -220,7 +279,7 @@ test('background polling pauses across committed clear or delete until its respo
     let release,committed;
     const waiting=new Promise(resolve=>{release=resolve;}),serverCommitted=new Promise(resolve=>{committed=resolve;});
     const {el,requests,timers,current}=await dashboard({afterManagement:async()=>{committed();await waiting;}});
-    await el('create').onclick();el(button).onclick();
+    await runGuided(el);el(button).onclick();
     const operation=el('confirm-delete-test').onclick();await serverCommitted;
     const before=requests.length;
     for(const timer of timers)timer();
@@ -237,7 +296,7 @@ test('background polling pauses across committed clear or delete until its respo
 
 test('three product clicks build one delivery; scenario selection is pure configuration and explicit restock preserves playback',async()=>{
   const {el,posts,orders,groups,inventory,player}=await dashboard();
-  for(let i=0;i<3;i++)await el('create').onclick();
+  for(let i=0;i<3;i++)await runGuided(el);
   assert.deepEqual(orders.map(order=>order.lines[0].product_id),['product-red','product-blue','product-green']);
   assert.equal(groups.length,1);assert.equal(player.data.jobs.length,3);
   assert.equal(el('create').disabled,false);assert.match(el('create').textContent,/Start new delivery/);
@@ -246,9 +305,9 @@ test('three product clicks build one delivery; scenario selection is pure config
   await el('fresh-scene').onclick();
   assert.equal(groups.length,2);assert.equal(groups[0].executions.length,3);
   assert.ok(inventory.every(item=>item.location_id==='source'));
-  assert.equal(posts.filter(item=>item.path.endsWith('/run')).length,3);
-  await el('create').onclick();
-  assert.equal(posts.at(-1).body.fault,'LOGICAL_ESTOP');assert.equal(orders.at(-1).status,'FAILED');
+  assert.equal(posts.filter(item=>physicalPost(item)).length,3);
+  await runGuided(el);
+  assert.equal(posts.filter(p=>p.path.endsWith('/v1/wms/tasks')).at(-1).body.fault,'LOGICAL_ESTOP');assert.equal(orders.at(-1).status,'FAILED');
   el('delivery').value=groups[0].delivery_id;await el('delivery').onchange();
   assert.equal(player.data.jobs.length,3);assert.equal(el('replay-scope').value,'delivery');
   el('orders').value=orders[0].job_ids[0];await el('orders').onchange();
@@ -257,15 +316,15 @@ test('three product clicks build one delivery; scenario selection is pure config
 
 test('exhausted happy path starts an explicit new delivery before issuing a new order',async()=>{
   const {el,posts,groups}=await dashboard();
-  for(let i=0;i<3;i++)await el('create').onclick();
+  for(let i=0;i<3;i++)await runGuided(el);
   const start=posts.length;
-  await el('create').onclick();
-  assert.deepEqual(posts.slice(start).map(item=>item.path),['/fixtures/fresh-scene','/orders','/jobs/job-3/run']);
+  await runGuided(el);
+  assert.deepEqual(posts.slice(start, start+2).map(item=>item.path),['/fixtures/fresh-scene','/v1/wms/tasks']);assert.deepEqual(posts.slice(start+2).map(item=>item.body.stage),Array.from({length:22},(_,i)=>i+1));
   assert.equal(groups.length,2);assert.equal(groups[0].executions.length,3);assert.equal(groups[1].executions.length,1);
 });
 
 test('scenario changes cannot dispatch or bypass an unresolved outcome',async()=>{
-  const {el,posts,groups,block,refresh}=await dashboard();await el('create').onclick();
+  const {el,posts,groups,block,refresh}=await dashboard();await runGuided(el);
   block('SCENE_RESET_BLOCKED_UNRESOLVED_JOBS');await refresh();const start=posts.length;
   el('scenario').value='LOGICAL_ESTOP';await el('scenario').onchange();
   assert.equal(groups.length,1);assert.equal(el('create').disabled,true);
@@ -275,7 +334,7 @@ test('scenario changes cannot dispatch or bypass an unresolved outcome',async()=
 
 test('individual legacy execution without a saved delivery identity survives polling',async()=>{
   const {el,orders,groups,player,refresh}=await dashboard();
-  await el('create').onclick();await el('create').onclick();
+  await runGuided(el);await runGuided(el);
   groups[0].executions.shift();
   el('orders').value=orders[0].job_ids[0];await el('orders').onchange();
   await refresh();
@@ -285,73 +344,73 @@ test('individual legacy execution without a saved delivery identity survives pol
 
 for(const fault of ['DROP_ACK_AFTER_EFFECT','DROP_ACK_BEFORE_EFFECT'])test(fault+': explain the paused next pick, reconcile original once, then allow another product',async()=>{
   const {el,orders,posts}=await dashboard();
-  el('scenario').value=fault;await el('scenario').onchange();await el('create').onclick();
+  el('scenario').value=fault;await el('scenario').onchange();await runGuided(el);
   el('product').value='product-blue';el('product').onchange();
   assert.equal(el('create').disabled,true);assert.match(el('create').textContent,/reconcile first/);
   assert.equal(el('next-step').hidden,false);assert.match(el('next-step-title').textContent,/product-red: outcome uncertain/);
   assert.match(el('resolve-blocker').textContent,/Reconcile product-red/);
-  const start=posts.length;await el('create').onclick();
+  const start=posts.length;await runGuided(el);
   assert.equal(posts.length,start);assert.equal(orders.length,1);
   await el('resolve-blocker').onclick();
-  assert.deepEqual(posts.slice(start),[{path:'/jobs/job-0/reconcile',body:{fault:null}}]);
+  assertReconcile(posts.slice(start),null);await finishGuided(el);
   assert.equal(orders[0].status,fault==='DROP_ACK_BEFORE_EFFECT'?'FAILED':'COMPLETED');
   assert.equal(el('create').disabled,false);assert.equal(el('next-step').hidden,true);
-  assert.equal(el('product').value,'product-blue');await el('create').onclick();
+  assert.equal(el('product').value,'product-blue');await runGuided(el);
   assert.equal(orders.length,2);assert.equal(orders[1].lines[0].product_id,'product-blue');
-  assert.equal(posts.filter(item=>item.path==='/jobs/job-0/run').length,1);
+  assert.equal(posts.filter(item=>physicalPost(item)).length,2);
 });
 
 test('next-step button reconciles the blocker even when historical execution details are selected',async()=>{
-  const {el,posts,orders,groups}=await dashboard();await el('create').onclick();
+  const {el,posts,orders,groups}=await dashboard();await runGuided(el);
   await el('fresh-scene').onclick();
-  el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('scenario').onchange();await el('create').onclick();
+  el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('scenario').onchange();await runGuided(el);
   el('delivery').value=groups[0].delivery_id;await el('delivery').onchange();
   assert.equal(el('orders').value,orders[0].job_ids[0]);
   const start=posts.length;await el('resolve-blocker').onclick();
-  assert.deepEqual(posts.slice(start),[{path:'/jobs/job-1/reconcile',body:{fault:null}}]);
+  assertReconcile(posts.slice(start),null);await finishGuided(el);
   assert.equal(el('orders').value,orders[1].job_ids[0]);
 });
 
 test('contradictory fresh evidence keeps next pick blocked but allows another observation of the original pick',async()=>{
   const {el,posts,orders}=await dashboard();
-  el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('scenario').onchange();await el('create').onclick();
+  el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('scenario').onchange();await runGuided(el);
   el('observation').value='CONTRADICTORY_OBSERVATION';await el('resolve-blocker').onclick();
   assert.equal(orders[0].status,'REQUIRES_INTERVENTION');assert.equal(el('create').disabled,true);
   assert.match(el('next-step-title').textContent,/more evidence needed/);assert.match(el('resolve-blocker').textContent,/Observe again: product-red/);
   assert.equal(el('resolve-blocker').disabled,false);assert.equal(el('reconcile').disabled,false);
-  const start=posts.length;await el('resolve-blocker').onclick();await el('create').onclick();
-  assert.deepEqual(posts.slice(start),[{path:'/jobs/job-0/reconcile',body:{fault:'CONTRADICTORY_OBSERVATION'}}]);
+  const start=posts.length;await el('resolve-blocker').onclick();await runGuided(el);
+  assertReconcile(posts.slice(start),'CONTRADICTORY_OBSERVATION');
   assert.equal(orders.length,1);assert.equal(orders[0].status,'REQUIRES_INTERVENTION');assert.equal(el('create').disabled,true);
-  el('observation').value='';await el('resolve-blocker').onclick();
+  el('observation').value='';await el('resolve-blocker').onclick();await finishGuided(el);
   assert.equal(orders[0].status,'COMPLETED');assert.equal(el('create').disabled,false);
-  assert.equal(posts.filter(p=>p.path.endsWith('/run')).length,1);
+  assert.equal(posts.filter(p=>physicalPost(p)).length,1);
 });
 
 const executions=['','DROP_ACK_AFTER_EFFECT','DROP_ACK_BEFORE_EFFECT','CONTRADICTORY_OBSERVATION','LOW_CONFIDENCE_OBSERVATION','STALE_OBSERVATION','LOGICAL_ESTOP','CELL_FAULT','BRAIN_INVALID_OUTPUT','BRAIN_TIMEOUT'];
 const observations=['','CONTRADICTORY_OBSERVATION','LOW_CONFIDENCE_OBSERVATION','STALE_OBSERVATION','MISSING_OBSERVATION'];
 for(const execution of ['DROP_ACK_AFTER_EFFECT','DROP_ACK_BEFORE_EFFECT'])for(const observation of observations.slice(1))test(`continue same test: ${execution} / ${observation}`,async()=>{
   const app=await dashboard(),{el,orders,posts,groups}=app;
-  el('scenario').value=execution;await el('create').onclick();
+  el('scenario').value=execution;await runGuided(el);
   el('observation').value=observation;await el('reconcile').onclick();
   assert.equal(orders[0].status,'REQUIRES_INTERVENTION');assert.equal(el('reconcile').disabled,false);
   assert.match(el('reconcile').textContent,/Observe again/);
   await el('reconcile').onclick();
   assert.equal(orders[0].status,'REQUIRES_INTERVENTION');assert.equal(el('create').disabled,true);
-  el('product').value='product-blue';el('observation').value='';await el('reconcile').onclick();
+  el('product').value='product-blue';el('observation').value='';await el('reconcile').onclick();await finishGuided(el);
   assert.equal(orders[0].status,execution==='DROP_ACK_AFTER_EFFECT'?'COMPLETED':'FAILED');
   assert.equal(app.current().id,'original');assert.equal(groups.length,1);
   assert.equal(el('create').disabled,false);assert.equal(el('reconcile').disabled,true);
-  el('scenario').value='';await el('create').onclick();
+  el('scenario').value='';await runGuided(el);
   assert.equal(orders[1].status,'COMPLETED');assert.equal(orders[1].lines[0].product_id,'product-blue');
   assert.equal(groups[0].executions.length,2);assert.equal(app.player.data.jobs.length,2);
-  assert.equal(posts.filter(p=>p.path==='/jobs/job-0/run').length,1);
+  assert.equal(posts.filter(p=>physicalPost(p)).length,2);
   assert.equal(posts.filter(p=>p.path.endsWith('/reconcile')).length,3);
   assert.ok(posts.every(p=>!p.path.includes('fresh-scene')&&p.path!=='/simulation-tests'));
 });
 for(const execution of executions)for(const observation of observations)test(`independent test: ${execution||'happy'} / ${observation||'normal'}`,async()=>{
   const app=await dashboard(),{el,posts,orders,inventory}=app;
   el('scenario').value=execution;el('observation').value=observation;
-  await el('scenario').onchange();await el('create').onclick();
+  await el('scenario').onchange();await runGuided(el);
   if(orders[0].status==='UNKNOWN_OUTCOME')await el('reconcile').onclick();
   const saved=JSON.stringify({orders,inventory});
   assert.equal(el('new-test').disabled,false);
@@ -362,7 +421,7 @@ for(const execution of executions)for(const observation of observations)test(`in
   assert.ok(app.current().inventory.every(p=>p.location_id===app.current().sources[p.product_id]));
   assert.equal(el('create').disabled,false);assert.equal(el('new-test').disabled,false);
   assert.equal(JSON.stringify({orders,inventory}),saved);
-  await el('create').onclick();
+  await runGuided(el);
   assert.equal(app.current().orders.length,1);assert.equal(app.current().orders[0].fault,execution||null);
   assert.ok(posts.at(-1).path.startsWith('/simulation-tests/'));
   el('test-history').value='original';await el('test-history').onchange();
@@ -370,7 +429,7 @@ for(const execution of executions)for(const observation of observations)test(`in
   assert.equal(el('reconcile').disabled,true);assert.equal(el('reset').disabled,true);assert.equal(el('fresh-scene').disabled,true);
   assert.equal(el('new-test').disabled,false);assert.equal(el('return-current').hidden,false);
   assert.equal(app.player.data.jobs.length,1);
-  const reads=posts.length;await el('create').onclick();await el('reconcile').onclick();await el('reset').onclick();
+  const reads=posts.length;await runGuided(el);await el('reconcile').onclick();await el('reset').onclick();
   assert.equal(posts.length,reads);assert.equal(JSON.stringify({orders,inventory}),saved);
   await el('return-current').onclick();
   assert.equal(el('return-current').hidden,true);assert.match(el('test-status').textContent,/current test/);
@@ -378,7 +437,7 @@ for(const execution of executions)for(const observation of observations)test(`in
 
 test('unreconciled test can be archived without reconciliation, then reviewed unchanged',async()=>{
   const {el,orders,posts}=await dashboard();
-  el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('create').onclick();
+  el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
   await el('new-test').onclick();await el('create-test').onclick();
   assert.equal(orders[0].status,'UNKNOWN_OUTCOME');
   assert.equal(posts.filter(p=>p.path.endsWith('/reconcile')).length,0);
@@ -393,7 +452,7 @@ test('guide directs attention once; choosing evidence and inspecting it never su
   el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('scenario').onchange();
   assert.match(el('scenario-help').textContent,/Expected: the product moves/);
   assert.equal(posts.length,0);
-  await el('create').onclick();
+  await runGuided(el);
   assert.match(el('guide-title').textContent,/product-red: outcome uncertain/);
   assert.equal(el('stage-2').getAttribute('aria-current'),'step');
   assert.equal(el('investigation-dialog').open,false);
@@ -418,23 +477,23 @@ test('guide directs attention once; choosing evidence and inspecting it never su
   assert.match(el('guide-title').textContent,/Pick verified/);
   assert.equal(el('stage-3').getAttribute('aria-current'),'step');
   await el('guide-action').onclick();assert.equal(el('setup-panel').open,true);assert.equal(el('product').focusCount,1);
-  assert.equal(posts.filter(p=>p.path.endsWith('/run')).length,1);
+  assert.equal(posts.filter(p=>physicalPost(p)).length,1);
 });
 
 test('human review stays available for repeated bad observations without focus stealing',async()=>{
-  const {el,posts,refresh}=await dashboard();el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('create').onclick();
+  const {el,posts,refresh}=await dashboard();el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
   await el('guide-action').onclick();
   el('observation').value='LOW_CONFIDENCE_OBSERVATION';await el('resolve-blocker').onclick();
   assert.match(el('guide-title').textContent,/your review is needed/);
   assert.equal(el('resolve-blocker').disabled,false);assert.equal(el('review-panel').open,true);
   const focus=el('review-heading').focusCount;await refresh();await el('resolve-blocker').onclick();
   assert.equal(el('review-heading').focusCount,focus);
-  assert.equal(posts.filter(p=>p.path.endsWith('/run')).length,1);
+  assert.equal(posts.filter(p=>physicalPost(p)).length,1);
 });
 
 test('guide review and full evidence target the active blocker while an earlier replay is selected',async()=>{
-  const {el,posts,orders,groups}=await dashboard();await el('create').onclick();await el('fresh-scene').onclick();
-  el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('create').onclick();
+  const {el,posts,orders,groups}=await dashboard();await runGuided(el);await el('fresh-scene').onclick();
+  el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
   el('delivery').value=groups[0].delivery_id;await el('delivery').onchange();
   assert.equal(el('orders').value,orders[0].job_ids[0]);assert.match(el('review-identity').textContent,/Job job-1/);
   const start=posts.length;await el('guide-action').onclick();
@@ -453,14 +512,14 @@ test('polling during slow planning keeps the newly submitted job before its deli
   const ui=await dashboard({beforeRun:async order=>{
     await ui.refresh();
     assert.equal(ui.el('orders').value,order.job_ids[0]);
-    assert.match(ui.el('selected-result').textContent,/RECEIVED/);
+    assert.match(ui.el('selected-result').textContent,/READY_TO_EXECUTE/);
   }});
-  await ui.el('create').onclick();await ui.el('create').onclick();
+  await runGuided(ui.el);await runGuided(ui.el);
   assert.equal(ui.el('orders').value,'job-1');assert.equal(ui.orders.length,2);
 });
 
 test('inspection tabs and return preserve selection and never submit work; changing tests closes old context',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();
+  const ui=await dashboard();await runGuided(ui.el);
   const selection=ui.el('orders').value,replay=ui.player.selected,start=ui.posts.length;
   await ui.el('inspect-selected').onclick();assert.equal(ui.player.paused,true);
   ui.el('tab-manual').onclick();assert.equal(ui.el('pane-manual').hidden,false);
@@ -475,11 +534,11 @@ test('inspection tabs and return preserve selection and never submit work; chang
 });
 
 test('request and refresh errors are identified as app problems without rewriting the recorded outcome',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();
+  const ui=await dashboard();await runGuided(ui.el);
   ui.failNext('/cell/reset');ui.failNext('/orders');await ui.el('reset').onclick();
   assert.equal(ui.el('message').getAttribute('data-kind'),'error');
   assert.match(ui.el('message').textContent,/App request problem.*separate from the recorded simulation outcome/);
-  assert.equal(ui.orders[0].status,'COMPLETED');assert.equal(ui.posts.filter(p=>p.path.endsWith('/run')).length,1);
+  assert.equal(ui.orders[0].status,'COMPLETED');assert.equal(ui.posts.filter(p=>physicalPost(p)).length,1);
 });
 
 test('technical confidence uses the assessed sensor record, never a later favorable planning capture',async()=>{
@@ -491,7 +550,7 @@ test('technical confidence uses the assessed sensor record, never a later favora
 });
 
 for(const fault of ['LOGICAL_ESTOP','CELL_FAULT'])test(fault+': guide resets the cell explicitly without rerunning',async()=>{
-  const {el,posts,orders}=await dashboard();el('scenario').value=fault;await el('create').onclick();
+  const {el,posts,orders}=await dashboard();el('scenario').value=fault;await runGuided(el);
   assert.match(el('guide-title').textContent,/Reset the stopped cell/);
   const start=posts.length;await el('guide-action').onclick();
   assert.deepEqual(posts.slice(start),[{path:'/cell/reset',body:{}}]);
@@ -499,14 +558,14 @@ for(const fault of ['LOGICAL_ESTOP','CELL_FAULT'])test(fault+': guide resets the
 });
 
 for(const fault of ['BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'])test(fault+': guide explains rejection and focuses configuration without dispatch',async()=>{
-  const {el,posts}=await dashboard();el('scenario').value=fault;await el('create').onclick();
+  const {el,posts}=await dashboard();el('scenario').value=fault;await runGuided(el);
   assert.match(el('guide-detail').textContent,/before a robot command was created/);
   const start=posts.length;await el('guide-action').onclick();
   assert.equal(el('scenario').focusCount,1);assert.equal(posts.length,start);
 });
 
 test('depleted delivery and saved test both have an explicit next action with history intact',async()=>{
-  const {el,posts,orders}=await dashboard();for(let i=0;i<3;i++)await el('create').onclick();
+  const {el,posts,orders}=await dashboard();for(let i=0;i<3;i++)await runGuided(el);
   assert.match(el('guide-title').textContent,/Delivery finished/);
   const saved=JSON.stringify(orders),start=posts.length;await el('guide-action').onclick();await el('create-test').onclick();
   assert.deepEqual(posts.slice(start).map(p=>p.path),['/simulation-tests']);
@@ -520,7 +579,7 @@ test('depleted delivery and saved test both have an explicit next action with hi
 
 test('every selectable mode has a definition and comparison; browsing them cannot execute a test',async()=>{
   const {el,posts,refresh}=await dashboard();
-  for(const [kind,values] of [['scenario',executions],['observation',observations]]){
+  for(const [kind,values] of [['scenario',[...executions.slice(0,-1),'DUPLICATE_DELIVERY','BROKER_TRANSIENT','EDGE_TRANSIENT','OPC_UA_DISCONNECT','PLC_RESTART','WMS_UNAVAILABLE',executions.at(-1)]],['observation',observations]]){
     const table=el(kind+'-comparisons');
     assert.equal(table.children.length,values.length);
     const meanings=[];
@@ -542,7 +601,7 @@ test('every selectable mode has a definition and comparison; browsing them canno
 
 test('execution and review help explain different stages without changing the uncertain outcome',async()=>{
   const {el,posts,orders}=await dashboard();
-  el('scenario').value='DROP_ACK_AFTER_EFFECT';await el('create').onclick();
+  el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
   const count=posts.length,job=orders[0].job_ids[0];
   el('scenario').value='STALE_OBSERVATION';el('scenario').onchange();
   assert.match(el('scenario-phase').textContent,/first check after movement/);
@@ -566,9 +625,9 @@ test('six source products use their own source IDs and remain available until in
   for(const sku of ['A','B','C','D','E','F']){
     assert.equal(ui.el('product').value,'product-SKU-'+sku+'-01');
     assert.equal(ui.el('create').disabled,false);
-    await ui.el('create').onclick();
+    await runGuided(ui.el);
   }
-  const orders=ui.posts.filter(item=>item.path==='/orders');
+  const orders=ui.posts.filter(item=>item.path==='/v1/wms/tasks').map(item=>({...item,body:item.body.request}));
   assert.deepEqual(orders.map(item=>item.body.lines[0].source_id),['SRC_A','SRC_B','SRC_C','SRC_D','SRC_E','SRC_F']);
   assert.equal(ui.groups[0].executions.length,6);
   assert.match(ui.el('create').textContent,/new delivery/);
@@ -593,7 +652,7 @@ test('tool and uncertainty inspector reads persisted decision and observation wi
 });
 
 
-const worldRequests=items=>items.filter(({path})=>!['/cell-profiles','/simulation-tests','/simulation-tests/delete-all'].includes(path)&&!/^\/simulation-tests\/[^/]+\/delete$/.test(path));
+const worldRequests=items=>items.filter(({path})=>!['/health','/cell-profiles','/simulation-tests','/simulation-tests/delete-all'].includes(path)&&!/^\/simulation-tests\/[^/]+\/delete$/.test(path));
 async function createSelectedTest(ui,profile){
   await ui.el('new-test').onclick();
   if(profile){ui.el('cell-profile').value=profile;await ui.el('cell-profile').onchange();}
@@ -644,7 +703,7 @@ test('a future available registry cell is selectable without hardcoded UI choice
 });
 
 test('deleting the current uncertain test requires confirmation and leaves an empty workspace without issuing a pick',async()=>{
-  const ui=await dashboard();ui.el('scenario').value='DROP_ACK_AFTER_EFFECT';await ui.el('create').onclick();
+  const ui=await dashboard();ui.el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(ui.el);
   const before=JSON.stringify(ui.orders),start=ui.posts.length;
   await ui.el('delete-test').onclick();assert.equal(ui.el('delete-test-dialog').open,true);
   assert.match(ui.el('delete-test-detail').textContent,/Test 1/i);assert.equal(ui.posts.length,start);
@@ -657,12 +716,12 @@ test('deleting the current uncertain test requires confirmation and leaves an em
   assert.equal(ui.el('empty-workspace').hidden,false);assert.equal(ui.el('test-workspace').hidden,true);
   assert.equal(ui.el('create').disabled,true);assert.equal(ui.player.selected,null);
   assert.deepEqual(worldRequests(ui.requests.slice(reads)),[]);
-  assert.equal(ui.posts.filter(item=>item.path.endsWith('/run')).length,1);
+  assert.equal(ui.posts.filter(item=>physicalPost(item)).length,1);
   assert.equal(ui.posts.filter(item=>item.path.endsWith('/reconcile')).length,0);
 });
 
 test('deleting a selected archive preserves the active test and never silently selects another world',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();await createSelectedTest(ui);
+  const ui=await dashboard();await runGuided(ui.el);await createSelectedTest(ui);
   const active=ui.activeId(),saved=JSON.stringify(ui.current());
   ui.el('test-history').value='original';await ui.el('test-history').onchange();
   assert.equal(ui.el('delete-test').disabled,false);await ui.el('delete-test').onclick();
@@ -692,7 +751,7 @@ test('empty startup performs no world reads or writes and only explicit cell con
   assert.equal(ui.el('empty-workspace').hidden,false);assert.equal(ui.el('test-workspace').hidden,true);
   assert.equal(ui.el('create').disabled,true);assert.equal(ui.el('delete-test').disabled,true);assert.equal(ui.el('clear-tests').disabled,true);
   assert.deepEqual(worldRequests(ui.requests),[]);assert.deepEqual(ui.posts,[]);
-  await ui.poll();await ui.el('create').onclick();await ui.el('reconcile').onclick();await ui.el('reset').onclick();
+  await ui.poll();await runGuided(ui.el);await ui.el('reconcile').onclick();await ui.el('reset').onclick();
   assert.deepEqual(worldRequests(ui.requests),[]);assert.deepEqual(ui.posts,[]);
   await ui.el('empty-new-test').onclick();assert.equal(ui.el('new-test-dialog').open,true);assert.deepEqual(ui.posts,[]);
   await ui.el('create-test').onclick();assert.equal(ui.current().inventory.length,6);
@@ -742,7 +801,7 @@ test('changed test history rejects stale clear confirmation until the user revie
 });
 
 test('polling after external deletion clears stale selection without activating an archived test',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();await createSelectedTest(ui);
+  const ui=await dashboard();await runGuided(ui.el);await createSelectedTest(ui);
   const removed=ui.activeId();ui.serverDelete(removed);const reads=ui.requests.length,posts=ui.posts.length;
   await ui.poll();assert.equal(ui.activeId(),null);assert.equal(ui.worlds.size,1);assert.ok(ui.worlds.has('original'));
   assert.equal(ui.el('test-workspace').hidden,true);assert.equal(ui.el('empty-workspace').hidden,false);
@@ -755,7 +814,7 @@ test('polling after external deletion clears stale selection without activating 
 
 test('clear keeps the test number and cell, restores products and preserves choices without another pick',async()=>{
   const ui=await dashboard({hkm:true});ui.el('scenario').value='DROP_ACK_AFTER_EFFECT';
-  ui.el('observation').value='CONTRADICTORY_OBSERVATION';await ui.el('create').onclick();
+  ui.el('observation').value='CONTRADICTORY_OBSERVATION';await runGuided(ui.el);
   const before=JSON.stringify(ui.current()),start=ui.posts.length;
   await ui.el('clear-test').onclick();assert.match(ui.el('delete-test-title').textContent,/Clear Test 1 and retry/);
   assert.match(ui.el('delete-test-detail').textContent,/Keep Test 1/);
@@ -771,12 +830,12 @@ test('clear keeps the test number and cell, restores products and preserves choi
   assert.equal(ui.el('scenario').value,'DROP_ACK_AFTER_EFFECT');assert.equal(ui.el('observation').value,'CONTRADICTORY_OBSERVATION');
   assert.equal(ui.el('create').disabled,false);assert.equal(ui.el('review-panel').open,false);
   assert.match(ui.el('message').textContent,/Test 1 cleared/);
-  await ui.el('create').onclick();
-  assert.equal(ui.requests.filter(r=>r.path.endsWith('/run')).at(-1).headers['X-Test-Revision'],'2');
+  await runGuided(ui.el);
+  assert.equal(ui.requests.filter(r=>physicalPost(r)).at(-1).headers['X-Test-Revision'],'2');
 });
 
 test('clearing a selected archive restores that same test for retry and keeps the other test intact',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();await createSelectedTest(ui);
+  const ui=await dashboard();await runGuided(ui.el);await createSelectedTest(ui);
   const newer=ui.activeId(),saved=JSON.stringify(ui.worlds.get(newer));
   ui.el('test-history').value='original';await ui.el('test-history').onchange();
   await ui.el('clear-test').onclick();await ui.el('confirm-delete-test').onclick();
@@ -786,7 +845,7 @@ test('clearing a selected archive restores that same test for retry and keeps th
 });
 
 test('delete then create reuses Test 1 with fresh identity and no saved orders',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();
+  const ui=await dashboard();await runGuided(ui.el);
   await ui.el('delete-test').onclick();await ui.el('confirm-delete-test').onclick();
   await createSelectedTest(ui);
   assert.equal(ui.current().number,1);assert.notEqual(ui.activeId(),'original');
@@ -795,11 +854,11 @@ test('delete then create reuses Test 1 with fresh identity and no saved orders',
 });
 
 test('retrying a clear after a lost response preserves the request and does not erase later work',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();await ui.el('clear-test').onclick();
+  const ui=await dashboard();await runGuided(ui.el);await ui.el('clear-test').onclick();
   ui.failNext('/simulation-tests/original/clear',{afterCommit:true});await ui.el('confirm-delete-test').onclick();
   assert.equal(ui.el('delete-test-dialog').open,true);assert.equal(ui.current().revision,2);
   const original=structuredClone(ui.posts.at(-1));
-  await ui.el('create').onclick();
+  await runGuided(ui.el);
   await ui.el('confirm-delete-test').onclick();
   assert.deepEqual(ui.posts.at(-1),original);assert.equal(ui.current().orders.length,1);
   assert.equal(ui.current().revision,2);assert.equal(ui.el('delete-test-dialog').open,false);
@@ -807,9 +866,19 @@ test('retrying a clear after a lost response preserves the request and does not 
 });
 
 test('external clear invalidates stale replay and inspection without sending any command',async()=>{
-  const ui=await dashboard();await ui.el('create').onclick();await ui.el('inspect-selected').onclick();
+  const ui=await dashboard();await runGuided(ui.el);await ui.el('inspect-selected').onclick();
   assert.equal(ui.el('investigation-dialog').open,true);
   const posts=ui.posts.length;ui.serverClear('original');await ui.poll();
   assert.equal(ui.el('investigation-dialog').open,false);assert.equal(ui.player.selected,'delivery:original-scene-2');assert.equal(ui.player.data.jobs.length,0);
   assert.equal(ui.posts.length,posts);assert.equal(ui.current().number,1);assert.equal(ui.el('orders').children.length,0);
+});
+
+test('Create only persists a guided session; every boundary requires an explicit stage request',async()=>{
+  const ui=await dashboard();await ui.el('create').onclick();
+  assert.equal(ui.orders.length,0);assert.equal(ui.posts.length,1);assert.equal(ui.posts[0].path,'/v1/wms/tasks');
+  assert.equal(ui.current().sessions[0].current_stage,1);assert.equal(ui.current().sessions[0].steps.length,0);
+  await ui.el('integration-advance').onclick();
+  assert.equal(ui.orders.length,0);assert.equal(ui.current().sessions[0].current_stage,2);
+  assert.equal(ui.posts.filter(physicalPost).length,0);
+  assert.equal(ui.posts.at(-1).body.stage,1);assert.equal(ui.posts.at(-1).body.expected_revision,0);
 });

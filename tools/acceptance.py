@@ -325,7 +325,13 @@ def render_report(manifest: dict, mapping: dict, suites: list[dict], out: Path) 
         )
     lines += [
         "",
-        "Optional model provider/fallback, external ERP outbox, OPC UA, contact physics and real hardware remain non-blocking and unimplemented.",
+        "Optional model provider/fallback, external production ERP delivery, contact physics and real hardware remain non-blocking and unimplemented. Real PostgreSQL, RabbitMQ and OPC UA against the synthetic virtual PLC are mandatory Integration Lab boundaries, covered by the LAB-MUST criteria above.",
+        "",
+        "## Integration Lab revision",
+        "",
+        "The 51 LAB-MUST criteria are additive to the 118 existing simulator criteria. Guided sessions persist 22 bounded stages and explicit physical authorization; the automatic REST driver uses the same handlers. The lab suite exercises actual PostgreSQL, RabbitMQ, the separate edge-owned OPC UA client, virtual PLC journal and synthetic WMS REST service. Protocol traffic is real; controller/runtime, ERP/WMS behavior and sensing remain synthetic. Physical verification does not complete the order until durable WMS acknowledgements and the ERP business marker are committed.",
+        "",
+        "Actual Chromium lab journeys retain source hashes, screenshots, network records and traces under artifacts/lab-browser. Local browser journeys exercise both deterministic and actual Blender runtimes. Displayed source paths and excerpts are checked against handlers observed executing. Tests cover original-command recovery, duplicate delivery and authorization, WMS outages, stale evidence, and read-only trace sockets across clear/delete. The results and source identity above, together with the final-loop ledger in docs/integration-lab-requirements.md, determine delivery status; this architectural description alone does not establish acceptance.",
         "",
         "## Windows desktop extension",
         "",

@@ -1,4 +1,36 @@
-# Goal Progress
+# Goal Progress ? Integration Lab
+
+Current objective: root GOAL.md, introduced at `814979d`. Status: **NOT ACHIEVED**.
+The older simulator acceptance below is historical and does not prove this upgrade.
+
+Milestones A?D are implemented incrementally on `feat/integration-lab`: persisted
+bounded sessions and authorizations, the console and shared core handlers,
+PostgreSQL durability, RabbitMQ outbox/inbox, real OPC UA and retained PLC identity,
+separate WMS HTTP acknowledgement, failure fixtures, and inspectable trace evidence.
+Recovery and final full-stack verification are still in progress.
+
+Development evidence already executed (not final acceptance):
+
+- Baseline deterministic unit/workflow/integration run: 529 passed.
+- Guided local Chromium happy/reload/physical-gate and lost-ACK paths: 2 passed.
+- The same two guided browser paths with actual Blender: 2 passed.
+- Initial complete real-service lab suite: 13 passed (PostgreSQL, RabbitMQ,
+  edge, OPC UA, WMS HTTP and restart); later telemetry changes require a rerun.
+- Guided interrupted-stage recovery and original-command reconciliation tests pass.
+- Automatic REST demo driver tests: 2 passed, including no motion without explicit
+  physical consent and lost-ACK reconciliation with one persisted effect.
+- Contract/governance checks: 75 passed; requirement registry now contains 169 MUSTs,
+  including all 51 new GOAL.md checkboxes. Strict mypy passed for 64 source files.
+
+Required next evidence: finish the business-acknowledgement and live-protocol
+checks, run the full suite and configured lint/type/security gates on stable source,
+start the complete clean lab through its native supervisor, execute the mandatory
+browser/reload/duplicate/recovery loop, inspect every requirement and evidence item,
+and record the final commit and limitations. No criterion may be waived just because
+it lacks a test. See [the complete checklist](docs/integration-lab-requirements.md).
+
+## Historical pre-lab progress
+
 Last updated: 2026-10-05 UTC
 Current revision: delete removes a test completely; clear resets that same test for reuse.
 Base: `4da22d75bded35452f4bca1db03c57da5e9eb957` (clean).

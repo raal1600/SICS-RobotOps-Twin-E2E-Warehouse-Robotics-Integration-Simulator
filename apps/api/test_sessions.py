@@ -673,6 +673,51 @@ class TestScopeMiddleware:
         self.original = registry.original
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "websocket":
+            # A stream is a read-only view. Resolve its world briefly; never hold
+            # the lifecycle lock for the duration of a connected browser.
+            try:
+                with self.registry.access():
+                    path = scope["path"]
+                    identity = "original"
+                    if path.startswith("/simulation-tests/"):
+                        identity, separator, rest = path[len("/simulation-tests/") :].partition("/")
+                        if not separator or identity == "original":
+                            raise NotFound(identity)
+                        scope = {**scope, "path": "/" + rest, "raw_path": ("/" + rest).encode()}
+                    engine = self.registry.engine(identity)
+                    target = self.app
+                    if identity != "original" or engine is not self.original:
+                        cached = self.children.get(identity)
+                        if cached is None or cached[0] is not engine:
+                            from apps.api.app import create_app
+
+                            cached = (engine, create_app(engine.store, engine, test_registry=False))
+                            self.children[identity] = cached
+                        target = cached[1]
+                    stream_revision = self.registry.engine_revisions[identity]
+
+                @contextmanager
+                def read_guard() -> Iterator[None]:
+                    # Protect each snapshot, never the lifetime of a socket. A
+                    # cleared test is a new world even when its ID is retained.
+                    with self.registry.access():
+                        with self.registry.connect() as db:
+                            row = db.execute(
+                                "SELECT revision,clearing FROM tests WHERE id=? AND deleted IS NULL",
+                                (identity,),
+                            ).fetchone()
+                        if row is None:
+                            raise NotFound(identity)
+                        if row["clearing"] or row["revision"] != stream_revision:
+                            raise Conflict("TEST_REVISION_CHANGED")
+                        yield
+
+                scope = {**scope, "test_stream_read_guard": read_guard}
+                await target(scope, receive, send)
+            except (Conflict, NotFound):
+                await send({"type": "websocket.close", "code": 1008})
+            return
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return

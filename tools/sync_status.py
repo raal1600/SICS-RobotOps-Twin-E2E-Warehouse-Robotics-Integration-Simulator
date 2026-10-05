@@ -52,8 +52,8 @@ def update(phase: str, summary: str, completion_manifest: Path | None = None) ->
     path = Path("README.md")
     text = path.read_text(encoding="utf-8")
     text = re.sub(
-        r"\*\*Aktuell status:\*\*.*?(?=\n\n)",
-        lambda _: "**Aktuell status:** " + summary + f" **{state}**.",
+        r"\*\*(?:Aktuell status|Current delivery status):\*\*.*?(?=\n\n)",
+        lambda _: "**Current delivery status:** " + summary + f" **{state}**.",
         text,
         flags=re.DOTALL,
     )

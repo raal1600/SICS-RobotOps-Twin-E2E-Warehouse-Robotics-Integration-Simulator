@@ -3,18 +3,19 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Aktuell status:** Test deletion and same-test clearing accepted at audited source 0d03402: all 118 MUSTs PASS, 693 tests twice on Windows and Linux, 146 UI checks, nine browser journeys per suite and eight Blender demos. Delete removes the test and releases its number; Clear restores the same test for retry. CI, native launcher and publication verified; earlier failures remain archived. **DONE**.
+**Current delivery status:** Integration Lab implementation is undergoing final recovery, real-service, browser and Blender verification. Historical simulator acceptance does not prove the new GOAL.md; all 51 additional MUSTs and the mandatory final loop remain required. **NOT DONE**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
 [Agent handoff](HANDOFF.md) · [Checklist](CODEX_GOAL_CHECKLIST.md)
 
-The workspace now follows **Run a pick → notice its result → Investigate this pick**.
-The investigation keeps the selected test/job and replay frame, separates symptoms
-from confirmed records and possible explanations, and provides direct evidence,
-manual inspection and a collapsed event timeline.
-[Screenshots, repeated tests and release evidence](docs/evidence/investigation-ui-final/README.md)
-and [the operator walkthrough](docs/implementation/investigation.md) show the flow.
+The workspace follows **Create a guided session → authorize boundaries → watch execution
+→ verify evidence → reconcile business status**. Investigation keeps the selected
+test/job and replay frame, separates symptoms from confirmed records and possible
+explanations, and provides direct evidence and manual inspection.
+The [operator walkthrough](docs/implementation/investigation.md) describes the current
+flow; [earlier investigation screenshots and tests](docs/evidence/investigation-ui-final/README.md)
+remain historical evidence for that earlier release.
 Close and reopen the desktop app to load the updated UI; saved tests remain intact.
 
 The implemented cell contains an original **HKM1800-inspired hybrid-kinematic
@@ -49,6 +50,49 @@ synthetic visualization and test state, not validated robot dynamics, an exact
 HKM1800 simulation or evidence of real-world robot performance. Logical E-stop is
 an application interlock, not safety certification. No API key, model service,
 GPU, real PLC or industrial hardware is required.
+
+
+## Integration Lab (implementation in progress)
+
+Create and run order now opens a persisted guided session. Each REST authorization
+advances one bounded stage. Reloading the browser reads the saved stage; it cannot
+execute work. The final physical boundary requires **AUTHORIZE ROBOT EXECUTION**.
+The existing automatic workflow and guided workflow share planning, validation,
+command, actuation and verification handlers.
+
+```text
+ERP demand / WMS task -> versioned REST -> durable application state
+ -> observation -> plan -> validation -> immutable command + outbox
+ -> RabbitMQ -> durable edge inbox -> real OPC UA -> virtual PLC journal
+ -> explicit physical authorization -> simulated controller interface
+ -> synthetic HKM-inspired robot -> fresh observation -> verification
+ -> WMS acknowledgement -> ERP business status -> correlated trace
+```
+
+Fast local mode retains SQLite and explicitly labelled in-process transport models.
+The lab profile uses PostgreSQL, real RabbitMQ publisher confirms/consumer ACKs,
+and an actual OPC UA client/server. The controller, robot and sensors remain
+synthetic. A controller result is distinct from verification and business completion.
+
+[Lab startup and protocol semantics](docs/integration-lab.md) ·
+[Native Windows service setup](docs/integration-lab-native.md) ·
+[Mandatory delivery and final-loop checklist](docs/integration-lab-requirements.md)
+
+New implementation and E2E evidence are under active verification. Do not interpret
+the historical acceptance reports below as completion of the Integration Lab goal.
+
+After starting either API profile, run the same staged workflow automatically:
+
+```sh
+uv run --locked python -m tools.integration_demo --scenario happy_path --authorize-robot
+uv run --locked python -m tools.integration_demo --scenario lost_ack_after_effect --authorize-robot
+```
+
+Each command saves the complete session and original command evidence under
+`runs/integration-demos`. Without `--authorize-robot`, the driver stops at the
+physical gate. `--session-id` resumes that same persisted session. The driver
+uses the same REST stage handlers as the browser, including WMS reconciliation;
+it never starts another pick to resolve a missing acknowledgement.
 
 ## Setup
 
@@ -86,8 +130,8 @@ needs the system libraries documented in [PUBLICATION.md](PUBLICATION.md).
 | `make docs` | `uv run --locked python -m tools.dev docs` |
 
 Dependencies are pinned by `uv.lock`. Security auditing queries public advisory
-databases during preflight; the mandatory runtime tests require no network after
-installation. [Toolchain and reviewed exceptions](docs/implementation/dependencies.md).
+databases during preflight. Lab tests require real local PostgreSQL, RabbitMQ and
+OPC UA traffic; they require no external runtime service. [Toolchain and reviewed exceptions](docs/implementation/dependencies.md).
 
 ## Demonstrations
 
@@ -252,8 +296,9 @@ uncertain. No natural-language MCP execution or generated code controls the runt
 | `tests/`, `tools/`, `.github/workflows/` | [Acceptance process](docs/implementation/acceptance.md) |
 
 Material design decisions are recorded in [ADR 0001](docs/adr/0001-durable-synthetic-boundaries.md).
-Optional model assistance, OPC UA, external ERP delivery, realistic physics and real
-hardware remain a non-blocking backlog. They are not implemented or validated.
+Optional model assistance, external production ERP delivery, realistic contact physics
+and real hardware remain a non-blocking backlog. The Integration Lab implements real
+OPC UA traffic against its synthetic virtual PLC; its acceptance evidence is tracked separately.
 
 ## Research and publication
 

@@ -1,31 +1,51 @@
 # Run a pick, notice the result, inspect its evidence
 
-The cell moves one product from its source box to the output tote. A normal pick
-also receives a reply and verifies a reliable sensor report before completing.
+The Guided Integration Console follows one order from synthetic enterprise intent
+through persisted command delivery, simulated robot motion, verified evidence and
+business acknowledgement. **Create and run order** creates a saved session at
+stage 1. It does not start the robot or secretly execute the workflow.
 
-1. In **Run a pick**, choose a product and **Execution scenario**. Read the short
-   description and **Watch for** line, then **Create and run order**.
-2. Watch the cell and its result badge. **UNKNOWN_OUTCOME** means the app cannot
-   confirm the result; it is different from a failed pick. An amber guide and
-   highlighted **Investigate this pick** button identify work needing attention.
-3. Open **Investigate this pick**. **What happened** separates the symptom,
-   confirmed record contents, their limits and possible explanations. The replay
-   pauses at its current frame; the robot workflow is not paused by this view.
-4. Choose **Inspect the supporting evidence** for the original command/journal
-   and exact sensor report used in the latest decision. Verification history,
-   tool-selection reasons, exact IDs and full JSON remain expandable. The
-   **Event timeline** is collapsed and bounded; select an event reason for its
-   full record, including available correlation/causation IDs.
-5. **Manual inspection** offers PowerShell GET requests for this test/job,
-   **Download evidence & events (JSON)**, recorded execution-fault guidance and
-   the actual source and local file locations. These are investigation entry
-   points, not a claim that a root cause has been proved.
-6. **Back to simulation** retains your replay selection and frame. Press Play to
-   resume it. Reopening the same investigation retains its tab. Choosing another
-   test closes the old panel and cannot display its delayed responses as new data.
+1. Choose a product and **Execution scenario**, then **Create and run order**.
+   The console shows the session/correlation IDs and a pending bounded stage.
+   **Continue** executes that stage and persists its evidence. The architecture
+   map follows the current boundary; timestamps and durations are backend values.
+2. Review ERP/WMS intent, versioned REST validation, durable intake, fresh sensor
+   observation, planning and independent plan validation. Database commit is not
+   execution. The immutable command and transactional outbox exist before dispatch.
+3. Authorize distributed dispatch and PLC submission at their named gates. Local
+   mode labels its transport **SIMULATED SYSTEM**; the lab profile records actual
+   AMQP and OPC UA operations as **REAL PROTOCOL**. Neither publisher confirmation,
+   consumer acknowledgement nor PLC acceptance proves a physical effect.
+4. At **READY FOR PHYSICAL EXECUTION**, review the command and explicitly click
+   **AUTHORIZE ROBOT EXECUTION**. The browser then requests the separate physical
+   stage. The 3D handoff shows the existing recorded runtime and read-only protocol
+   status. The controller interface and robot are simulated; the button is not a
+   certified safety function. There is no approval per animation keyframe.
+5. Return to the console for controller result, fresh post-execution observation
+   and verification. Continue through WMS acknowledgement and ERP status to the
+   final correlated trace. Verified physical work alone does not complete these
+   business stages. A WMS outage retries acknowledgement, without robot motion.
+6. Expand any persisted stage using **What / Wire / Code / State / Why / Failure
+   semantics**. Payloads, state changes, exact source path/symbol/excerpt and
+   evidence IDs come from the backend. Reload resumes the same committed session;
+   viewing or reconnecting the read-only trace stream never authorizes work.
+7. For a recorded pick, open **Investigate this pick**. **What happened** separates
+   the symptom, confirmed record contents, their limits and possible explanations.
+   **Evidence** retains the original command/journal, exact assessed sensor report,
+   verification history, tool selection and expandable JSON. Its bounded timeline
+   lets you select the complete event record.
+8. **Manual inspection** offers test/job-scoped PowerShell GET requests and
+   **Download evidence & events (JSON)**. **Back to simulation** retains the replay
+   selection and frame. Play resumes that presentation; it does not execute a pick.
 
-For the lost-reply example, the robot log may record one movement while the app
-has no verified result. In **What happened**, choose **Sensor report for the next
+The six-tool showcase creates one guided order with six lines. Each line reaches
+its own explicit physical gate and WMS acknowledgement before the order's final
+ERP stage. It does not bypass the integration console.
+
+For the lost-reply example, the robot log may record one movement while the job
+remains **UNKNOWN_OUTCOME**. The guided post-execution stages can already contain
+a fresh observation and assessment; explicit reconciliation still resolves the
+original uncertain dispatch before business acknowledgement. In **What happened**, choose **Sensor report for the next
 check** and click the named **Reconcile** or **Observe again** action. This
 collects another observation and checks the original command; it never picks
 again. A normal fresh report may resolve the result when it agrees with the
@@ -43,17 +63,21 @@ original uncertain command. Saved tests expose the same evidence read-only.
 explicit confirmed deletion. Neither is an implicit recovery step.
 
 Actual HTTP/service problems appear as **App request problem**, separately from
-the persisted simulation result. The workflow guide reports execution state;
+the persisted simulation result. The integration console reports the authoritative session and business stage;
 Play/Pause controls only recorded presentation. The static Blender image remains
 an optional collapsed technical checkpoint. Neither that image nor the 3D scene
 is the sensor report used by the verifier.
 
 ## Technical boundary and reproducible browser checks
 
-`apps/erp_ui/workflow-guide.js` derives descriptions from typed evidence and
+`apps/erp_ui/integration-console.js` renders persisted execution sessions and
+requests individual REST authorizations. `robotops/integration/engine.py` uses
+the same bounded core handlers as automatic `Engine.run`; SQL transactions close
+before human waiting. `apps/erp_ui/workflow-guide.js` derives descriptions from typed evidence and
 job/order-scoped events. `app.js` pins inspector context, builds scoped read-only
 requests and renders the exact assessed observation. `playback.js` owns the
-presentation cursor. No new robot/API wire schema or workflow transition is added.
+presentation cursor. Guided session/step/authorization/trace contracts extend the
+API while preserving the existing robot command and evidence contracts.
 The exported JSON wrapper identifies format `robotops-investigation-1`, test ID,
 JobEvidence and **order_events** (the full order timeline, possibly several jobs).
 The on-screen timeline filters to the inspected job and shared order events.
@@ -61,16 +85,19 @@ The on-screen timeline filters to the inspected job and shared order events.
 After installing the locked environment and Chromium, run:
 
 ```sh
-uv run --locked python -m pytest tests/browser/test_investigation.py -q
+uv run --locked python -m pytest tests/browser/test_investigation.py tests/browser/test_guided_console.py -q
 ```
 
 The suite starts disposable loopback servers with real SQLite and runs both
 synthetic and actual Blender paths at desktop and compact viewports. It performs
-normal execution, lost reply, evidence/manual inspection/download, return,
+explicit guided authorization, the physical gate, normal execution, lost reply,
+evidence/manual inspection/download, return,
 contradictory and normal re-observation, and saved-history review. It checks exact
 command ownership, one effect, no navigation writes, no browser errors, bounded
 timeline/dialog geometry and keyboard tabs. A separate intentional 503 checks
 error presentation without relabelling a job as a simulated failure.
+An active read-only WebSocket regression clears and deletes its watched test,
+checks the stream closes, and verifies that reading cannot recreate deleted world files.
 
 Screenshots, a Playwright `trace.zip`, browser request/error records, downloads and
 semantic results are saved under `artifacts/investigation-browser/<run>/<case>/`.
@@ -81,9 +108,9 @@ hardware. The narrow viewport verifies layout/access, not a touch-device or
 screen-reader usability study. [ADR 0012](../adr/0012-evidence-driven-investigation.md)
 records the design decision and preserved boundaries.
 
-[Accepted source-specific results and screenshots](../evidence/investigation-ui-final/README.md)
-cover clean `7b9f0a6` on Windows and Linux. All 118 MUSTs pass for that source;
-the five browser cases run in each complete suite. The evidence keeps the earlier
+[Historical source-specific results and screenshots](../evidence/investigation-ui-final/README.md)
+cover clean `7b9f0a6` on Windows and Linux. Its 118 MUSTs and five browser cases
+apply only to that historical source, not to the current integration-lab goal. The evidence keeps the earlier
 failed label assertion and its correction, rather than hiding it. The visual
 assessment remains an implementer review; independent novice, touch-device and
 screen-reader studies have not been performed.
@@ -95,7 +122,9 @@ the test entirely. Reused display numbers are labels; technical test/job/command
 UUIDs still distinguish independent evidence. Clearing invalidates old inspection
 and replay context before loading the restored world (ADR 0013).
 
-The accepted df45c93 revision adds four clear/retry/delete/create browser cases
-to those five investigation cases. All nine run twice in full acceptance; the
-[current evidence](../evidence/test-reset-final/README.md) preserves source hashes,
+The historical df45c93 revision added four clear/retry/delete/create browser
+cases. Those nine cases now drive explicit guided authorization, with a tenth
+active-watch lifecycle regression; current
+acceptance must be run again against the changed source. The
+[historical evidence](../evidence/test-reset-final/README.md) preserves source hashes,
 restored-world assertions and exactly one effect from each explicit retry.

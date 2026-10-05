@@ -1,3 +1,13 @@
+# Historical simulator acceptance
+
+The active objective is now [GOAL.md](GOAL.md). **Integration Lab is NOT ACHIEVED**;
+its current evidence and remaining final checks are recorded in
+[GOAL_PROGRESS.md](GOAL_PROGRESS.md) and the
+[51-item delivery checklist](docs/integration-lab-requirements.md).
+The material below records the earlier simulator revision and its scoped acceptance.
+
+---
+
 # Acceptance Report
 
 **DONE** — generated from executed gates; missing evidence is FAIL.

@@ -234,6 +234,65 @@ passes are scoped to their original source; this revision needs fresh evidence.
 - **UI-INV-MUST-007 MUST**: Actual application/request failures are labelled separately from injected simulation faults and do not invent a workflow outcome. Running work, recorded workflow result and paused/completed replay remain distinguishable. Evidence: intentional service-failure browser test, normal/fault journeys and slow-planning selection regression.
 - **UI-INV-MUST-008 MUST**: Repeatable actual-browser tests exercise normal run, supported fault, evidence/manual inspection, return and saved history at desktop and compact viewports with both deterministic synthetic and actual Blender runtimes. They verify actions, evidence ownership, no navigation writes, no unexpected browser errors and bounded layout; retain screenshots, traces and semantic results. Clarity/discoverability assessment and first-time-user uncertainty are reported separately from functional test success. All prior MUSTs and final exact-SHA publication gates still apply.
 
+## Integration Lab upgrade ? authoritative GOAL.md
+
+These 51 additive MUSTs preserve every checkbox from the new GOAL.md in order.
+The mandatory final agent loop also requires manual implementation inspection, a clean
+complete lab startup, actual browser scenarios and a final exact-source report.
+A test-name mapping alone is not completion evidence.
+
+- **LAB-MUST-001 MUST**: Create/Run Order starts guided execution rather than secretly running the full robot workflow.
+- **LAB-MUST-002 MUST**: Each displayed stage maps to actual backend work/state/protocol evidence.
+- **LAB-MUST-003 MUST**: Authorization advances only the intended bounded stage.
+- **LAB-MUST-004 MUST**: Authorizations are idempotent/revision-guarded against double click/replay.
+- **LAB-MUST-005 MUST**: No DB transaction remains open while waiting for a human.
+- **LAB-MUST-006 MUST**: Automatic and guided modes use the same stage handlers.
+- **LAB-MUST-007 MUST**: Existing correctness invariants and scenarios remain functional.
+- **LAB-MUST-008 MUST**: WMS-style versioned REST task intake exists with idempotency.
+- **LAB-MUST-009 MUST**: Integration-lab persistence uses PostgreSQL or a documented equivalent lab profile.
+- **LAB-MUST-010 MUST**: Transactional outbox is real, not a log message.
+- **LAB-MUST-011 MUST**: RabbitMQ/AMQP path is real in lab mode.
+- **LAB-MUST-012 MUST**: Publisher confirm and consumer ACK are represented distinctly.
+- **LAB-MUST-013 MUST**: Edge adapter persists/handles delivery identity robustly.
+- **LAB-MUST-014 MUST**: OPC UA client/server communication is real in lab mode.
+- **LAB-MUST-015 MUST**: Virtual PLC has durable-enough command identity/journal semantics for demonstrated recovery.
+- **LAB-MUST-016 MUST**: Same command ID + same payload cannot cause a second physical effect.
+- **LAB-MUST-017 MUST**: Same command ID + different payload is rejected.
+- **LAB-MUST-018 MUST**: Console shows What/Wire/Code/State/Why/failure semantics.
+- **LAB-MUST-019 MUST**: Protocol and real-vs-simulated badges are accurate.
+- **LAB-MUST-020 MUST**: Source references point to code that actually executes.
+- **LAB-MUST-021 MUST**: Payloads are derived from actual execution data and secrets are redacted.
+- **LAB-MUST-022 MUST**: Architecture mini-map follows the current stage.
+- **LAB-MUST-023 MUST**: In-progress session survives browser reload.
+- **LAB-MUST-024 MUST**: Final physical gate precedes robot side effect.
+- **LAB-MUST-025 MUST**: 3D viewer runs only after that gate and post-execution flow returns to verification/reconciliation.
+- **LAB-MUST-026 MUST**: Read-only viewing/streaming cannot mutate robot/workflow state.
+- **LAB-MUST-027 MUST**: ACK-before-effect loss scenario is demonstrated.
+- **LAB-MUST-028 MUST**: ACK-after-effect loss scenario reaches uncertainty/reconciliation without duplicate physical action.
+- **LAB-MUST-029 MUST**: Duplicate/redelivery scenario proves effect_count remains one.
+- **LAB-MUST-030 MUST**: OPC UA/network interruption has deterministic documented behavior.
+- **LAB-MUST-031 MUST**: Inconclusive observation can prevent false success.
+- **LAB-MUST-032 MUST**: WMS outage after verified execution retries business reconciliation, not robot motion.
+- **LAB-MUST-033 MUST**: UNKNOWN_OUTCOME is visible and explainable.
+- **LAB-MUST-034 MUST**: Reconciliation queries the original command instead of issuing a fresh pick.
+- **LAB-MUST-035 MUST**: Unit tests cover new state/domain logic.
+- **LAB-MUST-036 MUST**: Integration tests cover DB/outbox/broker/edge/OPC UA/virtual PLC path.
+- **LAB-MUST-037 MUST**: Browser E2E test drives a complete guided happy path through authorization -> 3D execution -> verification -> reconciliation.
+- **LAB-MUST-038 MUST**: Browser/integration E2E test drives at least ACK-after-effect/UNKNOWN_OUTCOME/reconciliation.
+- **LAB-MUST-039 MUST**: Browser reload/resume is tested.
+- **LAB-MUST-040 MUST**: Double authorization/idempotency is tested.
+- **LAB-MUST-041 MUST**: Duplicate AMQP/OPC command does not duplicate physical effect and is asserted.
+- **LAB-MUST-042 MUST**: Existing test suite passes.
+- **LAB-MUST-043 MUST**: Lint/type checks pass at repository policy level.
+- **LAB-MUST-044 MUST**: CI runs the relevant tests or documents any environment-specific Blender limitation with a deterministic headless substitute.
+- **LAB-MUST-045 MUST**: Docker/integration-lab startup has a documented smoke test and health checks.
+- **LAB-MUST-046 MUST**: README architecture matches implementation.
+- **LAB-MUST-047 MUST**: Clearly label simulated vs real-protocol components.
+- **LAB-MUST-048 MUST**: Document local fast mode and full integration-lab mode.
+- **LAB-MUST-049 MUST**: Document all acknowledgement meanings and uncertainty model.
+- **LAB-MUST-050 MUST**: Include a reproducible demo script for happy path and lost-ACK recovery.
+- **LAB-MUST-051 MUST**: No claim implies proprietary SICS.AI knowledge, exact HKM1800 behavior, or safety certification.
+
 ## DONE
 
 The project is DONE only when:

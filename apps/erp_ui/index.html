@@ -35,6 +35,23 @@
 <li id="stage-0" aria-current="step"><span>1</span> Set up</li><li id="stage-1"><span>2</span> Watch</li><li id="stage-2"><span>3</span> Investigate</li><li id="stage-3"><span>4</span> Continue</li></ol>
 <p id="message" role="status" aria-live="polite"></p>
 <div id="test-workspace">
+<section class="panel integration-console" id="integration-console" hidden aria-labelledby="integration-title">
+  <div class="integration-heading"><div><small>END-TO-END INTEGRATION LAB</small><h2 id="integration-title">Guided execution console</h2></div><strong id="integration-state"></strong></div>
+  <p class="muted">Inspect each boundary, then continue. Every entry comes from persisted backend work. This console is neither a shell nor a chat.</p>
+  <div class="integration-session-picker"><label for="integration-history">Execution session</label><select id="integration-history"></select><span id="integration-stream" class="muted">Persisted trace</span></div>
+  <ol id="integration-map" class="integration-map" aria-label="Integration architecture"></ol>
+  <details><summary>Correlated execution identifiers</summary><pre id="integration-ids"></pre></details>
+  <div class="integration-pending" id="integration-pending" aria-live="polite">
+    <div><small>PENDING TRANSITION</small><h3 id="integration-pending-title"></h3><p id="integration-pending-detail"></p></div>
+    <div class="integration-actions"><button id="integration-advance" disabled>Continue</button><button id="integration-reconcile" class="secondary" hidden>Reconcile original command</button></div>
+  </div>
+  <p id="integration-error" role="alert"></p>
+  <div class="integration-trace-grid">
+    <div><h3>Execution trace</h3><ol id="integration-events" class="integration-events" aria-label="Persisted execution steps"></ol></div>
+    <div class="integration-detail"><h3 id="integration-inspector-title">Select a persisted stage</h3><div id="integration-tabs" class="integration-tabs" role="tablist" aria-label="Trace inspector"></div><pre id="integration-inspector" role="tabpanel"></pre><a id="integration-evidence" target="_blank" hidden>Open original job evidence (JSON)</a></div>
+  </div>
+  <details class="acknowledgement-boundaries"><summary>What does each acknowledgement prove?</summary><p>HTTP 202 ≠ DB commit ≠ RabbitMQ publisher confirm ≠ consumer ACK ≠ OPC UA method acceptance ≠ PLC accepted ≠ controller succeeded ≠ sensor verification ≠ WMS reconciliation ≠ ERP completion.</p><p>Each boundary has its own evidence. A lost reply cannot justify another physical pick. Ordinary cell preconditions and authorization are application controls, never certified safety functions.</p></details>
+</section>
 <section class="panel guide" id="workflow-guide" data-tone="neutral" aria-labelledby="guide-title">
   <div class="eyebrow" id="guide-label">NEXT STEP</div>
   <div aria-live="polite" aria-atomic="true"><h2 id="guide-title">Loading your test</h2><p id="guide-detail">Reading the saved workflow state.</p></div>
@@ -72,6 +89,7 @@
 </details>
 </aside><div class="workspace">
 <section class="panel" id="motion-panel">
+<div id="integration-live" class="integration-live" hidden><strong>SIMULATED ROBOT · READ-ONLY REPLAY</strong><p id="integration-live-state"></p><details open><summary>Live protocol evidence</summary><pre id="integration-protocol-live">No protocol notifications received.</pre></details><button id="integration-return" class="secondary">Return to integration console</button></div>
 <div class="motion-heading"><h2>The robotic cell</h2><span id="cell-summary" class="muted">Cell: loading</span><span class="motion-badge" id="motion-outcome">No job selected</span></div>
 <div class="selected-incident"><p id="selected-result" class="muted">Ready for your first pick.</p><button id="inspect-selected" class="secondary" disabled>Investigate this pick</button></div>
 <p id="motion-scenario" class="muted">Choose an execution scenario on the left.</p><p id="motion-state" class="muted" role="status">Loading 3D cell</p><div class="scene-stage"><canvas id="motion-canvas" width="1000" height="600" tabindex="0" role="img" aria-label="Recorded Blender motion">Animated illustration of the recorded Blender scene. The current phase is also shown below.</canvas><div id="motion-event" role="status">Loading environment</div></div><p id="motion-phase">Cell ready</p><p id="motion-tool" class="muted"></p><div class="motion-controls"><button id="motion-play" disabled>Play</button><button id="motion-replay" class="secondary" disabled>Replay</button><button id="motion-step-back" class="secondary" disabled aria-label="Step backward">Previous frame</button><button id="motion-step-forward" class="secondary" disabled aria-label="Step forward">Next frame</button><input id="motion-scrub" type="range" min="0" max="99" value="0" aria-label="Scenario replay position" disabled><label for="motion-speed">Speed</label><select id="motion-speed" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="motion-import" hidden>Load saved animation</button><p id="motion-detail" class="muted">The environment stays visible in every scenario.</p><div class="camera-controls" role="group" aria-label="Presentation camera"><button id="camera-operator" class="secondary">Operator</button><button id="camera-overhead" class="secondary">Overhead</button><button id="camera-side" class="secondary">Side inspection</button><button id="camera-follow" class="secondary">Follow TCP</button></div><details class="viewer-details"><summary>Camera, replay selection &amp; illustration details</summary><div class="view-controls"><button id="motion-rotate" class="secondary">Rotate</button><button id="motion-zoom-in" class="secondary" aria-label="Zoom in">+</button><button id="motion-zoom-out" class="secondary" aria-label="Zoom out">&minus;</button><button id="motion-home" class="secondary">Reset camera</button><span id="motion-renderer">3D viewer</span></div><p class="muted">Drag to orbit &middot; scroll to zoom &middot; right-drag or Shift-drag to pan.</p><details class="replay-options"><summary>Choose delivery or product replay</summary><label for="delivery">Delivery replay</label><select id="delivery"></select><label for="replay-scope">Replay scope</label><select id="replay-scope"><option value="delivery">Full delivery (all products)</option><option value="product">Selected product execution</option></select><label for="orders">Product execution details</label><select id="orders"><option value="">No orders yet</option></select></details><p class="muted legend motion-note">The 3D view shows recorded simulator movement. It is not the sensor report used to confirm a pick. Replay never sends a command.</p></details></section>
@@ -145,4 +163,4 @@
   </div>
 </dialog>
 <footer>Local simulation only. No external model account, GPU or real industrial hardware required.</footer></main>
-<script src="/ui/scene-view.js"></script><script src="/ui/playback.js"></script><script src="/ui/workflow-guide.js"></script><script src="/ui/app.js"></script></body></html>
+<script src="/ui/scene-view.js"></script><script src="/ui/playback.js"></script><script src="/ui/workflow-guide.js"></script><script src="/ui/integration-console.js"></script><script src="/ui/app.js"></script></body></html>

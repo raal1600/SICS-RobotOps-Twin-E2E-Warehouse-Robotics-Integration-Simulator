@@ -57,6 +57,42 @@ const SimulationGuide = (() => {
       difference: "A reply arrives but is invalid. Brain timeout tests a planner that does not supply a plan within its deadline.",
       expected: "Expected: validation rejects the plan before dispatch. No product moves. Choose another scenario or repeat this rejection test."
     },
+    DUPLICATE_DELIVERY: {
+      label: "Duplicate command delivery", phase: "Transport · repeated original identity",
+      meaning: "Delivers the same immutable command identity again to the edge inbox. The inbox and PLC must recognize its payload hash and retain the original result.",
+      difference: "Delivery can repeat; authorization and physical work cannot be inferred from delivery count.",
+      expected: "Inspect delivery attempts and the original journal. One authorized pick must retain effect_count = 1."
+    },
+    BROKER_TRANSIENT: {
+      label: "Broker temporarily unavailable", phase: "Outbox · before distributed delivery",
+      meaning: "Makes the first bounded publication attempt unavailable. The committed command and outbox remain available for an explicit retry.",
+      difference: "A publication failure does not establish consumer acceptance or robot execution.",
+      expected: "Retry the publication stage using the same command and message identity; then continue through the physical gate."
+    },
+    EDGE_TRANSIENT: {
+      label: "Edge temporarily unavailable", phase: "Delivery · durable inbox boundary",
+      meaning: "Makes the first edge-delivery stage unavailable. Publisher confirmation alone does not establish that the edge stored the command.",
+      difference: "The durable inbox and consumer ACK are separate evidence from a broker publisher confirm.",
+      expected: "An explicit delivery-stage retry continues the original command without authorizing motion."
+    },
+    OPC_UA_DISCONNECT: {
+      label: "OPC UA connection interruption", phase: "Controller session · before acceptance",
+      meaning: "Injects an unavailable controller connection on the first session-stage attempt. Local mode models this boundary; lab mode uses an actual OPC UA client/server for the successful retry.",
+      difference: "A connection error before acceptance differs from losing a controller result after motion. Neither permits inventing an outcome.",
+      expected: "The session remains at its connection stage for an explicit retry; physical execution stays gated."
+    },
+    PLC_RESTART: {
+      label: "Controller restart after execution", phase: "Controller result · original durable journal",
+      meaning: "Restarts the virtual controller state after motion, then queries the original command. Lab mode changes the PLC boot identity through its restart method; local mode reloads the simulated runtime from durable storage.",
+      difference: "A new controller boot does not grant permission to repeat a command. Retained journal identity and fresh observation establish the outcome.",
+      expected: "Inspect the changed boot identity and retained command result. The original physical effect count must remain one."
+    },
+    WMS_UNAVAILABLE: {
+      label: "WMS unavailable after verified pick", phase: "Business reconciliation · after verification",
+      meaning: "The robot completes and fresh evidence verifies the pick, but the first WMS acknowledgement attempt is unavailable.",
+      difference: "Physical completion and business acknowledgement are separate durable states. Retrying business reconciliation must not move the robot again.",
+      expected: "Retry only the WMS stage; inspect the retained original command and effect count before ERP completion."
+    },
     BRAIN_TIMEOUT: {
       label: "Brain timeout", phase: "Planning · before command creation",
       meaning: "Simulates the pick planner missing its response deadline. The workflow handles the timeout before creating a robot command.",

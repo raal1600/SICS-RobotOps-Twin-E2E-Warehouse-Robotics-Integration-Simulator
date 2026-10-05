@@ -121,3 +121,21 @@ def test_investigation_criteria_are_additive_and_required_by_registry(tmp_path):
     assert {ident for ident in criterion_ids() if ident.startswith("UI-INV-")} == {
         f"UI-INV-MUST-{number:03d}" for number in range(1, 9)
     }
+
+
+def test_integration_lab_requires_all_51_goal_criteria_without_replacing_prior_acceptance(tmp_path):
+    (tmp_path / "SUCCESS_CRITERIA.md").write_text(
+        "**SC-ARCH-001 MUST**\n**LAB-MUST-001 MUST**\n**LAB-MUST-051 MUST**\n",
+        encoding="utf-8",
+    )
+    assert criterion_ids(tmp_path) == {"SC-ARCH-001", "LAB-MUST-001", "LAB-MUST-051"}
+    current = criterion_ids()
+    assert {ident for ident in current if ident.startswith("LAB-")} == {
+        f"LAB-MUST-{number:03d}" for number in range(1, 52)
+    }
+    assert len(current) == 169
+    mapping = json.loads(Path("docs/acceptance-map.json").read_text())
+    for ident in current:
+        if ident.startswith("LAB-"):
+            assert mapping[ident]["tests"], ident
+            assert not evaluate(mapping[ident], {}, [{}, {}])[0], ident

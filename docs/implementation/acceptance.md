@@ -61,8 +61,10 @@ rerun tests or change their outcomes. A failed local gate stays failed.
 [ADR 0002](../adr/0002-acceptance-attestations.md) explains source snapshots and
 the final-SHA attestation carried by CI artifacts and public `build.json`.
 
-The optional external model provider, real ERP delivery, OPC UA and hardware
-integration are not completion gates. Missing optional model fallback is recorded
+The optional external model provider, production ERP delivery and real hardware
+integration are not completion gates. Actual OPC UA against the synthetic virtual PLC,
+PostgreSQL, RabbitMQ and the separate edge service are mandatory for the Integration Lab.
+Missing optional model fallback is recorded
 against SHOULD SC-BRAIN-005. Reviewed subprocess exceptions are exact AST hashes;
 changes require review again. Dependency vulnerabilities have no exceptions.
 

@@ -1,5 +1,6 @@
 """Durable workflow; uncertainty always reconciles the original intent before resolution."""
 
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from time import monotonic
 
@@ -10,6 +11,7 @@ from robotops.brain.validation import ActionValidator
 from robotops.config import Settings
 from robotops.domain.models import (
     ActionPlan,
+    CommandReceipt,
     FailureInjection,
     Fault,
     JobEvidence,
@@ -81,89 +83,170 @@ class Engine:
                 job, "faults", "FAULT_INJECTED", fault.value, evidence_ids=(injection.injection_id,)
             )
 
+    def stage_intake(self, job: PickJob, claim: Claim) -> PickJob:
+        """Validate an already durably received job; no planning or actuation."""
+        try:
+            self.store.load(PresentationSnapshot, job.job_id)
+        except NotFound:
+            self.store.save(
+                job.job_id,
+                PresentationSnapshot(
+                    **metadata(job), job_id=job.job_id, world=self.runtime.world()
+                ),
+            )
+        if job.state == JobState.RECEIVED:
+            return self.store.transition(
+                job.job_id, JobState.VALIDATED, "ORDER_SCHEMA_VALID", claim=claim
+            )
+        return job
+
+    def stage_observe(self, job: PickJob, claim: Claim) -> WorldObservation:
+        if job.state == JobState.VALIDATED:
+            job = self.store.transition(
+                job.job_id, JobState.PLANNING, "BRAIN_REQUESTED", claim=claim
+            )
+        return self._observe(job)
+
+    def stage_plan(
+        self, job: PickJob, observation: WorldObservation, fault: Fault | None = None
+    ) -> ActionPlan:
+        destination = next(
+            loc for loc in self.settings.locations if loc.location_id == job.line.destination_id
+        )
+        if fault == Fault.BRAIN_TIMEOUT:
+            raise TimeoutError("BRAIN_TIMEOUT")
+        if fault == Fault.BRAIN_INVALID_OUTPUT:
+            ActionPlan.model_validate_json('{"code":"arbitrary code rejected"}')
+        # The planner only receives immutable inputs and has no actuator capability.
+        pool = ThreadPoolExecutor(max_workers=1)
+        future = pool.submit(self.brain.plan, job, observation, destination)
+        try:
+            plan = future.result(timeout=self.settings.brain_timeout_seconds)
+        finally:
+            pool.shutdown(wait=False, cancel_futures=True)
+        self.store.save(plan.action_plan_id, plan)
+        return plan
+
+    def stage_validate(
+        self, job: PickJob, observation: WorldObservation, plan: ActionPlan
+    ) -> ActionPlan:
+        destination = next(
+            loc for loc in self.settings.locations if loc.location_id == job.line.destination_id
+        )
+        plan = self.validator.validate(
+            plan, job, observation, self.runtime.world().cell, destination
+        )
+        self.store.emit(
+            job,
+            "validator",
+            "PLAN_VALIDATED",
+            "SEMANTIC_CHECKS_PASSED",
+            evidence_ids=(plan.action_plan_id,),
+        )
+        return plan
+
+    def stage_command(self, job: PickJob, plan: ActionPlan, claim: Claim) -> PickJob:
+        command = RobotCommand(
+            **plan.model_dump(),
+            command_id=stable_id(job.job_id, "pick-attempt-1"),
+            **({"required_tool_id": plan.selected_tool_id} if plan.schema_version == "2.0" else {}),
+        )
+        job = self.store.prepare(claim, plan, command)
+        if plan.tool_selection is not None:
+            self.store.emit(
+                job,
+                "brain",
+                "GRASP_SELECTION_EVALUATED",
+                "DETERMINISTIC_COMPATIBILITY_SCORE",
+                evidence_ids=(plan.action_plan_id,),
+            )
+            self.store.emit(
+                job,
+                "planner",
+                "TRAJECTORY_PLANNED",
+                "CONSERVATIVE_SYNTHETIC_COLLISION_PREFLIGHT",
+                evidence_ids=(plan.action_plan_id,),
+            )
+        return self.store.transition(
+            job.job_id, JobState.READY_TO_EXECUTE, "PLAN_PERSISTED", claim=claim
+        )
+
+    def stage_dispatch(
+        self,
+        job: PickJob,
+        claim: Claim,
+        fault: Fault | None = None,
+        sender: Callable[[RobotCommand, Fault | None], CommandReceipt] | None = None,
+    ) -> CommandReceipt | None:
+        if job.command_id is None:
+            raise Conflict("MISSING_DURABLE_COMMAND")
+        command = self.store.load(RobotCommand, job.command_id)
+        self.store.transition(job.job_id, JobState.EXECUTING, "DISPATCH_INTENT", claim=claim)
+        try:
+            return (sender or self.gateway.send)(
+                command, fault if fault in RUNTIME_FAULTS else None
+            )
+        except (TimeoutError, OSError):
+            self.store.transition(
+                job.job_id, JobState.UNKNOWN_OUTCOME, "COMMUNICATION_UNCERTAIN", claim=claim
+            )
+            return None
+
+    def stage_result(self, job: PickJob, claim: Claim) -> PickJob:
+        if job.state == JobState.EXECUTING:
+            return self.store.transition(
+                job.job_id, JobState.VERIFYING, "CONTROLLER_RESPONSE", claim=claim
+            )
+        return job
+
+    def stage_verify(
+        self,
+        job: PickJob,
+        command: RobotCommand,
+        observation: WorldObservation,
+        receipt: CommandReceipt | None,
+        claim: Claim,
+    ) -> VerificationResult:
+        result = self.verifier.verify(command, observation, receipt)
+        if result.verdict == Verdict.INCONCLUSIVE:
+            self.store.save(result.verification_id, result)
+            if job.state != JobState.UNKNOWN_OUTCOME:
+                self.store.transition(
+                    job.job_id, JobState.UNKNOWN_OUTCOME, result.reason, claim=claim
+                )
+        else:
+            target = (
+                JobState.COMPLETED
+                if result.verdict == Verdict.VERIFIED_SUCCESS
+                else JobState.FAILED
+            )
+            self.store.transition(job.job_id, target, result.reason, claim=claim, evidence=result)
+        return result
+
+    def is_guided(self, job_id: str) -> bool:
+        with self.store.connect() as db:
+            return (
+                db.execute("SELECT 1 FROM meta WHERE key=?", ("guided:" + job_id,)).fetchone()
+                is not None
+            )
+
     def run(self, job_id: str, fault: Fault | None = None, *, owner: str | None = None) -> PickJob:
+        if self.is_guided(job_id):
+            raise Conflict("GUIDED_JOB_REQUIRES_STAGE_AUTHORIZATION")
         claim = self.store.claim(job_id, owner or new_id(), self.settings.lease_seconds)
         if claim is None:
             return self.store.job(job_id)
         start = monotonic()
         try:
-            job = self.store.job(job_id)
-            if job.state == JobState.RECEIVED:
-                try:
-                    self.store.load(PresentationSnapshot, job_id)
-                except NotFound:
-                    self.store.save(
-                        job_id,
-                        PresentationSnapshot(
-                            **metadata(job), job_id=job_id, world=self.runtime.world()
-                        ),
-                    )
+            job = self.stage_intake(self.store.job(job_id), claim)
             self._inject(job, fault)
-            if job.state == JobState.RECEIVED:
-                job = self.store.transition(
-                    job_id, JobState.VALIDATED, "ORDER_SCHEMA_VALID", claim=claim
-                )
-            if job.state == JobState.VALIDATED:
-                job = self.store.transition(
-                    job_id, JobState.PLANNING, "BRAIN_REQUESTED", claim=claim
-                )
-            if job.state == JobState.PLANNING:
+            if job.state in {JobState.VALIDATED, JobState.PLANNING}:
                 try:
-                    observation = self._observe(job)
-                    destination = next(
-                        loc
-                        for loc in self.settings.locations
-                        if loc.location_id == job.line.destination_id
-                    )
-                    if fault == Fault.BRAIN_TIMEOUT:
-                        raise TimeoutError("BRAIN_TIMEOUT")
-                    if fault == Fault.BRAIN_INVALID_OUTPUT:
-                        ActionPlan.model_validate_json('{"code":"arbitrary code rejected"}')
-                    # A timed-out proposal is discarded. Brain has no gateway/runtime capability.
-                    pool = ThreadPoolExecutor(max_workers=1)
-                    future = pool.submit(self.brain.plan, job, observation, destination)
-                    try:
-                        plan = future.result(timeout=self.settings.brain_timeout_seconds)
-                    finally:
-                        pool.shutdown(wait=False, cancel_futures=True)
-                    plan = self.validator.validate(
-                        plan, job, observation, self.runtime.world().cell, destination
-                    )
-                    self.store.emit(
-                        job,
-                        "validator",
-                        "PLAN_VALIDATED",
-                        "SEMANTIC_CHECKS_PASSED",
-                        evidence_ids=(plan.action_plan_id,),
-                    )
-                    command = RobotCommand(
-                        **plan.model_dump(),
-                        command_id=stable_id(job_id, "pick-attempt-1"),
-                        **(
-                            {"required_tool_id": plan.selected_tool_id}
-                            if plan.schema_version == "2.0"
-                            else {}
-                        ),
-                    )
-                    job = self.store.prepare(claim, plan, command)
-                    if plan.tool_selection is not None:
-                        self.store.emit(
-                            job,
-                            "brain",
-                            "GRASP_SELECTION_EVALUATED",
-                            "DETERMINISTIC_COMPATIBILITY_SCORE",
-                            evidence_ids=(plan.action_plan_id,),
-                        )
-                        self.store.emit(
-                            job,
-                            "planner",
-                            "TRAJECTORY_PLANNED",
-                            "CONSERVATIVE_SYNTHETIC_COLLISION_PREFLIGHT",
-                            evidence_ids=(plan.action_plan_id,),
-                        )
-                    job = self.store.transition(
-                        job_id, JobState.READY_TO_EXECUTE, "PLAN_PERSISTED", claim=claim
-                    )
+                    observation = self.stage_observe(job, claim)
+                    job = self.store.job(job_id)
+                    plan = self.stage_plan(job, observation, fault)
+                    plan = self.stage_validate(job, observation, plan)
+                    job = self.stage_command(job, plan, claim)
                 except (
                     ValueError,
                     ValidationError,
@@ -175,37 +258,16 @@ class Engine:
                         job_id, JobState.FAILED, "PLANNING_REJECTED:" + str(exc), claim=claim
                     )
             if job.state == JobState.READY_TO_EXECUTE:
+                receipt = self.stage_dispatch(job, claim, fault)
+                if receipt is None:
+                    return self.store.job(job_id)
+                job = self.stage_result(self.store.job(job_id), claim)
+                observation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)
                 if job.command_id is None:
                     raise Conflict("MISSING_DURABLE_COMMAND")
                 command = self.store.load(RobotCommand, job.command_id)
-                job = self.store.transition(
-                    job_id, JobState.EXECUTING, "DISPATCH_INTENT", claim=claim
-                )
-                try:
-                    receipt = self.gateway.send(command, fault if fault in RUNTIME_FAULTS else None)
-                except (TimeoutError, OSError):
-                    return self.store.transition(
-                        job_id, JobState.UNKNOWN_OUTCOME, "COMMUNICATION_UNCERTAIN", claim=claim
-                    )
-                job = self.store.transition(
-                    job_id, JobState.VERIFYING, "CONTROLLER_RESPONSE", claim=claim
-                )
-                observation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)
-                result = self.verifier.verify(command, observation, receipt)
-                if result.verdict == Verdict.INCONCLUSIVE:
-                    self.store.save(result.verification_id, result)
-                    return self.store.transition(
-                        job_id, JobState.UNKNOWN_OUTCOME, result.reason, claim=claim
-                    )
-                target = (
-                    JobState.COMPLETED
-                    if result.verdict == Verdict.VERIFIED_SUCCESS
-                    else JobState.FAILED
-                )
-                return self.store.transition(
-                    job_id, target, result.reason, claim=claim, evidence=result
-                )
-            return job
+                self.stage_verify(job, command, observation, receipt, claim)
+            return self.store.job(job_id)
         finally:
             self.store.emit(
                 self.store.job(job_id),
@@ -289,6 +351,9 @@ class Engine:
             self.start_fresh_scene()
         recovered = []
         for job in self.store.recoverable():
+            if self.is_guided(job.job_id):
+                recovered.append(job)
+                continue
             if job.state in UNCERTAIN:
                 try:
                     recovered.append(self.reconcile(job.job_id))

@@ -66,7 +66,9 @@ def browser_page(request):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True, args=["--enable-unsafe-swiftshader"])
         context = browser.new_context()
-        context.tracing.start(screenshots=True, snapshots=True, sources=True)
+        # Exact input hashes are saved below. Inline source collection can hang
+        # Playwright trace finalization while shared workspace files are edited.
+        context.tracing.start(screenshots=True, snapshots=True, sources=False)
         page = context.new_page()
         page.set_default_timeout(20_000)
         errors, console_errors, requests = [], [], []
@@ -77,7 +79,12 @@ def browser_page(request):
                 console_errors.append(message.text) if message.type == "error" else None
             ),
         )
-        page.on("request", lambda req: requests.append({"method": req.method, "url": req.url}))
+        page.on(
+            "request",
+            lambda req: requests.append(
+                {"method": req.method, "url": req.url, "body": req.post_data_json}
+            ),
+        )
         try:
             yield page, directory, errors, console_errors, requests
         finally:
@@ -116,19 +123,58 @@ def open_ready(page, origin, viewport):
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
 
 
+def continue_guided(page, prefix, identity):
+    for _ in range(30):
+        session = get(page, f"{prefix}/integration/sessions/{identity}")
+        if session["status"] in {"COMPLETED", "UNKNOWN_OUTCOME", "FAILED"}:
+            return session
+        expect(page.locator("#integration-advance")).to_be_enabled()
+        with page.expect_response(
+            lambda response: (
+                response.request.method == "POST" and response.url.endswith("/authorize")
+            ),
+            timeout=180_000,
+        ) as response:
+            page.locator("#integration-advance").click()
+        assert response.value.ok, response.value.text()
+        if session["current_stage"] == 15:
+            expect(page.locator("#integration-pending-title")).to_have_text(
+                "Controller result", timeout=180_000
+            )
+        expect(page.locator("#integration-advance")).not_to_have_text(
+            "Executing bounded stage?", timeout=180_000
+        )
+        expect(page.locator("#integration-error")).to_be_empty()
+    pytest.fail("Guided workflow did not settle")
+
+
 def choose_pick(page, fault=""):
     if not page.locator("#setup-panel").evaluate("element => element.open"):
         page.locator("#setup-panel > summary").click()
     page.locator("#scenario").select_option(fault)
     with page.expect_response(
-        lambda response: response.request.method == "POST" and response.url.endswith("/run"),
+        lambda response: (
+            response.request.method == "POST" and response.url.endswith("/v1/wms/tasks")
+        ),
         timeout=180_000,
-    ) as run:
+    ) as creation:
         page.locator("#create").click()
-    assert run.value.ok, run.value.text()
-    job = run.value.json()
+    assert creation.value.ok, creation.value.text()
+    created = creation.value.json()
+    assert created["current_stage"] == 1
+    prefix = creation.value.url.removesuffix("/v1/wms/tasks")
+    completed = continue_guided(page, prefix, created["session_id"])
+    job = get(page, f"{prefix}/jobs/{completed['job_id']}")
     expect(page.locator("#selected-result")).to_contain_text(job["state"], timeout=30_000)
     return job
+
+
+def physical_request(request):
+    return (
+        request["method"] == "POST"
+        and request["url"].endswith("/authorize")
+        and request.get("body", {}).get("stage") == 16
+    )
 
 
 def inspect(page):
@@ -192,7 +238,9 @@ def test_run_notice_investigate_and_return(server, browser_page, viewport):
     screenshot(page, directory, "03-notice-uncertainty")
     inspect(page)
     expect(page.locator("#inspection-symptom")).to_contain_text("no confirmed result")
-    expect(page.locator("#inspection-finding")).to_contain_text("1 product move")
+    expect(page.locator("#inspection-finding")).to_contain_text(
+        "original journal and fresh observation agree"
+    )
     expect(page.locator("#inspection-limit")).to_contain_text("does not prove")
     panel_bounds(page)
     screenshot(page, directory, "03-unusual-result")
@@ -208,7 +256,8 @@ def test_run_notice_investigate_and_return(server, browser_page, viewport):
         json.loads(page.locator("#journal-record").inner_text())["command"]["command_id"]
         == command_id
     )
-    expect(page.locator("#observation-record")).to_contain_text("No assessed observation")
+    assessed_before = json.loads(page.locator("#observation-record").inner_text())
+    assert assessed_before["observation_id"] == before["verifications"][-1]["observation_id"]
     screenshot(page, directory, "04-evidence")
     page.locator("#journal-details > summary").click()
     page.locator("#observation-details > summary").click()
@@ -256,7 +305,7 @@ def test_run_notice_investigate_and_return(server, browser_page, viewport):
         lambda response: response.url.endswith("/reconcile") and response.request.method == "POST"
     ) as review:
         page.locator("#resolve-blocker").click()
-    assert review.value.json()["state"] == "REQUIRES_INTERVENTION"
+    assert review.value.json()["context"]["reconciliation"]["status"] == "REQUIRES_INTERVENTION"
     expect(page.locator("#inspection-context")).to_contain_text("REQUIRES_INTERVENTION")
     expect(page.locator("#inspection-symptom")).to_contain_text("could not establish")
     page.locator("#tab-evidence").click()
@@ -275,7 +324,7 @@ def test_run_notice_investigate_and_return(server, browser_page, viewport):
         lambda response: response.url.endswith("/reconcile") and response.request.method == "POST"
     ) as resolved:
         page.locator("#resolve-blocker").click()
-    assert resolved.value.json()["state"] == "COMPLETED"
+    assert resolved.value.json()["context"]["reconciliation"]["status"] == "COMPLETED"
     expect(page.locator("#investigation-title")).to_contain_text("Pick confirmed")
     expect(page.locator("#observation-controls")).not_to_be_visible()
     after = get(page, f"{origin}/jobs/{job_id}/evidence")
@@ -284,18 +333,11 @@ def test_run_notice_investigate_and_return(server, browser_page, viewport):
     assert after["journal"]["effect_count"] == 1
     effects = registry.original.runtime.events(command_id)
     assert sum(event.event_type == "PICK_EFFECT" for event in effects) == 1
-    assert (
-        len(
-            [
-                request
-                for request in requests
-                if request["method"] == "POST" and request["url"].endswith("/run")
-            ]
-        )
-        == 2
-    )
+    assert len([request for request in requests if physical_request(request)]) == 2
     screenshot(page, directory, "07-resolved-original-pick")
     page.locator("#return-simulation").click()
+    business = continue_guided(page, origin, page.locator("#integration-history").input_value())
+    assert business["status"] == "COMPLETED"
     page.locator("#new-test").click()
     expect(page.locator("#cell-profile")).to_have_value("hkm_inspired_v1")
     page.locator("#create-test").click()
@@ -354,7 +396,7 @@ def test_app_request_failure_does_not_become_simulated_outcome(server, browser_p
     page, directory, errors, console_errors, _ = browser_page
     open_ready(page, origin, {"width": 1440, "height": 1000})
     page.route(
-        "**/jobs/*/run",
+        "**/v1/wms/tasks",
         lambda route: route.fulfill(
             status=503,
             content_type="application/json",
@@ -367,14 +409,56 @@ def test_app_request_failure_does_not_become_simulated_outcome(server, browser_p
         "separate from the recorded simulation outcome"
     )
     orders = get(page, origin + "/orders")
-    assert len(orders) == 1
-    evidence = get(page, origin + f"/jobs/{orders[0]['job_ids'][0]}/evidence")
-    assert evidence["job"]["state"] == "RECEIVED"
-    assert evidence["command"] is None
-    assert evidence["journal"] is None
+    assert orders == []
+    assert get(page, origin + "/integration/sessions") == []
     assert not errors
     assert console_errors and all("503" in error for error in console_errors)
     screenshot(page, directory, "app-error-separate-from-simulation")
+
+
+def test_active_readonly_watch_closes_on_clear_and_delete(server, browser_page):
+    origin, registry = server
+    page, directory, errors, console_errors, requests = browser_page
+    open_ready(page, origin, {"width": 1440, "height": 1000})
+    for operation, close_code in [("clear", 4409), ("delete", 4404)]:
+        with page.expect_response(
+            lambda response: (
+                response.request.method == "POST" and response.url.endswith("/v1/wms/tasks")
+            )
+        ) as creation:
+            page.locator("#create").click()
+        session = creation.value.json()
+        assert session["current_stage"] == 1
+        await_snapshot = page.evaluate(
+            """url => new Promise((resolve, reject) => {
+                window.lifecycleWatch = {closed: null};
+                const socket = new WebSocket(url);
+                window.lifecycleWatch.socket = socket;
+                socket.onmessage = event => resolve(JSON.parse(event.data));
+                socket.onerror = () => reject(new Error('Lifecycle watch failed'));
+                socket.onclose = event => { window.lifecycleWatch.closed = event.code; };
+            })""",
+            origin.replace("http://", "ws://")
+            + f"/integration/sessions/{session['session_id']}/stream",
+        )
+        assert await_snapshot["revision"] == 0
+        if not page.locator(".manage-data").evaluate("element => element.open"):
+            page.locator(".manage-data > summary").click()
+        page.locator(f"#{operation}-test").click()
+        page.locator("#confirm-delete-test").click()
+        page.wait_for_function("window.lifecycleWatch.closed !== null")
+        assert page.evaluate("window.lifecycleWatch.closed") == close_code
+        if operation == "clear":
+            expect(page.locator("#create")).to_be_enabled()
+            assert get(page, origin + "/integration/sessions") == []
+        else:
+            expect(page.locator("#empty-workspace")).to_be_visible()
+            assert not (registry.data_dir / "workflow.db").exists()
+            assert not (registry.data_dir / "runtime.db").exists()
+    assert not [request for request in requests if physical_request(request)]
+    assert not errors, errors
+    assert not console_errors, console_errors
+    screenshot(page, directory, "readonly-watches-closed-without-recreating-world")
 
 
 @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
@@ -398,17 +482,14 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
         registry.engine("original").store.job(uncertain["job_id"]).state.value == "UNKNOWN_OUTCOME"
     )
     page.locator("#clear-test").click()
-    write_count = len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
+    write_count = len([r for r in requests if physical_request(r)])
     page.locator("#confirm-delete-test").click()
     expect(page.locator("#delete-test-dialog")).not_to_be_visible()
     expect(page.locator("#message")).to_contain_text("Test 1 cleared")
     expect(page.locator("#test-history")).to_have_value("original")
     expect(page.locator("#create")).to_be_enabled()
     expect(page.locator("#scenario")).to_have_value("DROP_ACK_AFTER_EFFECT")
-    assert (
-        len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
-        == write_count
-    )
+    assert len([r for r in requests if physical_request(r)]) == write_count
     history = get(page, origin + "/simulation-tests")
     assert len(history["tests"]) == 1
     assert (

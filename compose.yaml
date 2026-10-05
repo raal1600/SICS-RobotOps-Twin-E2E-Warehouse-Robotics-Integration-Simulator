@@ -1,0 +1,98 @@
+name: robotops-integration-lab
+x-lab-environment: &lab-environment
+  ROBOTOPS_POSTGRES_DSN: postgresql://robotops:local-demo-only@postgres:5432/robotops
+  ROBOTOPS_AMQP_URL: amqp://robotops:local-demo-only@rabbitmq:5672/%2F
+  ROBOTOPS_OPCUA_URL: opc.tcp://plc:4840/robotops/
+  ROBOTOPS_WMS_URL: http://wms:8081
+  ROBOTOPS_EDGE_URL: http://edge:8082
+  ROBOTOPS_PLC_JOURNAL: /data/plc.db
+  ROBOTOPS_LAB_DATA: /data
+  ROBOTOPS_LAB_RUNTIME: synthetic
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: robotops
+      POSTGRES_PASSWORD: local-demo-only
+      POSTGRES_DB: robotops
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U robotops -d robotops"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: robotops
+      RABBITMQ_DEFAULT_PASS: local-demo-only
+    ports: ["127.0.0.1:5672:5672", "127.0.0.1:15672:15672"]
+    volumes: ["rabbitmq:/var/lib/rabbitmq"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  plc:
+    build: .
+    command: ["python", "-m", "robotops.lab", "plc"]
+    environment:
+      <<: *lab-environment
+      ROBOTOPS_OPCUA_URL: opc.tcp://0.0.0.0:4840/robotops/
+    ports: ["127.0.0.1:4840:4840"]
+    volumes: ["plc:/data"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "robotops.lab", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  edge:
+    build: .
+    command: ["python", "-m", "robotops.lab", "edge"]
+    environment:
+      <<: *lab-environment
+      ROBOTOPS_EDGE_BIND_HOST: 0.0.0.0
+    ports: ["127.0.0.1:8082:8082"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-m", "robotops.lab", "edge-health"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  api:
+    build: .
+    environment: *lab-environment
+    ports: ["127.0.0.1:8000:8000"]
+    volumes: ["runtime:/data"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+      plc: {condition: service_healthy}
+      edge: {condition: service_healthy}
+      wms: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  wms:
+    build: .
+    command: ["uvicorn", "robotops.lab.business:create_app", "--factory", "--host", "0.0.0.0", "--port", "8081"]
+    environment: *lab-environment
+    ports: ["127.0.0.1:8081:8081"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+volumes:
+  postgres:
+  rabbitmq:
+  plc:
+  runtime:

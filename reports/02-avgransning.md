@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Test deletion and same-test clearing accepted at audited source 0d03402: all 118 MUSTs PASS, 693 tests twice on Windows and Linux, 146 UI checks, nine browser journeys per suite and eight Blender demos. Delete removes the test and releases its number; Clear restores the same test for retry. CI, native launcher and publication verified; earlier failures remain archived. Status: DONE.
+> **Implementation status, 2026-10-05:** Integration Lab implementation is undergoing final recovery, real-service, browser and Blender verification. Historical simulator acceptance does not prove the new GOAL.md; all 51 additional MUSTs and the mandatory final loop remain required. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -150,7 +150,7 @@ Varken rapportpaketet eller simulatorns logik ska användas som säkerhetsinstru
 | ”En deterministisk adapter föreslår handlingar.” | ”Jag har återskapat deras inlärda robotbrain.” |
 | ”Stoppet är en logisk simulering.” | ”Systemet har ett certifierat nödstopp.” |
 | ”Bildmodellen lämnar ett förslag som valideras.” | ”Schemakorrekt AI-utdata är säkert att exekvera.” |
-| ”OPC UA är ett planerat tillägg.” | ”PLC/OPC UA är klart eftersom jag har en signalvy.” |
+| ”Labbprofilen använder riktig OPC UA-trafik mot en syntetisk virtuell PLC.” | ”PLC/OPC UA är klart eftersom jag har en signalvy.” |
 | ”Det här behöver testas på verklig hårdvara.” | ”Byt adapter så är allt produktionsklart.” |
 
 Implementerade delar beskrivs som genomförda endast när de kan kopplas till sparad evidens. Valfria tillägg ska fortsatt märkas som framtida. Testresultat ska länka till en körning och en commit, inte bara till en skärmbild.

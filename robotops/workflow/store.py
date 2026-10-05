@@ -109,6 +109,27 @@ class Store:
             db.close()
 
     @contextmanager
+    def readonly_connect(self) -> Iterator[sqlite3.Connection]:
+        """Open an existing store without recreating a removed run database."""
+        try:
+            db = sqlite3.connect(
+                self.path.resolve().as_uri() + "?mode=ro",
+                uri=True,
+                timeout=30,
+                isolation_level=None,
+            )
+        except sqlite3.OperationalError as exc:
+            if not self.path.is_file():
+                raise NotFound("STORE_NO_LONGER_EXISTS") from exc
+            raise
+        db.row_factory = sqlite3.Row
+        try:
+            db.execute("PRAGMA query_only=ON")
+            yield db
+        finally:
+            db.close()
+
+    @contextmanager
     def transaction(self) -> Iterator[sqlite3.Connection]:
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -316,7 +337,8 @@ class Store:
         if row is None:
             raise NotFound(order_id)
         order = Order.model_validate_json(row[0])
-        states = {Store._job(db, ident).state for ident in order.job_ids}
+        jobs = [Store._job(db, ident) for ident in order.job_ids]
+        states = {job.state for job in jobs}
         if states == {JobState.COMPLETED}:
             status = JobState.COMPLETED
         else:
@@ -333,6 +355,18 @@ class Store:
                 JobState.RECEIVED,
             ]
             status = next(state for state in priority if state in states)
+        if states <= TERMINAL and any(job.command_id is not None for job in jobs):
+            guided = db.execute(
+                "SELECT value FROM meta WHERE key=?", ("guided:" + order.job_ids[0],)
+            ).fetchone()
+            business = db.execute(
+                "SELECT value FROM meta WHERE key=?", ("guided_business:" + order.order_id,)
+            ).fetchone()
+            if guided and business is None:
+                # Verified physical success/failure is distinct from acknowledged
+                # business completion. Pure planning rejection has no physical
+                # command/outcome to reconcile and remains terminal FAILED.
+                status = JobState.RECONCILING
         return order.model_copy(update={"status": status})
 
     def order(self, order_id: str) -> Order:
@@ -572,6 +606,15 @@ class Store:
                 raise Conflict("PLAN_IDENTITY_MISMATCH")
             self._record(db, plan.action_plan_id, plan)
             self._record(db, command.command_id, command)
+            # Guided command intent and outbox commit atomically before network I/O.
+            if db.execute("SELECT 1 FROM meta WHERE key=?", ("guided:" + job.job_id,)).fetchone():
+                body = json.dumps(
+                    command.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
+                )
+                db.execute(
+                    "INSERT OR IGNORE INTO integration_outbox VALUES (?,?,?,?)",
+                    (command.command_id, digest(command), body, "PENDING"),
+                )
             updated = job.model_copy(
                 update={
                     "action_plan_id": plan.action_plan_id,

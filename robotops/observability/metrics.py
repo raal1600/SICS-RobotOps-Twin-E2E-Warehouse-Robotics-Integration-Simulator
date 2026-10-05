@@ -1,6 +1,7 @@
 from collections import Counter
 
 from robotops.domain.models import JobState, RobotCommand, Verdict
+from robotops.integration.models import ExecutionSession
 from robotops.workflow.store import Store
 
 
@@ -124,5 +125,43 @@ def prometheus(store: Store) -> str:
         "# TYPE robotops_pipeline_latency_ms summary",
         f"robotops_pipeline_latency_ms_count {len(latencies)}",
         f"robotops_pipeline_latency_ms_sum {sum(latencies) * 1000:.6f}",
+    ]
+    # Read persisted sessions directly: observing metrics never initializes or advances them.
+    with store.connect() as db:
+        marker = db.execute("SELECT 1 FROM meta WHERE key='guided_schema'").fetchone()
+        sessions = (
+            [
+                ExecutionSession.model_validate_json(row[0])
+                for row in db.execute("SELECT body FROM execution_sessions").fetchall()
+            ]
+            if marker
+            else []
+        )
+    lines += ["# TYPE robotops_guided_sessions_current gauge"]
+    states = Counter(session.status for session in sessions)
+    for session_status in (
+        "WAITING_AUTHORIZATION",
+        "EXECUTING_STAGE",
+        "UNKNOWN_OUTCOME",
+        "RETRYABLE_FAILURE",
+        "COMPLETED",
+        "FAILED",
+    ):
+        lines.append(
+            f'robotops_guided_sessions_current{{status="{session_status}"}} {states[session_status]}'
+        )
+    steps = [step for session in sessions for step in session.steps]
+    for stage in range(1, 23):
+        stage_steps = [step for step in steps if step.stage == stage]
+        lines += [
+            f'robotops_guided_stage_duration_seconds_count{{stage="{stage}"}} {len(stage_steps)}',
+            f'robotops_guided_stage_duration_seconds_sum{{stage="{stage}"}} '
+            f"{sum(step.duration_ms for step in stage_steps) / 1000:.9f}",
+        ]
+    attempts = Counter((step.session_id, step.job_id, step.stage) for step in steps)
+    lines += [
+        f"robotops_guided_failed_stage_attempts_total {sum(step.status == 'FAILED' for step in steps)}",
+        f"robotops_guided_retries_total {sum(max(0, count - 1) for count in attempts.values())}",
+        f"robotops_guided_reconciliations_total {sum(step.component == 'reconciliation' for step in steps)}",
     ]
     return "\n".join(lines) + "\n"

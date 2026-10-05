@@ -5,6 +5,7 @@ from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 
 from apps.api.cell_profiles import CellProfiles, cell_profiles
+from apps.api.guided import mount_guided_routes
 from apps.api.playback import deliveries, delivery_playback, playback, visual_scene
 from apps.api.test_sessions import (
     ClearTestRequest,
@@ -145,7 +146,9 @@ def create_app(
 
     @app.get("/ui/{script}", response_class=FileResponse)
     def playback_javascript(
-        script: Literal["playback.js", "scene-view.js", "workflow-guide.js"],
+        script: Literal[
+            "playback.js", "scene-view.js", "workflow-guide.js", "integration-console.js"
+        ],
     ) -> FileResponse:
         return FileResponse(
             Path(__file__).parents[1] / "erp_ui" / script, media_type="text/javascript"
@@ -164,6 +167,8 @@ def create_app(
 
 
 def mount_world_routes(app: FastAPI, store: Store | None, workflow: Engine | None) -> None:
+    mount_guided_routes(app, store, workflow)
+
     def get_store() -> Store:
         if store is None:
             raise NotFound("original")
@@ -178,6 +183,9 @@ def mount_world_routes(app: FastAPI, store: Store | None, workflow: Engine | Non
     def create_order(
         payload: OrderRequest, idempotency_key: Annotated[str, Header(min_length=1, max_length=160)]
     ) -> Order:
+        if getattr(get_workflow(), "lab", None) is not None:
+            raise Conflict("LAB_REQUIRES_VERSIONED_WMS_INTAKE")
+
         def validate_fixture(request: OrderRequest) -> None:
             products = {product.product_id for product in get_workflow().settings.products}
             for line in request.lines:
@@ -209,6 +217,8 @@ def mount_world_routes(app: FastAPI, store: Store | None, workflow: Engine | Non
 
     @app.post("/jobs/{job_id}/run", response_model=PickJob)
     def run(job_id: str, request: ExecutionRequest) -> PickJob:
+        if getattr(get_workflow(), "lab", None) is not None:
+            raise Conflict("LAB_REQUIRES_BOUNDED_INTEGRATION_STAGES")
         return get_workflow().run(job_id, request.fault)
 
     @app.post("/jobs/{job_id}/reconcile", response_model=PickJob)
@@ -219,6 +229,8 @@ def mount_world_routes(app: FastAPI, store: Store | None, workflow: Engine | Non
         Each attempt retains its evidence; insufficient evidence pauses the job again.
         No pick is sent. COMPLETED/FAILED jobs and archived tests cannot be reopened.
         """
+        if get_workflow().is_guided(job_id):
+            raise Conflict("GUIDED_JOB_REQUIRES_STAGE_AUTHORIZATION")
         return get_workflow().reconcile(job_id, request.fault)
 
     @app.get("/cell", response_model=CellState)

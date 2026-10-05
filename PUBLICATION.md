@@ -4,6 +4,16 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
+### Integration Lab revision (2026-10-05; acceptance pending)
+
+Version 1.5 adds the guided 22-stage integration console, PostgreSQL, RabbitMQ,
+the separate edge/OPC UA service, virtual PLC journal and WMS/ERP reconciliation.
+Figure 13 and the design/boundary reports describe these implemented boundaries.
+The mandatory final loop and 51 additional LAB-MUST criteria remain tracked in
+[the requirements audit](docs/integration-lab-requirements.md). Earlier accepted
+simulator revisions below do not attest this implementation. Publication remains
+generated exclusively by the existing build tool and workflow.
+
 ### Final lifecycle/runtime verification (2026-10-05)
 
 The final-source replay-read/delete race and local Blender deadlines remain

@@ -1274,5 +1274,33 @@
         "review"
       ]
     ]
+  },
+  "integration-lab": {
+    "number": 13,
+    "title": "Integration Lab: explicit boundaries",
+    "subtitle": "Real SQL, AMQP and OPC UA; synthetic controller, robot and sensing",
+    "width": 900,
+    "height": 840,
+    "caption": "Figure 13. Implemented Integration Lab topology, with acceptance tracked in the current report. The console sends explicit REST authorizations and reads a persisted WebSocket trace. PostgreSQL commits immutable command/outbox intent before RabbitMQ publication. The separate edge service commits its inbox before consumer ACK and owns real OPC UA sessions to the virtual PLC. Bounded API-to-edge REST control calls preserve guided gates. PLC acceptance alone cannot actuate the runtime: explicit physical authorization and the original durable execution claim are required. The PLC-to-runtime interface is simulated; the existing runtime is invoked by the shared bounded handler. Fresh synthetic observations and the verifier determine the outcome. WMS HTTP acknowledgement precedes committed ERP business completion. Lost replies cause original-identity reconciliation, never an automatic replacement pick. This does not claim safety certification or exactly-once physical execution.",
+    "nodes": [
+      ["operator", 30, 90, 240, 105, "Guided Console", "ERP demand / WMS task", "business"],
+      ["api", 330, 90, 240, 105, "FastAPI / guided stages", "REST writes / read-only stream", "core"],
+      ["postgres", 630, 90, 240, 105, "PostgreSQL", "Sessions / command / outbox", "business"],
+      ["plc", 30, 270, 240, 105, "Virtual PLC", "Actual OPC UA / durable journal", "world"],
+      ["edge", 330, 270, 240, 105, "Separate Python edge", "Durable inbox / OPC UA client", "core"],
+      ["rabbit", 630, 270, 240, 105, "RabbitMQ / AMQP", "Publisher confirm / consumer ACK", "business"],
+      ["gate", 30, 450, 240, 105, "Physical authorization", "Original command execution claim", "warn"],
+      ["runtime", 330, 450, 240, 105, "Simulated controller", "Synthetic or Blender runtime", "world"],
+      ["observation", 630, 450, 240, 105, "Fresh observation", "Synthetic sensors / separate truth", "core"],
+      ["business", 30, 650, 240, 105, "WMS then ERP", "Durable ACK / business outcome", "business"],
+      ["verify", 330, 650, 240, 105, "Verifier / reconciliation", "Original journal + fresh evidence", "core"],
+      ["replay", 630, 650, 240, 105, "3D view / trace", "Read-only motion and evidence", "business"]
+    ],
+    "edges": [
+      ["operator", "api"], ["api", "postgres"], ["postgres", "rabbit"],
+      ["rabbit", "edge"], ["edge", "plc"], ["api", "edge", "both"],
+      ["plc", "gate"], ["gate", "runtime"], ["runtime", "observation"],
+      ["observation", "verify"], ["verify", "business"], ["observation", "replay"]
+    ]
   }
 }

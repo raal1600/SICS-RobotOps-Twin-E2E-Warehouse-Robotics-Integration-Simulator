@@ -9,6 +9,27 @@ permissions:
 jobs:
   core:
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: robotops
+          POSTGRES_PASSWORD: local-demo-only
+          POSTGRES_DB: robotops
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U robotops -d robotops"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+      rabbitmq:
+        image: rabbitmq:4
+        ports: [5672:5672]
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+    env:
+      ROBOTOPS_LAB_TESTS: "1"
+      ROBOTOPS_POSTGRES_DSN: postgresql://robotops:local-demo-only@127.0.0.1:5432/robotops
+      ROBOTOPS_AMQP_URL: amqp://guest:guest@127.0.0.1:5672/%2F
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

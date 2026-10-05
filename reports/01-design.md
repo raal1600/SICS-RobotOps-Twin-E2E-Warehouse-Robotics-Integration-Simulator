@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Test deletion and same-test clearing accepted at audited source 0d03402: all 118 MUSTs PASS, 693 tests twice on Windows and Linux, 146 UI checks, nine browser journeys per suite and eight Blender demos. Delete removes the test and releases its number; Clear restores the same test for retry. CI, native launcher and publication verified; earlier failures remain archived. Status: DONE.
+> **Implementation status, 2026-10-05:** Integration Lab implementation is undergoing final recovery, real-service, browser and Blender verification. Historical simulator acceptance does not prove the new GOAL.md; all 51 additional MUSTs and the mandatory final loop remain required. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -145,7 +145,7 @@ Systemet ska kunna köras utan externa modellkonton. Blender visar förändringe
 | K08 | Tillförlitlighet | Journal, dubblettskydd och reconciliation. | Modellens definierade felantaganden. |
 | K09 | Prestanda | Mätning per steg och kötid. | Flaskhalsanalys, inte industriell kapacitet. |
 | K10 | Dokumentation/kunddialog | Tre rapporter, kontrakt och demonstrationsmanus. | Förmåga att förklara beslut. |
-| K11 | Industriella protokoll | OPC UA-adapter som tillägg med kontraktstest. | Protokollintegration först när den är implementerad. |
+| K11 | Industriella protokoll | Integration Lab använder verklig AMQP och OPC UA mot en virtuell PLC. | Protokolltrafik belägger inte verklig hårdvara eller säkerhetscertifiering. |
 | K12 | AI-stödd utveckling | Versionshanterade ändringar och granskade tester. | Eget ansvar för agentgenererad kod. |
 
 K01–K10 är en forskningsbaserad kravkartläggning. Vilka simulatorfunktioner som har körts och godkänts framgår av ACCEPTANCE_REPORT.md, inte av denna tabell. K11 får inte markeras färdigt för att booleska signaler finns i JSON. Annonsens kärnuppgifter och meriterande områden är utgångspunkt för kartläggningen. [S01][S02]
@@ -178,7 +178,11 @@ Senare kan en lednivåadapter införas med lednamn, tidsatta waypoints och expli
 
 ### 5.3 Driftmiljö
 
-Körningen är lokal: webbläsare, Pythonprocesser, SQLite och Blender. Kundmocken använder integrations-API:t och dess beständiga orderkontrakt. Runtime-journal och värld har en separat SQLite-databas. En extern ERP-transport med egen outbox är ett valfritt tillägg, inte en implementerad leveransgaranti; se ADR 0001.
+Snabbprofilen använder webbläsare, Python, SQLite och syntetisk eller Blender-baserad runtime. Integration Lab använder PostgreSQL för applikationstillstånd, en transaktionell outbox, verklig RabbitMQ/AMQP, en separat Python-edge med beständig inbox och verklig OPC UA till en virtuell PLC. Runtime-journal, PLC-journal och värld lagras lokalt enligt den dokumenterade felmodellen. En syntetisk WMS-tjänst tar emot verifierade resultat över REST. En produktionsanslutning till ett verkligt ERP är fortfarande ett separat integrationsarbete.
+
+{{figure:integration-lab}}
+
+Guided Console sparar 22 avgränsade steg och revisionsskyddade beslut. Ingen databastransaktion väntar på användarens svar. **AUTHORIZE ROBOT EXECUTION** måste passeras innan simulerad rörelse får starta. WebSocket-strömmen är skrivskyddad. Källkod, protokolldata och verkligt respektive simulerat ansvar visas per steg. [Implementerad labbprofil och körkommandon](../docs/integration-lab.md) beskriver processer och återhämtning; [kravgranskningen](../docs/integration-lab-requirements.md) skiljer implementation från ännu ej styrkt slutacceptans.
 
 GitHub Pages används endast för rapporter, diagram och nedladdningar. Pages kör inte Pythonbackend eller Blender. En framtida inspelad demo ska märkas inspelad och inte presenteras som levande robottelemetri. [S19]
 
@@ -198,11 +202,13 @@ Valideringen kontrollerar bland annat tillåten kommandotyp, ändliga tal, rätt
 
 ### 6.3 Normativa API-gränser
 
-PROJECT_PLAN.md och contracts/ är implementationens kontrakt. Integrations-API:t
-omfattar POST /orders, GET /orders/{order_id}, GET /orders/{order_id}/timeline,
-GET /jobs/{job_id}, POST /jobs/{job_id}/reconcile, GET /health och GET /metrics.
-Brain, RobotGateway, ObservationModel och runtime har separata typade Python-
-eller processgränser; de äldre föreslagna /v1-endpointsen är inte publik API.
+GOAL.md, PROJECT_PLAN.md och contracts/ beskriver implementationens gränser.
+POST /v1/wms/tasks skapar en guidad session. POST /integration/sessions/{id}/authorize
+utför ett revisionsskyddat steg; /reconcile undersöker samma ursprungliga kommando.
+GET /integration/sessions/{id}, dess /live-resurs och /stream-WebSocket är skrivskyddade.
+Order-, jobb-, tidslinje-, evidens-, /health- och /metrics-resurser finns kvar.
+De äldre POST /orders och /jobs/{id}/run finns för lokal kompatibilitet men avvisas
+i labbprofilen, där hela den guidade protokollkedjan krävs.
 
 Samma idempotensnyckel och payload återger samma order. Ändrat innehåll ger
 konflikt. Journalens frånvaro bevisar inte i sig utebliven effekt.
@@ -212,9 +218,11 @@ konflikt. Journalens frånvaro bevisar inte i sig utebliven effekt.
 {{figure:state}}
 
 Den normativa normalvägen är RECEIVED → VALIDATED → PLANNING →
-READY_TO_EXECUTE → EXECUTING → VERIFYING → COMPLETED. ERP-status är den
-verifierade affärsstatus som API:t exponerar. En separat fjärr-ERP med outbox är
-ett framtida integrationsarbete, inte en implementerad kundkvittenskanal.
+READY_TO_EXECUTE → EXECUTING → VERIFYING → COMPLETED för plockuppdraget.
+I den guidade kedjan stannar orderns affärsstatus i RECONCILING tills samtliga
+verifierade plock har beständiga WMS-kvittenser och steg 21 sparar ERP-utfallet.
+Robotresultat, sensorverifiering, WMS-kvittens och ERP-status är separata fakta.
+Den syntetiska affärsmodellen är ingen leveransgaranti för ett verkligt kundsystem.
 
 UNKNOWN_OUTCOME kan endast lösas via RECONCILING och lagrad evidens.
 Otillräckligt eller motstridigt underlag ger REQUIRES_INTERVENTION, aldrig
@@ -344,7 +352,7 @@ Under utveckling kan en agent föreslå Blenderkod i en isolerad miljö. Under k
 
 Cellmodellen har READY, BUSY, FAULTED, ESTOP_LOGICAL, RESETTING och OFFLINE samt generationsnummer. Runtime kontrollerar källobjekt och destination mot det typade kommandot. Före start måste definierade förvillkor vara uppfyllda. Signalerna behöver aktualitetskontroll; ett gammalt READY räcker inte.
 
-En eventuell OPC UA-utökning ska implementera ett riktigt protokollgränssnitt med dokumenterad informationsmodell och testad klient/server-kommunikation. OPC Foundation beskriver dessa som separata delar av OPC UA. En REST-route som heter `/plc` är inte samma sak. [S18]
+Integration Lab implementerar OPC UA-klient/server-trafik med anslutning, browse, prenumeration och metoder för SubmitJob, ursprunglig status och resultatkvittens. Informationsmodell och återstartssemantik dokumenteras i labbguiden. Ett REST-svar från edge är inte i sig bevis för OPC UA; spåret innehåller de underliggande metodsvaren och datanotifikationerna. PLC-till-runtime-länken märks **simulated controller interface**. OPC Foundations åtskillnad mellan informationsmodell och kommunikationstjänster är relevant för denna gräns. [S18]
 
 Stoppknappen i demonstrationen är **en simulerad operationell spärr**, inte ett nödstopp med verifierad säkerhetsfunktion. Projektet ska inte anslutas till fysisk robotutrustning med denna logik som skyddssystem.
 

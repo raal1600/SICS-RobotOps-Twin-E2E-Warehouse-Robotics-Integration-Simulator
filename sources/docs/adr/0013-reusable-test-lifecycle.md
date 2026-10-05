@@ -83,3 +83,14 @@ Management pauses background polling and invalidates in-flight view versions.
 Replay draws at 24 fps while preserving elapsed-time cursor advancement and
 immediate scrubbing. Runtime deadlines, Blender quality and uncertain-outcome
 semantics remain unchanged; the earlier failed runs remain in development evidence.
+
+Final-source repetition then exposed an outstanding replay read racing deletion.
+The backend correctly retained its response-lifetime barrier. The client now
+drains its pending JSON and snapshot response bodies before confirmed management,
+with polling paused and view versions invalidated. Snapshots are fetched to local
+blob URLs so their HTTP reads participate too. A five-second stalled-view wait
+sends no management request and permits explicit retry. Controls stay busy through
+final refresh. Other clients' reads/downloads and real execution still block
+destruction. Controlled delayed-body, failed-read and stalled-read tests exercise
+this boundary without raising robot timeouts or retrying a pick. The original
+failure is preserved in [read-race evidence](../evidence/test-reset-read-drain/README.md).

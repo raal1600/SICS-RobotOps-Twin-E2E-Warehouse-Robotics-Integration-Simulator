@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Test lifecycle correction accepted at audited implementation df45c93: all 118 MUSTs PASS, 688 tests twice, 139 UI checks, nine real-browser cases and eight Blender demos. Delete removes the test and frees its number; clear restores the same test for retry. CI, Windows launcher and publication verified; original evidence and mapping correction remain archived. Status: DONE.
+> **Implementation status, 2026-10-05:** Final-source CI found a replay-read/delete race: the first suite passed 688 tests; the second passed 687 with one failure. Prior acceptance at df45c93 is preserved. Client read draining and 146 passing UI checks now cover the race; fresh full acceptance is in progress. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -126,6 +126,8 @@ Simulatorn behöver ingen B200. Den ska i stället kunna beskriva modellversion,
 Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en HKM-inspirerad manipulator. HKM-utökningen verifierades med upprepad full acceptans, Blender-tester och publicering vid källrevision ca7798798f916c8130e1833cf16b4d4d3f10d546. Den historiska evidensen ligger under docs/evidence/test-lifecycle-baseline; ACCEPTANCE_REPORT.md redovisar aktuell revisionsstatus. En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag. Sparade körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.
 
 Livscykeln skiljer val av robotcell från fel- och observationsscenario. ”Start new test” öppnar ett cellval; endast den HKM-inspirerade cellen kan väljas för nya försök. ”Clear test and retry” behåller försökets nummer och cell men tar efter bekräftelse bort gamla kördata och återställer produkter. ”Delete selected test” tar bort försöket helt; ”Delete all tests” tar bort den bekräftade samlingen. Lediga nummer återanvänds och en tom lista börjar på Test 1. Radering eller rensning avgör inget osäkert plock och skickar inget robotkommando. Ett raderat aktivt försök ersätts inte automatiskt. ADR 0013 beskriver beständig rensningsavsikt, revisionsskydd, anonyma begärandedigester och avgränsad filhantering.
+
+Inför bekräftad datahantering pausar gränssnittet uppdateringar och väntar på pågående läsning av replay och sparad bild. Om läsningen fastnar skickas ingen ändring; användaren kan försöka igen. Serverns skydd för pågående arbete och andra läsares filåtkomst finns kvar.
 
 Systemet ska kunna köras utan externa modellkonton. Blender visar förändringen i världen, men ordern blir inte färdig bara för att animationen slutar. UI:t visar orderstatus, cellstatus, kommandostatus och verifieringsstatus var för sig.
 

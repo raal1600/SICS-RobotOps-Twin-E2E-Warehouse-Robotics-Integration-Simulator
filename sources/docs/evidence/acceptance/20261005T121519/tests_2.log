@@ -1,0 +1,419 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.12.2, cov-7.1.0, anyio-4.15.1
+collected 688 items
+
+tests/blender/test_blender_runtime.py .....                              [  0%]
+tests/blender/test_hkm_runtime.py .............                          [  2%]
+tests/blender/test_playback.py ..............                            [  4%]
+tests/browser/test_investigation.py ......F..                            [  5%]
+tests/contract/test_api.py ..                                            [  6%]
+tests/contract/test_completion.py ...                                    [  6%]
+tests/contract/test_governance.py .......                                [  7%]
+tests/contract/test_hkm_boundaries.py ........                           [  8%]
+tests/contract/test_hkm_catalogue.py ................................    [ 13%]
+tests/contract/test_legacy_revision.py ..                                [ 13%]
+tests/contract/test_pdf_package.py .                                     [ 13%]
+tests/contract/test_robotics_documentation.py ..                         [ 14%]
+tests/contract/test_schemas.py ......................................... [ 20%]
+........................                                                 [ 23%]
+tests/e2e/test_hkm_scenarios.py ..................                       [ 26%]
+tests/e2e/test_observability.py .                                        [ 26%]
+tests/e2e/test_reobservation.py .......                                  [ 27%]
+tests/e2e/test_workflow.py ......................                        [ 30%]
+tests/integration/test_delivery_replay.py .........                      [ 31%]
+tests/integration/test_desktop_backend.py ...                            [ 32%]
+tests/integration/test_fresh_scene.py ...........                        [ 34%]
+tests/integration/test_hkm_api.py ..........                             [ 35%]
+tests/integration/test_process_restart.py .                              [ 35%]
+tests/integration/test_runtime.py .............                          [ 37%]
+tests/integration/test_simulation_tests.py ............................. [ 41%]
+........................................................................ [ 52%]
+.                                                                        [ 52%]
+tests/integration/test_store.py .....                                    [ 53%]
+tests/integration/test_test_management.py .............................. [ 57%]
+...................                                                      [ 60%]
+tests/unit/test_action_validation.py ................                    [ 62%]
+tests/unit/test_blender_adapter.py ......                                [ 63%]
+tests/unit/test_hkm_brain.py ...........                                 [ 64%]
+tests/unit/test_hkm_geometry.py ........................................ [ 70%]
+.                                                                        [ 70%]
+tests/unit/test_hkm_robotics.py ...........................              [ 74%]
+tests/unit/test_hkm_runtime_defenses.py ................................ [ 79%]
+......                                                                   [ 80%]
+tests/unit/test_observation_verifier.py ...                              [ 80%]
+tests/unit/test_states.py .............................................. [ 87%]
+........................................................................ [ 97%]
+...                                                                      [ 98%]
+tests/unit/test_visualization.py ...........                             [100%]
+
+=================================== FAILURES ===================================
+_ test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime] _
+
+server = ('http://127.0.0.1:52159', <apps.api.test_sessions.TestRegistry object at 0x7f0663adaaf0>)
+browser_page = (<Page url='http://127.0.0.1:52159/'>, PosixPath('artifacts/investigation-browser/20261005T123935582510/test_clear_ret...l': 'http://127.0.0.1:52159/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:52159/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+        assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+        epoch = registry.engine("original").runtime.world().scene_epoch
+        page.locator(".manage-data > summary").click()
+        page.locator("#clear-test").click()
+        expect(page.locator("#delete-test-title")).to_have_text("Clear Test 1 and retry?")
+        screenshot(page, directory, "clear-same-test-confirmation")
+        page.locator("#cancel-delete-test").click()
+        assert (
+            registry.engine("original").store.job(uncertain["job_id"]).state.value == "UNKNOWN_OUTCOME"
+        )
+        page.locator("#clear-test").click()
+        write_count = len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
+        page.locator("#confirm-delete-test").click()
+        expect(page.locator("#delete-test-dialog")).not_to_be_visible()
+        expect(page.locator("#message")).to_contain_text("Test 1 cleared")
+        expect(page.locator("#test-history")).to_have_value("original")
+        expect(page.locator("#create")).to_be_enabled()
+        expect(page.locator("#scenario")).to_have_value("DROP_ACK_AFTER_EFFECT")
+        assert (
+            len([r for r in requests if r["method"] == "POST" and r["url"].endswith("/run")])
+            == write_count
+        )
+        history = get(page, origin + "/simulation-tests")
+        assert len(history["tests"]) == 1
+        assert (
+            history["tests"][0]["number"],
+            history["tests"][0]["revision"],
+            history["tests"][0]["order_count"],
+        ) == (1, 2, 0)
+        assert registry.engine("original").runtime.world().scene_epoch != epoch
+        fixtures = get(page, origin + "/fixtures")
+        assert len(fixtures["inventory"]) == 6
+        assert all(
+            p["location_id"] == fixtures["product_sources"][p["product_id"]]
+            for p in fixtures["inventory"]
+        )
+        assert page.request.get(origin + f"/jobs/{uncertain['job_id']}/evidence").status == 404
+        screenshot(page, directory, "same-test-ready-again")
+        repeated = choose_pick(page)
+        assert repeated["state"] == "COMPLETED"
+        assert repeated["command_id"] != uncertain["command_id"]
+        assert registry.engine("original").runtime.journal(repeated["command_id"]).effect_count == 1
+        page.locator("#delete-test").click()
+        page.locator("#cancel-delete-test").click()
+        assert registry.exists("original")
+        page.locator("#delete-test").click()
+        page.locator("#confirm-delete-test").click()
+>       expect(page.locator("#empty-workspace")).to_be_visible()
+E       AssertionError: Locator expected to be visible
+E       Actual value: hidden 
+E       Call log:
+E         - Expect "to_be_visible" locator("#empty-workspace") with timeout 5000ms
+E         - waiting for locator("#empty-workspace")
+E           14 × locator resolved to <section hidden="" id="empty-workspace" class="panel empty-workspace">…</section>
+E              - unexpected value "hidden"
+E       
+E       Aria snapshot:
+E       - banner:
+E         - text: ROBOTOPS TWIN
+E         - heading "Simulation workspace" [level=1]
+E         - paragraph: Local · deterministic · synthetic
+E       - main:
+E         - region "Simulation tests":
+E           - text: Simulation test
+E           - combobox "Simulation test":
+E             - option "Select a test"
+E             - option "Test 1 · HKM1800-inspired warehouse cell · Current · 1 orders · COMPLETED" [selected]
+E           - button "Start new test"
+E           - group:
+E             - text: Manage test data
+E             - button "Clear test and retry"
+E             - button "Delete selected test"
+E             - button "Delete all tests"
+E             - paragraph: Clear keeps the test and restores its starting scene. Delete removes the test completely.
+E           - status: Test 1 · HKM1800-inspired warehouse cell · current test. Start new test creates a separate world; previous results stay in history.
+E         - dialog "Delete simulation test?":
+E           - heading "Delete simulation test?" [level=2]
+E           - paragraph: Test 1 · HKM1800-inspired warehouse cell · 1 orders will be deleted. There will be no current test until you create a new one.
+E           - paragraph: The selected tests, orders, evidence and replay files will be permanently removed. Their test numbers become available again. This does not run the robot or resolve uncertain outcomes.
+E           - alert: A test operation is still running. Wait for it to finish, then try again.
+E           - button "Cancel"
+E           - button "Delete test"
+E         - list "Test workflow":
+E           - listitem: 1 Set up
+E           - listitem: 2 Watch
+E           - listitem: 3 Investigate
+E           - listitem: 4 Continue
+E         - alert: App request problem — A test operation is still running. Wait for it to finish, then try again.. This message is separate from the recorded simulation outcome.
+E         - region "Pick verified — continue when ready":
+E           - text: NEXT STEP
+E           - heading "Pick verified — continue when ready" [level=2]
+E           - paragraph: Choose the next product and scenario below, then run the next order. Use Start new test above for an independent combination with fresh products.
+E           - button "Set up next pick"
+E         - complementary "Run a simulation":
+E           - paragraph: Move one product from its source box to the output tote. A normal pick ends with a reliable check that it arrived.
+E           - group:
+E             - text: Run a pick Product
+E             - combobox "Product":
+E               - option "SKU-A · at source" [selected]
+E               - option "SKU-B · already picked" [disabled]
+E               - option "SKU-C · at source"
+E               - option "SKU-D · at source"
+E               - option "SKU-E · at source"
+E               - option "SKU-F · at source"
+E             - text: Execution scenario
+E             - combobox "Execution scenario":
+E               - option "Happy path" [selected]
+E               - option "Lose acknowledgement after effect"
+E               - option "Lose acknowledgement before effect"
+E               - option "Contradictory observation"
+E               - option "Low-confidence observation"
+E               - option "Stale observation"
+E               - option "Logical E-stop"
+E               - option "Cell fault"
+E               - option "Invalid Brain output"
+E               - option "Brain timeout"
+E             - paragraph: "Normal pick: move the product, receive the reply and check its new position."
+E             - paragraph:
+E               - strong: "Watch for:"
+E               - text: The product reaches the output tote and the job becomes COMPLETED.
+E             - button "Create and run order"
+E             - status: Choose a scenario and run products in this test. Start new test above for a fresh, independent combination.
+E             - group: More about this scenario & test controls
+E           - group: Cell & diagnostics ·
+E         - heading "The robotic cell" [level=2]
+E         - text: "Cell: READY 1/1 completed"
+E         - paragraph: product-SKU-B-01 · COMPLETED
+E         - button "Investigate this pick"
+E         - paragraph: "Delivery scenario: Happy path"
+E         - status: Full delivery replay · 1 product executions
+E         - img "3D warehouse cell. 1/1 · product-SKU-B-01 · COMPLETED. JOURNAL_AND_FRESH_DESTINATION_AGREE"
+E         - status: JOURNAL_AND_FRESH_DESTINATION_AGREE
+E         - paragraph: 1/1 · product-SKU-B-01 · COMPLETED
+E         - paragraph: "Replay tool: EE_VAC_ARRAY · 5 tools in rack"
+E         - button "Play"
+E         - button "Replay"
+E         - button "Step backward": Previous frame
+E         - button "Step forward": Next frame
+E         - slider "Scenario replay position": "317"
+E         - text: Speed
+E         - combobox "Speed":
+E           - option "0.25×"
+E           - option "0.5×"
+E           - option "1×" [selected]
+E           - option "2×"
+E           - option "4×"
+E         - paragraph: Original executions in this scene, in durable execution order. Replay sends no commands.
+E         - group "Presentation camera":
+E           - button "Operator"
+E           - button "Overhead"
+E           - button "Side inspection"
+E           - button "Follow TCP"
+E         - group: Camera, replay selection & illustration details
+E         - group: Simulation boundaries
+E         - group: Technical details Saved Blender snapshot
+E         - text: Local simulation only. No external model account, GPU or real industrial hardware required.
+
+tests/browser/test_investigation.py:437: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261005T121519/tests-2.xml -
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.13.15-final-0 _______________
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+apps/__init__.py                          0      0   100%
+apps/api/__init__.py                      0      0   100%
+apps/api/__main__.py                     19      1    95%   33
+apps/api/app.py                         187      5    97%   122-123, 169, 174, 325
+apps/api/cell_profiles.py                24      0   100%
+apps/api/playback.py                     62      3    95%   30-31, 62
+apps/api/test_sessions.py               452     17    96%   49, 118, 341, 352, 354, 401, 403, 410, 484, 506, 532, 600, 621, 629, 663, 727-728
+apps/desktop/__init__.py                  0      0   100%
+apps/desktop/backend.py                  48     48     0%   3-79
+robotops/__init__.py                      0      0   100%
+robotops/blender/__init__.py              0      0   100%
+robotops/blender/adapter.py             214     22    90%   34-37, 109, 133, 176, 179, 186, 189, 191, 194, 387-394, 419, 445
+robotops/blender/visualization.py       180     19    89%   50, 53, 55, 57, 70, 72, 133, 136, 141, 183, 187, 190, 192, 199, 207, 211, 230, 233, 235
+robotops/brain/__init__.py                0      0   100%
+robotops/brain/deterministic.py          45      1    98%   65
+robotops/brain/validation.py             71     10    86%   58, 82, 92, 96, 105, 108, 115, 117, 123, 128
+robotops/cell/__init__.py                 0      0   100%
+robotops/cell/controller.py              12      0   100%
+robotops/cell/hkm_execution.py           48      5    90%   25, 32, 43, 81, 106
+robotops/cell/runtime.py                177      9    95%   67, 165, 267, 269, 271, 278, 390-394
+robotops/config.py                       67      7    90%   87, 94, 96, 100, 105, 110, 117
+robotops/demo.py                         74     74     0%   3-196
+robotops/domain/__init__.py               0      0   100%
+robotops/domain/base.py                  57      1    98%   59
+robotops/domain/models.py               317     24    92%   60, 145, 147, 149, 153, 156, 164, 169, 188, 237, 239, 244, 247, 249, 253, 255, 302, 304, 317, 329, 374, 379, 381, 385
+robotops/domain/ports.py                  6      0   100%
+robotops/faults/__init__.py               0      0   100%
+robotops/faults/injection.py              3      0   100%
+robotops/hkm_geometry.py                317     18    94%   81, 104, 107, 116, 119, 141, 367, 369, 608, 623-631
+robotops/observability/__init__.py        0      0   100%
+robotops/observability/metrics.py        35      0   100%
+robotops/observation/__init__.py          0      0   100%
+robotops/observation/model.py            36      1    97%   88
+robotops/observation/quality.py          22      2    91%   16, 31
+robotops/presentation_io.py              14      0   100%
+robotops/robot_gateway/__init__.py        0      0   100%
+robotops/robot_gateway/gateway.py        32      1    97%   16
+robotops/robotics/__init__.py             0      0   100%
+robotops/robotics/catalogue.py          106      1    99%   140
+robotops/robotics/catalogue_data.py       8      0   100%
+robotops/robotics/models.py             184      7    96%   59, 177, 182, 211, 272, 274, 284
+robotops/robotics/selector.py            59      0   100%
+robotops/robotics/trajectory.py         280     12    96%   190, 255, 486, 509, 512, 517, 519, 530, 541, 554, 563, 638
+robotops/scene_geometry.py               30      0   100%
+robotops/verification/__init__.py         0      0   100%
+robotops/verification/verifier.py        35      3    91%   39, 43, 54
+robotops/workflow/__init__.py             0      0   100%
+robotops/workflow/engine.py             148      3    98%   179, 208, 239
+robotops/workflow/states.py              25      2    92%   49, 53
+robotops/workflow/store.py              276     10    96%   129, 215, 228, 244-247, 428, 484, 521, 570, 572
+-------------------------------------------------------------------
+TOTAL                                  3670    306    92%
+Coverage JSON written to file /home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261005T121519/coverage-2.json
+Required test coverage of 85.0% reached. Total coverage: 91.66%
+=========================== short test summary info ============================
+FAILED tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime] - AssertionError: Locator expected to be visible
+Actual value: hidden 
+Call log:
+  - Expect "to_be_visible" locator("#empty-workspace") with timeout 5000ms
+  - waiting for locator("#empty-workspace")
+    14 × locator resolved to <section hidden="" id="empty-workspace" class="panel empty-workspace">…</section>
+       - unexpected value "hidden"
+
+Aria snapshot:
+- banner:
+  - text: ROBOTOPS TWIN
+  - heading "Simulation workspace" [level=1]
+  - paragraph: Local · deterministic · synthetic
+- main:
+  - region "Simulation tests":
+    - text: Simulation test
+    - combobox "Simulation test":
+      - option "Select a test"
+      - option "Test 1 · HKM1800-inspired warehouse cell · Current · 1 orders · COMPLETED" [selected]
+    - button "Start new test"
+    - group:
+      - text: Manage test data
+      - button "Clear test and retry"
+      - button "Delete selected test"
+      - button "Delete all tests"
+      - paragraph: Clear keeps the test and restores its starting scene. Delete removes the test completely.
+    - status: Test 1 · HKM1800-inspired warehouse cell · current test. Start new test creates a separate world; previous results stay in history.
+  - dialog "Delete simulation test?":
+    - heading "Delete simulation test?" [level=2]
+    - paragraph: Test 1 · HKM1800-inspired warehouse cell · 1 orders will be deleted. There will be no current test until you create a new one.
+    - paragraph: The selected tests, orders, evidence and replay files will be permanently removed. Their test numbers become available again. This does not run the robot or resolve uncertain outcomes.
+    - alert: A test operation is still running. Wait for it to finish, then try again.
+    - button "Cancel"
+    - button "Delete test"
+  - list "Test workflow":
+    - listitem: 1 Set up
+    - listitem: 2 Watch
+    - listitem: 3 Investigate
+    - listitem: 4 Continue
+  - alert: App request problem — A test operation is still running. Wait for it to finish, then try again.. This message is separate from the recorded simulation outcome.
+  - region "Pick verified — continue when ready":
+    - text: NEXT STEP
+    - heading "Pick verified — continue when ready" [level=2]
+    - paragraph: Choose the next product and scenario below, then run the next order. Use Start new test above for an independent combination with fresh products.
+    - button "Set up next pick"
+  - complementary "Run a simulation":
+    - paragraph: Move one product from its source box to the output tote. A normal pick ends with a reliable check that it arrived.
+    - group:
+      - text: Run a pick Product
+      - combobox "Product":
+        - option "SKU-A · at source" [selected]
+        - option "SKU-B · already picked" [disabled]
+        - option "SKU-C · at source"
+        - option "SKU-D · at source"
+        - option "SKU-E · at source"
+        - option "SKU-F · at source"
+      - text: Execution scenario
+      - combobox "Execution scenario":
+        - option "Happy path" [selected]
+        - option "Lose acknowledgement after effect"
+        - option "Lose acknowledgement before effect"
+        - option "Contradictory observation"
+        - option "Low-confidence observation"
+        - option "Stale observation"
+        - option "Logical E-stop"
+        - option "Cell fault"
+        - option "Invalid Brain output"
+        - option "Brain timeout"
+      - paragraph: "Normal pick: move the product, receive the reply and check its new position."
+      - paragraph:
+        - strong: "Watch for:"
+        - text: The product reaches the output tote and the job becomes COMPLETED.
+      - button "Create and run order"
+      - status: Choose a scenario and run products in this test. Start new test above for a fresh, independent combination.
+      - group: More about this scenario & test controls
+    - group: Cell & diagnostics ·
+  - heading "The robotic cell" [level=2]
+  - text: "Cell: READY 1/1 completed"
+  - paragraph: product-SKU-B-01 · COMPLETED
+  - button "Investigate this pick"
+  - paragraph: "Delivery scenario: Happy path"
+  - status: Full delivery replay · 1 product executions
+  - img "3D warehouse cell. 1/1 · product-SKU-B-01 · COMPLETED. JOURNAL_AND_FRESH_DESTINATION_AGREE"
+  - status: JOURNAL_AND_FRESH_DESTINATION_AGREE
+  - paragraph: 1/1 · product-SKU-B-01 · COMPLETED
+  - paragraph: "Replay tool: EE_VAC_ARRAY · 5 tools in rack"
+  - button "Play"
+  - button "Replay"
+  - button "Step backward": Previous frame
+  - button "Step forward": Next frame
+  - slider "Scenario replay position": "317"
+  - text: Speed
+  - combobox "Speed":
+    - option "0.25×"
+    - option "0.5×"
+    - option "1×" [selected]
+    - option "2×"
+    - option "4×"
+  - paragraph: Original executions in this scene, in durable execution order. Replay sends no commands.
+  - group "Presentation camera":
+    - button "Operator"
+    - button "Overhead"
+    - button "Side inspection"
+    - button "Follow TCP"
+  - group: Camera, replay selection & illustration details
+  - group: Simulation boundaries
+  - group: Technical details Saved Blender snapshot
+  - text: Local simulation only. No external model account, GPU or real industrial hardware required.
+============= 1 failed, 687 passed, 1 warning in 916.26s (0:15:16) =============
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tools/dev.py", line 49, in <module>
+    main()
+    ~~~~^^
+  File "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tools/dev.py", line 30, in main
+    run("-m", "pytest", *rest)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tools/dev.py", line 9, in run
+    subprocess.run([sys.executable, *args], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/.venv/bin/python3', '-m', 'pytest', '--basetemp=/tmp/robotops-acceptance-2-fgah47qv/fixtures', '--junitxml=/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261005T121519/tests-2.xml', '--cov=robotops', '--cov=apps', '--cov-report=json:/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/docs/evidence/acceptance/20261005T121519/coverage-2.json', '--cov-report=term']' returned non-zero exit status 1.

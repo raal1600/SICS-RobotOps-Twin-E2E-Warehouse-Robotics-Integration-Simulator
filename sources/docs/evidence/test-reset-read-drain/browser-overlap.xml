@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="215.579" timestamp="2026-10-05T15:01:54.067513+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]" time="11.148" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]" time="65.945"><failure message="AssertionError: assert 0 == 1&#10; +  where 0 = CommandReceipt(schema_version='2.0', run_id='3a622201-30e2-4344-a2f6-cec0ab031c4b', correlation_id='db65b6ed-91e4-55a4...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count&#10; +    where CommandReceipt(schema_version='2.0', run_id='3a622201-30e2-4344-a2f6-cec0ab031c4b', correlation_id='db65b6ed-91e4-55a4...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('8d8026b9-e0c8-501b-94ff-6e4a0343f533')&#10; +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x000002AE492BA7B0&gt;.journal&#10; +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x000002AE492BA7B0&gt; = &lt;robotops.workflow.engine.Engine object at 0x000002AE47616EA0&gt;.runtime&#10; +          where &lt;robotops.workflow.engine.Engine object at 0x000002AE47616EA0&gt; = engine('original')&#10; +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x000002AE4941EE90&gt;.engine">server = ('http://127.0.0.1:65391', &lt;apps.api.test_sessions.TestRegistry object at 0x000002AE4941EE90&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:65391/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T130205963277/test_clear_r...l': 'http://127.0.0.1:65391/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:65391/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+&gt;       assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CommandReceipt(schema_version='2.0', run_id='3a622201-30e2-4344-a2f6-cec0ab031c4b', correlation_id='db65b6ed-91e4-55a4...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count
+E        +    where CommandReceipt(schema_version='2.0', run_id='3a622201-30e2-4344-a2f6-cec0ab031c4b', correlation_id='db65b6ed-91e4-55a4...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('8d8026b9-e0c8-501b-94ff-6e4a0343f533')
+E        +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x000002AE492BA7B0&gt;.journal
+E        +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x000002AE492BA7B0&gt; = &lt;robotops.workflow.engine.Engine object at 0x000002AE47616EA0&gt;.runtime
+E        +          where &lt;robotops.workflow.engine.Engine object at 0x000002AE47616EA0&gt; = engine('original')
+E        +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x000002AE4941EE90&gt;.engine
+
+tests\browser\test_investigation.py:390: AssertionError</failure></testcase><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-SyntheticRuntime]" time="12.177" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-BlenderRuntime]" time="124.902" /></testsuite></testsuites>

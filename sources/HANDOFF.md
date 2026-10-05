@@ -87,6 +87,10 @@ Preserve request identity, bounded cleanup and the catalog lock. Removing the
 active test leaves no active world and never promotes history; explicitly clearing
 an archive activates only its freshly reset world.
 Unknown/intervention outcomes are not resolved by deleting their test evidence.
+The UI must drain its outstanding view/snapshot reads before confirmed test
+management and remain busy through its final refresh. Do not remove the backend
+response-lifetime barrier to make deletion pass. A stalled read leaves data intact
+and permits explicit retry; it must not trigger a pick or automatic reconciliation.
 The original 110 MUSTs remain normative; prior acceptance is historical evidence
 for its exact source, not a pass for this lifecycle change.
 

@@ -2,6 +2,15 @@
 
 Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain normative.
 
+## Follow-up: management must wait for current view reads
+
+- [x] Preserve the failed final-source CI at 317d4a4 and the earlier accepted source.
+- [x] Drain JSON/snapshot response bodies before confirmed test management.
+- [x] Bound stalled-read waiting without a management request or automatic pick.
+- [x] Keep controls and polling serialized through final refresh; pass 146 UI checks.
+- [ ] Pass isolated real-browser and broader lifecycle verification on the correction.
+- [ ] Publish fresh full acceptance and final exact-source workflow/Pages attestation.
+
 ## Test deletion and same-test clearing correction (ADR 0013)
 
 - [x] Record clean baseline 4da22d7 and preserve its existing acceptance evidence.

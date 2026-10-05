@@ -88,6 +88,10 @@ requires its exclusive lock before the catalog transaction, so it cannot race
 file use. Live jobs, leases and maintenance prevent deletion. The workspace
 application factory opens the catalog first; a workspace marker prevents an
 empty catalog from recreating the deleted original world.
+The client first pauses polling and drains its own outstanding JSON and snapshot
+response bodies before confirmed management. Its five-second stalled-view wait
+sends no lifecycle request, leaving data intact for explicit retry. This client
+coordination does not remove server protection for other readers or running jobs.
 
 Only registered application-owned paths are removed. UUID world directories stay
 beneath `simulation-tests`; the original world's known database/artifact paths

@@ -41,8 +41,13 @@ independent of display refresh rate. The playback cursor still uses elapsed pres
 selected speed. This bounds CPU-renderer contention with Blender during a live
 pick; it does not change recording frames, render quality, execution deadlines or
 the conservative outcome of a real timeout. Incoming evidence and explicit
-scrub/step actions redraw immediately. Background world polling pauses while a test is being cleared or
-deleted, then resumes after the returned test/revision has been selected.
+scrub/step actions redraw immediately. Before confirmed test management,
+background polling pauses and outstanding JSON/snapshot response bodies finish.
+The snapshot is fetched before displaying a local blob URL so its file response
+participates in the same drain. A five-second stalled-view wait sends no management
+request and offers explicit retry. Polling and controls resume after the returned
+test/revision and its final refresh are applied. Other clients' active reads,
+downloads and running work still block destructive backend operations.
 
 An uncertain pick pauses the entire cell, including picks of different products.
 The Run button says **Next pick paused — reconcile first**, with a named-product

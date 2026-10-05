@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Test lifecycle correction accepted at audited implementation df45c93: all 118 MUSTs PASS, 688 tests twice, 139 UI checks, nine real-browser cases and eight Blender demos. Delete removes the test and frees its number; clear restores the same test for retry. CI, Windows launcher and publication verified; original evidence and mapping correction remain archived. Status: DONE.
+> **Implementation status, 2026-10-05:** Final-source CI found a replay-read/delete race: the first suite passed 688 tests; the second passed 687 with one failure. Prior acceptance at df45c93 is preserved. Client read draining and 146 passing UI checks now cover the race; fresh full acceptance is in progress. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -58,6 +58,8 @@ En animation kan vara begriplig utan att dess moment, kontaktkrafter eller ledha
 Tabellen beskriver den implementerade simulatoravgränsningen för revision 1.2. Sex verktyg och produktfamiljer verifierades i faktisk Blender vid den accepterade källrevisionen ca7798798f916c8130e1833cf16b4d4d3f10d546. Den historiska acceptansen är arkiverad under docs/evidence/test-lifecycle-baseline; ACCEPTANCE_REPORT.md anger status för senare ändringar. Verktygsbyte under samma journalförda kommando ändrar inte innebörden av effect_count: endast produktförflyttningar räknas. Arbetsområde och konservativ geometrisk kollisionskontroll är egna simulatorregler, inte certifierad robotbanplanering. Små källpositionsfel kan centreras inom en uttrycklig syntetisk grepptolerans; det är ingen modell av riktiga gripkrafter eller uppmätt robotnoggrannhet.
 
 Cellregistret och datahanteringen är simulatorns egen design, inte en kunds lagringspolicy. Bekräftad radering tar bort försökets katalogpost och värld/evidens; lediga nummer återanvänds. Bekräftad ”Clear test and retry” behåller numret och cellen men kasserar kördata och återställer startscenen. Bara anonyma begärandedigester behålls efter färdig radering för att stoppa gamla återförsök; ingen dold försökspost sparas. Tillfällig rensningsavsikt finns tills filhanteringen är klar. Funktionen lovar inte säker överskrivning av lagringsmediet och ger inget affärsbeslut. Navigering, replay och vanlig omstart raderar ingenting (ADR 0013).
+
+Gränssnittet inväntar sina egna pågående svar innan datahantering skickas. Fastnar en läsning lämnas data orörda och ett nytt försök kräver användarens handling. Detta ersätter inte serverns skydd mot radering under pågående arbete eller filåtkomst.
 
 ### 2.3 PLC, beräkning och drift
 

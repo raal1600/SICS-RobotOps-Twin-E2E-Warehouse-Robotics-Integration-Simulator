@@ -190,7 +190,8 @@ determinism. Thresholds and physics limitations remain explicit simulator rules.
 ## Cell selection and test-data lifecycle addendum (2026-10-04)
 
 ADR 0011 extends the documented UI/API lifecycle without adding or weakening
-criterion IDs: the existing total remains 110 MUST criteria. Its scoped tests
+criterion IDs: that revision retained 110 MUST criteria, before the eight
+investigation criteria below brought the total to 118. Its scoped tests
 join the evidence for SC-ARCH, SC-IDEM, SC-PERSIST, SC-DEMO, SC-TEST and SC-KB
 requirements as applicable. Prior accepted source `ca779879` does not attest the
 new behavior.

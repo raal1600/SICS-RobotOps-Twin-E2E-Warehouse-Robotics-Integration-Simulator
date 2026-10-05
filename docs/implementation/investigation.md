@@ -80,3 +80,10 @@ These functional checks do not replace first-time user testing or validate real
 hardware. The narrow viewport verifies layout/access, not a touch-device or
 screen-reader usability study. [ADR 0012](../adr/0012-evidence-driven-investigation.md)
 records the design decision and preserved boundaries.
+
+[Accepted source-specific results and screenshots](../evidence/investigation-ui-final/README.md)
+cover clean `7b9f0a6` on Windows and Linux. All 118 MUSTs pass for that source;
+the five browser cases run in each complete suite. The evidence keeps the earlier
+failed label assertion and its correction, rather than hiding it. The visual
+assessment remains an implementer review; independent novice, touch-device and
+screen-reader studies have not been performed.

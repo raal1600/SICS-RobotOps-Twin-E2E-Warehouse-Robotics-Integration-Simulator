@@ -1,0 +1,179 @@
+{
+  "result": "PASS",
+  "audited_at_utc": "2026-10-05T02:15:19.528558+00:00",
+  "source": {
+    "commit": "7b9f0a656cdd077106ab4b7ee7ade82335e11f26",
+    "dirty": false,
+    "source_sha256": "7c89fbe22e815d48c0013576cb610dacedaca1f4a40847b051805080813f5cfd"
+  },
+  "scope": "Persisted actual Blender demo evidence; read-only audit",
+  "demos": [
+    {
+      "scenario": "happy_path",
+      "initial_state": "COMPLETED",
+      "final_state": "COMPLETED",
+      "order_count": 1,
+      "job_count": 1,
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "replacement_commands": 0,
+      "assessments": [],
+      "snapshot": "demo-happy_path.json",
+      "sha256": "693d52ec1ed1f6ebdaf7f3a748d1209bd65e3d0bf64608f78f191e60a3f4e3d0"
+    },
+    {
+      "scenario": "lost_ack_after_effect",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "COMPLETED",
+      "order_count": 1,
+      "job_count": 1,
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "replacement_commands": 0,
+      "assessments": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "observation_id": "ed37bd51-848c-4a99-b1b0-e1163fe3c8de",
+          "verification_id": "62510edc-57c8-4b50-992f-228911270934",
+          "verdict": "VERIFIED_SUCCESS",
+          "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+          "effects": 1
+        }
+      ],
+      "snapshot": "demo-lost_ack_after_effect.json",
+      "sha256": "3e6da422572a32a9551064d82f8e2bd7d2c4c4d5d0cd0446e8c5b89a9633f54f"
+    },
+    {
+      "scenario": "lost_ack_before_effect",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "FAILED",
+      "order_count": 1,
+      "job_count": 1,
+      "command_count": 1,
+      "pick_effect_count": 0,
+      "replacement_commands": 0,
+      "assessments": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "observation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+          "verification_id": "9e4a1cf8-03d6-4445-9940-d87ea9823fc6",
+          "verdict": "VERIFIED_FAILURE",
+          "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT",
+          "effects": 0
+        }
+      ],
+      "snapshot": "demo-lost_ack_before_effect.json",
+      "sha256": "c455197983c5ae42c7ce3639ac08860a4e59881ac000557fbe2a80cdfd70893b"
+    },
+    {
+      "scenario": "ambiguous",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "REQUIRES_INTERVENTION",
+      "order_count": 1,
+      "job_count": 1,
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "replacement_commands": 0,
+      "assessments": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "observation_id": "6af2368c-303b-4ea2-aaaa-dfa1745120c2",
+          "verification_id": "45d68b14-8702-41ac-ac02-237aa1c937dc",
+          "verdict": "INCONCLUSIVE",
+          "reason": "CONTRADICTORY_OBSERVATION",
+          "effects": 1
+        }
+      ],
+      "snapshot": "demo-ambiguous.json",
+      "sha256": "1ed3a53b6ac5d85eb7121071d2d2d7ca36b161f53a2d59a724aa4b905f5d372a"
+    },
+    {
+      "scenario": "restart",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "COMPLETED",
+      "order_count": 1,
+      "job_count": 1,
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "replacement_commands": 0,
+      "assessments": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "observation_id": "f362cec4-01bb-4813-b0c6-61693c85c1a4",
+          "verification_id": "53a8cd36-c8b9-4eb9-857a-86668c75e50e",
+          "verdict": "VERIFIED_SUCCESS",
+          "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+          "effects": 1
+        }
+      ],
+      "snapshot": "demo-restart.json",
+      "sha256": "0e0a2536d1818e7e444fb965d0aebdd60547763f3cc1d888d449566c510990c5"
+    },
+    {
+      "scenario": "logical_estop",
+      "initial_state": "FAILED",
+      "final_state": "FAILED",
+      "order_count": 1,
+      "job_count": 1,
+      "command_count": 1,
+      "pick_effect_count": 0,
+      "replacement_commands": 0,
+      "assessments": [],
+      "snapshot": "demo-logical_estop.json",
+      "sha256": "d63ea57bc4bf9f566b56951fef77cb7550f337926d509f1de3664cefd0340808"
+    },
+    {
+      "scenario": "cell_fault",
+      "initial_state": "FAILED",
+      "final_state": "FAILED",
+      "order_count": 1,
+      "job_count": 1,
+      "command_count": 1,
+      "pick_effect_count": 0,
+      "replacement_commands": 0,
+      "assessments": [],
+      "snapshot": "demo-cell_fault.json",
+      "sha256": "6d2a7e53b05b907394a511dcd01e639fdbd8bef233bd6337efdef996f28b4803"
+    },
+    {
+      "scenario": "tool_showcase",
+      "initial_state": "COMPLETED",
+      "final_state": "COMPLETED",
+      "order_count": 1,
+      "job_count": 6,
+      "command_count": 6,
+      "pick_effect_count": 6,
+      "replacement_commands": 0,
+      "assessments": [],
+      "snapshot": "demo-tool_showcase.json",
+      "sha256": "bd1b124295e65bc4c4a4ac80f57baf0960381c4a72eee50ff4da0c02685cdc5c"
+    }
+  ],
+  "tool_showcase": [
+    [
+      "SKU-A",
+      "EE_VAC_SINGLE"
+    ],
+    [
+      "SKU-B",
+      "EE_VAC_ARRAY"
+    ],
+    [
+      "SKU-C",
+      "EE_ADAPTIVE_SOFT"
+    ],
+    [
+      "SKU-D",
+      "EE_PINCH_NARROW"
+    ],
+    [
+      "SKU-E",
+      "EE_PINCH_WIDE"
+    ],
+    [
+      "SKU-F",
+      "EE_SUPPORT_FORK"
+    ]
+  ],
+  "ground_truth_used_for_verification": false
+}

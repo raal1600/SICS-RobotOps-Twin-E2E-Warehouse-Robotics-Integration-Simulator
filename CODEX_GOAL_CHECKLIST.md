@@ -12,8 +12,15 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 - [x] Preserve test/job/replay context; fix slow-planning selection and snapshot request races.
 - [x] Exercise real browser normal/fault/evidence/download/return/archive journeys in both runtimes and viewports.
 - [x] Complete visual clarity assessment and archive screenshots/results with source provenance.
-- [ ] Pass all 118 MUSTs through repeated clean suites and exact-SHA CI/publication.
-- [ ] Finalize current acceptance, documentation drift scan and Pages/PDF verification.
+- [x] Pass all 118 MUSTs through repeated clean suites and exact-SHA CI/publication for audited source `7b9f0a6`.
+- [x] Finalize that source's acceptance, documentation drift scan and Pages/PDF verification.
+
+[Current acceptance](docs/evidence/acceptance/20261005T014537/manifest.json) and
+[independent CI/browser/publication evidence](docs/evidence/investigation-ui-final/README.md)
+retain the exact source and original artifacts. The first attempt's stale UI-label
+failure remains archived. An evidence/status successor receives its own complete
+CI and deployed build attestation under ADR 0002; this checklist does not relabel
+the 7b9 results as evidence for a later SHA.
 
 ## Accepted cell selection and test-data lifecycle revision
 

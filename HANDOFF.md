@@ -55,6 +55,17 @@ Install its pinned Chromium during setup/CI; do not skip missing browsers. Recor
 functional results separately from first-time usability uncertainty. No schema or
 business-state change is authorized merely to simplify this presentation work.
 
+The investigation implementation is accepted at clean source
+`7b9f0a656cdd077106ab4b7ee7ade82335e11f26`: all 118 MUSTs pass in
+[the refreshed acceptance manifest](docs/evidence/acceptance/20261005T014537/manifest.json).
+[Exact-source CI, browser, native-host and publication evidence](docs/evidence/investigation-ui-final/README.md)
+preserves the original records, including remote placeholders in CI's local-only
+manifest. Windows and Linux each passed 665 tests twice; the mandatory suite
+includes 132 Node checks and five Chromium cases. Preserve these source boundaries
+and the earlier failed-label attempt. Final evidence/status successors still
+need their own CI and Pages attestations under ADR 0002. Do not restart this work
+as an unimplemented proposal or describe automated checks as a novice-user study.
+
 ### Accepted cell selection and test-data lifecycle revision
 
 ADR 0011 adds registry-backed cell selection for a new test and explicit deletion

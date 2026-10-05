@@ -4,6 +4,19 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
+### Accepted investigation workflow revision (2026-10-05)
+
+Clean source `7b9f0a656cdd077106ab4b7ee7ade82335e11f26` passes all 118 MUSTs.
+[The refreshed report evidence](docs/evidence/acceptance/20261005T014537/manifest.json)
+and [CI/browser/publication archive](docs/evidence/investigation-ui-final/README.md)
+retain repeated suites, source hashes, screenshots, eight Blender demos and
+published source/link/PDF checks. The first stale-label failure remains archived.
+Publication 1.3 / 2026-10-05 synchronizes the new investigation diagram, operator
+flow and status across sources. The 30 research entries keep their earlier control
+dates and provenance categories; this UI work adds no manufacturer-performance claim.
+Every evidence/status successor is checked again by complete CI and the deployed
+build SHA. Earlier acceptance is never relabelled to cover a later commit.
+
 ### Cell-selection and test-data lifecycle revision (2026-10-04)
 
 ADR 0011 adds one currently selectable HKM cell and explicit test-data retention

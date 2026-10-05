@@ -1,0 +1,2978 @@
+{
+  "scenario": "lost_ack_before_effect",
+  "runtime": "blender",
+  "initial_state": "UNKNOWN_OUTCOME",
+  "final_state": "FAILED",
+  "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+  "pick_effect_count": 0,
+  "duplicate_physical_picks": 0,
+  "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+  "command_count": 1,
+  "no_replacement_commands": true,
+  "tool_showcase": [],
+  "evidence": [
+    {
+      "schema_version": "1.0",
+      "job": {
+        "schema_version": "1.0",
+        "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+        "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+        "causation_id": "ed1dbf2f-efcb-4a41-b381-c50061c7ef6e",
+        "timestamp": "2026-10-05T02:12:06.952838Z",
+        "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+        "order_id": "demo-order",
+        "line": {
+          "schema_version": "1.0",
+          "order_line_id": "demo-line-1",
+          "product_id": "product-SKU-A-01",
+          "source_id": "SRC_A",
+          "destination_id": "DESTINATION",
+          "quantity": 1
+        },
+        "state": "FAILED",
+        "revision": 8,
+        "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "action_plan_id": "2e64b189-64c6-5b12-9b74-e788890cb1f1"
+      },
+      "command": {
+        "schema_version": "2.0",
+        "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+        "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+        "causation_id": "7a367fbc-20a6-40cd-b4f4-d2584b35a5e7",
+        "timestamp": "2026-10-05T02:12:06.582823Z",
+        "action_plan_id": "2e64b189-64c6-5b12-9b74-e788890cb1f1",
+        "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+        "order_id": "demo-order",
+        "order_line_id": "demo-line-1",
+        "kind": "PICK_AND_PLACE",
+        "product_id": "product-SKU-A-01",
+        "source_id": "SRC_A",
+        "destination_id": "DESTINATION",
+        "target_pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.38,
+            0.9400000000000002,
+            0.20249999999999999
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+        "observation_id": "7a367fbc-20a6-40cd-b4f4-d2584b35a5e7",
+        "cell_generation": 0,
+        "brain_version": "deterministic-hkm-1",
+        "selected_tool_id": "EE_VAC_SINGLE",
+        "grasp_pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.08,
+            -0.68,
+            0.22499999999999998
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "trajectory": {
+          "schema_version": "2.0",
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "profile": "SAFE_PICK_PLACE_V1",
+          "required_tool_id": "EE_VAC_SINGLE",
+          "grasp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              1.08,
+              -0.68,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "target_tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.38,
+              0.9400000000000002,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "product_attachment_offset_m": [
+            0.0,
+            0.0,
+            -0.022499999999999992
+          ],
+          "waypoints": [
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.0,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "TOOL_CHANGE_NOT_REQUIRED",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.05,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.65,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "APPROACH",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.25,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.45,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "LIFT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 2.05,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "SAFE_TRANSFER",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.65,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.15,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.3,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.4,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RETRACT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.9,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 5.5,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            }
+          ],
+          "estimated_sim_duration_s": 5.5,
+          "route_index": 0,
+          "trajectory_planner_version": "synthetic-trajectory-1",
+          "collision_check_version": "synthetic-aabb-preflight-1",
+          "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+          "calibration_version": "hkm-cal-1",
+          "frame_tree_version": "hkm-frame-tree-1"
+        },
+        "tool_selection": {
+          "schema_version": "2.0",
+          "product_id": "product-SKU-A-01",
+          "sku": "SKU-A",
+          "selected_tool_id": "EE_VAC_SINGLE",
+          "candidate_tools": [
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_SINGLE",
+              "compatibility": "P",
+              "compatible": true,
+              "eligible": true,
+              "score": 135,
+              "reasons": [
+                "PREFERRED_FOR_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "ALREADY_MOUNTED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_ARRAY",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_NARROW",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_WIDE",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_ADAPTIVE_SOFT",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_SUPPORT_FORK",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            }
+          ],
+          "assessed_mass_kg": 0.4,
+          "tool_change_required": false,
+          "selection_version": "deterministic-tool-selector-1",
+          "product_catalog_version": "synthetic-products-1",
+          "tool_spec_version": "synthetic-tools-1"
+        },
+        "robot_profile_version": "hkm_inspired_v1",
+        "product_catalog_version": "synthetic-products-1",
+        "tool_spec_version": "synthetic-tools-1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "required_tool_id": "EE_VAC_SINGLE"
+      },
+      "journal": {
+        "schema_version": "2.0",
+        "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+        "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+        "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "timestamp": "2026-10-05T02:12:06.751905Z",
+        "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+        "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+        "status": "REJECTED",
+        "reason": "PROVEN_NOT_STARTED",
+        "effect_count": 0,
+        "payload_hash": "66fbb5f1dc954e3c896903c4cfe9d650a64319366edd9f790ee7dbbfdd0d276a",
+        "journal_durable": true,
+        "active_tool_id": "EE_VAC_SINGLE",
+        "tool_change_performed": false,
+        "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+        "runtime_profile_version": "hkm_inspired_v1"
+      },
+      "observations": [
+        {
+          "schema_version": "2.0",
+          "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "timestamp": "2026-10-05T02:12:06.582823Z",
+          "observation_id": "7a367fbc-20a6-40cd-b4f4-d2584b35a5e7",
+          "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+          "step": 0,
+          "captured_at": "2026-10-05T02:12:06.582823Z",
+          "model_version": "synthetic-observer-2",
+          "calibration_version": "hkm-cal-1",
+          "objects": [
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-A-01",
+              "location_id": "SRC_A",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.20249999999999999
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-B-01",
+              "location_id": "SRC_B",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.1,
+                  -1.24,
+                  0.22999999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-C-01",
+              "location_id": "SRC_C",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.85,
+                  -0.92,
+                  0.21999999999999997
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-D-01",
+              "location_id": "SRC_D",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.26,
+                  -0.08,
+                  0.295
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-E-01",
+              "location_id": "SRC_E",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.15,
+                  0.75,
+                  0.24
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-F-01",
+              "location_id": "SRC_F",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.14,
+                  0.75,
+                  0.25
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            }
+          ],
+          "covered_locations": [
+            "SRC_A",
+            "SRC_B",
+            "SRC_C",
+            "SRC_D",
+            "SRC_E",
+            "SRC_F",
+            "DESTINATION"
+          ],
+          "cell_generation": 0,
+          "robot_profile_version": "hkm_inspired_v1",
+          "frame_tree_version": "hkm-frame-tree-1",
+          "sensors": [
+            {
+              "schema_version": "2.0",
+              "sensor_id": "overhead-observation",
+              "frame_id": "camera_overhead",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  0.0,
+                  2.6
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            },
+            {
+              "schema_version": "2.0",
+              "sensor_id": "side-inspection",
+              "frame_id": "camera_side",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.85,
+                  -0.65,
+                  1.25
+                ],
+                "quaternion_xyzw": [
+                  0.4164435022802413,
+                  -0.295082221134753,
+                  -0.4971755075060524,
+                  0.7016536231751722
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            }
+          ],
+          "machine_telemetry": {
+            "schema_version": "2.0",
+            "source": "SIMULATED_CELL_TELEMETRY",
+            "tool_state": {
+              "schema_version": "2.0",
+              "active_tool_id": "EE_VAC_SINGLE",
+              "changer_state": "READY",
+              "rack_tool_ids": [
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "tool_state_version": "synthetic-tool-state-1"
+            },
+            "tcp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                -0.6,
+                1.02
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "captured_at": "2026-10-05T02:12:06.582823Z",
+            "cell_generation": 0
+          }
+        },
+        {
+          "schema_version": "2.0",
+          "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "timestamp": "2026-10-05T02:12:06.915125Z",
+          "observation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+          "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+          "step": 0,
+          "captured_at": "2026-10-05T02:12:06.915125Z",
+          "model_version": "synthetic-observer-2",
+          "calibration_version": "hkm-cal-1",
+          "objects": [
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-A-01",
+              "location_id": "SRC_A",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.20249999999999999
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-B-01",
+              "location_id": "SRC_B",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.1,
+                  -1.24,
+                  0.22999999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-C-01",
+              "location_id": "SRC_C",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.85,
+                  -0.92,
+                  0.21999999999999997
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-D-01",
+              "location_id": "SRC_D",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.26,
+                  -0.08,
+                  0.295
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-E-01",
+              "location_id": "SRC_E",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.15,
+                  0.75,
+                  0.24
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-F-01",
+              "location_id": "SRC_F",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.14,
+                  0.75,
+                  0.25
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            }
+          ],
+          "covered_locations": [
+            "SRC_A",
+            "SRC_B",
+            "SRC_C",
+            "SRC_D",
+            "SRC_E",
+            "SRC_F",
+            "DESTINATION"
+          ],
+          "cell_generation": 0,
+          "robot_profile_version": "hkm_inspired_v1",
+          "frame_tree_version": "hkm-frame-tree-1",
+          "sensors": [
+            {
+              "schema_version": "2.0",
+              "sensor_id": "overhead-observation",
+              "frame_id": "camera_overhead",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  0.0,
+                  2.6
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            },
+            {
+              "schema_version": "2.0",
+              "sensor_id": "side-inspection",
+              "frame_id": "camera_side",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.85,
+                  -0.65,
+                  1.25
+                ],
+                "quaternion_xyzw": [
+                  0.4164435022802413,
+                  -0.295082221134753,
+                  -0.4971755075060524,
+                  0.7016536231751722
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            }
+          ],
+          "machine_telemetry": {
+            "schema_version": "2.0",
+            "source": "SIMULATED_CELL_TELEMETRY",
+            "tool_state": {
+              "schema_version": "2.0",
+              "active_tool_id": "EE_VAC_SINGLE",
+              "changer_state": "READY",
+              "rack_tool_ids": [
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "tool_state_version": "synthetic-tool-state-1"
+            },
+            "tcp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                -0.6,
+                1.02
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "captured_at": "2026-10-05T02:12:06.915125Z",
+            "cell_generation": 0
+          }
+        }
+      ],
+      "verifications": [
+        {
+          "schema_version": "1.0",
+          "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+          "timestamp": "2026-10-05T02:12:06.939524Z",
+          "verification_id": "9e4a1cf8-03d6-4445-9940-d87ea9823fc6",
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "observation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+          "verdict": "VERIFIED_FAILURE",
+          "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+        }
+      ],
+      "reconciliations": [
+        {
+          "schema_version": "1.0",
+          "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+          "timestamp": "2026-10-05T02:12:06.940075Z",
+          "evidence_id": "f410ed73-bbcb-40eb-96be-c2e777a06945",
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command": {
+            "schema_version": "2.0",
+            "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "7a367fbc-20a6-40cd-b4f4-d2584b35a5e7",
+            "timestamp": "2026-10-05T02:12:06.582823Z",
+            "action_plan_id": "2e64b189-64c6-5b12-9b74-e788890cb1f1",
+            "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+            "order_id": "demo-order",
+            "order_line_id": "demo-line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-SKU-A-01",
+            "source_id": "SRC_A",
+            "destination_id": "DESTINATION",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.38,
+                0.9400000000000002,
+                0.20249999999999999
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+            "observation_id": "7a367fbc-20a6-40cd-b4f4-d2584b35a5e7",
+            "cell_generation": 0,
+            "brain_version": "deterministic-hkm-1",
+            "selected_tool_id": "EE_VAC_SINGLE",
+            "grasp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.08,
+                -0.68,
+                0.22499999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "trajectory": {
+              "schema_version": "2.0",
+              "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+              "profile": "SAFE_PICK_PLACE_V1",
+              "required_tool_id": "EE_VAC_SINGLE",
+              "grasp_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "target_tcp_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "product_attachment_offset_m": [
+                0.0,
+                0.0,
+                -0.022499999999999992
+              ],
+              "waypoints": [
+                {
+                  "schema_version": "2.0",
+                  "phase": "HOME",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.0,
+                      -0.6,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 0.0,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "TOOL_CHANGE_NOT_REQUIRED",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.0,
+                      -0.6,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 0.05,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "PRE_GRASP",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 0.65,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "APPROACH",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 1.25,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "GRASP",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 1.45,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "GRASP_CONFIRM",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 1.55,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "LIFT",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 2.05,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "SAFE_TRANSFER",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 3.55,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "PRE_PLACE",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 3.65,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "PLACE",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.15,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "RELEASE",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.3,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "RELEASE_CONFIRM",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.4,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "RETRACT",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.9,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "HOME",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.0,
+                      -0.6,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 5.5,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                }
+              ],
+              "estimated_sim_duration_s": 5.5,
+              "route_index": 0,
+              "trajectory_planner_version": "synthetic-trajectory-1",
+              "collision_check_version": "synthetic-aabb-preflight-1",
+              "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+              "calibration_version": "hkm-cal-1",
+              "frame_tree_version": "hkm-frame-tree-1"
+            },
+            "tool_selection": {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-A-01",
+              "sku": "SKU-A",
+              "selected_tool_id": "EE_VAC_SINGLE",
+              "candidate_tools": [
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_VAC_SINGLE",
+                  "compatibility": "P",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 135,
+                  "reasons": [
+                    "PREFERRED_FOR_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "ALREADY_MOUNTED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_VAC_ARRAY",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_PINCH_NARROW",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_PINCH_WIDE",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_ADAPTIVE_SOFT",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_SUPPORT_FORK",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                }
+              ],
+              "assessed_mass_kg": 0.4,
+              "tool_change_required": false,
+              "selection_version": "deterministic-tool-selector-1",
+              "product_catalog_version": "synthetic-products-1",
+              "tool_spec_version": "synthetic-tools-1"
+            },
+            "robot_profile_version": "hkm_inspired_v1",
+            "product_catalog_version": "synthetic-products-1",
+            "tool_spec_version": "synthetic-tools-1",
+            "frame_tree_version": "hkm-frame-tree-1",
+            "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "required_tool_id": "EE_VAC_SINGLE"
+          },
+          "receipt": {
+            "schema_version": "2.0",
+            "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "timestamp": "2026-10-05T02:12:06.751905Z",
+            "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+            "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+            "status": "REJECTED",
+            "reason": "PROVEN_NOT_STARTED",
+            "effect_count": 0,
+            "payload_hash": "66fbb5f1dc954e3c896903c4cfe9d650a64319366edd9f790ee7dbbfdd0d276a",
+            "journal_durable": true,
+            "active_tool_id": "EE_VAC_SINGLE",
+            "tool_change_performed": false,
+            "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+            "runtime_profile_version": "hkm_inspired_v1"
+          },
+          "observation": {
+            "schema_version": "2.0",
+            "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "timestamp": "2026-10-05T02:12:06.915125Z",
+            "observation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+            "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+            "step": 0,
+            "captured_at": "2026-10-05T02:12:06.915125Z",
+            "model_version": "synthetic-observer-2",
+            "calibration_version": "hkm-cal-1",
+            "objects": [
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-A-01",
+                "location_id": "SRC_A",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    0.20249999999999999
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-B-01",
+                "location_id": "SRC_B",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.1,
+                    -1.24,
+                    0.22999999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-C-01",
+                "location_id": "SRC_C",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.85,
+                    -0.92,
+                    0.21999999999999997
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-D-01",
+                "location_id": "SRC_D",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -1.26,
+                    -0.08,
+                    0.295
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-E-01",
+                "location_id": "SRC_E",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -1.15,
+                    0.75,
+                    0.24
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-F-01",
+                "location_id": "SRC_F",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.14,
+                    0.75,
+                    0.25
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              }
+            ],
+            "covered_locations": [
+              "SRC_A",
+              "SRC_B",
+              "SRC_C",
+              "SRC_D",
+              "SRC_E",
+              "SRC_F",
+              "DESTINATION"
+            ],
+            "cell_generation": 0,
+            "robot_profile_version": "hkm_inspired_v1",
+            "frame_tree_version": "hkm-frame-tree-1",
+            "sensors": [
+              {
+                "schema_version": "2.0",
+                "sensor_id": "overhead-observation",
+                "frame_id": "camera_overhead",
+                "calibration_version": "hkm-cal-1",
+                "camera_model_version": "synthetic-orthographic-1",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    0.0,
+                    2.6
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "presentation_only": false
+              },
+              {
+                "schema_version": "2.0",
+                "sensor_id": "side-inspection",
+                "frame_id": "camera_side",
+                "calibration_version": "hkm-cal-1",
+                "camera_model_version": "synthetic-orthographic-1",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -1.85,
+                    -0.65,
+                    1.25
+                  ],
+                  "quaternion_xyzw": [
+                    0.4164435022802413,
+                    -0.295082221134753,
+                    -0.4971755075060524,
+                    0.7016536231751722
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "presentation_only": false
+              }
+            ],
+            "machine_telemetry": {
+              "schema_version": "2.0",
+              "source": "SIMULATED_CELL_TELEMETRY",
+              "tool_state": {
+                "schema_version": "2.0",
+                "active_tool_id": "EE_VAC_SINGLE",
+                "changer_state": "READY",
+                "rack_tool_ids": [
+                  "EE_VAC_ARRAY",
+                  "EE_PINCH_NARROW",
+                  "EE_PINCH_WIDE",
+                  "EE_ADAPTIVE_SOFT",
+                  "EE_SUPPORT_FORK"
+                ],
+                "tool_state_version": "synthetic-tool-state-1"
+              },
+              "tcp_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "captured_at": "2026-10-05T02:12:06.915125Z",
+              "cell_generation": 0
+            }
+          },
+          "verification": {
+            "schema_version": "1.0",
+            "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+            "timestamp": "2026-10-05T02:12:06.939524Z",
+            "verification_id": "9e4a1cf8-03d6-4445-9940-d87ea9823fc6",
+            "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+            "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "observation_id": "0a8a4af6-a266-4624-965e-3b4a06266a67",
+            "verdict": "VERIFIED_FAILURE",
+            "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT"
+          }
+        }
+      ]
+    }
+  ],
+  "oracle_label": "SIMULATION GROUND TRUTH \u2014 NOT VERIFICATION EVIDENCE",
+  "order": {
+    "schema_version": "1.0",
+    "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+    "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+    "causation_id": "a25c8f02-be1a-47eb-84ee-8f7535f58a4b",
+    "timestamp": "2026-10-05T02:12:06.484372Z",
+    "order_id": "demo-order",
+    "lines": [
+      {
+        "schema_version": "1.0",
+        "order_line_id": "demo-line-1",
+        "product_id": "product-SKU-A-01",
+        "source_id": "SRC_A",
+        "destination_id": "DESTINATION",
+        "quantity": 1
+      }
+    ],
+    "job_ids": [
+      "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac"
+    ],
+    "status": "FAILED"
+  },
+  "timeline": [
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "demo-order",
+      "timestamp": "2026-10-05T02:12:06.484372Z",
+      "event_id": "a25c8f02-be1a-47eb-84ee-8f7535f58a4b",
+      "component": "api",
+      "event_type": "ORDER_RECEIVED",
+      "order_id": "demo-order",
+      "job_id": null,
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "ACCEPTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "a25c8f02-be1a-47eb-84ee-8f7535f58a4b",
+      "timestamp": "2026-10-05T02:12:06.484372Z",
+      "event_id": "f20c6922-93af-40ea-9462-54750297a904",
+      "component": "workflow",
+      "event_type": "JOB_RECEIVED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": "RECEIVED",
+      "reason": "ORDER_LINE_CREATED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f20c6922-93af-40ea-9462-54750297a904",
+      "timestamp": "2026-10-05T02:12:06.546167Z",
+      "event_id": "c6f5a390-5e3c-4aed-9575-aca05d0c709f",
+      "component": "faults",
+      "event_type": "FAULT_INJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "DROP_ACK_BEFORE_EFFECT",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "a9bb7d9a-f3de-4b42-a168-ea0b7d52328e"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "c6f5a390-5e3c-4aed-9575-aca05d0c709f",
+      "timestamp": "2026-10-05T02:12:06.556411Z",
+      "event_id": "d0f04e7a-9d15-4087-8e85-a3cd879f5b2b",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": "RECEIVED",
+      "state_after": "VALIDATED",
+      "reason": "ORDER_SCHEMA_VALID",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "d0f04e7a-9d15-4087-8e85-a3cd879f5b2b",
+      "timestamp": "2026-10-05T02:12:06.568806Z",
+      "event_id": "5bdb5d48-22ad-4a12-a125-cb13eedfc4c5",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": "VALIDATED",
+      "state_after": "PLANNING",
+      "reason": "BRAIN_REQUESTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "5bdb5d48-22ad-4a12-a125-cb13eedfc4c5",
+      "timestamp": "2026-10-05T02:12:06.597689Z",
+      "event_id": "e7cd5bf1-b206-41b4-8299-9de90389b1e4",
+      "component": "observation",
+      "event_type": "OBSERVATION_CAPTURED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "FRESH_SENSOR_MODEL",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "7a367fbc-20a6-40cd-b4f4-d2584b35a5e7"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "e7cd5bf1-b206-41b4-8299-9de90389b1e4",
+      "timestamp": "2026-10-05T02:12:06.640408Z",
+      "event_id": "acb066a1-cbd7-40a2-abb3-fbd2096fcb84",
+      "component": "validator",
+      "event_type": "PLAN_VALIDATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "SEMANTIC_CHECKS_PASSED",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "2e64b189-64c6-5b12-9b74-e788890cb1f1"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "acb066a1-cbd7-40a2-abb3-fbd2096fcb84",
+      "timestamp": "2026-10-05T02:12:06.653973Z",
+      "event_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "component": "validator",
+      "event_type": "COMMAND_INTENT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "VALIDATED_DURABLE_COMMAND",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "2e64b189-64c6-5b12-9b74-e788890cb1f1"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "timestamp": "2026-10-05T02:12:06.666014Z",
+      "event_id": "0534c33c-3603-4b23-8e4b-37233b477a0d",
+      "component": "brain",
+      "event_type": "GRASP_SELECTION_EVALUATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DETERMINISTIC_COMPATIBILITY_SCORE",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "2e64b189-64c6-5b12-9b74-e788890cb1f1"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "0534c33c-3603-4b23-8e4b-37233b477a0d",
+      "timestamp": "2026-10-05T02:12:06.677921Z",
+      "event_id": "c6189fd3-c92c-4c52-b8f7-b340afe8fee3",
+      "component": "planner",
+      "event_type": "TRAJECTORY_PLANNED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "CONSERVATIVE_SYNTHETIC_COLLISION_PREFLIGHT",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "2e64b189-64c6-5b12-9b74-e788890cb1f1"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "c6189fd3-c92c-4c52-b8f7-b340afe8fee3",
+      "timestamp": "2026-10-05T02:12:06.687947Z",
+      "event_id": "73a24ee7-67c7-4930-8c20-993c96188ff3",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "PLANNING",
+      "state_after": "READY_TO_EXECUTE",
+      "reason": "PLAN_PERSISTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "73a24ee7-67c7-4930-8c20-993c96188ff3",
+      "timestamp": "2026-10-05T02:12:06.702203Z",
+      "event_id": "3479d449-c029-4e34-91a2-8aa84046d651",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "EXECUTING",
+      "reason": "DISPATCH_INTENT",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "3479d449-c029-4e34-91a2-8aa84046d651",
+      "timestamp": "2026-10-05T02:12:06.717665Z",
+      "event_id": "b66cfa85-57f2-40d2-aeb6-d1158ed8d70a",
+      "component": "gateway",
+      "event_type": "COMMAND_DISPATCHED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "ORIGINAL_COMMAND_IDENTITY",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "b66cfa85-57f2-40d2-aeb6-d1158ed8d70a",
+      "timestamp": "2026-10-05T02:12:06.764813Z",
+      "event_id": "dd97a307-c3f7-4377-ad5d-b1e61e75384a",
+      "component": "gateway",
+      "event_type": "COMMAND_STATUS_UNKNOWN",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "CommunicationTimeout",
+      "duration_ms": 34.96350000204984,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "timestamp": "2026-10-05T02:12:06.741738Z",
+      "event_id": "486ef444-0ee6-4048-b1c4-3b251e308728",
+      "component": "runtime",
+      "event_type": "COMMAND_CREATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DURABLE_INTENT",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "486ef444-0ee6-4048-b1c4-3b251e308728",
+      "timestamp": "2026-10-05T02:12:06.742040Z",
+      "event_id": "ac71f77d-0656-405c-9e0c-6ffb4c2ce613",
+      "component": "runtime",
+      "event_type": "COMMAND_DISPATCHED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DELIVERY",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "ac71f77d-0656-405c-9e0c-6ffb4c2ce613",
+      "timestamp": "2026-10-05T02:12:06.742121Z",
+      "event_id": "7559f6a0-f0a5-4a05-a79a-49e1739d87d8",
+      "component": "runtime",
+      "event_type": "FAULT_INJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DROP_ACK_BEFORE_EFFECT",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "7559f6a0-f0a5-4a05-a79a-49e1739d87d8",
+      "timestamp": "2026-10-05T02:12:06.752404Z",
+      "event_id": "d2632aa9-e9b1-4ed5-94ae-b4b865c96558",
+      "component": "runtime",
+      "event_type": "COMMAND_REJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "PROVEN_NOT_STARTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "d2632aa9-e9b1-4ed5-94ae-b4b865c96558",
+      "timestamp": "2026-10-05T02:12:06.829798Z",
+      "event_id": "208511d4-e2e6-4b51-863c-4e7ca0b9b6b4",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "EXECUTING",
+      "state_after": "UNKNOWN_OUTCOME",
+      "reason": "COMMUNICATION_UNCERTAIN",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "208511d4-e2e6-4b51-863c-4e7ca0b9b6b4",
+      "timestamp": "2026-10-05T02:12:06.846483Z",
+      "event_id": "c35fc378-7fe5-4f45-8d55-55ceb4bed345",
+      "component": "workflow",
+      "event_type": "PIPELINE_LATENCY",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "RUN_FINISHED",
+      "duration_ms": 331.4547999907518,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "c35fc378-7fe5-4f45-8d55-55ceb4bed345",
+      "timestamp": "2026-10-05T02:12:06.894640Z",
+      "event_id": "5422e44b-70b8-47c3-94a3-c1fd47018b9e",
+      "component": "gateway",
+      "event_type": "JOURNAL_QUERIED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "ORIGINAL_COMMAND_IDENTITY",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "5422e44b-70b8-47c3-94a3-c1fd47018b9e",
+      "timestamp": "2026-10-05T02:12:06.929715Z",
+      "event_id": "8e5a7d10-051e-4125-8d8e-7da2d90b4f36",
+      "component": "observation",
+      "event_type": "OBSERVATION_CAPTURED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "FRESH_SENSOR_MODEL",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "0a8a4af6-a266-4624-965e-3b4a06266a67"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "8e5a7d10-051e-4125-8d8e-7da2d90b4f36",
+      "timestamp": "2026-10-05T02:12:06.940169Z",
+      "event_id": "02bbaf04-07c3-4f13-b4cd-c1e6a848b308",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "UNKNOWN_OUTCOME",
+      "state_after": "RECONCILING",
+      "reason": "EVIDENCE_COLLECTED",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "f410ed73-bbcb-40eb-96be-c2e777a06945"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "02bbaf04-07c3-4f13-b4cd-c1e6a848b308",
+      "timestamp": "2026-10-05T02:12:06.952838Z",
+      "event_id": "ed1dbf2f-efcb-4a41-b381-c50061c7ef6e",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "RECONCILING",
+      "state_after": "FAILED",
+      "reason": "JOURNAL_AND_FRESH_SOURCE_PROVE_NO_EFFECT",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "f410ed73-bbcb-40eb-96be-c2e777a06945"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "ed1dbf2f-efcb-4a41-b381-c50061c7ef6e",
+      "timestamp": "2026-10-05T02:12:06.966815Z",
+      "event_id": "869af804-3996-4b05-8fad-50a7c6baf45e",
+      "component": "reconciliation",
+      "event_type": "RECONCILIATION_RESULT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "VERIFIED_FAILURE",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "f410ed73-bbcb-40eb-96be-c2e777a06945"
+      ]
+    }
+  ],
+  "controller_events": [
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "timestamp": "2026-10-05T02:12:06.741738Z",
+      "event_id": "486ef444-0ee6-4048-b1c4-3b251e308728",
+      "component": "runtime",
+      "event_type": "COMMAND_CREATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DURABLE_INTENT",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "486ef444-0ee6-4048-b1c4-3b251e308728",
+      "timestamp": "2026-10-05T02:12:06.742040Z",
+      "event_id": "ac71f77d-0656-405c-9e0c-6ffb4c2ce613",
+      "component": "runtime",
+      "event_type": "COMMAND_DISPATCHED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DELIVERY",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "ac71f77d-0656-405c-9e0c-6ffb4c2ce613",
+      "timestamp": "2026-10-05T02:12:06.742121Z",
+      "event_id": "7559f6a0-f0a5-4a05-a79a-49e1739d87d8",
+      "component": "runtime",
+      "event_type": "FAULT_INJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DROP_ACK_BEFORE_EFFECT",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "c4f6711e-7918-4f9d-a84e-cc892929b2ad",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "7559f6a0-f0a5-4a05-a79a-49e1739d87d8",
+      "timestamp": "2026-10-05T02:12:06.752404Z",
+      "event_id": "d2632aa9-e9b1-4ed5-94ae-b4b865c96558",
+      "component": "runtime",
+      "event_type": "COMMAND_REJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "PROVEN_NOT_STARTED",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+      "step": 0
+    }
+  ],
+  "oracle_world": {
+    "schema_version": "2.0",
+    "run_id": "8567e90f-ee27-4a1a-820f-4ff74f3c7fbb",
+    "correlation_id": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+    "causation_id": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+    "timestamp": "2026-10-05T02:12:06.423218Z",
+    "scene_epoch": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+    "step": 0,
+    "objects": [
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-A-01",
+          "sku": "SKU-A"
+        },
+        "location_id": "SRC_A",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.08,
+            -0.68,
+            0.20249999999999999
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-B-01",
+          "sku": "SKU-B"
+        },
+        "location_id": "SRC_B",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.1,
+            -1.24,
+            0.22999999999999998
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-C-01",
+          "sku": "SKU-C"
+        },
+        "location_id": "SRC_C",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.85,
+            -0.92,
+            0.21999999999999997
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-D-01",
+          "sku": "SKU-D"
+        },
+        "location_id": "SRC_D",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.26,
+            -0.08,
+            0.295
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-E-01",
+          "sku": "SKU-E"
+        },
+        "location_id": "SRC_E",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.15,
+            0.75,
+            0.24
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-F-01",
+          "sku": "SKU-F"
+        },
+        "location_id": "SRC_F",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.14,
+            0.75,
+            0.25
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      }
+    ],
+    "locations": [
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_A",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.08,
+            -0.68,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_B",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.1,
+            -1.24,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_C",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.85,
+            -0.92,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_D",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.26,
+            -0.08,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_E",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.15,
+            0.75,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_F",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.14,
+            0.75,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "DESTINATION",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.0,
+            1.12,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      }
+    ],
+    "cell": {
+      "schema_version": "1.0",
+      "run_id": "8567e90f-ee27-4a1a-820f-4ff74f3c7fbb",
+      "correlation_id": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+      "causation_id": "b3ea9a13-a066-47bf-93ae-2d7935957d27",
+      "timestamp": "2026-10-05T02:12:06.423218Z",
+      "cell_id": "cell-1",
+      "mode": "READY",
+      "generation": 0,
+      "reason": "INITIALIZED"
+    },
+    "robot_profile_version": "hkm_inspired_v1",
+    "product_catalog_version": "synthetic-products-1",
+    "tool_spec_version": "synthetic-tools-1",
+    "frame_tree_version": "hkm-frame-tree-1",
+    "robot_state": {
+      "schema_version": "2.0",
+      "tcp_pose": {
+        "schema_version": "1.0",
+        "position": [
+          0.0,
+          -0.6,
+          1.02
+        ],
+        "quaternion_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "active_tool_id": "EE_VAC_SINGLE",
+      "motion_phase": "HOME",
+      "robot_profile_version": "hkm_inspired_v1",
+      "kinematic_model_version": "HKM_INSPIRED_VISUAL_KINEMATICS_V1"
+    },
+    "tool_state": {
+      "schema_version": "2.0",
+      "active_tool_id": "EE_VAC_SINGLE",
+      "changer_state": "READY",
+      "rack_tool_ids": [
+        "EE_VAC_ARRAY",
+        "EE_PINCH_NARROW",
+        "EE_PINCH_WIDE",
+        "EE_ADAPTIVE_SOFT",
+        "EE_SUPPORT_FORK"
+      ],
+      "tool_state_version": "synthetic-tool-state-1"
+    }
+  }
+}

@@ -537,6 +537,20 @@ class GuidedEngine:
         if stage == 16:
             if not context.get("physical_authorized"):
                 raise Conflict("EXPLICIT_PHYSICAL_AUTHORIZATION_REQUIRED")
+            if self.lab:
+                # Read readiness before durable dispatch intent. A reboot found
+                # here cannot have invoked this attempt's runtime callback.
+                # BeginExecution still checks its boot atomically; a restart
+                # racing after this read remains an uncertain dispatch instead.
+                readiness = dict(self.lab.status(command.command_id))
+                context["execution_preflight"] = readiness
+                if (
+                    readiness.get("state") == "READY"
+                    and readiness.get("command_id") == command.command_id
+                    and readiness.get("payload_hash") == digest(command)
+                    and readiness.get("boot_id") != readiness.get("validated_boot_id")
+                ):
+                    raise Conflict("PLC_BOOT_CHANGED_RECHECK_PRECONDITIONS")
             claim = self._claim(session)
             try:
 
@@ -755,6 +769,23 @@ class GuidedEngine:
         if stage == 19 and after in {"UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION"}:
             status = "UNKNOWN_OUTCOME"
         next_stage = stage + 1 if step_status == "COMPLETED" else stage
+        if (
+            stage == 16
+            and result.get("error") == "PLC_BOOT_CHANGED_RECHECK_PRECONDITIONS"
+            and job is not None
+            and job.state == JobState.READY_TO_EXECUTE
+        ):
+            next_stage = 14
+            context["physical_authorized"] = False
+            result.update(
+                {
+                    "dispatch_intent_committed": False,
+                    "physical_resend": False,
+                    "retry_permitted": True,
+                    "controller_status": context["execution_preflight"],
+                    "next_action": "Recheck PLC preconditions, then renew explicit physical authorization.",
+                }
+            )
         if stage in {6, 7} and result.get("error") == "STALE_OR_FUTURE_OBSERVATION":
             # A human may spend longer than the sensor freshness window reviewing
             # a proposal. Require a new observed/planned/validated sequence.
@@ -920,12 +951,18 @@ class GuidedEngine:
         if receipt is not None:
             raise Conflict("DISPATCH_STATE_JOURNAL_CONFLICT_REQUIRES_INTERVENTION")
         context = {**session.context, "physical_authorized": False}
+        next_stage = 14 if self.lab else 15
+        next_action = (
+            "Recheck PLC preconditions, then renew explicit physical authorization."
+            if self.lab
+            else "Renew explicit physical authorization before any dispatch."
+        )
         result = {
             "command_id": session.command_id,
             "dispatch_intent_committed": False,
             "recorded_controller_result": None,
             "physical_resend": False,
-            "next_action": "Renew explicit physical authorization before any dispatch.",
+            "next_action": next_action,
         }
         step = ExecutionStep(
             step_id=stable_id(session.session_id, f"recovery:{session.revision}"),
@@ -939,7 +976,7 @@ class GuidedEngine:
             sequence=len(session.steps) + 1,
             revision=session.revision,
             title="Interrupted execution recovered before dispatch",
-            summary="No dispatch intent or controller result; renewed physical authorization required.",
+            summary="No dispatch intent or controller result; " + next_action,
             status="RECOVERED_NO_DISPATCH",
             component="recovery",
             protocol="SQL + controller journal",
@@ -948,7 +985,7 @@ class GuidedEngine:
             wire=result,
             state_before=JobState.READY_TO_EXECUTE,
             state_after=JobState.READY_TO_EXECUTE,
-            persistence_effect="Session returned to the mandatory physical gate; no command sent.",
+            persistence_effect="Session returned to pre-dispatch checks/consent; no command sent.",
             source=SourceReference(
                 path="robotops/integration/engine.py",
                 symbol="GuidedEngine._recover_unstarted_dispatch",
@@ -971,7 +1008,7 @@ class GuidedEngine:
             update={
                 "revision": session.revision + 1,
                 "status": "WAITING_AUTHORIZATION",
-                "current_stage": 15,
+                "current_stage": next_stage,
                 "context": context,
                 "steps": (*session.steps, step),
                 "updated_at": utc_now(),

@@ -6,6 +6,7 @@ import logging
 import os
 from urllib.parse import urlsplit
 
+import httpx
 import psycopg
 import uvicorn
 
@@ -34,6 +35,11 @@ def main() -> None:
     elif arguments.service == "health":
         print(OPCClient(config.opcua_url).call()["state"])
     elif arguments.service == "edge-health":
+        try:
+            response = httpx.get(config.edge_url + "/health", timeout=3)
+            response.raise_for_status()
+        except httpx.HTTPError:
+            raise SystemExit("EDGE_HTTP_UNAVAILABLE") from None
         with psycopg.connect(config.postgres_dsn, connect_timeout=5) as db:
             row = db.execute(
                 "SELECT 1 FROM lab_edge_health WHERE queue=%s "

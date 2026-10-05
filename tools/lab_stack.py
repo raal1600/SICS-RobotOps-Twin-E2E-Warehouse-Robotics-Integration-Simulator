@@ -122,6 +122,11 @@ class LabStack:
                 failures["broker_consumer"] = "HEARTBEAT_OLDER_THAN_15_SECONDS"
         except psycopg.Error as exc:
             failures["postgres"] = type(exc).__name__
+        try:
+            opc = OPCClient(self.config.opcua_url, 3).call()
+            self.service_process_ids["plc"] = int(opc["server_process_id"])
+        except (OSError, ValueError, KeyError) as exc:
+            failures["plc"] = type(exc).__name__
         self.health_failures = failures
         return not failures
 
@@ -187,12 +192,7 @@ class LabStack:
         try:
             while time.monotonic() < deadline:
                 if self.healthy():
-                    try:
-                        opc = OPCClient(self.config.opcua_url, 3).call()
-                        self.service_process_ids["plc"] = int(opc["server_process_id"])
-                        return self
-                    except OSError:
-                        pass
+                    return self
                 time.sleep(0.1)
             raise TimeoutError("LAB_STARTUP_TIMEOUT_CHECK_SCOPED_LOGS")
         except BaseException:

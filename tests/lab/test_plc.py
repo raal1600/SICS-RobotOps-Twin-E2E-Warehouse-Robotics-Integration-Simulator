@@ -49,6 +49,28 @@ def test_journal_rejects_payload_and_result_conflicts(tmp_path, lab_command):
         journal.acknowledge(command.command_id, 2)
 
 
+@pytest.mark.parametrize("process_restart", [False, True])
+def test_restart_invalidates_readiness_until_fresh_checks(tmp_path, lab_command, process_restart):
+    command, runtime = lab_command
+    path = tmp_path / "journal.db"
+    journal = PLCJournal(path)
+    journal.submit(command.model_dump(mode="json"))
+    checked = journal.preconditions(command.command_id, runtime.world().model_dump(mode="json"))
+    assert checked["validated_boot_id"] == journal.boot_id
+    if process_restart:
+        journal = PLCJournal(path)
+    else:
+        journal.restart()
+    with pytest.raises(Conflict, match="BOOT_CHANGED_RECHECK"):
+        journal.begin(command.command_id)
+    assert runtime.world().step == 0
+    fresh = journal.preconditions(command.command_id, runtime.world().model_dump(mode="json"))
+    assert fresh["validated_boot_id"] == journal.boot_id != checked["validated_boot_id"]
+    assert journal.begin(command.command_id)["execute"]
+    journal.restart()
+    assert not journal.begin(command.command_id)["execute"]
+
+
 def test_uncertain_controller_checkpoint_can_be_reconciled_to_immutable_final(
     tmp_path, lab_command
 ):
@@ -95,8 +117,14 @@ def test_real_opcua_browse_subscription_acceptance_gate_and_result(running_plc, 
         "CheckPreconditions", command.command_id, runtime.world().model_dump_json()
     )
     assert checked["state"] == "READY"
+    client.call("RestartController")
+    with pytest.raises(UaStatusCodeError):
+        client.call("BeginExecution", command.command_id)
+    assert runtime.world().step == 0
+    client.call("CheckPreconditions", command.command_id, runtime.world().model_dump_json())
     claim = client.call("BeginExecution", command.command_id)
     assert claim["execute"]
+    assert claim["payload_hash"] == checked["payload_hash"]
     receipt = runtime.apply(command)
     result = client.call("ReportResult", command.command_id, receipt.model_dump_json())
     assert result["result"]["effect_count"] == 1

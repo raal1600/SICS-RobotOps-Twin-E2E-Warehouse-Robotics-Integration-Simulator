@@ -180,6 +180,9 @@ EXECUTING and the workflow exposes UNKNOWN_OUTCOME. It never blindly calls the p
 again. Explicit reconciliation queries the **original runtime command journal**
 and fresh observation, then backfills `ReportResult`; it does not issue a new ID.
 Missing evidence remains uncertain. Runtime operational checks run again at effect.
+Readiness records the BootId that passed preconditions. A logical or process restart
+invalidates that readiness until fresh checks pass under the new boot; an existing
+execution claim remains retained and can never be renewed by revalidation.
 
 An interrupted authorization remains `EXECUTING_STAGE`. Explicit reconciliation
 cannot take over while the original bounded operation could still be running: it

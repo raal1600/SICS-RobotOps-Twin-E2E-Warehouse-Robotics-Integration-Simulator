@@ -14,7 +14,7 @@ The physical controller interface remains simulated: after the edge obtains the 
 
 Verified robot outcome, WMS acknowledgement and ERP completion are separate facts. `Store._order` projects terminal guided physical outcomes as `RECONCILING` until `IntegrationStore.complete_business` atomically commits ERP outcome, order marker and audit event after validating durable stage-20 acknowledgements for every order line. Pure planning rejection with no command remains terminal `FAILED`; there is no physical outcome to acknowledge.
 
-Interrupted nonphysical stages resume with the original identities after the operation budget expires. Interrupted physical stages query the original command and never resend motion. Proven absent dispatch intent returns to the physical gate for renewed authorization. A human pause that makes the pre-observation stale returns to fresh observation/planning/validation rather than weakening freshness checks.
+Interrupted nonphysical stages resume with the original identities after the operation budget expires. Interrupted physical stages query the original command and never resend motion. Proven absent dispatch intent returns to PLC preconditions in lab mode and then the physical gate for renewed authorization. Stage 16 reads the original PLC identity/readiness before committing dispatch intent: a changed boot invalidates readiness, clears physical consent and returns explicitly to stage 14, then stage 15. `BeginExecution` also fences the boot atomically. A restart racing after the preflight read and committed dispatch intent stays uncertain and requires reconciliation/intervention; it never triggers automatic resend. A human pause that makes the pre-observation stale returns to fresh observation/planning/validation rather than weakening freshness checks.
 
 ## Executing stage map
 
@@ -37,7 +37,7 @@ Every row is implemented. Local profiling tests check happy/lost-ACK paths. `tes
 | 13 SubmitJob gate | `LabBridge.submit` checks durable inbox hash; edge OPC method -> `PLCJournal.submit`; acceptance without physical effect |
 | 14 Preconditions | `SyntheticRuntime.rejection_reason`; lab `LabBridge.preconditions` -> `CheckPreconditions`; actual scene/mode/generation/tool/TCP checks, not certified safety |
 | 15 Physical gate | `_execute` persists `PHYSICAL_AUTHORIZATION` binding command/hash; mandatory explicit consent |
-| 16 Execution | `Engine.stage_dispatch`; `LabBridge.authorize_execute` -> `EdgeRPC.execute`, durable PLC claim, existing runtime callback, retained edge subscription; interface simulated |
+| 16 Execution | Read-only original PLC boot/readiness preflight before `Engine.stage_dispatch`; `LabBridge.authorize_execute` -> `EdgeRPC.execute`, atomic current-boot PLC claim, existing runtime callback, retained edge subscription; interface simulated |
 | 17 Result | `RobotGateway.query`; lab `LabBridge.status` -> edge OPC `GetJobStatus`; original journal/result sequence |
 | 18 Post-observation | `Engine._observe`; new persisted sensor observation after effect |
 | 19 Verification | `Verifier.verify`, persisted verdict; interrupted committed result uses `Store.records_for_job`, reflected in source metadata |
@@ -100,7 +100,7 @@ Unchecked means final verification is outstanding, not that mapped code is absen
 - [x] **FAIL-01:** ACK lost before effect. Guided original-identity test includes before-effect fault, zero-effect evidence and recovery; passed.
 - [x] **FAIL-02:** ACK lost after effect without duplicate motion. Guided original-identity and interrupted-physical after-effect cases passed; live browser evidence remains final-loop work.
 - [ ] **FAIL-03:** Duplicate/redelivery effect count one. Local journal/authorization checks passed; actual distributed/guided-lab duplicate suite awaits final updated edge run.
-- [ ] **FAIL-04:** Network interruption/restart deterministic. `EdgeRPC` rejects unavailable edge without callback; broker/OPC failures retain identity; `test_distributed.py`, `test_plc_process_restart.py`. UI injection honestly simulated; actual service/socket cases await final result.
+- [ ] **FAIL-04:** Network interruption/restart deterministic. `EdgeRPC` rejects unavailable edge without callback; broker/OPC failures retain identity; `test_distributed.py`, `test_plc_process_restart.py`. `test_guided_boot_recovery.py` passed three actual lab cases: changed boot before dispatch renews checks/consent; racing restart after intent stays uncertain/no resend; interrupted no-intent dispatch returns to checks. UI injection honestly simulated; broader final service/socket suite still required.
 - [x] **FAIL-05:** Inconclusive observation prevents false success. Guided stale/missing/verifier and human-wait reobserve/replan regression passed; no relaxed freshness window.
 - [x] **FAIL-06:** WMS outage retries business only. `test_guided_business.py` proves RECONCILING through outage/ACK, stage21 completion, effect one; multi-line ACK and atomic ERP rollback tests passed.
 - [ ] **FAIL-07:** UNKNOWN_OUTCOME visible/explainable. Backend traces passed; final browser uncertainty/recovery UI tests pending.

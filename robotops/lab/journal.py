@@ -33,6 +33,10 @@ class PLCJournal:
                     command_id TEXT NOT NULL, sequence INTEGER NOT NULL, receipt TEXT NOT NULL,
                     PRIMARY KEY(command_id,sequence));
             """)
+            columns = {row["name"] for row in db.execute("PRAGMA table_info(plc_commands)")}
+            if "validated_boot_id" not in columns:
+                # Existing retained commands stay fenced until fresh validation.
+                db.execute("ALTER TABLE plc_commands ADD COLUMN validated_boot_id TEXT")
 
     @contextmanager
     def connect(self) -> Iterator[sqlite3.Connection]:
@@ -55,6 +59,7 @@ class PLCJournal:
             "result": json.loads(row["result"]) if row["result"] else None,
             "acknowledged": bool(row["acknowledged"]),
             "accepted_boot_id": row["boot_id"],
+            "validated_boot_id": row["validated_boot_id"],
         }
 
     def submit(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -116,9 +121,10 @@ class PLCJournal:
             reason = SyntheticRuntime.rejection_reason(world, command, None)
             if reason:
                 raise Conflict(reason)
-            if row["state"] == "ACCEPTED":
+            if row["state"] in {"ACCEPTED", "READY"}:
                 db.execute(
-                    "UPDATE plc_commands SET state='READY' WHERE command_id=?", (command_id,)
+                    "UPDATE plc_commands SET state='READY',validated_boot_id=? WHERE command_id=?",
+                    (self.boot_id, command_id),
                 )
         return {
             **self.status(command_id),
@@ -136,6 +142,7 @@ class PLCJournal:
                 "tool",
                 "trajectory",
                 "payload_hash",
+                "controller_boot",
             ],
             "rechecked_by_runtime_at_effect": True,
         }
@@ -156,6 +163,8 @@ class PLCJournal:
                     "execute": False,
                     "reason": "QUERY_ORIGINAL_JOURNAL_DO_NOT_REPEAT",
                 }
+            if row["validated_boot_id"] != self.boot_id:
+                raise Conflict("PLC_BOOT_CHANGED_RECHECK_PRECONDITIONS")
             # Never clear or recycle this permit, including after a restart.
             permit = new_id()
             db.execute(
@@ -163,7 +172,8 @@ class PLCJournal:
                 (permit, command_id),
             )
         return {
-            "command_id": command_id,
+            **self._status(row),
+            "boot_id": self.boot_id,
             "state": "EXECUTING",
             "execute": True,
             "permit": permit,

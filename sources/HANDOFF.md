@@ -124,6 +124,10 @@ explicit conservative SIMULATOR_DESIGN choices; they do not require ordinary
 implementation clarification. Maintain the bounded typed Blender runtime and
 the WorldState -> ObservationModel -> WorldObservation -> Verifier boundary.
 No MCP/natural-language/generated code is permitted in runtime commands.
+The fixed Windows invocation includes Blender's `--qos high` CPU option and
+reports `cpu_qos` in its runtime manifest. It is process-local, not system policy.
+Keep this scheduling choice separate from synthetic motion timing; preserve
+the execution deadline and conservative timeout semantics (source S31).
 
 The procedural cell, six-product/tool catalogue, deterministic selection,
 segmented preflight, visible tool preparation and quaternion replay are now

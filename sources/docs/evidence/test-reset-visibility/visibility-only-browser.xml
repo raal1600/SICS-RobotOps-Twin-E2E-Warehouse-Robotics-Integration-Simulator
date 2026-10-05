@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="10" time="423.819" timestamp="2026-10-05T15:42:23.790382+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.blender.test_hkm_runtime" name="test_hkm_visibility_changes_survive_saved_animation" time="4.494" /><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[synthetic-desktop]" time="27.601" /><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[synthetic-compact]" time="18.936" /><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[blender-desktop]" time="65.746"><failure message="AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'&#10;  &#10;  - COMPLETED&#10;  + UNKNOWN_OUTCOME">server = ('http://127.0.0.1:61047', &lt;apps.api.test_sessions.TestRegistry object at 0x00000139F3E6A350&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:61047/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T134315660009/test_run_not...l': 'http://127.0.0.1:61047/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:61047/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize(
+        "viewport",
+        [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}],
+        ids=["desktop", "compact"],
+    )
+    @pytest.mark.parametrize(
+        "server",
+        [SyntheticRuntime, pytest.param(BlenderRuntime, marks=pytest.mark.blender)],
+        indirect=True,
+        ids=["synthetic", "blender"],
+    )
+    def test_run_notice_investigate_and_return(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        screenshot(page, directory, "01-ready")
+        happy = choose_pick(page)
+&gt;       assert happy["state"] == "COMPLETED"
+E       AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'
+E         
+E         - COMPLETED
+E         + UNKNOWN_OUTCOME
+
+tests\browser\test_investigation.py:174: AssertionError</failure></testcase><testcase classname="tests.browser.test_investigation" name="test_run_notice_investigate_and_return[blender-compact]" time="174.683"><failure message="AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'&#10;  &#10;  - COMPLETED&#10;  + UNKNOWN_OUTCOME">server = ('http://127.0.0.1:54247', &lt;apps.api.test_sessions.TestRegistry object at 0x00000139F11BE190&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:54247/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T134422059916/test_run_not...l': 'http://127.0.0.1:54247/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:54247/ui/app.js'}, ...])
+viewport = {'width': 390, 'height': 844}
+
+    @pytest.mark.parametrize(
+        "viewport",
+        [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}],
+        ids=["desktop", "compact"],
+    )
+    @pytest.mark.parametrize(
+        "server",
+        [SyntheticRuntime, pytest.param(BlenderRuntime, marks=pytest.mark.blender)],
+        indirect=True,
+        ids=["synthetic", "blender"],
+    )
+    def test_run_notice_investigate_and_return(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        screenshot(page, directory, "01-ready")
+        happy = choose_pick(page)
+        assert happy["state"] == "COMPLETED"
+        expect(page.locator("#motion-play")).to_be_enabled()
+        page.locator("#motion-scrub").fill("3")
+        assert page.locator("#motion-play").inner_text() == "Play"
+        selected = page.locator("#orders").input_value()
+        cursor = page.locator("#motion-scrub").input_value()
+        inspect(page)
+        expect(page.locator("#inspection-finding")).to_contain_text("destination")
+        page.locator("#return-simulation").click()
+        expect(page.locator("#orders")).to_have_value(selected)
+        expect(page.locator("#motion-scrub")).to_have_value(cursor)
+        screenshot(page, directory, "02-normal-completed")
+    
+        unusual = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert unusual["state"] == "UNKNOWN_OUTCOME"
+        expect(page.locator("#guide-title")).to_contain_text("outcome uncertain")
+        expect(page.locator("#investigation-dialog")).not_to_be_visible()
+        expect(page.locator("#inspect-selected")).to_have_attribute("data-attention", "true")
+        screenshot(page, directory, "03-notice-uncertainty")
+        inspect(page)
+        expect(page.locator("#inspection-symptom")).to_contain_text("no confirmed result")
+        expect(page.locator("#inspection-finding")).to_contain_text("1 product move")
+        expect(page.locator("#inspection-limit")).to_contain_text("does not prove")
+        panel_bounds(page)
+        screenshot(page, directory, "03-unusual-result")
+        job_id = unusual["job_id"]
+        command_id = unusual["command_id"]
+        before = get(page, f"{origin}/jobs/{job_id}/evidence")
+        assert before["journal"]["effect_count"] == 1
+        posts = [request for request in requests if request["method"] == "POST"]
+    
+        page.locator("#view-evidence").click()
+        assert not page.locator("#timeline-panel").evaluate("element =&gt; element.open")
+        assert (
+            json.loads(page.locator("#journal-record").inner_text())["command"]["command_id"]
+            == command_id
+        )
+        expect(page.locator("#observation-record")).to_contain_text("No assessed observation")
+        screenshot(page, directory, "04-evidence")
+        page.locator("#journal-details &gt; summary").click()
+        page.locator("#observation-details &gt; summary").click()
+        page.locator("#timeline-panel &gt; summary").click()
+        page.locator("#timeline-filter").select_option("all")
+        assert page.locator(".timeline-scroll").bounding_box()["height"] &lt;= 261
+        page.locator("#timeline button").first.click()
+        event = json.loads(page.locator("#event-record").inner_text())
+        assert event.get("job_id") in (None, job_id)
+        page.locator("#tab-manual").click()
+        expect(page.locator("#manual-reproduce")).to_contain_text("DROP_ACK_AFTER_EFFECT")
+        expect(page.locator("#manual-sources")).to_contain_text("robotops/verification/verifier.py")
+        urls = re.findall(r"Invoke-RestMethod '([^']+)'", page.locator("#manual-requests").inner_text())
+        assert len(urls) == 2
+        assert get(page, urls[0])["job"]["job_id"] == job_id
+        assert all(event.get("order_id") == unusual["order_id"] for event in get(page, urls[1]))
+        with page.expect_download() as download:
+            page.locator("#download-evidence").click()
+        download.value.save_as(directory / "investigation.json")
+        bundle = json.loads((directory / "investigation.json").read_text(encoding="utf-8"))
+        assert bundle["evidence"] == before
+        assert bundle["test_id"] == "original"
+        assert bundle["order_events"]
+        assert [request for request in requests if request["method"] == "POST"] == posts
+        assert get(page, f"{origin}/jobs/{job_id}/evidence") == before
+        screenshot(page, directory, "05-manual-inspection")
+        page.locator("#return-simulation").click()
+        expect(page.locator("#orders")).to_have_value(job_id)
+        page.locator(".viewer-details &gt; summary").click()
+        page.locator(".replay-options &gt; summary").click()
+        page.locator("#orders").select_option(happy["job_id"])
+        page.locator("#guide-action").click()
+        expect(page.locator("#orders")).to_have_value(happy["job_id"])
+        expect(page.locator("#inspection-context")).to_contain_text(job_id)
+        page.locator("#tab-evidence").click()
+        page.locator("#technical-status &gt; summary").click()
+        expect(page.locator("#status-command")).to_have_text(command_id)
+        expect(page.locator("#job-state")).to_have_text("UNKNOWN_OUTCOME")
+        expect(page.locator("#command")).to_contain_text(command_id)
+        assert [request for request in requests if request["method"] == "POST"] == posts
+    
+        page.locator("#tab-findings").click()
+        page.locator("#observation").select_option("CONTRADICTORY_OBSERVATION")
+        with page.expect_response(
+            lambda response: response.url.endswith("/reconcile") and response.request.method == "POST"
+        ) as review:
+            page.locator("#resolve-blocker").click()
+        assert review.value.json()["state"] == "REQUIRES_INTERVENTION"
+        expect(page.locator("#inspection-context")).to_contain_text("REQUIRES_INTERVENTION")
+        expect(page.locator("#inspection-symptom")).to_contain_text("could not establish")
+        page.locator("#tab-evidence").click()
+        if not page.locator("#observation-details").evaluate("element =&gt; element.open"):
+            page.locator("#observation-details &gt; summary").click()
+        observation = json.loads(page.locator("#observation-record").inner_text())
+        assessed = get(page, f"{origin}/jobs/{job_id}/evidence")
+        assert assessed["verifications"][-1]["observation_id"] == observation["observation_id"]
+        assert assessed["verifications"][-1]["verdict"] == "INCONCLUSIVE"
+        assert assessed["command"]["command_id"] == command_id
+        assert assessed["journal"]["effect_count"] == 1
+        screenshot(page, directory, "06-conflicting-sensor-report")
+        page.locator("#tab-findings").click()
+        page.locator("#use-normal").click()
+        with page.expect_response(
+            lambda response: response.url.endswith("/reconcile") and response.request.method == "POST"
+        ) as resolved:
+            page.locator("#resolve-blocker").click()
+        assert resolved.value.json()["state"] == "COMPLETED"
+        expect(page.locator("#investigation-title")).to_contain_text("Pick confirmed")
+        expect(page.locator("#observation-controls")).not_to_be_visible()
+        after = get(page, f"{origin}/jobs/{job_id}/evidence")
+        assert after["command"]["command_id"] == command_id
+        assert len(after["reconciliations"]) == 2
+        assert after["journal"]["effect_count"] == 1
+        effects = registry.original.runtime.events(command_id)
+        assert sum(event.event_type == "PICK_EFFECT" for event in effects) == 1
+        assert (
+            len(
+                [
+                    request
+                    for request in requests
+                    if request["method"] == "POST" and request["url"].endswith("/run")
+                ]
+            )
+            == 2
+        )
+        screenshot(page, directory, "07-resolved-original-pick")
+        page.locator("#return-simulation").click()
+        page.locator("#new-test").click()
+        expect(page.locator("#cell-profile")).to_have_value("hkm_inspired_v1")
+        page.locator("#create-test").click()
+        expect(page.locator("#new-test-dialog")).not_to_be_visible()
+        new_test_id = page.locator("#test-history").input_value()
+        assert new_test_id != "original"
+        fresh = choose_pick(page)
+&gt;       assert fresh["state"] == "COMPLETED"
+E       AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'
+E         
+E         - COMPLETED
+E         + UNKNOWN_OUTCOME
+
+tests\browser\test_investigation.py:306: AssertionError</failure></testcase><testcase classname="tests.browser.test_investigation" name="test_app_request_failure_does_not_become_simulated_outcome" time="2.951" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]" time="11.775" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]" time="65.686"><failure message="AssertionError: assert 0 == 1&#10; +  where 0 = CommandReceipt(schema_version='2.0', run_id='a87458d2-6847-47d3-b32d-4a60a272d811', correlation_id='9386d554-1681-58a0...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count&#10; +    where CommandReceipt(schema_version='2.0', run_id='a87458d2-6847-47d3-b32d-4a60a272d811', correlation_id='9386d554-1681-58a0...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('45e46033-8b1a-5f32-9038-7d2d05b2c3fa')&#10; +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000139F2D63410&gt;.journal&#10; +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000139F2D63410&gt; = &lt;robotops.workflow.engine.Engine object at 0x00000139F16E4050&gt;.runtime&#10; +          where &lt;robotops.workflow.engine.Engine object at 0x00000139F16E4050&gt; = engine('original')&#10; +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x00000139F93D2470&gt;.engine">server = ('http://127.0.0.1:52745', &lt;apps.api.test_sessions.TestRegistry object at 0x00000139F93D2470&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:52745/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T134731546659/test_clear_r...l': 'http://127.0.0.1:52745/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:52745/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+&gt;       assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CommandReceipt(schema_version='2.0', run_id='a87458d2-6847-47d3-b32d-4a60a272d811', correlation_id='9386d554-1681-58a0...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count
+E        +    where CommandReceipt(schema_version='2.0', run_id='a87458d2-6847-47d3-b32d-4a60a272d811', correlation_id='9386d554-1681-58a0...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('45e46033-8b1a-5f32-9038-7d2d05b2c3fa')
+E        +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000139F2D63410&gt;.journal
+E        +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x00000139F2D63410&gt; = &lt;robotops.workflow.engine.Engine object at 0x00000139F16E4050&gt;.runtime
+E        +          where &lt;robotops.workflow.engine.Engine object at 0x00000139F16E4050&gt; = engine('original')
+E        +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x00000139F93D2470&gt;.engine
+
+tests\browser\test_investigation.py:390: AssertionError</failure></testcase><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-SyntheticRuntime]" time="11.509" /><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-BlenderRuntime]" time="39.182" /></testsuite></testsuites>

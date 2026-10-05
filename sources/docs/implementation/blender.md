@@ -5,6 +5,11 @@ its executable; missing Blender fails the real-runtime tests explicitly. It neve
 substitutes the headless adapter. CPU rendering is enforced, with no model API,
 GPU, MCP, plugin or proprietary robot code. The fixed checked-in script is invoked
 with `--background --factory-startup --disable-autoexec --python-exit-code 2`.
+Windows also uses the fixed `--qos high` option before the Python entry point,
+including read-only saved-scene exports. It lets Blender use performance cores
+on hybrid CPUs without changing system policy. Other platforms keep OS defaults;
+the runtime manifest records the selected `cpu_qos`. This preserves the 60-second
+default deadline, CPU render settings and all recorded frames (source S31).
 The schema-1 compatibility path accepts reset/query/capture/pick; schema 2 accepts
 reset/capture/pick. World and journal queries use the durable local checkpoint.
 Neither version offers a code/eval/exec endpoint.

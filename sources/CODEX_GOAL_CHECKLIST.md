@@ -8,7 +8,11 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 - [x] Drain JSON/snapshot response bodies before confirmed test management.
 - [x] Bound stalled-read waiting without a management request or automatic pick.
 - [x] Keep controls and polling serialized through final refresh; pass 146 UI checks.
-- [ ] Pass isolated real-browser and broader lifecycle verification on the correction.
+- [x] Preserve isolated Blender deadline failures; do not relax timeout or render quality.
+- [x] Verify actual visibility changes survive save/reopen; avoid redundant assignments.
+- [x] Exercise Blender's Windows QoS option in all nine diagnostic browser journeys.
+- [x] Verify the production QoS adapter, six-tool showcase and replay/restart together.
+- [x] Pass isolated real-browser and broader lifecycle verification on the correction.
 - [ ] Publish fresh full acceptance and final exact-source workflow/Pages attestation.
 
 ## Test deletion and same-test clearing correction (ADR 0013)

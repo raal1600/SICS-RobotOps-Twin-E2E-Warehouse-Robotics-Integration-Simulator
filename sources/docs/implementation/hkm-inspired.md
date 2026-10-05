@@ -26,6 +26,16 @@ It is not exact HKM1800 inverse kinematics. Shared stable object identities and
 position/quaternion/visibility primitives must keep Blender and browser aligned.
 Motion evidence additionally carries phase, attachment, tool and rack state.
 
+Frame baking writes visibility flags only when they change, avoiding redundant
+dependency-graph invalidation. Both hidden and visible keyframes are still saved
+and checked after reopening the scene. On Windows the adapter passes Blender's
+documented `--qos high` option so the background process can use performance
+cores on hybrid CPUs; other platforms retain their normal scheduling. The runtime
+manifest reports `cpu_qos`. This process-local setting changes no Windows policy,
+render resolution/samples, recording frames, command semantics or execution
+deadline. Actual timeout outcomes remain uncertain. See source S31 and the
+[local investigation](../evidence/test-reset-visibility/README.md).
+
 New wire versions require strict contract tests and explicit compatibility.
 Legacy three-product scenes, positional recordings, command payload hashes and
 saved user tests retain their original interpretation. Unsupported historical

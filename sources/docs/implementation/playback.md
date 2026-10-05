@@ -49,6 +49,11 @@ request and offers explicit retry. Polling and controls resume after the returne
 test/revision and its final refresh are applied. Other clients' active reads,
 downloads and running work still block destructive backend operations.
 
+The Blender authoring path avoids resetting unchanged visibility flags, while
+retaining all animation keyframes. Its Windows child process uses Blender's
+`--qos high` scheduling option; saved-scene export uses the same bounded invocation.
+These runtime performance choices preserve replay data and render quality.
+
 An uncertain pick pauses the entire cell, including picks of different products.
 The Run button says **Next pick paused — reconcile first**, with a named-product
 explanation and **Reconcile [product]** action beside it. This action targets the

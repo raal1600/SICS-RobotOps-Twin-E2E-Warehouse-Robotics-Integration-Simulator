@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Final-source CI found a replay-read/delete race: the first suite passed 688 tests; the second passed 687 with one failure. Prior acceptance at df45c93 is preserved. Client read draining and 146 passing UI checks now cover the race; fresh full acceptance is in progress. Status: NOT DONE.
+> **Implementation status, 2026-10-05:** Delete removes test data and releases its number; Clear resets the same test for retry. Read draining, Windows Blender scheduling, 12 production browser/runtime checks and 170 unit/contract checks pass locally. Prior acceptance at df45c93 and successful read-drain CI at def3d51 remain scoped; fresh complete acceptance is pending. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

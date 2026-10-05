@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Final-source CI found a replay-read/delete race: the first suite passed 688 tests; the second passed 687 with one failure. Prior acceptance at df45c93 is preserved. Client read draining and 146 passing UI checks now cover the race; fresh full acceptance is in progress. Status: NOT DONE.
+> **Implementation status, 2026-10-05:** Delete removes test data and releases its number; Clear resets the same test for retry. Read draining, Windows Blender scheduling, 12 production browser/runtime checks and 170 unit/contract checks pass locally. Prior acceptance at df45c93 and successful read-drain CI at def3d51 remain scoped; fresh complete acceptance is pending. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->
@@ -327,6 +327,8 @@ Den egna konservativa geometrikontrollen samplar arbetsområdet och testar segme
 Blenders dokumentation varnar för osäker användning av Pythontrådar. Scenändringar ska inte göras godtyckligt från en långlivad bakgrundstråd. Timers ger ett API för schemalagda anrop. [S13][S14]
 
 Den implementerade adaptern använder i stället en tidsbegränsad Blender-batchprocess med ett fast Python-skript och typade JSON-filer. Scenändringar sker på Blenders huvudtråd. RUNNING journalförs före start; scenfilens hash och svarets identitet kontrolleras innan checkpointen godkänns. Saknat eller korrupt svar leder till osäkerhet utan omkörning. Blender-version och skripthash finns i runtime-manifestet. ADR 0001 dokumenterar valet; ingen långlivad nätverksbrygga krävs. CPU-versionen är Blender 5.2.1 LTS. [S21]
+
+På Windows startar den avgränsade processen med Blenders dokumenterade `--qos high` för att använda prestandakärnor på hybridprocessorer. [S31] Detta är ett processlokalt simulatorval; det ändrar inte Windows-policy, renderkvalitet, inspelningsfrekvens eller den befintliga tidsgränsen. Runtime-manifestet anger `cpu_qos`. Upprepade oförändrade synlighetsvärden skrivs inte om under animering, men verkliga synlighetsändringar behålls i sparade keyframes. Lokala prestandatester är inte validering av robotens fysiska genomströmning.
 
 ### 9.3 MCP hör till utvecklingsmiljön
 

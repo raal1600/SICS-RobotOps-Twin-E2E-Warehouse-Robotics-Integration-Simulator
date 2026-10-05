@@ -1,0 +1,41 @@
+{
+  "source": "def bake_frame(frame_index, primitives):\n    \"\"\"Bake actual world poses under FIXED parents; never reparent mid-animation.\n\n    Changing Blender parent ownership cannot be keyframed. Keeping the build-time\n    parent and baking its inverse each frame preserves the world trajectory when\n    a tool returns to its rack or a product attaches/releases. Recorded tool state\n    conveys that semantic change independently from Blender object parenting.\n    \"\"\"\n    bpy.context.scene.frame_set(frame_index)\n    # Actual parent order is fixed at scene creation, even if semantic ownership\n    # in the supplied sample changed during tool exchange.\n    definitions = []\n    for primitive in primitives:\n        fixed = dict(primitive)\n        obj = bpy.data.objects[primitive[\"name\"]]\n        fixed[\"parent_name\"] = obj.parent.name if obj.parent else None\n        definitions.append(fixed)\n    matrices = {p[\"name\"]: _matrix(p) for p in definitions}\n    for primitive in _parent_order(definitions):\n        if \"dynamic\" not in primitive[\"semantic_tags\"]:\n            continue\n        obj = bpy.data.objects[primitive[\"name\"]]\n        desired = matrices[primitive[\"name\"]]\n        # Compute the local pose against the requested parent pose directly.\n        # Updating the dependency graph after every link creates quadratic work\n        # as the animation grows; one evaluation after the whole frame suffices.\n        if obj.parent is not None:\n            desired = (\n                obj.matrix_parent_inverse.inverted()\n                @ matrices[obj.parent.name].inverted()\n                @ desired\n            )\n        obj.matrix_basis = desired\n        obj.hide_render = not primitive[\"visible\"]\n        obj.hide_viewport = not primitive[\"visible\"]\n    bpy.context.view_layer.update()\n    dynamic = [p for p in definitions if \"dynamic\" in p[\"semantic_tags\"]]\n    # Blender matrices are float32. A fixed parent several links away can\n    # accumulate micrometre translation roundoff when a previously mounted\n    # tool rests in the rack. Correct the evaluated residual in parent space;\n    # this preserves the actual hierarchy and the recorded mesh dimensions.\n    for _ in range(3):\n        for primitive in dynamic:\n            obj = bpy.data.objects[primitive[\"name\"]]\n            error = Vector(primitive[\"position\"]) - obj.matrix_world.translation\n            if obj.parent is not None:\n                error = (\n                    obj.parent.matrix_world @ obj.matrix_parent_inverse\n                ).to_3x3().inverted() @ error\n            obj.location += error\n        bpy.context.view_layer.update()\n    for primitive in dynamic:\n        obj = bpy.data.objects[primitive[\"name\"]]\n        for path in (\"location\", \"rotation_quaternion\", \"scale\", \"hide_render\", \"hide_viewport\"):\n            obj.keyframe_insert(data_path=path, frame=frame_index)\n",
+  "steps": {
+    "9": {
+      "calls": 120,
+      "elapsed_s": 0.6587352002388798
+    },
+    "12": {
+      "calls": 120,
+      "elapsed_s": 0.0001605997676961124
+    },
+    "13": {
+      "calls": 120,
+      "elapsed_s": 0.8967119998415001
+    },
+    "18": {
+      "calls": 120,
+      "elapsed_s": 0.12707239997689612
+    },
+    "19": {
+      "calls": 120,
+      "elapsed_s": 1.23341429993161
+    },
+    "36": {
+      "calls": 120,
+      "elapsed_s": 5.935044500161894
+    },
+    "37": {
+      "calls": 120,
+      "elapsed_s": 0.023351400071987882
+    },
+    "42": {
+      "calls": 120,
+      "elapsed_s": 6.39691290029441
+    },
+    "52": {
+      "calls": 120,
+      "elapsed_s": 3.2775216000445653
+    }
+  }
+}

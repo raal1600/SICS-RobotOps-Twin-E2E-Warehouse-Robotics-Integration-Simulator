@@ -1,0 +1,116 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\ramis\source\repos\robotops-twin
+configfile: pyproject.toml
+plugins: anyio-4.15.1, platformdirs-4.12.2, cov-7.1.0
+collected 9 items
+
+tests\browser\test_investigation.py ..F..E.F..                           [100%]
+
+=================================== ERRORS ====================================
+_ ERROR at teardown of test_app_request_failure_does_not_become_simulated_outcome _
+
+tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/reset-browser-cpu/fixtures/test_app_request_failure_does_0')
+request = <SubRequest 'server' for <Function test_app_request_failure_does_not_become_simulated_outcome>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        runtime_type = getattr(request, "param", SyntheticRuntime)
+        app = create_workspace_app(
+            tmp_path / "worlds", runtime_type=runtime_type, settings=Settings.hkm()
+        )
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            service = uvicorn.Server(uvicorn.Config(app, log_level="warning", access_log=False))
+            thread = threading.Thread(target=service.run, kwargs={"sockets": [listener]}, daemon=True)
+            thread.start()
+            deadline = time.monotonic() + 20
+            while not service.started and thread.is_alive() and time.monotonic() < deadline:
+                time.sleep(0.02)
+            assert service.started, "Local browser-test API failed to start"
+            try:
+                yield f"http://127.0.0.1:{listener.getsockname()[1]}", app.state.test_registry
+            finally:
+                service.should_exit = True
+                thread.join(timeout=20)
+>               assert not thread.is_alive(), "Browser-test API did not shut down"
+E               AssertionError: Browser-test API did not shut down
+E               assert not True
+E                +  where True = is_alive()
+E                +    where is_alive = <Thread(Thread-13 (run), started daemon 39396)>.is_alive
+
+tests\browser\test_investigation.py:46: AssertionError
+---------------------------- Captured log teardown ----------------------------
+ERROR    asyncio:base_events.py:1890 Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\ramis\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramis\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 166, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+================================== FAILURES ===================================
+___________ test_run_notice_investigate_and_return[blender-desktop] ___________
+
+server = ('http://127.0.0.1:63319', <apps.api.test_sessions.TestRegistry object at 0x0000018FD5C61090>)
+browser_page = (<Page url='http://127.0.0.1:63319/'>, WindowsPath('artifacts/investigation-browser/20261005T132732955170/test_run_not...l': 'http://127.0.0.1:63319/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:63319/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize(
+        "viewport",
+        [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}],
+        ids=["desktop", "compact"],
+    )
+    @pytest.mark.parametrize(
+        "server",
+        [SyntheticRuntime, pytest.param(BlenderRuntime, marks=pytest.mark.blender)],
+        indirect=True,
+        ids=["synthetic", "blender"],
+    )
+    def test_run_notice_investigate_and_return(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        screenshot(page, directory, "01-ready")
+        happy = choose_pick(page)
+>       assert happy["state"] == "COMPLETED"
+E       AssertionError: assert 'UNKNOWN_OUTCOME' == 'COMPLETED'
+E         
+E         - COMPLETED
+E         + UNKNOWN_OUTCOME
+
+tests\browser\test_investigation.py:174: AssertionError
+_ test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime] _
+
+server = ('http://127.0.0.1:52136', <apps.api.test_sessions.TestRegistry object at 0x0000018FD8F3F350>)
+browser_page = (<Page url='http://127.0.0.1:52136/'>, WindowsPath('artifacts/investigation-browser/20261005T133201860551/test_clear_r...l': 'http://127.0.0.1:52136/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:52136/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+>       assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CommandReceipt(schema_version='2.0', run_id='3993652e-273d-4111-b76a-d541f369ac01', correlation_id='9d824075-617c-5f43...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count
+E        +    where CommandReceipt(schema_version='2.0', run_id='3993652e-273d-4111-b76a-d541f369ac01', correlation_id='9d824075-617c-5f43...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('53a4e5f9-d6bf-56d4-be02-5006effa7273')
+E        +      where journal = <robotops.blender.adapter.BlenderRuntime object at 0x0000018FD30863F0>.journal
+E        +        where <robotops.blender.adapter.BlenderRuntime object at 0x0000018FD30863F0> = <robotops.workflow.engine.Engine object at 0x0000018FD336D910>.runtime
+E        +          where <robotops.workflow.engine.Engine object at 0x0000018FD336D910> = engine('original')
+E        +            where engine = <apps.api.test_sessions.TestRegistry object at 0x0000018FD8F3F350>.engine
+
+tests\browser\test_investigation.py:390: AssertionError
+- generated xml file: C:\Users\ramis\source\repos\robotops-twin\artifacts\reset-browser-cpu\tests.xml -
+=========================== short test summary info ===========================
+ERROR tests/browser/test_investigation.py::test_app_request_failure_does_not_become_simulated_outcome
+FAILED tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-desktop]
+FAILED tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]
+============== 2 failed, 7 passed, 1 error in 506.99s (0:08:26) ===============

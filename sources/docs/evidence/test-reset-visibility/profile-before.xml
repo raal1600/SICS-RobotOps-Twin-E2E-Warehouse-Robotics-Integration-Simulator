@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="65.775" timestamp="2026-10-05T15:37:32.461624+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.browser.test_investigation" name="test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]" time="64.608"><failure message="AssertionError: assert 0 == 1&#10; +  where 0 = CommandReceipt(schema_version='2.0', run_id='37557ac4-ac6a-48b3-b5bf-c645ab4f3ce1', correlation_id='a99b56c3-be7f-588c...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count&#10; +    where CommandReceipt(schema_version='2.0', run_id='37557ac4-ac6a-48b3-b5bf-c645ab4f3ce1', correlation_id='a99b56c3-be7f-588c...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('1a4c0a1c-bb5a-5ffc-a22c-0ca1ca944d4b')&#10; +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x000001FF6842CEC0&gt;.journal&#10; +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x000001FF6842CEC0&gt; = &lt;robotops.workflow.engine.Engine object at 0x000001FF6842C6E0&gt;.runtime&#10; +          where &lt;robotops.workflow.engine.Engine object at 0x000001FF6842C6E0&gt; = engine('original')&#10; +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x000001FF67997770&gt;.engine">server = ('http://127.0.0.1:59260', &lt;apps.api.test_sessions.TestRegistry object at 0x000001FF67997770&gt;)
+browser_page = (&lt;Page url='http://127.0.0.1:59260/'&gt;, WindowsPath('artifacts/investigation-browser/20261005T133733164710/test_clear_r...l': 'http://127.0.0.1:59260/ui/workflow-guide.js'}, {'method': 'GET', 'url': 'http://127.0.0.1:59260/ui/app.js'}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+&gt;       assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CommandReceipt(schema_version='2.0', run_id='37557ac4-ac6a-48b3-b5bf-c645ab4f3ce1', correlation_id='a99b56c3-be7f-588c...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1').effect_count
+E        +    where CommandReceipt(schema_version='2.0', run_id='37557ac4-ac6a-48b3-b5bf-c645ab4f3ce1', correlation_id='a99b56c3-be7f-588c...rajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7', runtime_profile_version='hkm_inspired_v1') = journal('1a4c0a1c-bb5a-5ffc-a22c-0ca1ca944d4b')
+E        +      where journal = &lt;robotops.blender.adapter.BlenderRuntime object at 0x000001FF6842CEC0&gt;.journal
+E        +        where &lt;robotops.blender.adapter.BlenderRuntime object at 0x000001FF6842CEC0&gt; = &lt;robotops.workflow.engine.Engine object at 0x000001FF6842C6E0&gt;.runtime
+E        +          where &lt;robotops.workflow.engine.Engine object at 0x000001FF6842C6E0&gt; = engine('original')
+E        +            where engine = &lt;apps.api.test_sessions.TestRegistry object at 0x000001FF67997770&gt;.engine
+
+tests\browser\test_investigation.py:390: AssertionError</failure></testcase></testsuite></testsuites>

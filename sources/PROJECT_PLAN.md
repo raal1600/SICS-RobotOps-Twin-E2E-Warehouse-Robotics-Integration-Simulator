@@ -143,6 +143,10 @@ orders or changing job/command semantics; individual replay remains available.
 See ADR 0006.
 
 MCP may author/debug assets, but runtime control uses a bounded documented adapter/protocol, not unrestricted natural-language execution.
+The Windows batch invocation uses Blender's process-local `--qos high` option
+(source S31); the manifest records `cpu_qos`. This CPU scheduling choice and
+avoiding redundant visibility invalidation preserve render quality, recorded
+frames, the fixed timeout and all command/effect semantics.
 
 ## Ground truth, observation, verification
 

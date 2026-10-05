@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="10" time="1.530" timestamp="2026-10-05T15:57:51.058487+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.unit.test_blender_adapter" name="test_blender_qos_is_scoped_to_windows_process_and_preserves_boundary[False-Windows]" time="0.110" /><testcase classname="tests.unit.test_blender_adapter" name="test_blender_qos_is_scoped_to_windows_process_and_preserves_boundary[False-Linux]" time="0.106" /><testcase classname="tests.unit.test_blender_adapter" name="test_blender_qos_is_scoped_to_windows_process_and_preserves_boundary[True-Windows]" time="0.098" /><testcase classname="tests.unit.test_blender_adapter" name="test_blender_qos_is_scoped_to_windows_process_and_preserves_boundary[True-Linux]" time="0.115" /><testcase classname="tests.unit.test_blender_adapter" name="test_blender_timeout_retains_partial_diagnostics_without_claiming_effect[Saved scene.blend-Cycles render initializing-expected0-False]" time="0.128"><failure message="subprocess.TimeoutExpired: Command 'ver' timed out after None seconds">tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/pytest-of-ramis/pytest-62/test_blender_timeout_retains_p0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002B34F63D9D0&gt;
+record_existing = False, stdout = 'Saved scene.blend'
+stderr = 'Cycles render initializing'
+expected = ('Saved scene.blend', 'Cycles render initializing')
+
+    @pytest.mark.parametrize("record_existing", [False, True])
+    @pytest.mark.parametrize(
+        ("stdout", "stderr", "expected"),
+        [
+            (
+                "Saved scene.blend",
+                "Cycles render initializing",
+                ("Saved scene.blend", "Cycles render initializing"),
+            ),
+            (
+                b"Frame 133 complete\xff",
+                b"CPU render stalled",
+                ("Frame 133 complete\ufffd", "CPU render stalled"),
+            ),
+            (None, None, ()),
+        ],
+    )
+    def test_blender_timeout_retains_partial_diagnostics_without_claiming_effect(
+        tmp_path, monkeypatch, record_existing, stdout, stderr, expected
+    ):
+        monkeypatch.setattr("robotops.blender.adapter.executable", lambda: "blender-not-invoked")
+        runtime = BlenderRuntime(tmp_path / "runtime.db")
+        original_world = runtime.world()
+        directory = tmp_path / "exchange"
+        directory.mkdir()
+        invocations = []
+    
+        def timeout(args, **kwargs):
+            invocations.append((args, kwargs))
+            raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+    
+        monkeypatch.setattr("robotops.blender.adapter.subprocess.run", timeout)
+        with pytest.raises(CommunicationTimeout, match="BLENDER_PROCESS_TIMEOUT") as failure:
+&gt;           runtime._invoke(directory, record_existing=record_existing)
+
+tests\unit\test_blender_adapter.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+robotops\blender\adapter.py:86: in _invoke
+    if platform.system() == "Windows":
+       ^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:1073: in system
+    return uname().system
+           ^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:999: in uname
+    release, version, csd, ptype = win32_ver()
+                                   ^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:450: in win32_ver
+    version, csd, ptype, is_client = _win32_ver(version, csd, ptype)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:417: in _win32_ver
+    version = _syscmd_ver()[2]
+              ^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:287: in _syscmd_ver
+    info = subprocess.check_output(cmd,
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py:472: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = 'ver'
+kwargs = {'stdout': -1, 'timeout': None, 'check': True, 'stdin': -3, ...}
+
+    def timeout(args, **kwargs):
+        invocations.append((args, kwargs))
+&gt;       raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+E       subprocess.TimeoutExpired: Command 'ver' timed out after None seconds
+
+tests\unit\test_blender_adapter.py:72: TimeoutExpired</failure></testcase><testcase classname="tests.unit.test_blender_adapter" name="test_blender_timeout_retains_partial_diagnostics_without_claiming_effect[Saved scene.blend-Cycles render initializing-expected0-True]" time="0.092"><failure message="subprocess.TimeoutExpired: Command 'ver' timed out after None seconds">tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/pytest-of-ramis/pytest-62/test_blender_timeout_retains_p1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002B350628D50&gt;
+record_existing = True, stdout = 'Saved scene.blend'
+stderr = 'Cycles render initializing'
+expected = ('Saved scene.blend', 'Cycles render initializing')
+
+    @pytest.mark.parametrize("record_existing", [False, True])
+    @pytest.mark.parametrize(
+        ("stdout", "stderr", "expected"),
+        [
+            (
+                "Saved scene.blend",
+                "Cycles render initializing",
+                ("Saved scene.blend", "Cycles render initializing"),
+            ),
+            (
+                b"Frame 133 complete\xff",
+                b"CPU render stalled",
+                ("Frame 133 complete\ufffd", "CPU render stalled"),
+            ),
+            (None, None, ()),
+        ],
+    )
+    def test_blender_timeout_retains_partial_diagnostics_without_claiming_effect(
+        tmp_path, monkeypatch, record_existing, stdout, stderr, expected
+    ):
+        monkeypatch.setattr("robotops.blender.adapter.executable", lambda: "blender-not-invoked")
+        runtime = BlenderRuntime(tmp_path / "runtime.db")
+        original_world = runtime.world()
+        directory = tmp_path / "exchange"
+        directory.mkdir()
+        invocations = []
+    
+        def timeout(args, **kwargs):
+            invocations.append((args, kwargs))
+            raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+    
+        monkeypatch.setattr("robotops.blender.adapter.subprocess.run", timeout)
+        with pytest.raises(CommunicationTimeout, match="BLENDER_PROCESS_TIMEOUT") as failure:
+&gt;           runtime._invoke(directory, record_existing=record_existing)
+
+tests\unit\test_blender_adapter.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+robotops\blender\adapter.py:86: in _invoke
+    if platform.system() == "Windows":
+       ^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:1073: in system
+    return uname().system
+           ^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:999: in uname
+    release, version, csd, ptype = win32_ver()
+                                   ^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:450: in win32_ver
+    version, csd, ptype, is_client = _win32_ver(version, csd, ptype)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:417: in _win32_ver
+    version = _syscmd_ver()[2]
+              ^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:287: in _syscmd_ver
+    info = subprocess.check_output(cmd,
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py:472: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = 'ver'
+kwargs = {'stdout': -1, 'timeout': None, 'check': True, 'stdin': -3, ...}
+
+    def timeout(args, **kwargs):
+        invocations.append((args, kwargs))
+&gt;       raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+E       subprocess.TimeoutExpired: Command 'ver' timed out after None seconds
+
+tests\unit\test_blender_adapter.py:72: TimeoutExpired</failure></testcase><testcase classname="tests.unit.test_blender_adapter" name="test_blender_timeout_retains_partial_diagnostics_without_claiming_effect[Frame 133 complete\xff-CPU render stalled-expected1-False]" time="0.091"><failure message="subprocess.TimeoutExpired: Command 'ver' timed out after None seconds">tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/pytest-of-ramis/pytest-62/test_blender_timeout_retains_p2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002B350629350&gt;
+record_existing = False, stdout = b'Frame 133 complete\xff'
+stderr = b'CPU render stalled'
+expected = ('Frame 133 complete�', 'CPU render stalled')
+
+    @pytest.mark.parametrize("record_existing", [False, True])
+    @pytest.mark.parametrize(
+        ("stdout", "stderr", "expected"),
+        [
+            (
+                "Saved scene.blend",
+                "Cycles render initializing",
+                ("Saved scene.blend", "Cycles render initializing"),
+            ),
+            (
+                b"Frame 133 complete\xff",
+                b"CPU render stalled",
+                ("Frame 133 complete\ufffd", "CPU render stalled"),
+            ),
+            (None, None, ()),
+        ],
+    )
+    def test_blender_timeout_retains_partial_diagnostics_without_claiming_effect(
+        tmp_path, monkeypatch, record_existing, stdout, stderr, expected
+    ):
+        monkeypatch.setattr("robotops.blender.adapter.executable", lambda: "blender-not-invoked")
+        runtime = BlenderRuntime(tmp_path / "runtime.db")
+        original_world = runtime.world()
+        directory = tmp_path / "exchange"
+        directory.mkdir()
+        invocations = []
+    
+        def timeout(args, **kwargs):
+            invocations.append((args, kwargs))
+            raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+    
+        monkeypatch.setattr("robotops.blender.adapter.subprocess.run", timeout)
+        with pytest.raises(CommunicationTimeout, match="BLENDER_PROCESS_TIMEOUT") as failure:
+&gt;           runtime._invoke(directory, record_existing=record_existing)
+
+tests\unit\test_blender_adapter.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+robotops\blender\adapter.py:86: in _invoke
+    if platform.system() == "Windows":
+       ^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:1073: in system
+    return uname().system
+           ^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:999: in uname
+    release, version, csd, ptype = win32_ver()
+                                   ^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:450: in win32_ver
+    version, csd, ptype, is_client = _win32_ver(version, csd, ptype)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:417: in _win32_ver
+    version = _syscmd_ver()[2]
+              ^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:287: in _syscmd_ver
+    info = subprocess.check_output(cmd,
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py:472: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = 'ver'
+kwargs = {'stdout': -1, 'timeout': None, 'check': True, 'stdin': -3, ...}
+
+    def timeout(args, **kwargs):
+        invocations.append((args, kwargs))
+&gt;       raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+E       subprocess.TimeoutExpired: Command 'ver' timed out after None seconds
+
+tests\unit\test_blender_adapter.py:72: TimeoutExpired</failure></testcase><testcase classname="tests.unit.test_blender_adapter" name="test_blender_timeout_retains_partial_diagnostics_without_claiming_effect[Frame 133 complete\xff-CPU render stalled-expected1-True]" time="0.091"><failure message="subprocess.TimeoutExpired: Command 'ver' timed out after None seconds">tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/pytest-of-ramis/pytest-62/test_blender_timeout_retains_p3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002B34F4EBC50&gt;
+record_existing = True, stdout = b'Frame 133 complete\xff'
+stderr = b'CPU render stalled'
+expected = ('Frame 133 complete�', 'CPU render stalled')
+
+    @pytest.mark.parametrize("record_existing", [False, True])
+    @pytest.mark.parametrize(
+        ("stdout", "stderr", "expected"),
+        [
+            (
+                "Saved scene.blend",
+                "Cycles render initializing",
+                ("Saved scene.blend", "Cycles render initializing"),
+            ),
+            (
+                b"Frame 133 complete\xff",
+                b"CPU render stalled",
+                ("Frame 133 complete\ufffd", "CPU render stalled"),
+            ),
+            (None, None, ()),
+        ],
+    )
+    def test_blender_timeout_retains_partial_diagnostics_without_claiming_effect(
+        tmp_path, monkeypatch, record_existing, stdout, stderr, expected
+    ):
+        monkeypatch.setattr("robotops.blender.adapter.executable", lambda: "blender-not-invoked")
+        runtime = BlenderRuntime(tmp_path / "runtime.db")
+        original_world = runtime.world()
+        directory = tmp_path / "exchange"
+        directory.mkdir()
+        invocations = []
+    
+        def timeout(args, **kwargs):
+            invocations.append((args, kwargs))
+            raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+    
+        monkeypatch.setattr("robotops.blender.adapter.subprocess.run", timeout)
+        with pytest.raises(CommunicationTimeout, match="BLENDER_PROCESS_TIMEOUT") as failure:
+&gt;           runtime._invoke(directory, record_existing=record_existing)
+
+tests\unit\test_blender_adapter.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+robotops\blender\adapter.py:86: in _invoke
+    if platform.system() == "Windows":
+       ^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:1073: in system
+    return uname().system
+           ^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:999: in uname
+    release, version, csd, ptype = win32_ver()
+                                   ^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:450: in win32_ver
+    version, csd, ptype, is_client = _win32_ver(version, csd, ptype)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:417: in _win32_ver
+    version = _syscmd_ver()[2]
+              ^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:287: in _syscmd_ver
+    info = subprocess.check_output(cmd,
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py:472: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = 'ver'
+kwargs = {'stdout': -1, 'timeout': None, 'check': True, 'stdin': -3, ...}
+
+    def timeout(args, **kwargs):
+        invocations.append((args, kwargs))
+&gt;       raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+E       subprocess.TimeoutExpired: Command 'ver' timed out after None seconds
+
+tests\unit\test_blender_adapter.py:72: TimeoutExpired</failure></testcase><testcase classname="tests.unit.test_blender_adapter" name="test_blender_timeout_retains_partial_diagnostics_without_claiming_effect[None-None-expected2-False]" time="0.114"><failure message="subprocess.TimeoutExpired: Command 'ver' timed out after None seconds">tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/pytest-of-ramis/pytest-62/test_blender_timeout_retains_p4')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002B34F4EAE40&gt;
+record_existing = False, stdout = None, stderr = None, expected = ()
+
+    @pytest.mark.parametrize("record_existing", [False, True])
+    @pytest.mark.parametrize(
+        ("stdout", "stderr", "expected"),
+        [
+            (
+                "Saved scene.blend",
+                "Cycles render initializing",
+                ("Saved scene.blend", "Cycles render initializing"),
+            ),
+            (
+                b"Frame 133 complete\xff",
+                b"CPU render stalled",
+                ("Frame 133 complete\ufffd", "CPU render stalled"),
+            ),
+            (None, None, ()),
+        ],
+    )
+    def test_blender_timeout_retains_partial_diagnostics_without_claiming_effect(
+        tmp_path, monkeypatch, record_existing, stdout, stderr, expected
+    ):
+        monkeypatch.setattr("robotops.blender.adapter.executable", lambda: "blender-not-invoked")
+        runtime = BlenderRuntime(tmp_path / "runtime.db")
+        original_world = runtime.world()
+        directory = tmp_path / "exchange"
+        directory.mkdir()
+        invocations = []
+    
+        def timeout(args, **kwargs):
+            invocations.append((args, kwargs))
+            raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+    
+        monkeypatch.setattr("robotops.blender.adapter.subprocess.run", timeout)
+        with pytest.raises(CommunicationTimeout, match="BLENDER_PROCESS_TIMEOUT") as failure:
+&gt;           runtime._invoke(directory, record_existing=record_existing)
+
+tests\unit\test_blender_adapter.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+robotops\blender\adapter.py:86: in _invoke
+    if platform.system() == "Windows":
+       ^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:1073: in system
+    return uname().system
+           ^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:999: in uname
+    release, version, csd, ptype = win32_ver()
+                                   ^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:450: in win32_ver
+    version, csd, ptype, is_client = _win32_ver(version, csd, ptype)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:417: in _win32_ver
+    version = _syscmd_ver()[2]
+              ^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:287: in _syscmd_ver
+    info = subprocess.check_output(cmd,
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py:472: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = 'ver'
+kwargs = {'stdout': -1, 'timeout': None, 'check': True, 'stdin': -3, ...}
+
+    def timeout(args, **kwargs):
+        invocations.append((args, kwargs))
+&gt;       raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+E       subprocess.TimeoutExpired: Command 'ver' timed out after None seconds
+
+tests\unit\test_blender_adapter.py:72: TimeoutExpired</failure></testcase><testcase classname="tests.unit.test_blender_adapter" name="test_blender_timeout_retains_partial_diagnostics_without_claiming_effect[None-None-expected2-True]" time="0.123"><failure message="subprocess.TimeoutExpired: Command 'ver' timed out after None seconds">tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/pytest-of-ramis/pytest-62/test_blender_timeout_retains_p5')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002B350674D70&gt;
+record_existing = True, stdout = None, stderr = None, expected = ()
+
+    @pytest.mark.parametrize("record_existing", [False, True])
+    @pytest.mark.parametrize(
+        ("stdout", "stderr", "expected"),
+        [
+            (
+                "Saved scene.blend",
+                "Cycles render initializing",
+                ("Saved scene.blend", "Cycles render initializing"),
+            ),
+            (
+                b"Frame 133 complete\xff",
+                b"CPU render stalled",
+                ("Frame 133 complete\ufffd", "CPU render stalled"),
+            ),
+            (None, None, ()),
+        ],
+    )
+    def test_blender_timeout_retains_partial_diagnostics_without_claiming_effect(
+        tmp_path, monkeypatch, record_existing, stdout, stderr, expected
+    ):
+        monkeypatch.setattr("robotops.blender.adapter.executable", lambda: "blender-not-invoked")
+        runtime = BlenderRuntime(tmp_path / "runtime.db")
+        original_world = runtime.world()
+        directory = tmp_path / "exchange"
+        directory.mkdir()
+        invocations = []
+    
+        def timeout(args, **kwargs):
+            invocations.append((args, kwargs))
+            raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+    
+        monkeypatch.setattr("robotops.blender.adapter.subprocess.run", timeout)
+        with pytest.raises(CommunicationTimeout, match="BLENDER_PROCESS_TIMEOUT") as failure:
+&gt;           runtime._invoke(directory, record_existing=record_existing)
+
+tests\unit\test_blender_adapter.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+robotops\blender\adapter.py:86: in _invoke
+    if platform.system() == "Windows":
+       ^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:1073: in system
+    return uname().system
+           ^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:999: in uname
+    release, version, csd, ptype = win32_ver()
+                                   ^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:450: in win32_ver
+    version, csd, ptype, is_client = _win32_ver(version, csd, ptype)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:417: in _win32_ver
+    version = _syscmd_ver()[2]
+              ^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\platform.py:287: in _syscmd_ver
+    info = subprocess.check_output(cmd,
+..\..\..\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py:472: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = 'ver'
+kwargs = {'stdout': -1, 'timeout': None, 'check': True, 'stdin': -3, ...}
+
+    def timeout(args, **kwargs):
+        invocations.append((args, kwargs))
+&gt;       raise subprocess.TimeoutExpired(args, kwargs["timeout"], output=stdout, stderr=stderr)
+E       subprocess.TimeoutExpired: Command 'ver' timed out after None seconds
+
+tests\unit\test_blender_adapter.py:72: TimeoutExpired</failure></testcase></testsuite></testsuites>

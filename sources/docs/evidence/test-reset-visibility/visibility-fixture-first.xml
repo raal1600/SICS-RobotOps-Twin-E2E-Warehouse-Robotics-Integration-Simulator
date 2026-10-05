@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="19.434" timestamp="2026-10-05T15:41:22.333885+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="tests.blender.test_hkm_runtime" name="test_hkm_visibility_changes_survive_saved_animation" time="3.556"><failure message="AssertionError: Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)&#10;  &#10;  Blender quit&#10;  Traceback (most recent call last):&#10;    File &quot;C:\Users\ramis\source\repos\robotops-twin\artifacts\visibility-regression-fixtures\test_hkm_visibility_changes_su0\visibility.py&quot;, line 16, in &lt;module&gt;&#10;      next(p for p in sample if p['name'] == name)['visible'] = visible&#10;      ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  StopIteration&#10;  &#10;  Error: script failed, file: 'C:\Users\ramis\source\repos\robotops-twin\artifacts\visibility-regression-fixtures\test_hkm_visibility_changes_su0\visibility.py', exiting.&#10;  &#10;assert 2 == 0&#10; +  where 2 = CompletedProcess(args=['C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe', '--background', '--factory-s...obotops-twin\\artifacts\\visibility-regression-fixtures\\test_hkm_visibility_changes_su0\\visibility.py\', exiting.\n').returncode">tmp_path = WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/visibility-regression-fixtures/test_hkm_visibility_changes_su0')
+
+    def test_hkm_visibility_changes_survive_saved_animation(tmp_path):
+        """Unchanged flags avoid graph rebuilds; actual visibility changes stay baked."""
+        runtime = BlenderRuntime(tmp_path / "runtime.db", Settings.hkm())
+        script = tmp_path / "visibility.py"
+        script.write_text(
+            """import copy, json, sys
+    from pathlib import Path
+    import bpy
+    root, directory = map(Path, sys.argv[sys.argv.index('--') + 1:])
+    sys.path.insert(0, str(root))
+    from blender.scripts.hkm_scene import bake_frame, build_scene, sampled_primitives
+    from robotops.hkm_geometry import camera_views, scene_primitives
+    from robotops.robotics.catalogue_data import raw_catalogue
+    data = json.loads((directory / 'world.json').read_text())
+    primitives = scene_primitives(data)
+    build_scene(primitives, camera_views(raw_catalogue()))
+    name = 'Robot/ActiveTool'
+    visibility = [True, True, False, False, True, True]
+    for frame, visible in enumerate(visibility, 1):
+        sample = copy.deepcopy(primitives)
+        next(p for p in sample if p['name'] == name)['visible'] = visible
+        bake_frame(frame, sample)
+        obj = bpy.data.objects[name]
+        assert obj.hide_render == obj.hide_viewport == (not visible)
+        assert next(p for p in sampled_primitives() if p['name'] == name)['visible'] == visible
+    scene = directory / 'visibility.blend'
+    bpy.ops.wm.save_as_mainfile(filepath=str(scene))
+    bpy.ops.wm.open_mainfile(filepath=str(scene), use_scripts=False)
+    for frame, visible in enumerate(visibility, 1):
+        bpy.context.scene.frame_set(frame)
+        obj = bpy.data.objects[name]
+        assert obj.hide_render == obj.hide_viewport == (not visible)
+        assert next(p for p in sampled_primitives() if p['name'] == name)['visible'] == visible
+    (directory / 'verified.json').write_text(json.dumps(visibility))
+    """,
+            encoding="utf-8",
+        )
+        (tmp_path / "world.json").write_text(runtime.world().model_dump_json(), encoding="utf-8")
+        process = subprocess.run(
+            [
+                runtime.executable,
+                "--background",
+                "--factory-startup",
+                "--disable-autoexec",
+                "--python-exit-code",
+                "2",
+                "--python",
+                str(script),
+                "--",
+                str(Path(__file__).resolve().parents[2]),
+                str(tmp_path),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=60,
+        )
+&gt;       assert process.returncode == 0, process.stdout + process.stderr
+E       AssertionError: Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+E         
+E         Blender quit
+E         Traceback (most recent call last):
+E           File "C:\Users\ramis\source\repos\robotops-twin\artifacts\visibility-regression-fixtures\test_hkm_visibility_changes_su0\visibility.py", line 16, in &lt;module&gt;
+E             next(p for p in sample if p['name'] == name)['visible'] = visible
+E             ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         StopIteration
+E         
+E         Error: script failed, file: 'C:\Users\ramis\source\repos\robotops-twin\artifacts\visibility-regression-fixtures\test_hkm_visibility_changes_su0\visibility.py', exiting.
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe', '--background', '--factory-s...obotops-twin\\artifacts\\visibility-regression-fixtures\\test_hkm_visibility_changes_su0\\visibility.py\', exiting.\n').returncode
+
+tests\blender\test_hkm_runtime.py:90: AssertionError</failure></testcase><testcase classname="tests.blender.test_hkm_runtime" name="test_hkm_real_lost_ack_restart_ambiguity_and_read_only_replay_keep_one_command" time="15.426" /></testsuite></testsuites>

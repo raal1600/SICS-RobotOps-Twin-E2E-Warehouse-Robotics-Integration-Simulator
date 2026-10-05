@@ -4,6 +4,17 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
+### Final lifecycle/runtime verification (2026-10-05)
+
+The final-source replay-read/delete race and local Blender deadlines remain
+archived with their original failures. Client response draining and process-local
+Windows Blender QoS now have targeted browser, runtime and contract evidence.
+Source S31 adds official Blender command-line documentation; previous research
+classifications remain unchanged. Runtime/plan/handoff/playback sources and the
+design report describe the same bounded invocation. Architecture and state
+boundaries are unchanged. New complete acceptance and final-source publication
+verification remain required; the accepted revisions below retain their own scope.
+
 ### Delete versus clear correction (2026-10-05)
 
 ADR 0013 implements the owner's updated lifecycle semantics: delete purges the

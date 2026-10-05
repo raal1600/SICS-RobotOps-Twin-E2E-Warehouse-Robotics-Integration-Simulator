@@ -1,0 +1,255 @@
+"""Read-only local/public publication audit; output is scoped review evidence."""
+
+import argparse
+import hashlib
+import json
+import os
+import subprocess
+import urllib.request
+import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+from html.parser import HTMLParser
+from pathlib import Path
+from urllib.parse import unquote, urljoin, urlsplit
+
+from PIL import Image, ImageDraw
+from pypdf import PdfReader
+
+ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser()
+parser.add_argument('--site', type=Path)
+parser.add_argument('--url')
+parser.add_argument('--expected')
+parser.add_argument('--status')
+parser.add_argument('--audited')
+parser.add_argument('--out', type=Path, required=True)
+parser.add_argument('--render', action='store_true')
+args = parser.parse_args()
+assert bool(args.site) != bool(args.url)
+out = args.out.resolve()
+out.mkdir(parents=True, exist_ok=True)
+base = args.url or 'https://local-publication.invalid/'
+
+
+class Page(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.links = []
+        self.ids = set()
+
+    def handle_starttag(self, tag, attrs):
+        for key, value in attrs:
+            if key == 'id':
+                self.ids.add(value)
+            elif key in ('href', 'src') and value:
+                self.links.append(value)
+
+
+def fetch(name):
+    target = (out / name).resolve()
+    assert target.is_relative_to(out), (name, str(target), str(out))
+    if args.site:
+        source = (args.site / name).resolve()
+        assert source.is_relative_to(args.site.resolve())
+        data = source.read_bytes()
+        metadata = {'source': str(source), 'bytes': len(data)}
+    else:
+        with urllib.request.urlopen(base + name, timeout=40) as response:
+            data = response.read()
+            metadata = {'url': base + name, 'status': response.status, 'bytes': len(data)}
+    metadata['sha256'] = hashlib.sha256(data).hexdigest()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(data)
+    return name, data, metadata
+
+
+def local_link(page, link):
+    absolute = urljoin(base + page, link)
+    if not absolute.startswith(base):
+        return None
+    parts = urlsplit(absolute)
+    return unquote(parts.path[len(urlsplit(base).path):]), unquote(parts.fragment)
+
+
+def pdf_destinations(reader):
+    result = []
+    for page in reader.pages:
+        for ref in page.get('/Annots', []):
+            annotation = ref.get_object()
+            destination = annotation.get('/Dest')
+            if '/A' in annotation and annotation['/A'].get('/S') == '/GoTo':
+                destination = annotation['/A'].get('/D')
+            if isinstance(destination, str):
+                target = reader.get_destination_page_number(reader.named_destinations[destination])
+            elif isinstance(destination, list):
+                target = reader.get_page_number(destination[0].get_object())
+            else:
+                continue
+            assert 0 <= target < len(reader.pages)
+            result.append(target)
+    return result
+
+
+name, data, metadata = fetch('build.json')
+manifest = json.loads(data)
+if args.expected:
+    assert manifest['source_commit'] == args.expected, manifest['source_commit']
+if args.status:
+    assert manifest['simulator_status']['status'] == args.status
+if args.audited:
+    assert args.audited in manifest['simulator_status']['summary']
+resources = {name: metadata}
+pages = {}
+queue = {'index.html', 'design.html', 'avgransning.html', 'diskussion.html',
+         'diagram.html', 'kallor.html', 'governance.html'}
+while queue:
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        entries = list(pool.map(fetch, sorted(queue)))
+    queue = set()
+    for name, data, metadata in entries:
+        resources[name] = metadata
+        if not name.endswith('.html'):
+            continue
+        page = Page()
+        page.feed(data.decode('utf8'))
+        pages[name] = page
+        for link in page.links:
+            local = local_link(name, link)
+            if local and local[0] and local[0] not in resources:
+                queue.add(local[0])
+    queue -= resources.keys()
+
+link_count = 0
+for name, page in pages.items():
+    for link in page.links:
+        local = local_link(name, link)
+        if local is None:
+            continue
+        resource, fragment = local
+        assert resource in resources, (name, link)
+        if fragment and resource in pages:
+            assert fragment in pages[resource].ids, (name, link)
+        link_count += 1
+
+reports = []
+expected_destinations = []
+offset = 0
+for item in manifest['reports']:
+    name = 'downloads/' + item['report'] + '.pdf'
+    assert resources[name]['sha256'] == item['pdf_sha256']
+    reader = PdfReader(out / name)
+    assert len(reader.pages) == item['pages']
+    destinations = pdf_destinations(reader)
+    expected_destinations.extend(offset + target for target in destinations)
+    offset += len(reader.pages)
+    reports.append({'name': name, 'pages': len(reader.pages), 'sha256': item['pdf_sha256'],
+                    'internal_links': len(destinations)})
+
+combined_path = out / 'downloads/robotops-twin-samlat.pdf'
+combined = PdfReader(combined_path)
+assert len(combined.pages) == offset == manifest['combined_pdf_pages']
+assert pdf_destinations(combined) == expected_destinations
+texts = []
+for number, page in enumerate(combined.pages, 1):
+    text = page.extract_text()
+    texts.append(text)
+    (out / f'page-{number:02d}.txt').write_text(text, encoding='utf8')
+assert all('5 oktober 2026' in text and '\ufffd' not in text for text in texts)
+cover_pages = [1]
+for report in reports[:-1]:
+    cover_pages.append(cover_pages[-1] + report['pages'])
+for number in cover_pages:
+    assert 'Status: se aktuell revisionsruta.' in texts[number - 1]
+    assert 'HKM-inspirerad revision p\u00e5g\u00e5r' not in texts[number - 1]
+status_pages = [n for n, text in enumerate(texts, 1) if 'Implementation status' in text]
+assert len(status_pages) == 3
+for number in status_pages:
+    assert 'Status: ' + manifest['simulator_status']['status'] in ' '.join(texts[number - 1].split())
+
+design = (out / 'sources/01-design.md').read_text(encoding='utf8')
+scope = (out / 'sources/02-avgransning.md').read_text(encoding='utf8')
+discussion = (out / 'sources/03-diskussion.md').read_text(encoding='utf8')
+assert 'Delete selected test' in design and 'Clear test and retry' in design and 'Delete all tests' in design
+assert 'Cellregistret' in scope and 'ADR 0013' in scope
+assert 'Robot cell' in discussion and 'Create test' in discussion
+assert 'figure:investigation' in design
+assert 'sensor eller' in scope
+assert 'originaljournal' in discussion
+source_checks = []
+if args.url:
+    for path in sorted((out / 'sources').glob('*.md')):
+        repository_path = 'reports/' + path.name if path.name[:2] in ('01', '02', '03') else path.name
+        original = subprocess.check_output(['git', 'show', manifest['source_commit'] + ':' + repository_path], cwd=ROOT)
+        assert path.read_bytes().replace(b'\r\n', b'\n') == original.replace(b'\r\n', b'\n'), repository_path
+        source_checks.append({'public_file': path.relative_to(out).as_posix(),
+                              'repository_file': repository_path, 'matches_source': True})
+svgs = list((out / 'assets').glob('*.svg'))
+assert len(svgs) == manifest['diagrams'] == 12
+for svg in svgs:
+    ET.parse(svg)
+architecture = (out / 'assets/architecture.svg').read_text(encoding='utf8')
+assert 'reset intent' in architecture and 'anonymous request digests' in architecture
+assert 'Confirmed deletion removes the test world and catalog entry' in architecture
+assert 'Clear retains the same test identity/number/cell' in architecture
+investigation = (out / 'assets/investigation.svg').read_text(encoding='utf8')
+assert 'Evidence + manual inspection' in investigation
+assert 'Original-command reconciliation only' in investigation
+assert 'Same selection and paused replay frame' in investigation
+catalogue = json.loads((ROOT / 'robotops/robotics/catalogue-v1.json').read_text(encoding='utf8'))
+matrix = ET.parse(out / 'assets/product-tool-compatibility.svg')
+cells = [text.strip() for text in matrix.getroot().itertext() if text.strip() in ('P', 'C', 'N')]
+assert cells == [p['compatibility'][t['tool_id']] for p in catalogue['products'] for t in catalogue['tools']]
+
+keywords = ('Figure 2.', 'Delete selected test', 'Cellregistret', 'livscykel',
+            'Figure 12.', 'Why this tool', 'Krav och minsta', 'unders', 'symptom')
+detailed_pages = sorted(set(cover_pages + status_pages + [n for n, text in enumerate(texts, 1)
+                                          if any(word in text for word in keywords)]))
+commands = []
+if args.render:
+    poppler = Path.home() / '.cache/robotops-build-tools/pdf-env/Library/bin'
+    env = dict(os.environ)
+    env['PATH'] = str(poppler) + os.pathsep + env['PATH']
+    def render(arguments):
+        command = [str(poppler / 'pdftoppm.exe'), *arguments]
+        commands.append(command)
+        subprocess.run(command, check=True, env=env, capture_output=True)
+    render(['-r', '50', '-png', str(combined_path), str(out / 'overview')])
+    images = sorted(out.glob('overview-*.png'))
+    assert len(images) == len(texts)
+    for start in range(0, len(images), 16):
+        sheet = Image.new('RGB', (1200, 1800), '#b8bdc7')
+        draw = ImageDraw.Draw(sheet)
+        for index, path in enumerate(images[start:start + 16]):
+            with Image.open(path) as source:
+                source.thumbnail((284, 412))
+                x, y = (index % 4) * 300 + 8, (index // 4) * 450 + 28
+                sheet.paste(source, (x, y))
+                draw.text((x, y - 20), f'Page {start + index + 1}', fill='black')
+        sheet.save(out / f'contact-{start // 16 + 1}.png')
+    for number in detailed_pages:
+        render(['-f', str(number), '-l', str(number), '-r', '120', '-png',
+                str(combined_path), str(out / 'detail')])
+
+if args.url:
+    with urllib.request.urlopen(base + 'build.json', timeout=40) as response:
+        assert json.load(response)['source_commit'] == manifest['source_commit']
+result = {
+    'status': 'AUTOMATED_PASS_VISUAL_REVIEW_PENDING',
+    'scope': 'Public deployed source' if args.url else 'Local dirty-worktree publication only; not exact-commit or remote acceptance',
+    'reviewed_at_utc': datetime.now(timezone.utc).isoformat(),
+    'source_commit_in_build': manifest['source_commit'],
+    'worktree_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+    'worktree_dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT)),
+    'status_in_publication': manifest['simulator_status'],
+    'resource_count': len(resources), 'html_pages': len(pages), 'relative_links_checked': link_count,
+    'pdfs': reports, 'combined_pdf_sha256': resources['downloads/robotops-twin-samlat.pdf']['sha256'],
+    'combined_pages': len(texts), 'internal_pdf_links': len(expected_destinations),
+    'matrix_cells_checked': len(cells), 'sources': manifest['references'], 'diagrams': len(svgs),
+    'cover_pages': cover_pages, 'status_pages': status_pages, 'detailed_pages': detailed_pages,
+    'generated_files_edited': False, 'source_files_edited': False,
+    'external_research_urls_rechecked': False, 'resources': resources, 'render_commands': commands,
+    'deployed_source_documents_compared_to_git': source_checks,
+}
+(out / 'result.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf8')
+print(json.dumps({k: v for k, v in result.items() if k not in ('resources', 'render_commands')}, indent=2))

@@ -1,0 +1,99 @@
+"""Read-only audit of actual acceptance snapshots and browser result files."""
+
+import argparse
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument('directory', type=Path)
+parser.add_argument('--sha', required=True)
+parser.add_argument('--out', type=Path, required=True)
+args = parser.parse_args()
+manifest = json.loads((args.directory / 'manifest.json').read_text(encoding='utf8'))
+assert manifest['source']['commit'] == args.sha
+assert manifest['source']['dirty'] is False
+expectations = {
+    'happy_path': ('COMPLETED', 'COMPLETED', 1, 1),
+    'lost_ack_after_effect': ('UNKNOWN_OUTCOME', 'COMPLETED', 1, 1),
+    'lost_ack_before_effect': ('UNKNOWN_OUTCOME', 'FAILED', 1, 0),
+    'ambiguous': ('UNKNOWN_OUTCOME', 'REQUIRES_INTERVENTION', 1, 1),
+    'restart': ('UNKNOWN_OUTCOME', 'COMPLETED', 1, 1),
+    'logical_estop': ('FAILED', 'FAILED', 1, 0),
+    'cell_fault': ('FAILED', 'FAILED', 1, 0),
+    'tool_showcase': ('COMPLETED', 'COMPLETED', 6, 6),
+}
+expected_tools = [
+    ('SKU-A', 'EE_VAC_SINGLE'), ('SKU-B', 'EE_VAC_ARRAY'),
+    ('SKU-C', 'EE_ADAPTIVE_SOFT'), ('SKU-D', 'EE_PINCH_NARROW'),
+    ('SKU-E', 'EE_PINCH_WIDE'), ('SKU-F', 'EE_SUPPORT_FORK'),
+]
+results = []
+for scenario, (initial, final, commands, effects) in expectations.items():
+    path = args.directory / f'demo-{scenario}.json'
+    snapshot = json.loads(path.read_text(encoding='utf8'))
+    assert snapshot['scenario'] == scenario and snapshot['runtime'] == 'blender'
+    assert snapshot['initial_state'] == initial and snapshot['final_state'] == final
+    assert snapshot['command_count'] == commands
+    assert snapshot['pick_effect_count'] == effects
+    assert snapshot['duplicate_physical_picks'] == 0
+    assert snapshot['no_replacement_commands'] is True
+    assert snapshot['command_id'] == snapshot['original_command_id']
+    assert len(snapshot['order']['job_ids']) == commands
+    evidence = snapshot['evidence']
+    assert len(evidence) == commands
+    ids = {entry['command']['command_id'] for entry in evidence}
+    assert len(ids) == commands
+    assert {entry['job']['order_id'] for entry in evidence} == {snapshot['order']['order_id']}
+    controller = snapshot['controller_events']
+    assert sum(event['event_type'] == 'COMMAND_CREATED' for event in controller) == commands
+    assert sum(event['event_type'] == 'PICK_EFFECT' for event in controller) == effects
+    assert sum(entry['journal']['effect_count'] for entry in evidence) == effects
+    assessments = []
+    for entry in evidence:
+        command = entry['command']
+        command_id = command['command_id']
+        assert entry['job']['command_id'] == command_id
+        assert entry['journal']['command_id'] == command_id
+        counted = sum(event['event_type'] == 'PICK_EFFECT' and event['command_id'] == command_id
+                      for event in controller)
+        assert counted == entry['journal']['effect_count'] <= 1
+        if initial == 'UNKNOWN_OUTCOME':
+            states = [event['state_after'] for event in snapshot['timeline']
+                      if event.get('job_id') == entry['job']['job_id']]
+            assert 'UNKNOWN_OUTCOME' in states and 'RECONCILING' in states and final in states
+            review = entry['reconciliations'][-1]
+            assert review['command']['command_id'] == command_id
+            assert review['receipt']['command_id'] == command_id
+            observed = review['observation']
+            verified = review['verification']
+            assert observed['observation_id'] != command['observation_id']
+            assert datetime.fromisoformat(observed['captured_at']) > datetime.fromisoformat(command['timestamp'])
+            assert verified['observation_id'] == observed['observation_id']
+            assert verified['command_id'] == command_id
+            assert observed in entry['observations'] and verified in entry['verifications']
+            verdict = 'INCONCLUSIVE' if scenario == 'ambiguous' else (
+                'VERIFIED_FAILURE' if scenario == 'lost_ack_before_effect' else 'VERIFIED_SUCCESS')
+            assert verified['verdict'] == verdict
+            assessments.append({'command_id': command_id, 'observation_id': observed['observation_id'],
+                                'verification_id': verified['verification_id'], 'verdict': verified['verdict'],
+                                'reason': verified['reason'], 'effects': counted})
+    if scenario == 'tool_showcase':
+        assert [(item['sku'], item['tool_id']) for item in snapshot['tool_showcase']] == expected_tools
+        assert all(item['effect_count'] == 1 for item in snapshot['tool_showcase'])
+        assert sum(event['event_type'] == 'TOOL_CHANGE_COMPLETED' for event in controller) == 5
+        assert sum(event['event_type'] == 'TOOL_CHANGE_NOT_REQUIRED' for event in controller) == 1
+    results.append({'scenario': scenario, 'initial_state': initial, 'final_state': final,
+                    'order_count': 1, 'job_count': commands, 'command_count': commands,
+                    'pick_effect_count': effects, 'replacement_commands': 0,
+                    'assessments': assessments, 'snapshot': path.name,
+                    'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+result = {'result': 'PASS', 'audited_at_utc': datetime.now(timezone.utc).isoformat(),
+          'source': manifest['source'], 'scope': 'Persisted actual Blender demo evidence; read-only audit',
+          'demos': results, 'tool_showcase': expected_tools,
+          'ground_truth_used_for_verification': False}
+args.out.parent.mkdir(parents=True, exist_ok=True)
+args.out.write_text(json.dumps(result, indent=2) + '\n', encoding='utf8')
+print(json.dumps({'result': result['result'], 'source': result['source'],
+                  'demos': len(results), 'assessed_original_commands': sum(len(r['assessments']) for r in results)}))

@@ -9,9 +9,13 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 ADR 0013 implements the owner's updated lifecycle semantics: delete purges the
 test entry/world and releases its number; clear keeps that test for a fresh run.
 Pending cleanup/reset and anonymous request digests preserve safe retries.
-Current verification is separate from the accepted historical revisions below.
-API/contracts, operator guides, all three reports and the architecture caption
-are synchronized; rebuild generated Pages/PDFs through the normal process.
+The df45c93 implementation passes all 118 MUSTs with 688 tests twice, 91.66%
+coverage and successful exact-source CI/native/publication workflows.
+[Evidence and mapping correction](docs/evidence/test-reset-final/README.md) remain
+separate from accepted historical revisions below. API/contracts, operator guides,
+all three reports, architecture caption and citation version 1.4 are synchronized.
+The generated Pages/PDFs are rebuilt through the normal process; the final
+evidence/status successor gets its own complete CI and deployed-SHA verification.
 External source entries and provenance classifications are unchanged.
 
 ### Accepted investigation workflow revision (2026-10-05)

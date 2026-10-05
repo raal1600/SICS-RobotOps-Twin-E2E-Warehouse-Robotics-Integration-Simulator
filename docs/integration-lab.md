@@ -53,8 +53,9 @@ uv run uvicorn robotops.lab.api:create_app --factory --host 127.0.0.1 --port 800
 The lab uses one retained cell; creating/deleting independent fast-profile tests
 is disabled and advertised through `/health` capabilities.
 `ROBOTOPS_WMS_URL` selects the actual business REST service (default
-`http://127.0.0.1:8081`). `python -m robotops.lab edge-health` checks the edge's
-recent PostgreSQL heartbeat after successful broker polling.
+`http://127.0.0.1:8081`). `python -m robotops.lab edge-health` checks both the
+edge control service's HTTP health and its recent PostgreSQL heartbeat after
+successful broker polling.
 `ROBOTOPS_EDGE_URL` selects the separate edge control service (default
 `http://127.0.0.1:8082`). The edge process owns the OPC UA client; the API has no
 direct OPC UA fallback. The edge's bounded REST control endpoint makes each
@@ -191,7 +192,8 @@ network timeout plus 60 seconds, and planner timeout plus 60 seconds. After that
 budget, nonphysical stages resume their same stage and identity. For interrupted
 physical stage 16, a committed dispatch intent triggers original-journal/fresh-
 observation reconciliation only. If neither dispatch intent nor controller result
-exists, recovery returns to mandatory gate 15 with physical authorization cleared.
+exists, lab recovery returns to preconditions at stage 14, then mandatory gate 15,
+with physical authorization cleared. Local recovery returns directly to gate 15.
 A missing result after committed intent remains uncertain/intervention. Persisted
 command/verdict stages recover their existing records; a stale pre-plan observation
 returns to the observation stage, while hard planner rejection terminates FAILED.

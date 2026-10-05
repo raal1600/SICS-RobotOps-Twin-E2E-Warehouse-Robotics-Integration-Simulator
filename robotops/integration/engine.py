@@ -4,6 +4,7 @@ Local mode is deliberately an in-process transport model. No trace claims an AMQ
 or OPC UA wire operation unless the configured LabBridge actually performs one.
 """
 
+import ast
 from pathlib import Path
 from time import monotonic
 from typing import Any
@@ -144,7 +145,7 @@ STAGES = (
         "SIMULATED SYSTEM",
         "robotops/integration/engine.py",
         "GuidedEngine._execute",
-        "Local mode performs no OPC UA network operation.",
+        "Establishing a controller session does not accept or execute a command.",
     ),
     (
         "PLC SubmitJob",
@@ -843,7 +844,8 @@ class GuidedEngine:
         source_path = Path(__file__).parents[2] / path
         excerpt = ""
         if source_path.exists():
-            lines = source_path.read_text(encoding="utf-8").splitlines()
+            source_text = source_path.read_text(encoding="utf-8")
+            lines = source_text.splitlines()
             method = symbol.split(".")[-1]
             match = next((i for i, line in enumerate(lines) if f"def {method}(" in line), None)
             if method == "_execute":
@@ -861,7 +863,19 @@ class GuidedEngine:
                         match,
                     )
             if match is not None:
-                excerpt = "\n".join(lines[match : match + 8])
+                # Short methods/branches must not display the next operation as
+                # evidence for this stage. AST bounds retain multiline signatures.
+                source_node = next(
+                    (
+                        node
+                        for node in ast.walk(ast.parse(source_text))
+                        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.If))
+                        and node.lineno == match + 1
+                    ),
+                    None,
+                )
+                end = source_node.end_lineno if source_node else len(lines)
+                excerpt = "\n".join(lines[match : min(match + 8, end or len(lines))])
         step = ExecutionStep(
             step_id=stable_id(session_id, f"step:{session.revision}"),
             session_id=session_id,

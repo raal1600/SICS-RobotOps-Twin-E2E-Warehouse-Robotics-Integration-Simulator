@@ -207,6 +207,9 @@ class IntegrationConsole {
     if (!session) return;
     this.el("integration-console").hidden = false;
     this.el("integration-history").value = session.session_id;
+    for (const option of this.el("integration-history").children) {
+      if (option.value === session.session_id) option.textContent = `${session.order_id || session.session_id} · ${session.status}`;
+    }
     this.el("integration-state").textContent = `${session.status} · revision ${session.revision}`;
     this.el("integration-ids").textContent = [
       ["Session", session.session_id], ["Correlation", session.correlation_id],
@@ -229,13 +232,16 @@ class IntegrationConsole {
     }
     const pending = session.pending_authorization;
     const current = session.steps?.find(step => step.stage === stage);
-    this.el("integration-pending-title").textContent = pending?.title || current?.title || session.status;
-    this.el("integration-pending-detail").textContent = stage === 15
+    const unproven = ["UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION"].includes(session.status);
+    this.el("integration-pending-title").textContent = unproven ? "Outcome unproven · reconciliation required" : pending?.title || current?.title || session.status;
+    this.el("integration-pending-detail").textContent = unproven
+      ? "The physical outcome is unproven. Reconcile queries the original command journal and fresh observation; it does not issue a new pick. Business completion remains blocked until verification and WMS acknowledgement."
+      : stage === 15
       ? "This permits the original command to change the synthetic world. A lost response must be reconciled using its journal; it must never trigger a fresh pick. This is not a safety function."
       : pending?.summary || "Continue executes one bounded backend stage and saves its result. Waiting and viewing do not execute work.";
     this.el("integration-advance").textContent = this.busy ? "Executing bounded stage…"
-      : stage === 15 ? "AUTHORIZE ROBOT EXECUTION" : pending?.label || `Continue · stage ${stage}`;
-    this.el("integration-advance").disabled = this.busy || this.readOnly() || !pending;
+      : unproven ? "Awaiting reconciliation" : stage === 15 ? "AUTHORIZE ROBOT EXECUTION" : pending?.label || `Continue · stage ${stage}`;
+    this.el("integration-advance").disabled = this.busy || this.readOnly() || unproven || !pending;
     this.el("integration-pending").classList.toggle("physical-gate", stage === 15);
     const uncertain = ["UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION", "EXECUTING_STAGE"].includes(session.status);
     this.el("integration-reconcile").textContent = session.status === "EXECUTING_STAGE" ? "Recover interrupted stage" : "Reconcile original command";

@@ -133,6 +133,13 @@ def test_guided_lost_ack_reconciles_original_command_without_second_effect(serve
     assert runtime.recorded_journal(command).effect_count == 1
     expect(page.locator("#integration-reconcile")).to_be_visible()
     expect(page.locator("#integration-advance")).to_be_disabled()
+    expect(page.locator("#integration-pending-title")).to_contain_text("Outcome unproven")
+    expect(page.locator("#integration-pending-detail")).to_contain_text(
+        "original command journal and fresh observation"
+    )
+    expect(page.locator("#integration-pending-detail")).to_contain_text("does not issue a new pick")
+    expect(page.locator("#integration-advance")).to_have_text("Awaiting reconciliation")
+    expect(page.locator("#integration-history option:checked")).to_contain_text("UNKNOWN_OUTCOME")
     page.screenshot(path=str(directory / "unknown-outcome.png"), full_page=True)
     with page.expect_response(lambda response: response.url.endswith("/reconcile")) as response:
         page.locator("#integration-reconcile").click()

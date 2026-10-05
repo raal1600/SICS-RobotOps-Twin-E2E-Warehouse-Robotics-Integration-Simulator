@@ -1,5 +1,6 @@
 """Displayed source references must execute on the real distributed lab path."""
 
+import inspect
 import socket
 import sys
 import threading
@@ -101,6 +102,11 @@ def test_every_lab_stage_source_symbol_executes_and_excerpt_matches(
             )
             if stage in {12, 13, 14, 17}:
                 assert ("robotops/lab/edge_rpc.py", "EdgeRPC.call") in calls
+            if stage == 12:
+                assert step.source.excerpt == inspect.getsource(LabBridge.opc_connect).rstrip()
+                assert step.invariant == (
+                    "Establishing a controller session does not accept or execute a command."
+                )
             if stage == 16:
                 assert ("robotops/lab/edge_rpc.py", "EdgeRPC.execute") in calls
         assert session.status == "COMPLETED"

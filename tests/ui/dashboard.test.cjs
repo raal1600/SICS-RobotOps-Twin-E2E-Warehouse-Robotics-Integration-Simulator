@@ -438,6 +438,12 @@ for(const execution of executions)for(const observation of observations)test(`in
 test('unreconciled test can be archived without reconciliation, then reviewed unchanged',async()=>{
   const {el,orders,posts}=await dashboard();
   el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
+  assert.match(el('integration-pending-title').textContent,/Outcome unproven/);
+  assert.match(el('integration-pending-detail').textContent,/original command journal and fresh observation/);
+  assert.match(el('integration-pending-detail').textContent,/does not issue a new pick/);
+  assert.equal(el('integration-advance').textContent,'Awaiting reconciliation');
+  assert.equal(el('integration-advance').disabled,true);
+  assert.match(el('integration-history').children.find(option=>option.value===el('integration-history').value).textContent,/UNKNOWN_OUTCOME/);
   await el('new-test').onclick();await el('create-test').onclick();
   assert.equal(orders[0].status,'UNKNOWN_OUTCOME');
   assert.equal(posts.filter(p=>p.path.endsWith('/reconcile')).length,0);

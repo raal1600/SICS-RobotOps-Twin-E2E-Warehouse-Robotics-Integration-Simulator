@@ -35,6 +35,18 @@ Do not begin architecture-changing implementation before understanding the norma
 
 ## Execution loop
 
+### Accepted delete/clear behavior and runtime follow-up
+
+Clean source `0d03402776cf7ba63710634c5df2a8047501bdfb` passes all 118 MUSTs.
+Windows and Linux each pass 693 tests twice, including 146 Node checks and nine
+Chromium journeys per suite; eight Blender demos pass on each platform.
+[Current acceptance](docs/evidence/acceptance/20261005T141427/manifest.json) and
+[the exact-source archive](docs/evidence/reset-verified/README.md) preserve the
+repeated results, remote gates and original failures. ADR 0013's deletion/clearing,
+response draining and fixed Windows QoS invocation below are implemented. Retain
+their protections and source attribution. Evidence/status successors still need
+their own full workflows and deployed SHA under ADR 0002.
+
 ### Investigation workflow revision
 
 ADR 0012 adapts the accepted UI at `0db6168` around run, notice and investigate.

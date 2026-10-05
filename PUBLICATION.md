@@ -12,8 +12,13 @@ Windows Blender QoS now have targeted browser, runtime and contract evidence.
 Source S31 adds official Blender command-line documentation; previous research
 classifications remain unchanged. Runtime/plan/handoff/playback sources and the
 design report describe the same bounded invocation. Architecture and state
-boundaries are unchanged. New complete acceptance and final-source publication
-verification remain required; the accepted revisions below retain their own scope.
+boundaries are unchanged. Clean source 0d03402 now passes all 118 MUSTs, with
+693 tests twice on both Windows and Linux, 146 UI checks and eight Blender
+demos. [The verified archive](docs/evidence/reset-verified/README.md) preserves
+the original CI evidence, native results and public source/PDF/link checks.
+README, report status, handoff, checklist and acceptance guide are synchronized.
+The evidence/status successor is independently verified after publication;
+accepted historical revisions below retain their exact source scope.
 
 ### Delete versus clear correction (2026-10-05)
 

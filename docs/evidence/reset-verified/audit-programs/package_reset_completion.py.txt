@@ -1,0 +1,98 @@
+"""Archive exact-source verification without rewriting any historical evidence."""
+import argparse
+import hashlib
+import json
+import shutil
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser()
+parser.add_argument('--sha', required=True)
+parser.add_argument('--local', type=Path, required=True)
+parser.add_argument('--ci', type=Path, required=True)
+parser.add_argument('--browser', type=Path, required=True)
+parser.add_argument('--semantics', type=Path, required=True)
+parser.add_argument('--local-semantics', type=Path, required=True)
+parser.add_argument('--remote', type=Path, required=True)
+parser.add_argument('--publication', type=Path, required=True)
+parser.add_argument('--layout', type=Path, required=True)
+parser.add_argument('--out', type=Path, required=True)
+args = parser.parse_args()
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+local = read(args.local / 'manifest.json')
+ci = read(args.ci / 'ci-evidence-verification.json')
+browser = read(args.browser / 'browser-verification.json')
+remote = read(args.remote / 'runs.json')
+native = read(args.remote / 'native-evidence.json')
+public = read(args.publication / 'result.json')
+visual = read(args.publication / 'visual-review.json')
+assert local['source']['commit'] == ci['source']['commit'] == args.sha
+assert local['source']['dirty'] is ci['source']['dirty'] is False
+assert all(value['passed'] for value in local['gates'].values())
+assert ci['artifact_digest_verified'] and ci['test_identities_identical']
+assert all(t['passed'] == 693 and t['failures'] == t['errors'] == t['skipped'] == 0 for t in ci['tests'])
+assert browser['result'] == 'PASS' and browser['source_commit'] == args.sha
+assert browser['case_count'] == 18 and browser['lifecycle_journeys'] == 8
+assert len(remote['runs']) == 3 and all(r['head_sha'] == args.sha and r['conclusion'] == 'success' for r in remote['runs'])
+assert native['source_commit'] == args.sha and native['source_dirty'] is False
+assert native['passed'] and len(native['checks']) == 6
+assert public['source_commit_in_build'] == args.sha
+assert visual['source_commit'] == args.sha and visual['result'] == 'PASS_FOR_SELECTED_STATUS_AND_LAYOUT_REVIEW'
+for path in (args.semantics, args.local_semantics):
+    value = read(path)
+    assert value['source']['commit'] == args.sha and value['result'] == 'PASS'
+
+out = args.out.resolve()
+assert out.is_relative_to(ROOT / 'docs/evidence')
+out.mkdir(parents=True, exist_ok=False)
+imports = []
+
+def preserve(origin, name):
+    origin = origin.resolve()
+    target = (out / name).resolve()
+    assert target.is_relative_to(out)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    data = origin.read_bytes()
+    target.write_bytes(data)
+    assert target.read_bytes() == data
+    imports.append({'path': target.relative_to(out).as_posix(),
+                    'original_path': origin.relative_to(ROOT).as_posix(),
+                    'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
+
+preserve(args.ci / 'ci-evidence-verification.json', 'ci/audit.json')
+ci_original = args.ci / Path(ci['selected_manifest']).parent
+for origin in sorted(ci_original.rglob('*')):
+    if origin.is_file():
+        preserve(origin, Path('ci/original') / origin.relative_to(ci_original))
+for origin in sorted(args.browser.rglob('*')):
+    if origin.is_file():
+        preserve(origin, Path('browser') / origin.relative_to(args.browser))
+for name in ('runs.json', 'ci-artifacts.json', 'native-artifacts.json', 'native-evidence.json'):
+    preserve(args.remote / name, Path('remote') / name)
+for name in ('result.json', 'build.json', 'visual-review.json'):
+    preserve(args.publication / name, Path('publication') / name)
+for page in (3, 38, 52):
+    preserve(args.layout / f'detail-{page:02}.png', f'publication/page-{page:02}.png')
+preserve(args.semantics, 'semantics/linux.json')
+preserve(args.local_semantics, 'semantics/windows.json')
+for name in ('audit_investigation_ci', 'audit_reset_browser', 'audit_investigation_semantics',
+             'review_reset_publication', 'package_reset_completion'):
+    preserve(ROOT / f'artifacts/{name}.py', f'audit-programs/{name}.py.txt')
+result = {
+    'audited_source': args.sha,
+    'baseline_commit': '4da22d75bded35452f4bca1db03c57da5e9eb957',
+    'packaged_at_utc': datetime.now(timezone.utc).isoformat(),
+    'scope': 'Exact-source implementation evidence; a later status successor needs independent workflows.',
+    'local_acceptance': args.local.as_posix(),
+    'local_manifest_sha256': hashlib.sha256((args.local / 'manifest.json').read_bytes()).hexdigest(),
+    'historical_evidence_modified': False,
+    'ci_remote_placeholders_preserved': True,
+    'publication_status_at_audit': public['status_in_publication']['status'],
+    'files': imports,
+}
+(out / 'archive.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+print(json.dumps({'archive': str(out), 'files': len(imports), 'source': args.sha}))

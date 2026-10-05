@@ -1,0 +1,3624 @@
+{
+  "scenario": "lost_ack_after_effect",
+  "runtime": "blender",
+  "initial_state": "UNKNOWN_OUTCOME",
+  "final_state": "COMPLETED",
+  "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+  "pick_effect_count": 1,
+  "duplicate_physical_picks": 0,
+  "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+  "command_count": 1,
+  "no_replacement_commands": true,
+  "tool_showcase": [],
+  "evidence": [
+    {
+      "schema_version": "1.0",
+      "job": {
+        "schema_version": "1.0",
+        "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+        "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+        "causation_id": "ac56c3a2-4bb0-4973-9f9b-51b5c62a960e",
+        "timestamp": "2026-10-05T14:49:16.297991Z",
+        "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+        "order_id": "demo-order",
+        "line": {
+          "schema_version": "1.0",
+          "order_line_id": "demo-line-1",
+          "product_id": "product-SKU-A-01",
+          "source_id": "SRC_A",
+          "destination_id": "DESTINATION",
+          "quantity": 1
+        },
+        "state": "COMPLETED",
+        "revision": 8,
+        "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "action_plan_id": "b523b78e-fe3c-5865-9c0a-7ac92bcc15c5"
+      },
+      "command": {
+        "schema_version": "2.0",
+        "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+        "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+        "causation_id": "db51346c-f358-46b6-ac3a-6af99b24dd6f",
+        "timestamp": "2026-10-05T14:48:56.059948Z",
+        "action_plan_id": "b523b78e-fe3c-5865-9c0a-7ac92bcc15c5",
+        "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+        "order_id": "demo-order",
+        "order_line_id": "demo-line-1",
+        "kind": "PICK_AND_PLACE",
+        "product_id": "product-SKU-A-01",
+        "source_id": "SRC_A",
+        "destination_id": "DESTINATION",
+        "target_pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.38,
+            0.9400000000000002,
+            0.20249999999999999
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+        "observation_id": "db51346c-f358-46b6-ac3a-6af99b24dd6f",
+        "cell_generation": 0,
+        "brain_version": "deterministic-hkm-1",
+        "selected_tool_id": "EE_VAC_SINGLE",
+        "grasp_pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.08,
+            -0.68,
+            0.22499999999999998
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "trajectory": {
+          "schema_version": "2.0",
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "profile": "SAFE_PICK_PLACE_V1",
+          "required_tool_id": "EE_VAC_SINGLE",
+          "grasp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              1.08,
+              -0.68,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "target_tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.38,
+              0.9400000000000002,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "product_attachment_offset_m": [
+            0.0,
+            0.0,
+            -0.022499999999999992
+          ],
+          "waypoints": [
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.0,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "TOOL_CHANGE_NOT_REQUIRED",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.05,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.65,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "APPROACH",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.25,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.45,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "LIFT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 2.05,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "SAFE_TRANSFER",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.65,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.15,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.3,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.4,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RETRACT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.9,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 5.5,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            }
+          ],
+          "estimated_sim_duration_s": 5.5,
+          "route_index": 0,
+          "trajectory_planner_version": "synthetic-trajectory-1",
+          "collision_check_version": "synthetic-aabb-preflight-1",
+          "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+          "calibration_version": "hkm-cal-1",
+          "frame_tree_version": "hkm-frame-tree-1"
+        },
+        "tool_selection": {
+          "schema_version": "2.0",
+          "product_id": "product-SKU-A-01",
+          "sku": "SKU-A",
+          "selected_tool_id": "EE_VAC_SINGLE",
+          "candidate_tools": [
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_SINGLE",
+              "compatibility": "P",
+              "compatible": true,
+              "eligible": true,
+              "score": 135,
+              "reasons": [
+                "PREFERRED_FOR_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "ALREADY_MOUNTED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_ARRAY",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_NARROW",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_WIDE",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_ADAPTIVE_SOFT",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_SUPPORT_FORK",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            }
+          ],
+          "assessed_mass_kg": 0.4,
+          "tool_change_required": false,
+          "selection_version": "deterministic-tool-selector-1",
+          "product_catalog_version": "synthetic-products-1",
+          "tool_spec_version": "synthetic-tools-1"
+        },
+        "robot_profile_version": "hkm_inspired_v1",
+        "product_catalog_version": "synthetic-products-1",
+        "tool_spec_version": "synthetic-tools-1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "required_tool_id": "EE_VAC_SINGLE"
+      },
+      "journal": {
+        "schema_version": "2.0",
+        "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+        "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+        "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "timestamp": "2026-10-05T14:49:16.226922Z",
+        "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+        "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+        "status": "SUCCEEDED",
+        "reason": "BLENDER_PICK_APPLIED",
+        "effect_count": 1,
+        "payload_hash": "36e7326e01a7560ce299e1a58242fdd366be922bd28479ce6fd7a21ba3a932a3",
+        "journal_durable": true,
+        "active_tool_id": "EE_VAC_SINGLE",
+        "tool_change_performed": false,
+        "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+        "runtime_profile_version": "hkm_inspired_v1"
+      },
+      "observations": [
+        {
+          "schema_version": "2.0",
+          "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "timestamp": "2026-10-05T14:48:56.059948Z",
+          "observation_id": "db51346c-f358-46b6-ac3a-6af99b24dd6f",
+          "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+          "step": 0,
+          "captured_at": "2026-10-05T14:48:56.059948Z",
+          "model_version": "synthetic-observer-2",
+          "calibration_version": "hkm-cal-1",
+          "objects": [
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-A-01",
+              "location_id": "SRC_A",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.20249999999999999
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-B-01",
+              "location_id": "SRC_B",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.1,
+                  -1.24,
+                  0.22999999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-C-01",
+              "location_id": "SRC_C",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.85,
+                  -0.92,
+                  0.21999999999999997
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-D-01",
+              "location_id": "SRC_D",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.26,
+                  -0.08,
+                  0.295
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-E-01",
+              "location_id": "SRC_E",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.15,
+                  0.75,
+                  0.24
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-F-01",
+              "location_id": "SRC_F",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.14,
+                  0.75,
+                  0.25
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            }
+          ],
+          "covered_locations": [
+            "SRC_A",
+            "SRC_B",
+            "SRC_C",
+            "SRC_D",
+            "SRC_E",
+            "SRC_F",
+            "DESTINATION"
+          ],
+          "cell_generation": 0,
+          "robot_profile_version": "hkm_inspired_v1",
+          "frame_tree_version": "hkm-frame-tree-1",
+          "sensors": [
+            {
+              "schema_version": "2.0",
+              "sensor_id": "overhead-observation",
+              "frame_id": "camera_overhead",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  0.0,
+                  2.6
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            },
+            {
+              "schema_version": "2.0",
+              "sensor_id": "side-inspection",
+              "frame_id": "camera_side",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.85,
+                  -0.65,
+                  1.25
+                ],
+                "quaternion_xyzw": [
+                  0.4164435022802413,
+                  -0.295082221134753,
+                  -0.4971755075060524,
+                  0.7016536231751722
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            }
+          ],
+          "machine_telemetry": {
+            "schema_version": "2.0",
+            "source": "SIMULATED_CELL_TELEMETRY",
+            "tool_state": {
+              "schema_version": "2.0",
+              "active_tool_id": "EE_VAC_SINGLE",
+              "changer_state": "READY",
+              "rack_tool_ids": [
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "tool_state_version": "synthetic-tool-state-1"
+            },
+            "tcp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                -0.6,
+                1.02
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "captured_at": "2026-10-05T14:48:56.059948Z",
+            "cell_generation": 0
+          }
+        },
+        {
+          "schema_version": "2.0",
+          "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "timestamp": "2026-10-05T14:49:16.291128Z",
+          "observation_id": "0a564130-05b0-4828-bdc1-78965ee6d856",
+          "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+          "step": 1,
+          "captured_at": "2026-10-05T14:49:16.291128Z",
+          "model_version": "synthetic-observer-2",
+          "calibration_version": "hkm-cal-1",
+          "objects": [
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-A-01",
+              "location_id": "DESTINATION",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.3799999952316284,
+                  0.9399999976158142,
+                  0.20249998569488525
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-B-01",
+              "location_id": "SRC_B",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.10000000149011612,
+                  -1.2400000095367432,
+                  0.23000001907348633
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-C-01",
+              "location_id": "SRC_C",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.8500000238418579,
+                  -0.9200000166893005,
+                  0.2199999988079071
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-D-01",
+              "location_id": "SRC_D",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.2599999904632568,
+                  -0.07999999821186066,
+                  0.29499998688697815
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-E-01",
+              "location_id": "SRC_E",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.149999976158142,
+                  0.75,
+                  0.24000000953674316
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            },
+            {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-F-01",
+              "location_id": "SRC_F",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.1399999856948853,
+                  0.75,
+                  0.25
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "confidence": 1.0,
+              "uncertainty_m": 0.0,
+              "sensor_id": "overhead-observation",
+              "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+            }
+          ],
+          "covered_locations": [
+            "SRC_A",
+            "SRC_B",
+            "SRC_C",
+            "SRC_D",
+            "SRC_E",
+            "SRC_F",
+            "DESTINATION"
+          ],
+          "cell_generation": 0,
+          "robot_profile_version": "hkm_inspired_v1",
+          "frame_tree_version": "hkm-frame-tree-1",
+          "sensors": [
+            {
+              "schema_version": "2.0",
+              "sensor_id": "overhead-observation",
+              "frame_id": "camera_overhead",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  0.0,
+                  2.6
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            },
+            {
+              "schema_version": "2.0",
+              "sensor_id": "side-inspection",
+              "frame_id": "camera_side",
+              "calibration_version": "hkm-cal-1",
+              "camera_model_version": "synthetic-orthographic-1",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -1.85,
+                  -0.65,
+                  1.25
+                ],
+                "quaternion_xyzw": [
+                  0.4164435022802413,
+                  -0.295082221134753,
+                  -0.4971755075060524,
+                  0.7016536231751722
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "presentation_only": false
+            }
+          ],
+          "machine_telemetry": {
+            "schema_version": "2.0",
+            "source": "SIMULATED_CELL_TELEMETRY",
+            "tool_state": {
+              "schema_version": "2.0",
+              "active_tool_id": "EE_VAC_SINGLE",
+              "changer_state": "READY",
+              "rack_tool_ids": [
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "tool_state_version": "synthetic-tool-state-1"
+            },
+            "tcp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                -0.6,
+                1.02
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "captured_at": "2026-10-05T14:49:16.291128Z",
+            "cell_generation": 0
+          }
+        }
+      ],
+      "verifications": [
+        {
+          "schema_version": "1.0",
+          "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "0a564130-05b0-4828-bdc1-78965ee6d856",
+          "timestamp": "2026-10-05T14:49:16.294775Z",
+          "verification_id": "4322e655-e6e1-4437-8a08-bd922811e2fd",
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "observation_id": "0a564130-05b0-4828-bdc1-78965ee6d856",
+          "verdict": "VERIFIED_SUCCESS",
+          "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+        }
+      ],
+      "reconciliations": [
+        {
+          "schema_version": "1.0",
+          "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+          "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+          "causation_id": "0a564130-05b0-4828-bdc1-78965ee6d856",
+          "timestamp": "2026-10-05T14:49:16.295421Z",
+          "evidence_id": "5f91f7d9-47f6-403c-b7ca-e98172024725",
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command": {
+            "schema_version": "2.0",
+            "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "db51346c-f358-46b6-ac3a-6af99b24dd6f",
+            "timestamp": "2026-10-05T14:48:56.059948Z",
+            "action_plan_id": "b523b78e-fe3c-5865-9c0a-7ac92bcc15c5",
+            "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+            "order_id": "demo-order",
+            "order_line_id": "demo-line-1",
+            "kind": "PICK_AND_PLACE",
+            "product_id": "product-SKU-A-01",
+            "source_id": "SRC_A",
+            "destination_id": "DESTINATION",
+            "target_pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.38,
+                0.9400000000000002,
+                0.20249999999999999
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+            "observation_id": "db51346c-f358-46b6-ac3a-6af99b24dd6f",
+            "cell_generation": 0,
+            "brain_version": "deterministic-hkm-1",
+            "selected_tool_id": "EE_VAC_SINGLE",
+            "grasp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.08,
+                -0.68,
+                0.22499999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "trajectory": {
+              "schema_version": "2.0",
+              "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+              "profile": "SAFE_PICK_PLACE_V1",
+              "required_tool_id": "EE_VAC_SINGLE",
+              "grasp_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "target_tcp_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "product_attachment_offset_m": [
+                0.0,
+                0.0,
+                -0.022499999999999992
+              ],
+              "waypoints": [
+                {
+                  "schema_version": "2.0",
+                  "phase": "HOME",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.0,
+                      -0.6,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 0.0,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "TOOL_CHANGE_NOT_REQUIRED",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.0,
+                      -0.6,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 0.05,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "PRE_GRASP",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 0.65,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "APPROACH",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 1.25,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "GRASP",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 1.45,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "GRASP_CONFIRM",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 1.55,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "LIFT",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.08,
+                      -0.68,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 2.05,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "SAFE_TRANSFER",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 3.55,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "PRE_PLACE",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 3.65,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "PLACE",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.15,
+                  "attached": true,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "RELEASE",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.3,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "RELEASE_CONFIRM",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      0.22499999999999998
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.4,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "RETRACT",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.38,
+                      0.9400000000000002,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 4.9,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                },
+                {
+                  "schema_version": "2.0",
+                  "phase": "HOME",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.0,
+                      -0.6,
+                      1.02
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "sim_time_s": 5.5,
+                  "attached": false,
+                  "active_tool_id": "EE_VAC_SINGLE"
+                }
+              ],
+              "estimated_sim_duration_s": 5.5,
+              "route_index": 0,
+              "trajectory_planner_version": "synthetic-trajectory-1",
+              "collision_check_version": "synthetic-aabb-preflight-1",
+              "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+              "calibration_version": "hkm-cal-1",
+              "frame_tree_version": "hkm-frame-tree-1"
+            },
+            "tool_selection": {
+              "schema_version": "2.0",
+              "product_id": "product-SKU-A-01",
+              "sku": "SKU-A",
+              "selected_tool_id": "EE_VAC_SINGLE",
+              "candidate_tools": [
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_VAC_SINGLE",
+                  "compatibility": "P",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 135,
+                  "reasons": [
+                    "PREFERRED_FOR_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "ALREADY_MOUNTED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_VAC_ARRAY",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_PINCH_NARROW",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_PINCH_WIDE",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_ADAPTIVE_SOFT",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                },
+                {
+                  "schema_version": "2.0",
+                  "tool_id": "EE_SUPPORT_FORK",
+                  "compatibility": "C",
+                  "compatible": true,
+                  "eligible": true,
+                  "score": 80,
+                  "reasons": [
+                    "COMPATIBLE_PRODUCT_FAMILY",
+                    "MASS_WITHIN_SIMULATED_LIMIT",
+                    "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                    "TOOL_CHANGE_REQUIRED"
+                  ]
+                }
+              ],
+              "assessed_mass_kg": 0.4,
+              "tool_change_required": false,
+              "selection_version": "deterministic-tool-selector-1",
+              "product_catalog_version": "synthetic-products-1",
+              "tool_spec_version": "synthetic-tools-1"
+            },
+            "robot_profile_version": "hkm_inspired_v1",
+            "product_catalog_version": "synthetic-products-1",
+            "tool_spec_version": "synthetic-tools-1",
+            "frame_tree_version": "hkm-frame-tree-1",
+            "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "required_tool_id": "EE_VAC_SINGLE"
+          },
+          "receipt": {
+            "schema_version": "2.0",
+            "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "timestamp": "2026-10-05T14:49:16.226922Z",
+            "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+            "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+            "status": "SUCCEEDED",
+            "reason": "BLENDER_PICK_APPLIED",
+            "effect_count": 1,
+            "payload_hash": "36e7326e01a7560ce299e1a58242fdd366be922bd28479ce6fd7a21ba3a932a3",
+            "journal_durable": true,
+            "active_tool_id": "EE_VAC_SINGLE",
+            "tool_change_performed": false,
+            "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+            "runtime_profile_version": "hkm_inspired_v1"
+          },
+          "observation": {
+            "schema_version": "2.0",
+            "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "timestamp": "2026-10-05T14:49:16.291128Z",
+            "observation_id": "0a564130-05b0-4828-bdc1-78965ee6d856",
+            "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+            "step": 1,
+            "captured_at": "2026-10-05T14:49:16.291128Z",
+            "model_version": "synthetic-observer-2",
+            "calibration_version": "hkm-cal-1",
+            "objects": [
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-A-01",
+                "location_id": "DESTINATION",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.3799999952316284,
+                    0.9399999976158142,
+                    0.20249998569488525
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-B-01",
+                "location_id": "SRC_B",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.10000000149011612,
+                    -1.2400000095367432,
+                    0.23000001907348633
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-C-01",
+                "location_id": "SRC_C",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.8500000238418579,
+                    -0.9200000166893005,
+                    0.2199999988079071
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-D-01",
+                "location_id": "SRC_D",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -1.2599999904632568,
+                    -0.07999999821186066,
+                    0.29499998688697815
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-E-01",
+                "location_id": "SRC_E",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -1.149999976158142,
+                    0.75,
+                    0.24000000953674316
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              },
+              {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-F-01",
+                "location_id": "SRC_F",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.1399999856948853,
+                    0.75,
+                    0.25
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "confidence": 1.0,
+                "uncertainty_m": 0.0,
+                "sensor_id": "overhead-observation",
+                "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+              }
+            ],
+            "covered_locations": [
+              "SRC_A",
+              "SRC_B",
+              "SRC_C",
+              "SRC_D",
+              "SRC_E",
+              "SRC_F",
+              "DESTINATION"
+            ],
+            "cell_generation": 0,
+            "robot_profile_version": "hkm_inspired_v1",
+            "frame_tree_version": "hkm-frame-tree-1",
+            "sensors": [
+              {
+                "schema_version": "2.0",
+                "sensor_id": "overhead-observation",
+                "frame_id": "camera_overhead",
+                "calibration_version": "hkm-cal-1",
+                "camera_model_version": "synthetic-orthographic-1",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    0.0,
+                    2.6
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "presentation_only": false
+              },
+              {
+                "schema_version": "2.0",
+                "sensor_id": "side-inspection",
+                "frame_id": "camera_side",
+                "calibration_version": "hkm-cal-1",
+                "camera_model_version": "synthetic-orthographic-1",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -1.85,
+                    -0.65,
+                    1.25
+                  ],
+                  "quaternion_xyzw": [
+                    0.4164435022802413,
+                    -0.295082221134753,
+                    -0.4971755075060524,
+                    0.7016536231751722
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "presentation_only": false
+              }
+            ],
+            "machine_telemetry": {
+              "schema_version": "2.0",
+              "source": "SIMULATED_CELL_TELEMETRY",
+              "tool_state": {
+                "schema_version": "2.0",
+                "active_tool_id": "EE_VAC_SINGLE",
+                "changer_state": "READY",
+                "rack_tool_ids": [
+                  "EE_VAC_ARRAY",
+                  "EE_PINCH_NARROW",
+                  "EE_PINCH_WIDE",
+                  "EE_ADAPTIVE_SOFT",
+                  "EE_SUPPORT_FORK"
+                ],
+                "tool_state_version": "synthetic-tool-state-1"
+              },
+              "tcp_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "captured_at": "2026-10-05T14:49:16.291128Z",
+              "cell_generation": 0
+            }
+          },
+          "verification": {
+            "schema_version": "1.0",
+            "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+            "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+            "causation_id": "0a564130-05b0-4828-bdc1-78965ee6d856",
+            "timestamp": "2026-10-05T14:49:16.294775Z",
+            "verification_id": "4322e655-e6e1-4437-8a08-bd922811e2fd",
+            "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+            "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+            "observation_id": "0a564130-05b0-4828-bdc1-78965ee6d856",
+            "verdict": "VERIFIED_SUCCESS",
+            "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+          }
+        }
+      ]
+    }
+  ],
+  "oracle_label": "SIMULATION GROUND TRUTH \u2014 NOT VERIFICATION EVIDENCE",
+  "order": {
+    "schema_version": "1.0",
+    "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+    "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+    "causation_id": "b9d64863-b950-417b-84f7-a416a4992c33",
+    "timestamp": "2026-10-05T14:48:56.046684Z",
+    "order_id": "demo-order",
+    "lines": [
+      {
+        "schema_version": "1.0",
+        "order_line_id": "demo-line-1",
+        "product_id": "product-SKU-A-01",
+        "source_id": "SRC_A",
+        "destination_id": "DESTINATION",
+        "quantity": 1
+      }
+    ],
+    "job_ids": [
+      "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac"
+    ],
+    "status": "COMPLETED"
+  },
+  "timeline": [
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "demo-order",
+      "timestamp": "2026-10-05T14:48:56.046684Z",
+      "event_id": "b9d64863-b950-417b-84f7-a416a4992c33",
+      "component": "api",
+      "event_type": "ORDER_RECEIVED",
+      "order_id": "demo-order",
+      "job_id": null,
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "ACCEPTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "b9d64863-b950-417b-84f7-a416a4992c33",
+      "timestamp": "2026-10-05T14:48:56.046684Z",
+      "event_id": "d02dd22d-8ddd-4eb8-9b17-bc71f8f99546",
+      "component": "workflow",
+      "event_type": "JOB_RECEIVED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": "RECEIVED",
+      "reason": "ORDER_LINE_CREATED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "d02dd22d-8ddd-4eb8-9b17-bc71f8f99546",
+      "timestamp": "2026-10-05T14:48:56.055612Z",
+      "event_id": "e4bcd977-bec6-4d3e-9a37-86e4bbfdc3a0",
+      "component": "faults",
+      "event_type": "FAULT_INJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "DROP_ACK_AFTER_EFFECT",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "7f320483-8193-44de-b375-e9d36e6bb08b"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "e4bcd977-bec6-4d3e-9a37-86e4bbfdc3a0",
+      "timestamp": "2026-10-05T14:48:56.056589Z",
+      "event_id": "d1167440-6707-479a-a0fc-771f4c0b6807",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": "RECEIVED",
+      "state_after": "VALIDATED",
+      "reason": "ORDER_SCHEMA_VALID",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "d1167440-6707-479a-a0fc-771f4c0b6807",
+      "timestamp": "2026-10-05T14:48:56.057942Z",
+      "event_id": "0c115cbb-6c8c-480e-a227-125b51ec3afa",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": "VALIDATED",
+      "state_after": "PLANNING",
+      "reason": "BRAIN_REQUESTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "0c115cbb-6c8c-480e-a227-125b51ec3afa",
+      "timestamp": "2026-10-05T14:48:56.063063Z",
+      "event_id": "d1add133-8770-4b90-8b69-2d512241e551",
+      "component": "observation",
+      "event_type": "OBSERVATION_CAPTURED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "FRESH_SENSOR_MODEL",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "db51346c-f358-46b6-ac3a-6af99b24dd6f"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "d1add133-8770-4b90-8b69-2d512241e551",
+      "timestamp": "2026-10-05T14:48:56.112510Z",
+      "event_id": "e8ae9397-9933-4a39-9598-b88b87990907",
+      "component": "validator",
+      "event_type": "PLAN_VALIDATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": null,
+      "state_before": null,
+      "state_after": null,
+      "reason": "SEMANTIC_CHECKS_PASSED",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "b523b78e-fe3c-5865-9c0a-7ac92bcc15c5"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "e8ae9397-9933-4a39-9598-b88b87990907",
+      "timestamp": "2026-10-05T14:48:56.115932Z",
+      "event_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "component": "validator",
+      "event_type": "COMMAND_INTENT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "VALIDATED_DURABLE_COMMAND",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "b523b78e-fe3c-5865-9c0a-7ac92bcc15c5"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "timestamp": "2026-10-05T14:48:56.117563Z",
+      "event_id": "eef229c9-becf-4809-9463-ec5d1b625227",
+      "component": "brain",
+      "event_type": "GRASP_SELECTION_EVALUATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DETERMINISTIC_COMPATIBILITY_SCORE",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "b523b78e-fe3c-5865-9c0a-7ac92bcc15c5"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "eef229c9-becf-4809-9463-ec5d1b625227",
+      "timestamp": "2026-10-05T14:48:56.118811Z",
+      "event_id": "386034e5-ab49-46b7-a413-2c0360f2358b",
+      "component": "planner",
+      "event_type": "TRAJECTORY_PLANNED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "CONSERVATIVE_SYNTHETIC_COLLISION_PREFLIGHT",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "b523b78e-fe3c-5865-9c0a-7ac92bcc15c5"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "386034e5-ab49-46b7-a413-2c0360f2358b",
+      "timestamp": "2026-10-05T14:48:56.119626Z",
+      "event_id": "38be18a4-7c7e-4b0c-80cb-e1c996d1d582",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "PLANNING",
+      "state_after": "READY_TO_EXECUTE",
+      "reason": "PLAN_PERSISTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "38be18a4-7c7e-4b0c-80cb-e1c996d1d582",
+      "timestamp": "2026-10-05T14:48:56.121721Z",
+      "event_id": "0580be77-0004-4845-95f6-522b3f31c058",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "EXECUTING",
+      "reason": "DISPATCH_INTENT",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "0580be77-0004-4845-95f6-522b3f31c058",
+      "timestamp": "2026-10-05T14:48:56.124718Z",
+      "event_id": "8437acd2-b4f5-487b-9652-75bfd9b0589a",
+      "component": "gateway",
+      "event_type": "COMMAND_DISPATCHED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "ORIGINAL_COMMAND_IDENTITY",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "8437acd2-b4f5-487b-9652-75bfd9b0589a",
+      "timestamp": "2026-10-05T14:49:16.230030Z",
+      "event_id": "a3b70d75-74a4-4a5e-86d8-a42563598090",
+      "component": "gateway",
+      "event_type": "COMMAND_STATUS_UNKNOWN",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "CommunicationTimeout",
+      "duration_ms": 20104.110324999965,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "timestamp": "2026-10-05T14:48:56.145391Z",
+      "event_id": "89411f24-f338-46b3-855c-97ab83d0f1af",
+      "component": "runtime",
+      "event_type": "COMMAND_CREATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DURABLE_BLENDER_INTENT",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "89411f24-f338-46b3-855c-97ab83d0f1af",
+      "timestamp": "2026-10-05T14:48:56.145799Z",
+      "event_id": "f8949c11-a288-4561-9a71-a6a2406d8e13",
+      "component": "runtime",
+      "event_type": "COMMAND_DISPATCHED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BOUNDED_PROCESS",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f8949c11-a288-4561-9a71-a6a2406d8e13",
+      "timestamp": "2026-10-05T14:48:56.145864Z",
+      "event_id": "ecda62f0-8d55-44c2-b7ea-90e038309a18",
+      "component": "runtime",
+      "event_type": "COMMAND_ACCEPTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "PRECONDITIONS_PASSED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "ecda62f0-8d55-44c2-b7ea-90e038309a18",
+      "timestamp": "2026-10-05T14:48:56.145910Z",
+      "event_id": "e04911b5-a28d-4d8f-9cc0-3f18a9b318a3",
+      "component": "runtime",
+      "event_type": "COMMAND_RUNNING",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BLENDER_PROCESS",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "e04911b5-a28d-4d8f-9cc0-3f18a9b318a3",
+      "timestamp": "2026-10-05T14:48:56.145954Z",
+      "event_id": "e6cdf5a0-2c67-488b-8f8c-91e3802095e7",
+      "component": "runtime",
+      "event_type": "FAULT_INJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DROP_ACK_AFTER_EFFECT",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "e6cdf5a0-2c67-488b-8f8c-91e3802095e7",
+      "timestamp": "2026-10-05T14:49:16.227066Z",
+      "event_id": "b1e2cabe-4c04-4c7f-a071-e2f9341b4cab",
+      "component": "runtime",
+      "event_type": "HOME",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=0.000000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "b1e2cabe-4c04-4c7f-a071-e2f9341b4cab",
+      "timestamp": "2026-10-05T14:49:16.227161Z",
+      "event_id": "9879af84-63c2-4400-88e5-95b42a406f15",
+      "component": "runtime",
+      "event_type": "TOOL_CHANGE_NOT_REQUIRED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=0.050000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "9879af84-63c2-4400-88e5-95b42a406f15",
+      "timestamp": "2026-10-05T14:49:16.227215Z",
+      "event_id": "db20c240-9b7b-4a49-b27d-bcfb06a024d7",
+      "component": "runtime",
+      "event_type": "PRE_GRASP",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=0.650000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "db20c240-9b7b-4a49-b27d-bcfb06a024d7",
+      "timestamp": "2026-10-05T14:49:16.227258Z",
+      "event_id": "85750deb-2248-4932-9106-7b13221045cf",
+      "component": "runtime",
+      "event_type": "APPROACH",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=1.250000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "85750deb-2248-4932-9106-7b13221045cf",
+      "timestamp": "2026-10-05T14:49:16.227297Z",
+      "event_id": "12f1b31c-db33-4e41-bf6a-7a83eaff6157",
+      "component": "runtime",
+      "event_type": "GRASP",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=1.450000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "12f1b31c-db33-4e41-bf6a-7a83eaff6157",
+      "timestamp": "2026-10-05T14:49:16.227334Z",
+      "event_id": "a5bb9a70-d899-4739-9532-58ce6af0e5b0",
+      "component": "runtime",
+      "event_type": "GRASP_CONFIRM",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=1.550000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "a5bb9a70-d899-4739-9532-58ce6af0e5b0",
+      "timestamp": "2026-10-05T14:49:16.227372Z",
+      "event_id": "36c8e7e4-16e9-452e-9a8b-7a65ed7cfd71",
+      "component": "runtime",
+      "event_type": "LIFT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=2.050000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "36c8e7e4-16e9-452e-9a8b-7a65ed7cfd71",
+      "timestamp": "2026-10-05T14:49:16.227409Z",
+      "event_id": "703418de-7bdd-4b88-83cc-cb37089afde0",
+      "component": "runtime",
+      "event_type": "SAFE_TRANSFER",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=3.550000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "703418de-7bdd-4b88-83cc-cb37089afde0",
+      "timestamp": "2026-10-05T14:49:16.227477Z",
+      "event_id": "5f042609-280a-486e-b60a-f97775bc7640",
+      "component": "runtime",
+      "event_type": "PRE_PLACE",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=3.650000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "5f042609-280a-486e-b60a-f97775bc7640",
+      "timestamp": "2026-10-05T14:49:16.227542Z",
+      "event_id": "35d4a82b-bef0-4b37-94bf-fffd3f2fa8f4",
+      "component": "runtime",
+      "event_type": "PLACE",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.150000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "35d4a82b-bef0-4b37-94bf-fffd3f2fa8f4",
+      "timestamp": "2026-10-05T14:49:16.227582Z",
+      "event_id": "fbb24f03-c5a0-4d37-853c-3ff3f0e81919",
+      "component": "runtime",
+      "event_type": "RELEASE",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.300000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "fbb24f03-c5a0-4d37-853c-3ff3f0e81919",
+      "timestamp": "2026-10-05T14:49:16.227619Z",
+      "event_id": "9eed6328-d042-4f08-a4fd-9e447abdb8a3",
+      "component": "runtime",
+      "event_type": "RELEASE_CONFIRM",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.400000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "9eed6328-d042-4f08-a4fd-9e447abdb8a3",
+      "timestamp": "2026-10-05T14:49:16.227654Z",
+      "event_id": "77458ba5-912f-47f8-bc76-388708aed1b4",
+      "component": "runtime",
+      "event_type": "RETRACT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.900000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "77458ba5-912f-47f8-bc76-388708aed1b4",
+      "timestamp": "2026-10-05T14:49:16.227689Z",
+      "event_id": "3027d3ff-d2e2-45c7-b355-bbbc39103705",
+      "component": "runtime",
+      "event_type": "HOME",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=5.500000000",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "3027d3ff-d2e2-45c7-b355-bbbc39103705",
+      "timestamp": "2026-10-05T14:49:16.227725Z",
+      "event_id": "9e65b0bf-a15b-4d46-ae38-f7a03bcc61bb",
+      "component": "runtime",
+      "event_type": "PICK_EFFECT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BLENDER_ATTACH_TRANSFER_DETACH",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "9e65b0bf-a15b-4d46-ae38-f7a03bcc61bb",
+      "timestamp": "2026-10-05T14:49:16.227761Z",
+      "event_id": "efc1db03-c0a3-407d-b854-f131208b7f3e",
+      "component": "runtime",
+      "event_type": "COMMAND_SUCCEEDED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BLENDER_CHECKPOINT_COMMITTED",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "efc1db03-c0a3-407d-b854-f131208b7f3e",
+      "timestamp": "2026-10-05T14:49:16.260257Z",
+      "event_id": "8d093f63-ee48-454c-b42d-07d16dc0d94f",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "EXECUTING",
+      "state_after": "UNKNOWN_OUTCOME",
+      "reason": "COMMUNICATION_UNCERTAIN",
+      "duration_ms": 0.0,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "8d093f63-ee48-454c-b42d-07d16dc0d94f",
+      "timestamp": "2026-10-05T14:49:16.262860Z",
+      "event_id": "2eff7e30-de60-4d61-accf-5b56e5d2dd83",
+      "component": "workflow",
+      "event_type": "PIPELINE_LATENCY",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "RUN_FINISHED",
+      "duration_ms": 20212.529509999968,
+      "evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "2eff7e30-de60-4d61-accf-5b56e5d2dd83",
+      "timestamp": "2026-10-05T14:49:16.278756Z",
+      "event_id": "b3c8ea66-c47c-4245-9bda-d0985372da55",
+      "component": "gateway",
+      "event_type": "JOURNAL_QUERIED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "ORIGINAL_COMMAND_IDENTITY",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "b3c8ea66-c47c-4245-9bda-d0985372da55",
+      "timestamp": "2026-10-05T14:49:16.293954Z",
+      "event_id": "d5a27fb5-797d-43df-973b-990b417acdd8",
+      "component": "observation",
+      "event_type": "OBSERVATION_CAPTURED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "FRESH_SENSOR_MODEL",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "0a564130-05b0-4828-bdc1-78965ee6d856"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "d5a27fb5-797d-43df-973b-990b417acdd8",
+      "timestamp": "2026-10-05T14:49:16.295631Z",
+      "event_id": "92b05f5c-056b-485c-a95d-d56b3401af16",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "UNKNOWN_OUTCOME",
+      "state_after": "RECONCILING",
+      "reason": "EVIDENCE_COLLECTED",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "5f91f7d9-47f6-403c-b7ca-e98172024725"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "92b05f5c-056b-485c-a95d-d56b3401af16",
+      "timestamp": "2026-10-05T14:49:16.297991Z",
+      "event_id": "ac56c3a2-4bb0-4973-9f9b-51b5c62a960e",
+      "component": "workflow",
+      "event_type": "JOB_TRANSITION",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": "RECONCILING",
+      "state_after": "COMPLETED",
+      "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "5f91f7d9-47f6-403c-b7ca-e98172024725"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "ac56c3a2-4bb0-4973-9f9b-51b5c62a960e",
+      "timestamp": "2026-10-05T14:49:16.300391Z",
+      "event_id": "557e23b9-9819-41c3-8545-fb39a580e7e0",
+      "component": "reconciliation",
+      "event_type": "RECONCILIATION_RESULT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "VERIFIED_SUCCESS",
+      "duration_ms": 0.0,
+      "evidence_ids": [
+        "5f91f7d9-47f6-403c-b7ca-e98172024725"
+      ]
+    }
+  ],
+  "controller_events": [
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "timestamp": "2026-10-05T14:48:56.145391Z",
+      "event_id": "89411f24-f338-46b3-855c-97ab83d0f1af",
+      "component": "runtime",
+      "event_type": "COMMAND_CREATED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DURABLE_BLENDER_INTENT",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "89411f24-f338-46b3-855c-97ab83d0f1af",
+      "timestamp": "2026-10-05T14:48:56.145799Z",
+      "event_id": "f8949c11-a288-4561-9a71-a6a2406d8e13",
+      "component": "runtime",
+      "event_type": "COMMAND_DISPATCHED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BOUNDED_PROCESS",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "f8949c11-a288-4561-9a71-a6a2406d8e13",
+      "timestamp": "2026-10-05T14:48:56.145864Z",
+      "event_id": "ecda62f0-8d55-44c2-b7ea-90e038309a18",
+      "component": "runtime",
+      "event_type": "COMMAND_ACCEPTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "PRECONDITIONS_PASSED",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "ecda62f0-8d55-44c2-b7ea-90e038309a18",
+      "timestamp": "2026-10-05T14:48:56.145910Z",
+      "event_id": "e04911b5-a28d-4d8f-9cc0-3f18a9b318a3",
+      "component": "runtime",
+      "event_type": "COMMAND_RUNNING",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BLENDER_PROCESS",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "e04911b5-a28d-4d8f-9cc0-3f18a9b318a3",
+      "timestamp": "2026-10-05T14:48:56.145954Z",
+      "event_id": "e6cdf5a0-2c67-488b-8f8c-91e3802095e7",
+      "component": "runtime",
+      "event_type": "FAULT_INJECTED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "DROP_ACK_AFTER_EFFECT",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 0
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "e6cdf5a0-2c67-488b-8f8c-91e3802095e7",
+      "timestamp": "2026-10-05T14:49:16.227066Z",
+      "event_id": "b1e2cabe-4c04-4c7f-a071-e2f9341b4cab",
+      "component": "runtime",
+      "event_type": "HOME",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=0.000000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "b1e2cabe-4c04-4c7f-a071-e2f9341b4cab",
+      "timestamp": "2026-10-05T14:49:16.227161Z",
+      "event_id": "9879af84-63c2-4400-88e5-95b42a406f15",
+      "component": "runtime",
+      "event_type": "TOOL_CHANGE_NOT_REQUIRED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=0.050000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "9879af84-63c2-4400-88e5-95b42a406f15",
+      "timestamp": "2026-10-05T14:49:16.227215Z",
+      "event_id": "db20c240-9b7b-4a49-b27d-bcfb06a024d7",
+      "component": "runtime",
+      "event_type": "PRE_GRASP",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=0.650000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "db20c240-9b7b-4a49-b27d-bcfb06a024d7",
+      "timestamp": "2026-10-05T14:49:16.227258Z",
+      "event_id": "85750deb-2248-4932-9106-7b13221045cf",
+      "component": "runtime",
+      "event_type": "APPROACH",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=1.250000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "85750deb-2248-4932-9106-7b13221045cf",
+      "timestamp": "2026-10-05T14:49:16.227297Z",
+      "event_id": "12f1b31c-db33-4e41-bf6a-7a83eaff6157",
+      "component": "runtime",
+      "event_type": "GRASP",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=1.450000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "12f1b31c-db33-4e41-bf6a-7a83eaff6157",
+      "timestamp": "2026-10-05T14:49:16.227334Z",
+      "event_id": "a5bb9a70-d899-4739-9532-58ce6af0e5b0",
+      "component": "runtime",
+      "event_type": "GRASP_CONFIRM",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=1.550000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "a5bb9a70-d899-4739-9532-58ce6af0e5b0",
+      "timestamp": "2026-10-05T14:49:16.227372Z",
+      "event_id": "36c8e7e4-16e9-452e-9a8b-7a65ed7cfd71",
+      "component": "runtime",
+      "event_type": "LIFT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=2.050000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "36c8e7e4-16e9-452e-9a8b-7a65ed7cfd71",
+      "timestamp": "2026-10-05T14:49:16.227409Z",
+      "event_id": "703418de-7bdd-4b88-83cc-cb37089afde0",
+      "component": "runtime",
+      "event_type": "SAFE_TRANSFER",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=3.550000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "703418de-7bdd-4b88-83cc-cb37089afde0",
+      "timestamp": "2026-10-05T14:49:16.227477Z",
+      "event_id": "5f042609-280a-486e-b60a-f97775bc7640",
+      "component": "runtime",
+      "event_type": "PRE_PLACE",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=3.650000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "5f042609-280a-486e-b60a-f97775bc7640",
+      "timestamp": "2026-10-05T14:49:16.227542Z",
+      "event_id": "35d4a82b-bef0-4b37-94bf-fffd3f2fa8f4",
+      "component": "runtime",
+      "event_type": "PLACE",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.150000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "35d4a82b-bef0-4b37-94bf-fffd3f2fa8f4",
+      "timestamp": "2026-10-05T14:49:16.227582Z",
+      "event_id": "fbb24f03-c5a0-4d37-853c-3ff3f0e81919",
+      "component": "runtime",
+      "event_type": "RELEASE",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.300000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "fbb24f03-c5a0-4d37-853c-3ff3f0e81919",
+      "timestamp": "2026-10-05T14:49:16.227619Z",
+      "event_id": "9eed6328-d042-4f08-a4fd-9e447abdb8a3",
+      "component": "runtime",
+      "event_type": "RELEASE_CONFIRM",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.400000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "9eed6328-d042-4f08-a4fd-9e447abdb8a3",
+      "timestamp": "2026-10-05T14:49:16.227654Z",
+      "event_id": "77458ba5-912f-47f8-bc76-388708aed1b4",
+      "component": "runtime",
+      "event_type": "RETRACT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=4.900000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "77458ba5-912f-47f8-bc76-388708aed1b4",
+      "timestamp": "2026-10-05T14:49:16.227689Z",
+      "event_id": "3027d3ff-d2e2-45c7-b355-bbbc39103705",
+      "component": "runtime",
+      "event_type": "HOME",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "SIM_TIME_S=5.500000000",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "3027d3ff-d2e2-45c7-b355-bbbc39103705",
+      "timestamp": "2026-10-05T14:49:16.227725Z",
+      "event_id": "9e65b0bf-a15b-4d46-ae38-f7a03bcc61bb",
+      "component": "runtime",
+      "event_type": "PICK_EFFECT",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BLENDER_ATTACH_TRANSFER_DETACH",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    },
+    {
+      "schema_version": "1.0",
+      "run_id": "f8b69948-f131-4c2d-a804-1d4a5a58463a",
+      "correlation_id": "b1139fcd-3760-50eb-b942-1c7175adab2c",
+      "causation_id": "9e65b0bf-a15b-4d46-ae38-f7a03bcc61bb",
+      "timestamp": "2026-10-05T14:49:16.227761Z",
+      "event_id": "efc1db03-c0a3-407d-b854-f131208b7f3e",
+      "component": "runtime",
+      "event_type": "COMMAND_SUCCEEDED",
+      "order_id": "demo-order",
+      "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+      "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "state_before": null,
+      "state_after": null,
+      "reason": "BLENDER_CHECKPOINT_COMMITTED",
+      "duration_ms": 0.0,
+      "evidence_ids": [],
+      "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "step": 1
+    }
+  ],
+  "oracle_world": {
+    "schema_version": "2.0",
+    "run_id": "68def1b4-9c1a-4eb9-bca3-3548ff16fe4d",
+    "correlation_id": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+    "causation_id": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+    "timestamp": "2026-10-05T14:49:01.834815Z",
+    "scene_epoch": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+    "step": 1,
+    "objects": [
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-A-01",
+          "sku": "SKU-A"
+        },
+        "location_id": "DESTINATION",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.3799999952316284,
+            0.9399999976158142,
+            0.20249998569488525
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-B-01",
+          "sku": "SKU-B"
+        },
+        "location_id": "SRC_B",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.10000000149011612,
+            -1.2400000095367432,
+            0.23000001907348633
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-C-01",
+          "sku": "SKU-C"
+        },
+        "location_id": "SRC_C",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.8500000238418579,
+            -0.9200000166893005,
+            0.2199999988079071
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-D-01",
+          "sku": "SKU-D"
+        },
+        "location_id": "SRC_D",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.2599999904632568,
+            -0.07999999821186066,
+            0.29499998688697815
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-E-01",
+          "sku": "SKU-E"
+        },
+        "location_id": "SRC_E",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.149999976158142,
+            0.75,
+            0.24000000953674316
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      },
+      {
+        "schema_version": "1.0",
+        "product": {
+          "schema_version": "1.0",
+          "product_id": "product-SKU-F-01",
+          "sku": "SKU-F"
+        },
+        "location_id": "SRC_F",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.1399999856948853,
+            0.75,
+            0.25
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "attached": false
+      }
+    ],
+    "locations": [
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_A",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.08,
+            -0.68,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_B",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.1,
+            -1.24,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_C",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.85,
+            -0.92,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_D",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.26,
+            -0.08,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_E",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            -1.15,
+            0.75,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "SRC_F",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.14,
+            0.75,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      },
+      {
+        "schema_version": "1.0",
+        "location_id": "DESTINATION",
+        "pose": {
+          "schema_version": "1.0",
+          "position": [
+            0.0,
+            1.12,
+            0.18
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        }
+      }
+    ],
+    "cell": {
+      "schema_version": "1.0",
+      "run_id": "68def1b4-9c1a-4eb9-bca3-3548ff16fe4d",
+      "correlation_id": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "causation_id": "3e3f83c5-2069-4638-bf59-7dc87856ee91",
+      "timestamp": "2026-10-05T14:48:56.033812Z",
+      "cell_id": "cell-1",
+      "mode": "READY",
+      "generation": 0,
+      "reason": "BLENDER_COMMAND_FINISHED"
+    },
+    "robot_profile_version": "hkm_inspired_v1",
+    "product_catalog_version": "synthetic-products-1",
+    "tool_spec_version": "synthetic-tools-1",
+    "frame_tree_version": "hkm-frame-tree-1",
+    "robot_state": {
+      "schema_version": "2.0",
+      "tcp_pose": {
+        "schema_version": "1.0",
+        "position": [
+          0.0,
+          -0.6,
+          1.02
+        ],
+        "quaternion_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "unit": "m",
+        "frame_id": "cell_world",
+        "calibration_version": "hkm-cal-1"
+      },
+      "active_tool_id": "EE_VAC_SINGLE",
+      "motion_phase": "HOME",
+      "robot_profile_version": "hkm_inspired_v1",
+      "kinematic_model_version": "HKM_INSPIRED_VISUAL_KINEMATICS_V1"
+    },
+    "tool_state": {
+      "schema_version": "2.0",
+      "active_tool_id": "EE_VAC_SINGLE",
+      "changer_state": "READY",
+      "rack_tool_ids": [
+        "EE_VAC_ARRAY",
+        "EE_PINCH_NARROW",
+        "EE_PINCH_WIDE",
+        "EE_ADAPTIVE_SOFT",
+        "EE_SUPPORT_FORK"
+      ],
+      "tool_state_version": "synthetic-tool-state-1"
+    }
+  }
+}

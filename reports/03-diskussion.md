@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Delete removes test data and releases its number; Clear resets the same test for retry. Read draining, Windows Blender scheduling, 12 production browser/runtime checks and 170 unit/contract checks pass locally. Prior acceptance at df45c93 and successful read-drain CI at def3d51 remain scoped; fresh complete acceptance is pending. Status: NOT DONE.
+> **Implementation status, 2026-10-05:** Test deletion and same-test clearing accepted at audited source 0d03402: all 118 MUSTs PASS, 693 tests twice on Windows and Linux, 146 UI checks, nine browser journeys per suite and eight Blender demos. Delete removes the test and releases its number; Clear restores the same test for retry. CI, native launcher and publication verified; earlier failures remain archived. Status: DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

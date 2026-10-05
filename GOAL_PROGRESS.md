@@ -3,7 +3,48 @@ Last updated: 2026-10-05 UTC
 Current revision: delete removes a test completely; clear resets that same test for reuse.
 Base: `4da22d75bded35452f4bca1db03c57da5e9eb957` (clean).
 
-## In progress: final acceptance of read draining and Windows Blender scheduling
+## Accepted: complete deletion and same-test retry
+
+Audited implementation: `0d03402776cf7ba63710634c5df2a8047501bdfb`. All 118 MUSTs pass in
+[the refreshed acceptance manifest](docs/evidence/acceptance/20261005T141427/manifest.json).
+Windows and Linux each pass 693 tests twice, with identical case sets and no
+failures, errors or skips. Coverage is 91.72% locally and
+91.67% in CI. The suite includes 146 JavaScript checks and nine
+actual-browser journeys on each repetition. Eight real Blender demos pass;
+independent audits prove the original command moves the product exactly once
+after lost acknowledgement and restart, while contradictory evidence remains
+inconclusive. The six-product showcase uses all six preferred tools.
+
+[The exact-source archive](docs/evidence/reset-verified/README.md) preserves the
+CI artifact digest, both original manifests, browser/source checks, native-host
+results and public source/PDF/link verification. Delete removes the catalog row
+and owned world files and reuses the lowest free display number; an empty history
+starts at Test 1. Clear retains the test identity, number, cell and settings while
+restoring products and removing prior execution data. Neither action issues a
+pick. Confirmation/cancellation, interrupted cleanup, stale writes, delayed view
+responses and fresh Test 1 creation are covered using disposable data only.
+
+Drift resolved: the former pending status is replaced by executed evidence in
+README, all three reports, status metadata, handoff, checklist, acceptance guide,
+PUBLICATION and this progress record. The earlier plan/runtime/replay descriptions,
+source S31 and security review already match the fixed Windows invocation.
+Contracts, architecture/state diagrams and the 118 MUST definitions were reviewed
+and remain unchanged in this evidence update. No prior failed evidence is rewritten.
+SHOULD SC-BRAIN-005 remains the optional external-model fallback, not a mandatory
+dependency. No new ADR is needed beyond lifecycle ADR 0013.
+
+Final source synchronization also updates the report generator's drift narrative
+and affected-file list. Twelve governance/completion/documentation checks pass,
+along with lint, formatting, typing and a rebuilt publication. The first scoped
+check encountered an inaccessible shared temporary directory; a fresh disposable
+fixture directory passed. Mixed line endings introduced by the text edit were
+normalized by Ruff before the final format check. These development checks do not
+replace the clean acceptance evidence above.
+
+Next: the evidence/status successor receives its own complete CI, native workflow
+and deployed-SHA publication audit under ADR 0002 before final delivery.
+
+## Verification history: view-read draining and Windows Blender scheduling
 
 The final evidence/status successor `317d4a4` exposed a real timing race in CI
 run 37308097691: suite 1 passed 688 tests; suite 2 passed 687 and failed the
@@ -11,7 +52,7 @@ desktop Blender delete journey. A 541 ms replay response overlapped deletion;
 the unchanged backend access barrier correctly returned TEST_OPERATION_IN_PROGRESS.
 The [failed evidence](docs/evidence/test-reset-read-drain/README.md) preserves the
 artifact digest, original manifests/JUnit, trace finding and earlier accepted report.
-The current revision is NOT DONE; previous acceptance below stays source-scoped.
+That failed revision was NOT DONE; previous acceptance below stays source-scoped.
 
 The UI now drains its own JSON and snapshot response bodies before confirmed
 create/clear/delete, keeps polling paused and holds the busy state until its final
@@ -37,10 +78,10 @@ contract checks pass. No assertion, render setting, motion frame or deadline is
 relaxed. Source S31 records the official CLI documentation; the other provenance
 entries are unchanged. Scene and control/state diagrams need no boundary changes.
 
-CI/native/publication all pass for clean read-drain source `def3d51`; the further
-Windows correction still requires its own full acceptance. Next: synchronize
-sources/publication, commit the correction, run fresh exact-source full acceptance
-and attest the final SHA. Final-source evidence is never inferred from its parent.
+CI/native/publication all passed for clean read-drain source `def3d51`. The
+further Windows correction was committed as `0d03402` and received the separate
+complete acceptance recorded above. Final-source evidence is never inferred from
+its parent.
 
 ## Previous accepted: test deletion, reset and reusable numbering
 

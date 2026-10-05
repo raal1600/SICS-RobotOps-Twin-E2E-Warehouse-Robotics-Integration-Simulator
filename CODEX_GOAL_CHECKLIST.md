@@ -13,7 +13,10 @@ Operational checklist only. `PROJECT_PLAN.md` and `SUCCESS_CRITERIA.md` remain n
 - [x] Exercise Blender's Windows QoS option in all nine diagnostic browser journeys.
 - [x] Verify the production QoS adapter, six-tool showcase and replay/restart together.
 - [x] Pass isolated real-browser and broader lifecycle verification on the correction.
-- [ ] Publish fresh full acceptance and final exact-source workflow/Pages attestation.
+- [x] Pass fresh Windows/Linux acceptance and exact-source workflows/Pages for 0d03402.
+
+The final evidence/status successor receives its own CI, native and publication
+attestation under ADR 0002; the committed report remains scoped to 0d03402.
 
 ## Test deletion and same-test clearing correction (ADR 0013)
 

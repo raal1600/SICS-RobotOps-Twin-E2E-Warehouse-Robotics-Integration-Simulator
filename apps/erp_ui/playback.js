@@ -22,14 +22,15 @@ class MotionPlayer {
     this.view=new SceneView(document.getElementById("motion-canvas"));
     this.byId=id=>document.getElementById(id);
     this.job=null;this.scene=null;this.preview=null;this.recording=null;this.data=null;this.delivery=null;
-    this.cursor=0;this.track=[];this.playing=false;this.manualPause=false;this.speed=1;this.last=null;
+    this.cursor=0;this.track=[];this.playing=false;this.manualPause=false;this.executionGated=false;this.speed=1;this.last=null;
     this.byId("motion-play").onclick=()=>{
+      if(this.executionGated)return;
       if(!this.playing&&this.atEnd())this.cursor=0;
       this.playing=!this.playing;this.manualPause=!this.playing;this.controls();
     };
-    this.byId("motion-replay").onclick=()=>{this.cursor=0;this.playing=true;this.manualPause=false;this.controls();};
-    this.byId("motion-scrub").oninput=e=>{this.cursor=Math.max(0,Math.min(Number(e.target.value),this.limit()));this.playing=false;this.manualPause=true;this.controls();this.draw();};
-    this.byId("motion-speed").onchange=e=>{this.speed=Number(e.target.value);};
+    this.byId("motion-replay").onclick=()=>{if(this.executionGated)return;this.cursor=0;this.playing=true;this.manualPause=false;this.controls();};
+    this.byId("motion-scrub").oninput=e=>{if(this.executionGated)return;this.cursor=Math.max(0,Math.min(Number(e.target.value),this.limit()));this.playing=false;this.manualPause=true;this.controls();this.draw();};
+    this.byId("motion-speed").onchange=e=>{if(this.executionGated)return;this.speed=Number(e.target.value);};
     this.byId("motion-rotate").onclick=()=>this.view.rotate();
     this.byId("motion-home").onclick=()=>this.view.reset();
     this.byId("motion-zoom-in").onclick=()=>this.view.zoom(0.8);
@@ -38,25 +39,55 @@ class MotionPlayer {
       this.byId(id).onclick=()=>this.view.viewpoint(name);
     }
     for(const [id,delta] of [["motion-step-back",-1],["motion-step-forward",1]]){
-      this.byId(id).onclick=()=>{this.cursor=Math.max(0,Math.min(this.limit(),Math.floor(this.cursor)+delta));this.playing=false;this.manualPause=true;this.controls();this.draw();};
+      this.byId(id).onclick=()=>{if(this.executionGated)return;this.cursor=Math.max(0,Math.min(this.limit(),Math.floor(this.cursor)+delta));this.playing=false;this.manualPause=true;this.controls();this.draw();};
     }
     requestAnimationFrame(time=>this.tick(time));this.controls();
   }
-  previewScene(scene){this.preview=scene;if(!this.job){this.scene=scene;this.byId("motion-state").textContent="3D cell ready";this.controls();this.draw();}}
+  previewScene(scene){this.preview=scene;if(!this.job)this.scene=scene;if(!this.job||this.executionGated){this.controls();this.draw();}}
   pause(){this.playing=false;this.manualPause=true;this.controls();}
+  setExecutionGate(gated){
+    gated=!!gated;if(this.executionGated===gated)return;
+    this.executionGated=gated;
+    if(gated){this.playing=false;this.cursor=0;}
+    else this.playing=!!this.track.length&&!this.manualPause;
+    this.describeClips();this.controls();this.draw();
+  }
   select(job){
     if(this.job===job)return;
     this.job=job;this.recording=null;this.scene=this.preview;this.data=null;this.delivery=null;this.track=[];
     this.cursor=0;this.playing=false;this.manualPause=false;
-    this.byId("motion-state").textContent="Loading selected scenario";
-    if(!job){
-      this.byId("motion-state").textContent="3D cell ready";
+    this.describeClips();this.controls();this.draw();
+  }
+  describeClips(){
+    const {data,delivery,scene}=this,clips=delivery?.jobs||(data?[data]:[]);
+    if(this.executionGated){
+      this.byId("motion-outcome").textContent="Robot execution not authorized";
+      this.byId("motion-outcome").classList.toggle("uncertain",false);
+      this.byId("motion-scenario").textContent="Guided robot execution is not authorized.";
+      this.byId("motion-detail").textContent="Static scene preview while execution is unauthorized. Saved motion is hidden.";
+      this.byId("motion-import").hidden=true;
+      return;
+    }
+    if(!data&&!delivery){
       this.byId("motion-outcome").textContent="Current cell";
       this.byId("motion-outcome").classList.toggle("uncertain",false);
       this.byId("motion-scenario").textContent="Choose an execution scenario on the left.";
       this.byId("motion-detail").textContent="Current scene. Saved orders retain their original replay.";
+      this.byId("motion-import").hidden=true;
+      return;
     }
-    this.byId("motion-import").hidden=true;this.controls();this.draw();
+    const uncertain=clips.some(clip=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(clip.job_state));
+    const completed=clips.filter(clip=>clip.job_state==="COMPLETED").length;
+    this.byId("motion-outcome").textContent=delivery?(clips.length?`${completed}/${clips.length} completed${uncertain?" · uncertain outcome":""}`:"Ready for a new delivery"):"Job: "+data.job_state;
+    const fault=clips.flatMap(clip=>clip.events||[]).find(e=>e.event_type==="FAULT_INJECTED");
+    this.byId("motion-scenario").textContent=delivery&&!clips.length?"New delivery · ready for the selected scenario.":(delivery?"Delivery scenario: ":"Execution: ")+(scenarioNames[fault?.reason]||"Happy path");
+    this.byId("motion-outcome").classList.toggle("uncertain",uncertain);
+    const provenance=data?.recording?"Original Blender poses":scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
+    const missing=clips.filter(clip=>!clip.recording).length;
+    this.byId("motion-detail").textContent=delivery
+      ? (clips.length?`${delivery.reason}${missing?` ${missing} executions have no motion recording; their events and scene provenance remain explicit.`:""}`:"Create an order to start this delivery. Previous deliveries remain available above.")
+      : `${provenance}. ${data.reason}`;
+    this.byId("motion-import").hidden=!!delivery||!data?.can_import;
   }
   buildTrack(data){
     const track=[],events=(data.events||[]).filter(e=>e.state_after||["FAULT_INJECTED","PLAN_VALIDATED","PICK_EFFECT","OBSERVATION_CAPTURED","COMMAND_REJECTED","COMMAND_FAILED"].includes(e.event_type));
@@ -95,37 +126,28 @@ class MotionPlayer {
       const start=this.track.findIndex(step=>step.clip.job_id===previousStep.clip.job_id);
       if(start>=0)this.cursor=start+oldClipOffset+fraction;
     }
-    if((first||this.track.length>oldLength&&wasEnd)&&!this.manualPause)this.playing=true;
-    if(!this.track.length)this.playing=false;
+    if((first||this.track.length>oldLength&&wasEnd)&&!this.manualPause&&!this.executionGated)this.playing=true;
+    if(!this.track.length||this.executionGated)this.playing=false;
     this.cursor=Math.min(this.cursor,this.limit());
-    this.byId("motion-state").textContent=delivery?(clips.length?"Full delivery replay · "+clips.length+" product executions":"3D cell ready") :data.recording
-      ? ({RECORDING:"Live Blender motion",RECORDED:"Recorded 3D scenario",PARTIAL:"Partial motion - outcome uncertain"}[data.status]||data.status)
-      : "Scenario events - stationary scene";
-    const uncertain=clips.some(clip=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(clip.job_state));
-    const completed=clips.filter(clip=>clip.job_state==="COMPLETED").length;
-    this.byId("motion-outcome").textContent=delivery?(clips.length?`${completed}/${clips.length} completed${uncertain?" · uncertain outcome":""}`:"Ready for a new delivery"):"Job: "+data.job_state;
-    const fault=clips.flatMap(clip=>clip.events||[]).find(e=>e.event_type==="FAULT_INJECTED");
-    this.byId("motion-scenario").textContent=delivery&&!clips.length?"New delivery · ready for the selected scenario.":(delivery?"Delivery scenario: ":"Execution: ")+(scenarioNames[fault?.reason]||"Happy path");
-    this.byId("motion-outcome").classList.toggle("uncertain",uncertain);
-    const provenance=data?.recording?"Original Blender poses":scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
-    const missing=clips.filter(clip=>!clip.recording).length;
-    this.byId("motion-detail").textContent=delivery
-      ? (clips.length?`${delivery.reason}${missing?` ${missing} executions have no motion recording; their events and scene provenance remain explicit.`:""}`:"Create an order to start this delivery. Previous deliveries remain available above.")
-      : `${provenance}. ${data.reason}`;
-    this.byId("motion-import").hidden=!!delivery||!data?.can_import;
-    this.controls();this.draw();
+    this.describeClips();this.controls();this.draw();
   }
   limit(){return Math.max(0,this.track.length-1);}
   atEnd(){return this.cursor>=this.limit();}
   controls(){
-    for(const id of ["motion-play","motion-replay","motion-scrub","motion-speed","motion-step-back","motion-step-forward"])this.byId(id).disabled=!this.track.length;
+    for(const id of ["motion-play","motion-replay","motion-scrub","motion-speed","motion-step-back","motion-step-forward"])this.byId(id).disabled=this.executionGated||!this.track.length;
     for(const id of ["motion-rotate","motion-home","motion-zoom-in","motion-zoom-out"])this.byId(id).disabled=!this.scene&&!this.recording;
+    this.byId("motion-state").textContent=this.executionGated?"Physical execution not authorized":this.delivery
+      ?(this.delivery.jobs.length?"Full delivery replay · "+this.delivery.jobs.length+" product executions":"3D cell ready")
+      :this.data?this.data.recording
+        ?({RECORDING:"Live Blender motion",RECORDED:"Recorded 3D scenario",PARTIAL:"Partial motion - outcome uncertain"}[this.data.status]||this.data.status)
+        :"Scenario events - stationary scene"
+      :this.job?"Loading selected scenario":"3D cell ready";
     this.byId("motion-play").textContent=this.playing?"Pause":"Play";
     this.byId("motion-scrub").max=this.limit();this.byId("motion-scrub").value=Math.round(this.cursor);
   }
   tick(time){
     const delta=this.last===null?0:Math.min((time-this.last)/1000,0.1);this.last=time;
-    if(this.playing&&this.track.length){
+    if(!this.executionGated&&this.playing&&this.track.length){
       this.cursor=Math.min(this.cursor+delta*24*this.speed,this.limit());
       if(this.atEnd()&&!['WAITING','RECORDING'].includes(this.track.at(-1)?.clip.status))this.playing=false;
       this.controls();
@@ -140,6 +162,7 @@ class MotionPlayer {
     requestAnimationFrame(next=>this.tick(next));
   }
   pose(){
+    if(this.executionGated)return {objects:(this.preview||this.scene)?.objects||[],positions:{},transforms:{},phase:"Physical execution not authorized",event:null,data:null};
     const step=this.track[Math.floor(this.cursor)],data=step?.clip||this.data,rec=data?.recording;
     const objects=rec?.objects||data?.scene?.objects||this.scene?.objects||[];
     let positions={},transforms={},phase="Cell ready",event=null;
@@ -167,7 +190,7 @@ class MotionPlayer {
   }
   draw(){
     const {objects,positions,transforms,phase,event,data}=this.pose();
-    this.view.configure?.((data?.scene||this.scene)?.cameras);
+    this.view.configure?.((this.executionGated?this.preview||this.scene:data?.scene||this.scene)?.cameras);
     this.view.render(objects,positions,data?.product_id,transforms);
     let message=this.job?"Waiting for persisted execution events":"Environment ready. Create and run an order to begin.";
     let tone="normal";
@@ -192,11 +215,12 @@ class MotionPlayer {
       message+=" "+(!dispatched?"No pick dispatched at this stage.":rejected?"Controller recorded no pick effect. Machine and product stay still.":"No motion recording is available; a stationary view is not proof of no effect.");
       if(data.scene.source==="CURRENT_WORLD_REFERENCE")message+=" Current cell reference; historical starting scene unavailable.";
     }
+    if(this.executionGated)message="Static scene view. Physical execution is not authorized; playback is disabled.";
     const banner=this.byId("motion-event");
     if(banner.textContent!==message)banner.textContent=message;
     if(banner.dataset.tone!==tone)banner.dataset.tone=tone;
     if(this.byId("motion-phase").textContent!==phase)this.byId("motion-phase").textContent=phase;
-    const step=this.track[Math.floor(this.cursor)];
+    const step=this.executionGated?null:this.track[Math.floor(this.cursor)];
     const frame=step?.kind==="motion"?data.recording.frames[step.frame]:step?.afterMotion?data?.recording?.frames.at(-1):null;
     this.byId("motion-tool").textContent=frame?.schema_version==="2.0"?`Replay tool: ${frame.active_tool_id||"empty flange"} · ${frame.rack_tool_ids?.length??0} tools in rack`:"";
     const description=`3D warehouse cell. ${phase}. ${message}`;

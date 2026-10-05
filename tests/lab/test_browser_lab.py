@@ -47,8 +47,103 @@ def advance(page, origin):
     return updated
 
 
+def assert_waiting_without_playback(page):
+    page.wait_for_function("() => player.executionGated === true")
+    for identity in (
+        "motion-play",
+        "motion-replay",
+        "motion-scrub",
+        "motion-speed",
+        "motion-step-back",
+        "motion-step-forward",
+    ):
+        expect(page.locator(f"#{identity}")).to_be_disabled()
+    before = page.evaluate(
+        """() => ({playing: player.playing, recording: player.recording,
+          motions: player.track.filter(step => step.kind === 'motion').length,
+          pose: player.pose()})"""
+    )
+    assert before["playing"] is False
+    assert before["recording"] is None and before["motions"] == 0
+    after = page.evaluate(
+        """async () => {
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          return {playing: player.playing, pose: player.pose()};
+        }"""
+    )
+    assert after["playing"] is False and after["pose"] == before["pose"]
+
+
+def prove_blender_playback(page, command_id, evidence):
+    page.wait_for_function(
+        """() => player.recording?.complete && player.recording.frames.length > 1
+          && player.track.some(step => step.kind === 'motion')""",
+        timeout=30_000,
+    )
+    recording = page.evaluate(
+        """() => {
+          const rec = player.recording, robot = 'Robot/ToolFlange';
+          const product = rec.objects.find(object => object.product_id === player.data.product_id);
+          const motions = player.track.filter(step => step.kind === 'motion');
+          const position = frame => frame.transforms[robot].position;
+          const moving = rec.frames.findIndex((frame, i) => i < rec.frames.length - 1
+            && position(frame).some((value, axis) =>
+              Math.abs(value - position(rec.frames[i + 1])[axis]) > 1e-5));
+          return {source: rec.source, complete: rec.complete, command_id: rec.command_id,
+            frames: rec.frames.length, total_frames: rec.total_frames, motion_steps: motions.length,
+            robot_poses: new Set(rec.frames.map(frame => JSON.stringify(position(frame)))).size,
+            product_name: product.name,
+            product_start: rec.frames[0].transforms[product.name].position,
+            product_finish: rec.frames.at(-1).transforms[product.name].position,
+            moving_cursor: player.track.findIndex(step => step.kind === 'motion'
+              && step.frame === moving)};
+        }"""
+    )
+    assert recording["source"] == "BLENDER_EVALUATED_SCENE"
+    assert recording["complete"] is True and recording["command_id"] == command_id
+    assert recording["frames"] == recording["total_frames"] == recording["motion_steps"]
+    assert recording["frames"] > 1 and recording["robot_poses"] > 1
+    assert recording["product_start"] != recording["product_finish"]
+    assert recording["moving_cursor"] >= 0
+    assert page.evaluate("() => player.executionGated") is False
+    page.locator("#motion-scrub").fill(str(recording["moving_cursor"]))
+    before = page.evaluate(
+        """() => ({cursor: player.cursor, pose: player.pose().transforms['Robot/ToolFlange'],
+          rendered: player.view.meshes.get('Robot/ToolFlange').position.toArray()})"""
+    )
+    expect(page.locator("#motion-play")).to_have_text("Play")
+    page.locator("#motion-play").click()
+    page.wait_for_function(
+        """before => player.playing && player.cursor > before.cursor
+          && JSON.stringify(player.pose().transforms['Robot/ToolFlange']) !== JSON.stringify(before.pose)
+          && JSON.stringify(player.view.meshes.get('Robot/ToolFlange').position.toArray())
+            !== JSON.stringify(before.rendered)""",
+        arg=before,
+        timeout=30_000,
+    )
+    after = page.evaluate(
+        """() => ({cursor: player.cursor, playing: player.playing,
+          pose: player.pose().transforms['Robot/ToolFlange'],
+          rendered: player.view.meshes.get('Robot/ToolFlange').position.toArray()})"""
+    )
+    page.locator("#motion-play").click()
+    expect(page.locator("#motion-play")).to_have_text("Play")
+    (evidence / "blender-motion.json").write_text(
+        json.dumps({"recording": recording, "before": before, "after": after}, indent=2),
+        encoding="utf-8",
+    )
+    page.screenshot(path=str(evidence / "blender-motion.png"), full_page=True)
+    page.locator("#integration-return").click()
+
+
 @pytest.mark.parametrize(
-    "scenario", ["", "DROP_ACK_AFTER_EFFECT", "DUPLICATE_DELIVERY", "WMS_UNAVAILABLE"]
+    "scenario",
+    [
+        pytest.param("", marks=pytest.mark.blender),
+        "DROP_ACK_AFTER_EFFECT",
+        "DUPLICATE_DELIVERY",
+        "WMS_UNAVAILABLE",
+    ],
 )
 def test_full_lab_browser_authorization_recovery_and_business_completion(
     lab_config, tmp_path, scenario
@@ -59,6 +154,8 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
     sources = [
         *Path("robotops/lab").glob("*.py"),
         *Path("robotops/integration").glob("*.py"),
+        *Path("robotops/blender").glob("*.py"),
+        *Path("blender/scripts").glob("*.py"),
         *Path("apps/api").glob("*.py"),
         *Path("apps/erp_ui").glob("*.js"),
         Path("tools/lab_stack.py"),
@@ -66,7 +163,8 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
     ]
     hashes = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     (evidence / "source-hashes.json").write_text(json.dumps(hashes, indent=2), encoding="utf-8")
-    stack = LabStack(lab_config, tmp_path / "process-stack").start()
+    runtime = "synthetic" if scenario else "blender"
+    stack = LabStack(lab_config, tmp_path / "process-stack", runtime=runtime).start()
     (evidence / "stack.json").write_text(json.dumps(stack.report(), indent=2), encoding="utf-8")
     try:
         with sync_playwright() as playwright:
@@ -97,7 +195,11 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
             )
             try:
                 page.goto(stack.origin)
+                health = page.request.get(f"{stack.origin}/health")
+                assert health.ok and health.json()["runtime"] == runtime
                 expect(page.locator("#create")).to_be_enabled(timeout=30_000)
+                expect(page.locator("#execution-profile")).to_contain_text("Integration lab")
+                expect(page.locator("#execution-profile")).to_contain_text("real AMQP / OPC UA")
                 expect(page.locator("#motion-state")).to_have_text("3D cell ready", timeout=30_000)
                 expect(page.locator("#new-test")).to_be_hidden()
                 page.locator("#scenario").select_option(scenario)
@@ -115,6 +217,8 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                     current = state(page, stack.origin)
                     if current["status"] == "COMPLETED":
                         break
+                    if current["current_stage"] <= 15:
+                        assert_waiting_without_playback(page)
                     if current["command_id"] and current["current_stage"] <= 15:
                         receipt, effects = read_journal(stack, current["command_id"])
                         assert receipt is None and effects == 0
@@ -127,6 +231,7 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                         expect(page.locator("#integration-stream")).to_contain_text(
                             "read-only WebSocket"
                         )
+                        assert_waiting_without_playback(page)
                         reloaded = True
                     if current["current_stage"] == 15:
                         expect(page.locator("#integration-advance")).to_have_text(
@@ -139,6 +244,8 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                         assert receipt["effect_count"] == effects == 1
                         expect(page.locator("#integration-live")).to_be_visible()
                         expect(page.locator("#motion-play")).to_be_enabled()
+                        if runtime == "blender":
+                            prove_blender_playback(page, executed["command_id"], evidence)
                         live = page.request.get(
                             f"{stack.origin}/integration/sessions/{executed['session_id']}/live"
                         ).json()
@@ -184,6 +291,19 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                 assert reloaded and physical_request
                 assert unknown_seen == (scenario == "DROP_ACK_AFTER_EFFECT")
                 assert business_retry_seen == (scenario == "WMS_UNAVAILABLE")
+                if scenario == "DUPLICATE_DELIVERY":
+                    delivery = next(
+                        step["output"] for step in final["steps"] if step["stage"] == 11
+                    )
+                    duplicate = delivery.get("redelivery", delivery)
+                    assert duplicate["deliveries"] == 2
+                    attempt = page.locator(
+                        '#integration-events [data-stage="11"] .integration-attempt'
+                    )
+                    expect(attempt).to_contain_text("Deliveries 2 · original command identity")
+                    assert ("broker redelivery" in attempt.inner_text()) == (
+                        duplicate.get("redelivered") is True
+                    )
                 assert final["context"]["wms_ack"] is True
                 opc = next(step["output"] for step in final["steps"] if step["stage"] == 12)
                 assert opc["opcua_client_component"] == "edge-adapter"

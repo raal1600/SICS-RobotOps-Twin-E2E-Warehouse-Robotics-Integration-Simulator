@@ -17,6 +17,14 @@ from robotops.lab.edge_rpc import EdgeRPC
 from robotops.workflow.store import Conflict, digest
 
 
+class WMSResponseError(OSError):
+    """An actual HTTP response, distinct from a transport failure before a reply."""
+
+    def __init__(self, status_code: int):
+        super().__init__(f"WMS_HTTP_{status_code}_RETRY_BUSINESS_ACK_ONLY")
+        self.status_code = status_code
+
+
 class DeliveryStore:
     def __init__(self, config: LabConfig):
         self.config = config
@@ -328,8 +336,8 @@ class LabBridge:
             )
         except httpx.TransportError:
             raise OSError("WMS_REST_UNAVAILABLE_RETRY_BUSINESS_ACK_ONLY") from None
-        if response.status_code == 503:
-            raise OSError("WMS_HTTP_503_RETRY_BUSINESS_ACK_ONLY")
+        if response.status_code >= 500:
+            raise WMSResponseError(response.status_code)
         if response.status_code == 409:
             raise Conflict("WMS_COMMAND_PAYLOAD_CONFLICT")
         response.raise_for_status()

@@ -177,7 +177,9 @@ class OPCClient:
         self.timeout = timeout
 
     async def _call(self, method: str | None, args: tuple[Any, ...]) -> dict[str, Any]:
-        async with Client(self.endpoint, timeout=self.timeout) as client:
+        async with Client(
+            self.endpoint, timeout=self.timeout, watchdog_intervall=self.timeout
+        ) as client:
             index = await client.get_namespace_index(NAMESPACE)
             cell = await client.nodes.objects.get_child([f"{index}:RobotCell"])
             children = await cell.get_children()

@@ -139,6 +139,21 @@ def test_guided_network_stack_recovers_without_repeating_motion(
             assert resumed
             assert recovered == (fault == "DROP_ACK_AFTER_EFFECT")
             assert retry_seen == (fault == "WMS_UNAVAILABLE")
+            if fault == "WMS_UNAVAILABLE":
+                business_steps = [step for step in session["steps"] if step["stage"] == 20]
+                assert [step["status"] for step in business_steps] == ["FAILED", "COMPLETED"]
+                failed = business_steps[0]
+                assert failed["protocol"] == "REST"
+                assert failed["classification"] == "REAL PROTOCOL"
+                assert failed["source"]["symbol"] == "LabBridge.reconcile_business"
+                assert failed["wire"]["protocol_evidence_confirmed"] is True
+                assert failed["wire"]["http_response"] == {
+                    "method": "POST",
+                    "path": "/v1/wms/acknowledgements",
+                    "status_code": 503,
+                }
+                assert failed["wire"]["wms_acknowledged"] is False
+                assert failed["wire"]["physical_retry"] is False
             receipt = workflow.runtime.recorded_journal(session["command_id"])
             assert receipt.effect_count == 1
             assert workflow.runtime.world().step == 1

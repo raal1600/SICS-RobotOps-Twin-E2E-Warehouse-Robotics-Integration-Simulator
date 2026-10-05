@@ -87,11 +87,14 @@ def test_guided_happy_reload_gate_trace_and_business_completion(server, browser_
     workflow = registry.engine("original")
     command = before_reload["command_id"]
     assert workflow.runtime.recorded_journal(command) is None
+    expect(page.locator("#motion-play")).to_be_disabled()
+    assert page.evaluate("() => player.executionGated && !player.playing")
     page.reload()
     expect(page.locator("#integration-console")).to_be_visible()
     resumed = session(page, origin)
     assert resumed["session_id"] == initial["session_id"]
     assert resumed["revision"] == before_reload["revision"]
+    expect(page.locator("#motion-play")).to_be_disabled()
     gate = until_stage(page, origin, 15)
     expect(page.locator("#integration-advance")).to_have_text("AUTHORIZE ROBOT EXECUTION")
     assert workflow.runtime.recorded_journal(command) is None
@@ -113,6 +116,41 @@ def test_guided_happy_reload_gate_trace_and_business_completion(server, browser_
     assert not any(item["method"] == "POST" and item["url"].endswith("/run") for item in requests)
     (directory / "session.json").write_text(json.dumps(final, indent=2), encoding="utf-8")
     assert gate["context"].get("physical_authorized") is not True
+
+
+@pytest.mark.parametrize("server", [SyntheticRuntime], indirect=True, ids=["synthetic"])
+@pytest.mark.parametrize("fault", ["BROKER_TRANSIENT", "DUPLICATE_DELIVERY"])
+def test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly(
+    server, browser_page, fault
+):
+    origin, registry = server
+    page, _, errors, console_errors, requests = browser_page
+    start_guided(page, origin, fault)
+    saved = until_stage(page, origin, 12)
+    page.wait_for_function("() => !integration.busy")
+    if fault == "BROKER_TRANSIENT":
+        attempts = [step for step in saved["steps"] if step["stage"] == 10]
+        assert [step["status"] for step in attempts] == ["FAILED", "COMPLETED"]
+        labels = page.locator('[data-stage="10"] .integration-attempt').all_text_contents()
+        assert labels == ["Attempt 1", "Repeated stage · Attempt 2"]
+    else:
+        delivery = next(step for step in saved["steps"] if step["stage"] == 11)
+        assert delivery["output"]["redelivery"]["deliveries"] == 2
+        expect(page.locator('[data-stage="11"] .integration-attempt')).to_contain_text(
+            "Deliveries 2 · original command identity"
+        )
+    assert registry.engine("original").runtime.world().step == 0
+    page.get_by_role("tab", name="Wire", exact=True).click()
+    original = page.locator("#integration-inspector").inner_text()
+    posts = sum(item["method"] == "POST" for item in requests)
+    page.locator("#integration-payload summary").click()
+    expect(page.locator("#integration-inspector")).to_be_hidden()
+    page.locator("#integration-payload summary").click()
+    expect(page.locator("#integration-inspector")).to_be_visible()
+    assert page.locator("#integration-inspector").inner_text() == original
+    assert sum(item["method"] == "POST" for item in requests) == posts
+    assert session(page, origin)["revision"] == saved["revision"]
+    assert not errors and not console_errors
 
 
 @pytest.mark.parametrize(

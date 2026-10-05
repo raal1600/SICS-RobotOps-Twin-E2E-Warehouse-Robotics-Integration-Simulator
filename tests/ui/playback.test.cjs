@@ -178,6 +178,58 @@ test('opening an investigation can freeze a replay without losing its frame or s
   el('motion-play').onclick();assert.equal(p.playing,true);assert.equal(p.cursor,8.5);
 });
 
+test('guided intake gate blocks autoplay and temporal handlers while cameras remain inspectable',()=>{
+  const {player:p,el}=setup(),scene={source:'CURRENT_WORLD_REFERENCE',objects:[{name:'Robot',position:[0,0,1]}]};
+  p.previewScene(scene);p.setExecutionGate(true);p.select('guided');
+  const data={job_id:'guided',job_state:'QUEUED',status:'UNAVAILABLE',scene,recording:null,
+    events:[{event_type:'JOB_TRANSITION',state_after:'QUEUED',reason:'WMS_TASK_ACCEPTED'}]};
+  p.update(data);assert.ok(p.track.length>0);assert.equal(p.playing,false);
+  const before=JSON.stringify(data);
+  for(const id of ['motion-play','motion-replay','motion-scrub','motion-speed','motion-step-back','motion-step-forward'])assert.equal(el(id).disabled,true,id);
+  for(const id of ['motion-play','motion-replay','motion-step-back','motion-step-forward'])el(id).onclick();
+  el('motion-scrub').oninput({target:{value:11}});el('motion-speed').onchange({target:{value:4}});
+  p.tick(0);p.tick(100);p.update(data);
+  assert.equal(p.cursor,0);assert.equal(p.speed,1);assert.equal(p.playing,false);
+  assert.deepEqual(p.pose().objects,scene.objects);assert.equal(p.pose().event,null);
+  assert.equal(el('motion-state').textContent,'Physical execution not authorized');
+  assert.equal(el('motion-phase').textContent,'Physical execution not authorized');
+  assert.match(el('motion-event').textContent,/Static scene view/);
+  for(const id of ['motion-rotate','motion-home','motion-zoom-in','motion-zoom-out'])assert.equal(el(id).disabled,false,id);
+  el('camera-overhead').onclick();assert.equal(p.view.views.at(-1),'OverheadObservation');
+  assert.equal(JSON.stringify(data),before);
+});
+
+test('guided gate replaces historical robot poses with the static current cell without altering evidence',()=>{
+  const {player:p,el}=setup(),current={source:'CURRENT_WORLD_REFERENCE',objects:[{name:'Robot',position:[7,0,0]}]};
+  p.previewScene(current);p.select('j1');const data=clip(5,true);
+  data.scene.objects=[{name:'Robot',position:[-5,0,0]}];data.recording.objects=data.scene.objects;
+  data.recording.frames.forEach((frame,index)=>{frame.positions={Robot:[index,0,0]};});
+  p.update(data);p.cursor=2;assert.equal(p.pose().positions.Robot[0],2);
+  const before=JSON.stringify(data);p.setExecutionGate(true);
+  assert.equal(p.playing,false);assert.deepEqual(p.pose().objects,current.objects);
+  assert.equal(Object.keys(p.pose().positions).length,0);assert.equal(Object.keys(p.pose().transforms).length,0);
+  p.update(data);p.cursor=4;p.tick(0);p.tick(100);p.draw();
+  assert.deepEqual(p.pose().objects,current.objects);assert.equal(Object.keys(p.pose().positions).length,0);
+  assert.doesNotMatch(el('motion-event').textContent,/evaluated Blender poses/);assert.equal(el('motion-tool').textContent,'');
+  assert.equal(el('motion-outcome').textContent,'Robot execution not authorized');
+  assert.match(el('motion-detail').textContent,/Static scene preview while execution is unauthorized/);
+  const refreshed={...current,objects:[{name:'Robot',position:[8,0,0]}]};
+  p.previewScene(refreshed);assert.deepEqual(p.pose().objects,refreshed.objects);
+  assert.equal(JSON.stringify(data),before);
+  p.setExecutionGate(false);assert.equal(p.playing,true);assert.equal(el('motion-replay').disabled,false);
+  assert.equal(el('motion-state').textContent,'Recorded 3D scenario');
+  assert.equal(el('motion-outcome').textContent,'Job: UNKNOWN_OUTCOME');
+  assert.match(el('motion-detail').textContent,/Original Blender poses/);
+  el('motion-replay').onclick();p.tick(200);assert.ok(p.cursor>0);assert.ok(p.pose().positions.Robot[0]>0);
+});
+
+test('releasing the guided gate preserves an existing manual pause and enables explicit replay',()=>{
+  const {player:p,el}=setup();p.select('j1');p.update(clip(20,true));p.pause();
+  p.setExecutionGate(true);p.update(clip(40,true));p.setExecutionGate(false);
+  assert.equal(p.playing,false);assert.equal(p.manualPause,true);assert.equal(el('motion-play').disabled,false);
+  el('motion-play').onclick();assert.equal(p.playing,true);
+});
+
 function realSceneTypes(){
   const context=vm.createContext({fetch(){throw Error('Presentation must not send commands or capture evidence');}});
   vm.runInContext(fs.readFileSync('apps/erp_ui/scene-view.js','utf8')+'\nglobalThis.types={SceneView,SoftwareSceneView};',context);

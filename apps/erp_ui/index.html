@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RobotOps Twin · Local operations</title>
+<title>RobotOps Twin · Simulation workspace</title>
 <link rel="stylesheet" href="/ui/theme.css"><script type="importmap">{"imports":{"three":"/ui/vendor/three.module.min.js"}}</script></head><body>
-<header><div><small>ROBOTOPS TWIN</small><h1>Simulation workspace</h1></div><p>Local &middot; deterministic &middot; synthetic</p></header>
+<header><div><small>ROBOTOPS TWIN</small><h1>Simulation workspace</h1></div><p id="execution-profile">Independent synthetic simulator · checking execution profile</p></header>
 <main>
 <section class="panel test-toolbar" aria-label="Simulation tests">
   <div class="test-picker"><label for="test-history">Simulation test</label><select id="test-history"></select></div>
@@ -48,7 +48,7 @@
   <p id="integration-error" role="alert"></p>
   <div class="integration-trace-grid">
     <div><h3>Execution trace</h3><ol id="integration-events" class="integration-events" aria-label="Persisted execution steps"></ol></div>
-    <div class="integration-detail"><h3 id="integration-inspector-title">Select a persisted stage</h3><div id="integration-tabs" class="integration-tabs" role="tablist" aria-label="Trace inspector"></div><pre id="integration-inspector" role="tabpanel"></pre><a id="integration-evidence" target="_blank" hidden>Open original job evidence (JSON)</a></div>
+    <div class="integration-detail"><h3 id="integration-inspector-title">Select a persisted stage</h3><div id="integration-tabs" class="integration-tabs" role="tablist" aria-label="Trace inspector"></div><details id="integration-payload" open><summary>Persisted step data · expand or collapse · read-only</summary><pre id="integration-inspector" role="tabpanel"></pre></details><a id="integration-evidence" target="_blank" hidden>Open original job evidence (JSON)</a></div>
   </div>
   <details class="acknowledgement-boundaries"><summary>What does each acknowledgement prove?</summary><p>HTTP 202 ≠ DB commit ≠ RabbitMQ publisher confirm ≠ consumer ACK ≠ OPC UA method acceptance ≠ PLC accepted ≠ controller succeeded ≠ sensor verification ≠ WMS reconciliation ≠ ERP completion.</p><p>Each boundary has its own evidence. A lost reply cannot justify another physical pick. Ordinary cell preconditions and authorization are application controls, never certified safety functions.</p></details>
 </section>
@@ -157,8 +157,8 @@
     <button id="download-evidence" class="secondary" disabled>Download evidence &amp; events (JSON)</button>
     <h3>Reproduce the test</h3><p id="manual-reproduce"></p><p class="muted">Create a separate test; do not retry an uncertain command to reproduce a fault. Earlier sensor-review faults are listed in the downloaded events.</p>
     <h3>Where to look in the repository</h3><ul id="manual-sources"></ul>
-    <h3>Local files</h3><p class="muted">The API JSON above is the simplest way to inspect the persisted records. On the desktop, the default data root is <code>%LOCALAPPDATA%\RobotOpsTwin\data</code>. For the CLI, use the directory passed to <code>--data-dir</code>.</p><p id="manual-storage" class="muted"></p>
-    <p class="muted">Workflow events are stored in <code>workflow.db</code> (events table); the controller journal and world configuration are in <code>runtime.db</code>. Custom database names may differ. Blender artifacts are under <code>blender-artifacts</code>. Desktop process logs are under <code>%LOCALAPPDATA%\RobotOpsTwin\sessions</code>; CLI process logs go to its terminal. Inspect a copy of databases; avoid editing a running test.</p>
+    <h3>Storage and logs</h3><p class="muted">The API JSON above is the simplest way to inspect the persisted records. On the desktop, the default data root is <code>%LOCALAPPDATA%\RobotOpsTwin\data</code>. For the CLI, use the directory passed to <code>--data-dir</code>.</p><p id="manual-storage" class="muted"></p>
+    <p class="muted">In local mode, workflow events are stored in <code>workflow.db</code> (events table); the controller journal and world configuration are in <code>runtime.db</code>. Custom database names may differ. Blender artifacts are under <code>blender-artifacts</code>. Desktop process logs are under <code>%LOCALAPPDATA%\RobotOpsTwin\sessions</code>; CLI process logs go to its terminal. Inspect a copy of databases; avoid editing a running test.</p>
   </section>
   </div>
 </dialog>

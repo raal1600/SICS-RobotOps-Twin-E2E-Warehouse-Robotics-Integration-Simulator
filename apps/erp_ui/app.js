@@ -7,14 +7,27 @@ let selectedTest = "original", activeTest = "original", testHistory = [], histor
 let selectedRevision = 1;
 let managingTests = false;
 let testLifecycleAvailable = true;
+let distributedProfile = false;
 const pendingReads = new Set();
 let artifactPath = null, artifactObjectUrl = null;
 let guideEvidence = null, guideJob = null, guidance = null;
 let cellProfiles = [], newTestRequest = null, deletionRequest = null, historyVersion = 0;
 let selectedEvidence = null, selectedEvents = [], knownOrders = [], inspection = null, inspectionVersion = 0, timelineSignature = "";
+let guidedPlaybackGate = false;
 const inspectionPanes = ["findings", "evidence", "manual"];
 const integration = new IntegrationConsole({
   request: (path, body) => api(path, body), path: path => testPath(path), readOnly: () => readOnly(),
+  sessionChanged: session => {
+    const gated = !!session && !session.context?.physical_authorized && session.status !== "COMPLETED";
+    if (guidedPlaybackGate && !gated && session?.job_id) {
+      // Consent belongs to this job; never resume a previous delivery's motion.
+      byId("replay-scope").value="product";
+      selectedJob=session.job_id;
+      player.select(session.job_id);
+    }
+    guidedPlaybackGate=gated;
+    player.setExecutionGate?.(gated);
+  },
   activity: active => {busy=active;fixtureControls();},
   update: async session => {
     const stage=session.steps?.at(-1)?.stage||0;
@@ -87,7 +100,7 @@ function renderInspection() {
   text("manual-identity",`Test ${test?.number??inspection.testId} · ${job.job_id} · command ${evidence.command?.command_id||"none"}`);
   text("manual-requests",urls.map(url=>`Invoke-RestMethod '${url.replaceAll("'","%27")}' | ConvertTo-Json -Depth 100`).join("\n\n"));
   text("manual-reproduce",`Use a new ${test?.cell_display_name||"matching cell"} test and product ${sku}. `+(model.initialFault?`The execution log records an injected ${model.initialFault} fault (${SimulationGuide.explain("scenario",model.initialFault).label}). Select that scenario and run the order.`:"No injected execution fault is recorded before the first outcome. Use the event log to establish the original setup; the current dropdown is not historical evidence."));
-  text("manual-storage",inspection.testId==="original"?"This is the original test: its world files are directly under the configured data root.":`This test's world is under simulation-tests/${inspection.testId} inside the configured data root.`);
+  text("manual-storage",distributedProfile?"Integration lab: application records are in PostgreSQL. Runtime and PLC journals are separate files under the configured lab data root; broker durability is retained independently.":inspection.testId==="original"?"This is the original test: its world files are directly under the configured data root.":`This test's world is under simulation-tests/${inspection.testId} inside the configured data root.`);
   byId("manual-sources").replaceChildren();
   for(const [path,reason] of model.sources){const item=document.createElement("li"),code=document.createElement("code"),detail=document.createElement("span");code.textContent=path;detail.textContent=` — ${reason}`;item.append(code,detail);byId("manual-sources").append(item);}
   byId("download-evidence").disabled=inspection.loading;
@@ -706,6 +719,8 @@ for(const kind of ["scenario","observation"]){
 }
 (async()=>{try{
   const health=await request("/health");
+  distributedProfile=health.capabilities?.distributed_protocols===true;
+  text("execution-profile",distributedProfile?"Integration lab · PostgreSQL · real AMQP / OPC UA · simulated systems":"Local profile · simulated transport · synthetic systems");
   testLifecycleAvailable=health.capabilities?.test_lifecycle!==false;
   if(!testLifecycleAvailable){byId("new-test").hidden=true;byId("clear-test").closest("details").hidden=true;}
   await refreshHistory();await selectTest(activeTest);

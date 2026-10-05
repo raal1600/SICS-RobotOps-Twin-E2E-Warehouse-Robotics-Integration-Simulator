@@ -34,6 +34,7 @@ from robotops.integration.models import (
     SourceReference,
 )
 from robotops.integration.store import IntegrationStore, sanitize
+from robotops.lab.transport import WMSResponseError
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Claim, Conflict, digest
 
@@ -738,6 +739,20 @@ class GuidedEngine:
             status = "UNKNOWN_OUTCOME" if stage == 16 and physical_started else "RETRYABLE_FAILURE"
             step_status = "FAILED"
             result = {"error": str(exc), "retry_permitted": stage != 16}
+            if isinstance(exc, WMSResponseError):
+                result.update(
+                    {
+                        "protocol_evidence_confirmed": True,
+                        "network_attempted": True,
+                        "http_response": {
+                            "method": "POST",
+                            "path": "/v1/wms/acknowledgements",
+                            "status_code": exc.status_code,
+                        },
+                        "wms_acknowledged": False,
+                        "physical_retry": False,
+                    }
+                )
             injected_before_wire = (
                 stage in {10, 11, 12}
                 and context.get(f"fault_once_{stage}")
@@ -827,7 +842,7 @@ class GuidedEngine:
         if stage == 19 and result.get("recovered_verification"):
             path = "robotops/workflow/store.py"
             symbol = "Store.records_for_job"
-        if step_status == "FAILED":
+        if step_status == "FAILED" and not result.get("protocol_evidence_confirmed"):
             # A guard may reject before the intended adapter is ever called.
             # Report only the handler that certainly executed, without claiming
             # confirmed protocol evidence for a failed operation.

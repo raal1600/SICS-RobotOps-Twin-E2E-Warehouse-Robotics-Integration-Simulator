@@ -2,8 +2,8 @@
 
 // This view renders server records. It never invents execution or protocol events.
 class IntegrationConsole {
-  constructor({request, path, readOnly, update, physical, activity}) {
-    Object.assign(this, {request, path, readOnly, update, physical, activity});
+  constructor({request, path, readOnly, update, physical, activity, sessionChanged = () => {}}) {
+    Object.assign(this, {request, path, readOnly, update, physical, activity, sessionChanged});
     this.session = null;
     this.busy = false;
     this.generation = 0;
@@ -72,6 +72,7 @@ class IntegrationConsole {
     this.session = null;
     this.el("integration-console").hidden = true;
     this.el("integration-live").hidden = true;
+    this.sessionChanged(null);
   }
 
   async start(request, fault) {
@@ -205,6 +206,7 @@ class IntegrationConsole {
   render() {
     const session = this.session;
     if (!session) return;
+    this.sessionChanged(session);
     this.el("integration-console").hidden = false;
     this.el("integration-history").value = session.session_id;
     for (const option of this.el("integration-history").children) {
@@ -249,7 +251,11 @@ class IntegrationConsole {
     this.el("integration-reconcile").disabled = this.busy || this.readOnly();
     this.el("integration-history").disabled = this.busy;
     this.el("integration-events").replaceChildren();
+    const attempts = new Map();
     for (const step of session.steps || []) {
+      const attemptKey = `${step.job_id || ""}:${step.stage}:${step.component || ""}`;
+      const attempt = (attempts.get(attemptKey) || 0) + 1;
+      attempts.set(attemptKey, attempt);
       const row = document.createElement("li");
       const button = document.createElement("button");
       button.className = "integration-event secondary";
@@ -260,7 +266,16 @@ class IntegrationConsole {
       info.textContent = `${step.status} · ${step.protocol || "REAL CODE"} · ${step.classification || step.truth || ""}`;
       const timing = document.createElement("small");
       timing.textContent = `${step.timestamp || ""} · ${Number(step.duration_ms || 0).toFixed(1)} ms`;
-      button.append(title, info, timing);
+      const delivery = step.output?.redelivery || step.output;
+      const repetitions = document.createElement("small");
+      repetitions.className = "integration-attempt";
+      repetitions.textContent = `${attempt > 1 ? "Repeated stage · " : ""}Attempt ${attempt}`;
+      if (Number.isInteger(delivery?.deliveries)) {
+        repetitions.textContent += ` · Deliveries ${delivery.deliveries}`;
+        if (delivery.deliveries > 1) repetitions.textContent += " · original command identity";
+      }
+      if (delivery?.redelivered === true) repetitions.textContent += " · broker redelivery";
+      button.append(title, info, timing, repetitions);
       button.onclick = () => { this.selected = step; this.pinned = true; this.inspect(); };
       row.append(button); this.el("integration-events").append(row);
     }

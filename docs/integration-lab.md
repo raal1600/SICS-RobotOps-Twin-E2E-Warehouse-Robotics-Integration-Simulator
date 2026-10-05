@@ -22,7 +22,8 @@ world/journal separately. `docker compose down` retains these volumes. A clean
 experiment uses an explicitly new Compose project name and its own volumes.
 
 The container profile runs the existing deterministic HKM-inspired synthetic
-runtime and existing browser 3D playback. It does not claim Blender execution.
+runtime. Its browser replays recorded events against a stationary 3D scene; it
+does not generate Blender motion frames or claim animated robot motion.
 Native launch supports the existing `BlenderRuntime` using
 `ROBOTOPS_LAB_RUNTIME=blender` and `BLENDER_EXECUTABLE`.
 
@@ -92,12 +93,23 @@ the loopback addresses. The report contains no credentials. Ctrl+C stops only
 the supervisor's children and retains evidence. It never stops the existing
 PostgreSQL/RabbitMQ services. `--runtime blender` selects the existing Blender
 adapter; the default explicitly selects the deterministic synthetic runtime.
+For recorded robot animation, use the same complete stack with
+`--runtime blender` and an installed Blender executable. Before physical consent,
+guided playback and event autoplay are disabled while the static cell and camera
+controls remain inspectable. Consent selects the current job before playback is
+enabled, so an earlier delivery cannot appear to be its motion. The console's
+payload body expands/collapses without a REST mutation; attempt and delivery
+indicators come from persisted step and inbox evidence.
 
 `tests/lab/test_browser_lab.py` drives Chromium against this separate-process
-stack. Happy, lost-ACK-after-effect, duplicate delivery, and real WMS HTTP503
-scenarios prove pre-gate effect zero, post-gate effect one, 3D playback handoff,
-mid-stage reload, duplicate physical authorization, final business completion,
-and no credential values in trace/log artifacts under `artifacts/lab-browser`.
+stack. Its mandatory happy case uses Blender and checks nonempty original motion
+frames, a motion track, product displacement, and changing evaluated and rendered
+robot poses during browser playback after consent. The lost-ACK-after-effect,
+duplicate-delivery and real WMS HTTP503 cases use the synthetic runtime and prove
+protocol, effect and recovery semantics, not animated robot motion. All cases
+check pre-gate effect zero, disabled playback, mid-stage reload, duplicate physical
+authorization, final business completion and no credential values in trace/log
+artifacts under `artifacts/lab-browser`.
 
 ## Persistence and execution contract
 
@@ -131,6 +143,8 @@ the PLC's one-use execution claim, then returns the permit. The API invokes the
 same existing runtime callback as local/automatic execution; this co-located
 adapter is the explicitly **simulated controller interface**, not an OPC UA
 connection. ReportResult goes back through the edge's retained UA session.
+OPC UA requests and background ServerState probes use the same bounded network
+timeout; a delayed probe never authorizes a second runtime callback.
 If the callback or API disappears, the edge closes its session after a bounded
 180-second retention window without resetting the PLC claim. Reconciliation can
 reconnect through the edge and report the original journal receipt. Tests assert

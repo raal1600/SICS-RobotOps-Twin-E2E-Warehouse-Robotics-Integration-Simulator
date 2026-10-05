@@ -2457,7 +2457,9 @@
     ],
     "tests": [
       "test_real_opcua_browse_subscription_acceptance_gate_and_result",
-      "test_full_lab_browser_authorization_recovery_and_business_completion"
+      "test_full_lab_browser_authorization_recovery_and_business_completion",
+      "test_slow_real_server_state_probe_preserves_original_execution_session",
+      "test_sustained_real_server_state_delay_is_bounded_without_a_second_execution"
     ],
     "files": [
       "GOAL.md",
@@ -2474,7 +2476,8 @@
       "robotops/lab/edge.py",
       "robotops/lab/edge_rpc.py",
       "tools/lab_stack.py",
-      "tests/lab/test_plc.py"
+      "tests/lab/test_plc.py",
+      "tests/lab/test_opc_health_probe.py"
     ],
     "explanation": "OPC UA client/server communication is real in lab mode. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
   },
@@ -2484,7 +2487,8 @@
       "tests_2"
     ],
     "tests": [
-      "test_opc_server_process_restart_does_not_regrant_effect"
+      "test_opc_server_process_restart_does_not_regrant_effect",
+      "test_acknowledgement_cannot_mark_a_concurrently_advanced_result"
     ],
     "files": [
       "GOAL.md",
@@ -2496,7 +2500,8 @@
       "robotops/lab/opcua.py",
       "robotops/lab/journal.py",
       "tests/lab/test_distributed.py",
-      "tests/lab/test_guided_lab.py"
+      "tests/lab/test_guided_lab.py",
+      "tests/lab/test_plc.py"
     ],
     "explanation": "Virtual PLC has durable-enough command identity/journal semantics for demonstrated recovery. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
   },
@@ -2550,7 +2555,8 @@
       "tests_2"
     ],
     "tests": [
-      "test_guided_happy_reload_gate_trace_and_business_completion"
+      "test_guided_happy_reload_gate_trace_and_business_completion",
+      "test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly"
     ],
     "files": [
       "GOAL.md",
@@ -2713,7 +2719,8 @@
     "tests": [
       "test_readonly_routes_and_stream_do_not_advance",
       "test_deleted_guided_store_reads_do_not_recreate_database",
-      "test_active_stream_closes_when_world_is_cleared_or_deleted"
+      "test_active_stream_closes_when_world_is_cleared_or_deleted",
+      "test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly"
     ],
     "files": [
       "GOAL.md",
@@ -2807,7 +2814,10 @@
       "test_boot_change_after_dispatch_intent_remains_uncertain_without_repeat",
       "test_interrupted_unstarted_lab_dispatch_returns_to_preconditions",
       "test_restart_invalidates_readiness_until_fresh_checks",
-      "test_opc_server_process_restart_does_not_regrant_effect"
+      "test_opc_server_process_restart_does_not_regrant_effect",
+      "test_acknowledgement_cannot_mark_a_concurrently_advanced_result",
+      "test_slow_real_server_state_probe_preserves_original_execution_session",
+      "test_sustained_real_server_state_delay_is_bounded_without_a_second_execution"
     ],
     "files": [
       "GOAL.md",
@@ -2822,7 +2832,9 @@
       "tests/lab/test_guided_lab.py",
       "tests/lab/test_guided_boot_recovery.py",
       "tests/lab/test_plc.py",
-      "tests/lab/test_plc_process_restart.py"
+      "tests/lab/test_plc_process_restart.py",
+      "tests/lab/test_opc_health_probe.py",
+      "robotops/lab/edge.py"
     ],
     "explanation": "OPC UA/network interruption has deterministic documented behavior. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
   },

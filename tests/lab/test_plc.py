@@ -1,4 +1,7 @@
+import sqlite3
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
+from threading import Event, current_thread
 
 import pytest
 from asyncua.ua.uaerrors import UaStatusCodeError
@@ -94,6 +97,75 @@ def test_uncertain_controller_checkpoint_can_be_reconciled_to_immutable_final(
         journal.result(command.command_id, provisional)
     with journal.connect() as db:
         assert db.execute("SELECT count(*) FROM plc_results").fetchone()[0] == 2
+
+
+def test_acknowledgement_cannot_mark_a_concurrently_advanced_result(
+    tmp_path, lab_command, monkeypatch
+):
+    command, runtime = lab_command
+    journal = PLCJournal(tmp_path / "journal.db")
+    journal.submit(command.model_dump(mode="json"))
+    journal.preconditions(command.command_id, runtime.world().model_dump(mode="json"))
+    journal.begin(command.command_id)
+    final = runtime.apply(command).model_dump(mode="json")
+    provisional = {**final, "status": "STATUS_UNKNOWN", "effect_count": 0, "reason": "PENDING"}
+    journal.result(command.command_id, provisional)
+    read, resume = Event(), Event()
+    connect = journal.connect
+
+    class PausedCursor:
+        def __init__(self, cursor):
+            self.cursor = cursor
+
+        def fetchone(self):
+            row = self.cursor.fetchone()
+            read.set()
+            assert resume.wait(10), "Acknowledgement test did not resume its reader"
+            return row
+
+    class PausedConnection:
+        def __init__(self, db):
+            self.db = db
+
+        def execute(self, statement, parameters=()):
+            cursor = self.db.execute(statement, parameters)
+            if statement.startswith("SELECT result_sequence,result FROM plc_commands"):
+                return PausedCursor(cursor)
+            return cursor
+
+    @contextmanager
+    def interleaved_connection():
+        with connect() as db:
+            if current_thread().name.startswith("ack-reader"):
+                yield PausedConnection(db)
+            else:
+                # A competing real SQLite writer reports contention immediately;
+                # no sleep or scheduling assumption determines the interleaving.
+                db.execute("PRAGMA busy_timeout=0")
+                yield db
+
+    monkeypatch.setattr(journal, "connect", interleaved_connection)
+    advanced = False
+    with ThreadPoolExecutor(max_workers=1, thread_name_prefix="ack-reader") as pool:
+        acknowledgement = pool.submit(journal.acknowledge, command.command_id, 1)
+        try:
+            assert read.wait(10), "Acknowledgement did not read its original sequence"
+            try:
+                journal.result(command.command_id, final)
+                advanced = True
+            except sqlite3.OperationalError as error:
+                assert "locked" in str(error)
+        finally:
+            resume.set()
+        acknowledgement.result(timeout=10)
+    if not advanced:
+        journal.result(command.command_id, final)
+    retained = journal.status(command.command_id)
+    assert retained["result_sequence"] == 2
+    assert retained["acknowledged"] is False
+    assert retained["result"]["effect_count"] == runtime.world().step == 1
+    with pytest.raises(Conflict, match="SEQUENCE_MISMATCH"):
+        journal.acknowledge(command.command_id, 1)
 
 
 def test_real_opcua_browse_subscription_acceptance_gate_and_result(running_plc, lab_command):

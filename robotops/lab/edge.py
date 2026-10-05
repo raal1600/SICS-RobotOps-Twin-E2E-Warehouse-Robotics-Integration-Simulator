@@ -69,7 +69,13 @@ class EdgeControl:
             await session.close()
 
     async def begin(self, command_id: str) -> dict[str, Any]:
-        client = Client(self.config.opcua_url, timeout=self.config.timeout)
+        # asyncua also uses watchdog_intervall as its ServerState probe deadline.
+        # Keep it within the configured network budget, not the default one second.
+        client = Client(
+            self.config.opcua_url,
+            timeout=self.config.timeout,
+            watchdog_intervall=self.config.timeout,
+        )
         await client.connect()
         session = None
         try:

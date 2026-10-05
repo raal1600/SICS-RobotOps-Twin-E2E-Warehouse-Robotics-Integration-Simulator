@@ -214,6 +214,9 @@ class PLCJournal:
 
     def acknowledge(self, command_id: str, sequence: int) -> dict[str, Any]:
         with self.connect() as db:
+            # A provisional result may advance concurrently. Bind the acknowledgement
+            # to the sequence checked under the same writer lock as its update.
+            db.execute("BEGIN IMMEDIATE")
             row = db.execute(
                 "SELECT result_sequence,result FROM plc_commands WHERE command_id=?", (command_id,)
             ).fetchone()

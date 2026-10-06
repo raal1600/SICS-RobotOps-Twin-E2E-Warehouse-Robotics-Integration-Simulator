@@ -1,0 +1,165 @@
+{
+  "captured_at_utc": "2026-10-05T20:44:18.999917+00:00",
+  "completion": "NOT ACHIEVED",
+  "overall_suite_status": "FAILED: tests_1 finished 799 tests, 796 passed, 3 failed, 0 skipped. tests_2 and remaining acceptance gates are still pending; overall acceptance has not passed.",
+  "source_commit": "f78985b3440a1800b4c3e0bccf25663628b05f56",
+  "acceptance_source": {
+    "commit": "f78985b3440a1800b4c3e0bccf25663628b05f56",
+    "dirty": false,
+    "source_sha256": "aff0c25739581941c98ba9f486e12f56220a01a73e8dfc1f9d875abbeffa6afc"
+  },
+  "all_case_source_maps_identical": true,
+  "all_recorded_source_files_match_current": true,
+  "cases": [
+    {
+      "case": "happy",
+      "runtime": "blender",
+      "identity": {
+        "session_id": "5feaebbc-71a5-56c1-af4e-bf3d853c571b",
+        "correlation_id": "e48dcdc6-8658-5487-9ddf-8f2546669419",
+        "order_id": "order-16f22ece-c059-49f5-811a-5d47e7ed3438",
+        "job_id": "1c67cb18-53d1-5bfd-81d0-c25e51eeea25",
+        "command_id": "c6d3d746-e1b0-5954-95f0-05feb33450ac"
+      },
+      "final": {
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "updated_at": "2026-10-05T20:36:28.264207Z"
+      },
+      "physical_effect_count": 1,
+      "runtime_journal_command_count": 1,
+      "interpretation": "Actual Blender happy path completed all 22 stages; evaluated motion and rendered movement are retained, followed by verification, WMS acknowledgement and ERP completion.",
+      "journal_capture": "happy-journals.json"
+    },
+    {
+      "case": "DROP_ACK_AFTER_EFFECT",
+      "runtime": "synthetic",
+      "identity": {
+        "session_id": "a4feb78f-cdc4-5bf4-830f-e6388132c68e",
+        "correlation_id": "b8154e35-f4c0-54c4-8b72-ad0477757f25",
+        "order_id": "order-2a7f3a93-7ef9-4634-adb9-4970a7af4e79",
+        "job_id": "0ad65c40-7dd2-53bd-9861-d8745abac231",
+        "command_id": "72ec37df-41af-5ed8-8626-af4ba51cd9d0"
+      },
+      "final": {
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-05T20:37:35.013945Z"
+      },
+      "physical_effect_count": 1,
+      "runtime_journal_command_count": 1,
+      "interpretation": "UNKNOWN_OUTCOME persisted until explicit original-command reconciliation with a fresh observation; final business state completed with one durable runtime effect. Runtime is synthetic, while lab protocols are real.",
+      "journal_capture": "drop_ack_after_effect-journals.json"
+    },
+    {
+      "case": "DUPLICATE_DELIVERY",
+      "runtime": "synthetic",
+      "identity": {
+        "session_id": "40fe5f2d-b9a5-5a07-a6ea-750e9db625cc",
+        "correlation_id": "352505c6-563f-51f0-9e05-827091e20ead",
+        "order_id": "order-1a896ed2-af65-4060-a9ed-acfdaf10cbd4",
+        "job_id": "ccc6aa7f-62d1-5f67-81ca-8b5fc6790ff1",
+        "command_id": "7426da77-4d87-5db0-b679-9fd6c86ebf80"
+      },
+      "final": {
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "updated_at": "2026-10-05T20:38:34.202421Z"
+      },
+      "physical_effect_count": 1,
+      "runtime_journal_command_count": 1,
+      "interpretation": "The intended fault boundary was reached: actual duplicate publication produced deliveries=2 for the same command/hash, while durable runtime effect_count remained 1. redelivered=false means this was duplicate publication, not broker-redelivery-flag proof.",
+      "journal_capture": "duplicate_delivery-journals.json"
+    },
+    {
+      "case": "WMS_UNAVAILABLE",
+      "runtime": "synthetic",
+      "identity": {
+        "session_id": "85817201-d0cc-533f-9e12-3e1fff933a77",
+        "correlation_id": "6ea3ae54-72f3-5964-8ca0-2be09d0521b7",
+        "order_id": "order-74eec932-e6cc-4d8e-8801-87e08dfa4bd8",
+        "job_id": "2b6a374a-812e-58e7-8ae3-0d47a3e8e473",
+        "command_id": "df193b27-575d-5614-8978-ae7360747aba"
+      },
+      "final": {
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-05T20:39:35.360234Z"
+      },
+      "physical_effect_count": 1,
+      "runtime_journal_command_count": 1,
+      "interpretation": "The intended HTTP fault boundary was reached: stage 20 retained actual HTTP 503 with REAL PROTOCOL/network_attempted=true, then a business-only retry returned HTTP 200/attempts=2. Both retain physical_retry=false; effect_count remained 1.",
+      "journal_capture": "wms_unavailable-journals.json"
+    }
+  ],
+  "secret_scan": {
+    "potential_findings": 0,
+    "sensitive_headers": 0,
+    "cookies": 0
+  },
+  "relationship_to_previous_pack": "Earlier targeted 2-pass/2-fail evidence remains unchanged. All four later tests_1 lab-browser scenarios formally PASSED, including duplicate and WMS fault boundaries. The whole tests_1 suite FAILED on three other browser cases.",
+  "pending": [
+    "Diagnose/fix three tests_1 failures and repeat required verification",
+    "Terminal tests_2 result and remaining local acceptance gates",
+    "Final manual browser/CLI evidence",
+    "Final documentation and exact-source remote CI/publication/Pages"
+  ],
+  "terminal_status_updated_at_utc": "2026-10-05T20:48:50.524740+00:00",
+  "tests_1_terminal": {
+    "junit": "docs/evidence/acceptance/20261005T195412/tests-1.xml",
+    "tests": 799,
+    "passed": 796,
+    "failed": 3,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 3037.937,
+    "coverage_percent": 91.43983480382954,
+    "failures": [
+      {
+        "classname": "tests.browser.test_guided_console",
+        "name": "test_guided_happy_reload_gate_trace_and_business_completion[synthetic]",
+        "seconds": 144.925
+      },
+      {
+        "classname": "tests.browser.test_investigation",
+        "name": "test_run_notice_investigate_and_return[blender-desktop]",
+        "seconds": 118.057
+      },
+      {
+        "classname": "tests.browser.test_investigation",
+        "name": "test_run_notice_investigate_and_return[blender-compact]",
+        "seconds": 98.666
+      }
+    ]
+  },
+  "lab_browser_test_results": [
+    {
+      "classname": "tests.lab.test_browser_lab",
+      "name": "test_full_lab_browser_authorization_recovery_and_business_completion[]",
+      "seconds": 84.71,
+      "status": "PASSED"
+    },
+    {
+      "classname": "tests.lab.test_browser_lab",
+      "name": "test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]",
+      "seconds": 65.094,
+      "status": "PASSED"
+    },
+    {
+      "classname": "tests.lab.test_browser_lab",
+      "name": "test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]",
+      "seconds": 59.301,
+      "status": "PASSED"
+    },
+    {
+      "classname": "tests.lab.test_browser_lab",
+      "name": "test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]",
+      "seconds": 61.219,
+      "status": "PASSED"
+    }
+  ]
+}

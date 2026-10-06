@@ -1,0 +1,47 @@
+{
+  "at_utc": "2026-10-06T03:54:35.993839+00:00",
+  "status": "COVERAGE_ONLY_FIX_ACTUAL_PS51_EXTRACTION_VERIFIED",
+  "original_failure": "PowerShell5.1 ConvertFrom-Json rejects the empty context-name key in the full coverage JSON before service launch. Original stderr and exact launcher retained.",
+  "change": "Python standard-library JSON reads only totals.percent_covered, requires finite numeric type and serializes a small totals object with allow_nan=False. Check Python exit and nonempty output before PowerShell ConvertFrom-Json. Existing85percent test and all other source/campaign/gate/JUnit/launch guards remain unchanged.",
+  "manual_launcher": {
+    "path": "artifacts/run-manual-lab-9e83fe7.ps1",
+    "sha256": "81b20e45df77e48a80239e376722415d5e741c0c731c4392b0fac44989f12e42",
+    "bytes": 7415
+  },
+  "CLI_launcher": {
+    "path": "artifacts/run-final-cli-9e83fe7.ps1",
+    "sha256": "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150",
+    "bytes": 11306
+  },
+  "CLI_scope": "Inspected; contains no coverage JSON parsing, byte-unchanged.",
+  "preserved_originals": {
+    "path": "artifacts/final-evidence-pack/9e83fe7/prep-before-coverage-fix-20261006T035307/snapshot-receipt.json",
+    "sha256": "77ee9faef3c4132f9ed3c5ce3da460afb63928ad6ac36602d882eb5c4f3e2b44",
+    "bytes": 1739
+  },
+  "diff": {
+    "path": "artifacts/final-evidence-pack/9e83fe7/prep-before-coverage-fix-20261006T035307/coverage-only.diff.txt",
+    "sha256": "e8c3bc4be391a9f170d5f8256e397baf832248b9d6bcb216c46549751165124c",
+    "bytes": 1628
+  },
+  "validation": {
+    "path": "artifacts/final-evidence-pack/9e83fe7/coverage-extraction-fix-validation.json",
+    "sha256": "efadb7b66eac440377f1311dfacfd628a23a8085dc966ca708e942cd96644f94",
+    "bytes": 3083
+  },
+  "powershell_version": "5.1.26100.9444",
+  "actual_coverage_values": [
+    91.38059701492537,
+    91.43656716417911
+  ],
+  "launcher_parser_errors": 0,
+  "launcher_executed": false,
+  "service_started": false,
+  "product_tests_run": false,
+  "tracked_source_changes": false,
+  "limits": [
+    "Only the exact extraction fragment ran against actual saved coverage. No complete launcher, browser, service or physical action was executed.",
+    "This repair does not itself validate the future manual workflow or imply goal completion."
+  ],
+  "goal_status": "NOT_ACHIEVED"
+}

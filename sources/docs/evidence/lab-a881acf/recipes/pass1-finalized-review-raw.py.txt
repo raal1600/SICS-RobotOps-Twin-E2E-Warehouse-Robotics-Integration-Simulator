@@ -1,0 +1,165 @@
+import collections,hashlib,json,re,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+from urllib.parse import urlsplit
+import xml.etree.ElementTree as ET
+r=Path('.').resolve(); out=r/'artifacts/final-evidence-pack/a881acf'; campaign=r/'docs/evidence/acceptance/20261006T012424'
+expected={'commit':'a881acfee55bb56e808882f724a150ad77d05eb6','dirty':False,'source_sha256':'cc354a6e622b244619e4766280632822781ae974770122ed3850fe136f90150f'}
+fixture='robotops-acceptance-1-gy0l7me9'
+names=['happy','drop_ack_after_effect','duplicate_delivery','wms_unavailable']
+faults={n:(None if n=='happy' else n.upper()) for n in names}
+issues=[]; raw_inputs={}; secret_findings=[]; checks_total=0
+def h(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def ref(p): return {'path':p.relative_to(r).as_posix(),'sha256':h(p),'bytes':p.stat().st_size}
+def load(p):
+ raw=p.read_bytes(); raw_inputs[p.relative_to(r).as_posix()]=ref(p)
+ return json.loads(raw.decode('utf-16' if raw.startswith((b'\xff\xfe',b'\xfe\xff')) else 'utf-8-sig'))
+def walk_secret(v,path,p):
+ if isinstance(v,dict):
+  for k,x in v.items():
+   if re.fullmatch(r'(?i)(password|passwd|api[_-]?key|access[_-]?token|client[_-]?secret|authorization)',k) and isinstance(x,str) and x and not re.fullmatch(r'(?i)(redacted|\*+|<redacted>|\[redacted\])',x): secret_findings.append({'path':path,'field':p+'.'+k,'kind':'sensitive_key_value'})
+   walk_secret(x,path,p+'.'+k)
+ elif isinstance(v,list):
+  for i,x in enumerate(v): walk_secret(x,path,p+f'[{i}]')
+ elif isinstance(v,str):
+  for kind,pattern in [('fixture_credential',r'demo-only|local-demo-only|guest:guest|postgresql://'),('url_userinfo',r'\b[a-z][a-z0-9+.-]*://[^/\s:]+:[^@\s/]+@'),('bearer_or_private_key',r'(?i)\bBearer\s+[A-Za-z0-9._~+/-]{12,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----')]:
+   if re.search(pattern,v): secret_findings.append({'path':path,'field':p,'kind':kind})
+def scan(v,p): walk_secret(v,p.relative_to(r).as_posix(),'$')
+fixed=out/'pass1-finalized-snapshots'
+manifest=load(fixed/'manifest.json'); watcher=load(fixed/'status.json')
+copy_receipt=load(fixed/'copy-receipt.json')
+for copy in copy_receipt['files']: assert h(r/copy['copy'])==copy['sha256']
+original_review=ref(out/'pass1-case-review.json')
+assert original_review['sha256']=='49cd8c819c6247877f32ffbd471f0181c40af23931e5bc4a4be57fcf3bab7de2'
+assert manifest['source']==expected and watcher['source']==expected
+assert watcher['acceptance_directory']==campaign.relative_to(r).as_posix() and watcher['fixture_roots']['1']==fixture
+assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==expected['commit']
+junit_path=campaign/'tests-1.xml'; formal={}; suite={'status':'PENDING_JUNIT','path':junit_path.relative_to(r).as_posix(),'file_exists_at_review':junit_path.exists()}
+if junit_path.exists():
+ try:
+  xml=ET.parse(junit_path); allcases=list(xml.iter('testcase')); declared=list(xml.iter('testsuite'))
+  if allcases and declared:
+   keys=[c.attrib['classname'].replace('.','/')+'.py::'+c.attrib['name'] for c in allcases]
+   outcomes=[next((s for s in ['error','failure','skipped'] if c.find(s) is not None),'passed') for c in allcases]
+   counts=dict(collections.Counter(outcomes)); duplicates=[k for k,n in collections.Counter(keys).items() if n>1]
+   formal=dict(zip(keys,outcomes))
+   suite={'status':'TERMINAL_JUNIT','artifact':ref(junit_path),'actual_testcase_count':len(allcases),'unique_testcase_count':len(set(keys)),'outcomes':counts,'duplicates':duplicates,'declared_suites':[d.attrib for d in declared],'manifest_gate':manifest['gates'].get('tests_1')}
+   suite['declared_counts_match']=sum(int(d.attrib['tests']) for d in declared)==len(allcases)
+   suite['clean']=not duplicates and suite['declared_counts_match'] and counts.get('passed')==len(allcases) and all(int(d.attrib[k])==0 for d in declared for k in ['errors','failures','skipped'])
+   if not suite['clean']: issues.append({'scope':'first_suite','issue':'Terminal JUnit is not wholly clean; exact counts retained.'})
+   cp=campaign/'coverage-1.json'
+   if cp.exists(): cov=load(cp); suite['coverage']={'artifact':ref(cp),'totals':cov['totals']}
+ except ET.ParseError:
+  suite['status']='PENDING_COMPLETE_JUNIT_XML'
+results={}; source_sets=[]
+for n in names:
+ p=fixed/f'{n}.json'; d=load(p); scan(d,p)
+ assert d['formal_test_status']=='PASSED' and 'formal_test_result' in d
+ a=r/d['artifact_directory']; s=load(a/'session.json'); b=load(a/'browser.json'); st=load(a/'stack.json'); sh=load(a/'source-hashes.json')
+ for fn,obj in [('session.json',s),('browser.json',b),('stack.json',st),('source-hashes.json',sh)]: scan(obj,a/fn)
+ checks={}
+ def check(k,v):
+  global checks_total
+  checks_total+=1;checks[k]=bool(v)
+  if not v: issues.append({'case':n,'check':k})
+ for item in d['input_files']: check('input_hash_'+Path(item['path']).name,h(r/item['path'])==item['sha256'])
+ source_set={(r/Path(k)).resolve().relative_to(r).as_posix():v for k,v in sh.items()}; source_sets.append(source_set)
+ snapshot_set={x['path'].replace('\\','/'):x['recorded_sha256'] for x in d['source_checks']}
+ check('source_manifest_exact',d['source']==expected)
+ check('campaign_pass_fixture_exact',d['acceptance_pass']==1 and d['acceptance_directory']==campaign.relative_to(r).as_posix() and fixture in Path(st['data_directory']).parts)
+ check('capture_complete',d['capture_complete'] is True)
+ check('raw_stack_matches',st==d['stack'])
+ check('source_map_matches_snapshot',source_set==snapshot_set and len(source_set)==35)
+ check('raw_session_matches_summary',all(s[k]==v for k,v in d['session'].items()))
+ sid,cid,jid=s['session_id'],s['command_id'],s['job_id']
+ fault=faults[n]; runtime='blender' if n=='happy' else 'synthetic'
+ check('runtime_truthful',d['runtime']==st['runtime']==runtime)
+ check('lab_guided_original_fault',s['profile']=='lab' and s['mode']=='guided' and s['fault']==fault)
+ check('completed_stage22',s['status']=='COMPLETED' and s['current_stage']==22 and s['pending_authorization'] is None)
+ check('revision_steps',s['revision']==(46 if n in ['drop_ack_after_effect','wms_unavailable'] else 44) and len(s['steps'])==(23 if n in ['drop_ack_after_effect','wms_unavailable'] else 22))
+ steps=s['steps']; bystage={k:[x for x in steps if x['stage']==k] for k in range(1,23)}
+ check('all22_stages_present',all(bystage[k] for k in bystage))
+ check('all_steps_bound_original_session',all(x['session_id']==sid and x['correlation_id']==s['correlation_id'] and x['command_id'] in [None,cid] for x in steps))
+ runtime_db=d['journals']['runtime.db']; plc=d['journals']['plc.db']
+ check('journal_paths_exact_fixture',all(fixture in Path(x['path']).parts and Path(x['path']).parent==Path(st['data_directory']) and x['read_only'] is True for x in [runtime_db,plc]))
+ check('one_row_each_journal',len(runtime_db['controller_journal'])==len(plc['plc_commands'])==len(plc['plc_results'])==1)
+ row=runtime_db['controller_journal'][0]; receipt=row['receipt']; pc=plc['plc_commands'][0]; pr=plc['plc_results'][0]; payload=row['payload_hash']
+ check('original_command_payload_all_journals',row['command_id']==pc['command_id']==pr['command_id']==receipt['command_id']==cid and pc['payload_hash']==receipt['payload_hash']==payload)
+ check('receipt_job_correlation',receipt['job_id']==jid and receipt['correlation_id']==s['correlation_id'])
+ check('exact_original_receipt_all_journals',receipt==pc['result']==pr['receipt'])
+ check('one_durable_effect',receipt['effect_count']==d['physical_effect_count']==1 and receipt['journal_durable'] is True and receipt['status']=='SUCCEEDED')
+ check('plc_succeeded_sequence1',pc['state']=='SUCCEEDED' and pc['result_sequence']==pr['sequence']==1)
+ check('runtime_receipt_reason',receipt['reason']==('BLENDER_PICK_APPLIED' if n=='happy' else 'PICK_APPLIED'))
+ requests=b['requests']; posts=[x for x in requests if x['method']=='POST']
+ physical=[x for x in posts if (x.get('body') or {}).get('stage')==16]
+ consent=[x for x in posts if (x.get('body') or {}).get('stage')==15]
+ reconciles=[x for x in posts if urlsplit(x['url']).path.endswith('/reconcile')]
+ businessposts=[x for x in posts if (x.get('body') or {}).get('stage')==20]
+ creations=[x for x in posts if urlsplit(x['url']).path=='/v1/wms/tasks']
+ check('original_creation_request',len(creations)==1 and creations[0]['body']['fault']==fault and creations[0]['body']['request']['order_id']==s['order_id'])
+ check('one_browser_physical_post',len(physical)==1 and physical[0]['url'].endswith('/'+sid+'/authorize'))
+ check('consent_before_physical',len(consent)==1 and requests.index(consent[0])<requests.index(physical[0]) and bystage[15][0]['output']['authorized'] is True and bystage[15][0]['output']['command_id']==cid and bystage[15][0]['output']['payload_hash']==payload)
+ check('no_run_endpoint',not any(urlsplit(x['url']).path.endswith('/run') for x in posts))
+ check('browser_no_errors',not b['errors'] and not b['console_errors'] and b['errors']==d['browser_errors'] and b['console_errors']==d['browser_console_errors'])
+ pre=s['context']['execution_preflight']
+ check('preflight_original_READY_no_result',pre['command_id']==cid and pre['payload_hash']==payload and pre['state']=='READY' and pre['result_sequence']==0 and pre['result'] is None)
+ check('truthful_classifications',all(x['classification']=='REAL PROTOCOL' for x in steps if x['stage'] in [10,11,12,13,14,17,20]) and bystage[16][0]['classification']=='SIMULATED ROBOT')
+ opc=bystage[12][0]['output']
+ check('real_opc_edge_distinct_process',opc['opcua_client_component']=='edge-adapter' and opc['edge_process_id']==st['processes']['edge'] and opc['edge_process_id']!=st['processes']['api'])
+ check('original_getstatus_readonly',bystage[17][0]['output']['journal_query_only'] is True and bystage[17][0]['output']['receipt']==receipt)
+ business=bystage[20]; lastbusiness=business[-1]['output']; erp=bystage[21][-1]['output']
+ check('wms_final200_no_physical_retry',lastbusiness['wire']['http_status']==200 and lastbusiness['wms_acknowledged'] is True and lastbusiness['physical_retry'] is False and lastbusiness['command_id']==cid and lastbusiness['job_id']==jid)
+ check('erp_complete',erp['business_status']=='COMPLETED' and erp['wms_acknowledged'] is True and erp['order_id']==s['order_id'] and s['context']['wms_ack'] is True)
+ check('verification_final_success',s['context']['verification']['verdict']=='VERIFIED_SUCCESS' and s['context']['verification']['command_id']==cid)
+ detail={}
+ if n=='happy':
+  motion=load(a/'blender-motion.json'); scan(motion,a/'blender-motion.json'); rec=motion['recording']
+  check('motion_raw_matches_snapshot',all(d['motion'].get(k)==v for k,v in motion.items()) and set(d['motion'])==set(motion)|{'rendered_position_changed'})
+  check('blender_original_complete',rec['source']=='BLENDER_EVALUATED_SCENE' and rec['complete'] is True and rec['command_id']==cid)
+  check('actual_133frames_118poses',rec['frames']==rec['total_frames']==rec['motion_steps']==133 and rec['robot_poses']==118)
+  check('product_moved',rec['product_start']!=rec['product_finish'])
+  check('pose_and_rendered_movement',motion['after']['playing'] is True and motion['after']['cursor']>motion['before']['cursor'] and motion['after']['pose']!=motion['before']['pose'] and motion['after']['rendered']!=motion['before']['rendered'] and d['motion']['rendered_position_changed'] is True)
+  detail['motion']=motion
+ if n=='drop_ack_after_effect':
+  recovery=[x for x in steps if x['wire'].get('original_identity_queried') is True]
+  check('unknown_receipt_loss',bystage[16][0]['output']['status']=='UNKNOWN_OUTCOME' and bystage[16][0]['output']['receipt'] is None and bystage[19][0]['state_after']=='UNKNOWN_OUTCOME')
+  check('one_original_reconcile_no_resend',len(reconciles)==len(recovery)==1 and recovery[0]['state_before']=='UNKNOWN_OUTCOME' and recovery[0]['state_after']=='COMPLETED' and recovery[0]['wire']['command_id']==cid and recovery[0]['wire']['physical_resend'] is False and recovery[0]['output']['command']['command_id']==cid and recovery[0]['output']['receipt']==receipt)
+  detail['recovery']={'unknown_stage16':bystage[16][0]['output'],'prior_verification':bystage[19][0]['output'],'wire':recovery[0]['wire'],'sequence':recovery[0]['sequence'],'receipt_unchanged':recovery[0]['output']['receipt']==receipt}
+ else: check('no_reconcile_post',len(reconciles)==0)
+ delivery=bystage[11][0]['output']
+ if n=='duplicate_delivery':
+  duplicate=delivery['redelivery']; publish=duplicate['duplicate_publish']
+  check('duplicate_deliveries1to2_same_original',delivery['deliveries']==1 and duplicate['deliveries']==2 and delivery['command_id']==duplicate['command_id']==publish['command_id']==publish['message_id']==cid and delivery['payload_hash']==duplicate['payload_hash']==payload)
+  check('duplicate_publish_not_broker_redelivery',delivery['redelivered'] is False and duplicate['redelivered'] is False and publish['publisher_confirm'] is True and duplicate['consumer_ack_sent'] is True and duplicate['durable_inbox_committed'] is True)
+  detail['duplicate_delivery']=delivery
+ if n=='wms_unavailable':
+  first=business[0]['output']
+  check('actual_wms503_then200',len(business)==2 and business[0]['status']=='FAILED' and first['http_response']['status_code']==503 and first['network_attempted'] is True and first['protocol_evidence_confirmed'] is True and first['retry_permitted'] is True and first['physical_retry'] is False and first['wms_acknowledged'] is False and lastbusiness['wire']['attempts']==2 and len(businessposts)==2)
+ else: check('one_wms_business_attempt',len(business)==1 and lastbusiness['wire']['attempts']==1 and len(businessposts)==1)
+ case_id='tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion['+(fault or '')+']'
+ fs='PASSED' if formal.get(case_id)=='passed' else (formal.get(case_id,'PENDING_JUNIT').upper())
+ check('watcher_no_secret_findings',d['secret_review']['potential_findings']==[])
+ if formal and fs!='PASSED': issues.append({'case':n,'formal_status':fs})
+ test_attestation={'status':'ATTESTED_BY_EXACT_CLEAN_TESTCASE' if fs=='PASSED' else 'PENDING_EXACT_TESTCASE_JUNIT','testcase_id':case_id,'source_path':'tests/lab/test_browser_lab.py','checks':['Repeated runtime receipt absent/effect0 before stage15','Stage10 reload preserves original session/revision and read-only stream','Playback disabled before authorization and enabled after effect1','Live read_only true','Exact physical authorization replay returns same revision and effect1','Saved playback execution_scenario bound to original fault/session','Recorded caption retains original scenario after real UI dropdown change to BRAIN_TIMEOUT']}
+ results[n]={'snapshot':ref(p),'captured_at_utc':d['captured_at_utc'],'artifact_directory':d['artifact_directory'],'fixture_directory':st['data_directory'],'formal_test_status':fs,'snapshot_formal_status_at_review':d['formal_test_status'],'runtime':runtime,'session':d['session'],'fault':fault,'payload_hash':payload,'runtime_receipt':receipt,'journal_summary':{'runtime_rows':1,'plc_command_rows':1,'plc_result_rows':1,'plc_state':pc['state'],'result_sequence':pc['result_sequence'],'physical_effect_count':d['physical_effect_count'],'robot_event_count':runtime_db['robot_event_count'],'databases':[{'path':x['path'],'database_sha256_at_capture':x['database_sha256_at_capture'],'read_only_capture':x['read_only']} for x in [runtime_db,plc]]},'browser':{'request_count':len(requests),'post_count':len(posts),'physical_stage16_browser_posts':len(physical),'reconcile_browser_posts':len(reconciles),'stage20_browser_posts':len(businessposts),'errors':b['errors'],'console_errors':b['console_errors'],'recorded_keys':list(b)},'checks':checks,'source_count':len(source_set),'business':{'wms_steps':[{'sequence':x['sequence'],'status':x['status'],'output':x['output']} for x in business],'erp':erp},'exact_test_assertion_attestation':test_attestation,'caption_dropdown_review':{'status':'PENDING_FULL_DOM_AUDIT','raw_browser_contains_responses_or_DOM':False,'note':'Saved browser JSON records requests/errors only. Exact test source has actual caption/dropdown/original execution_scenario assertions, attested only when its terminal testcase passes.'},'watcher_secret_review':d['secret_review'],**detail}
+source_checks=[]
+for path,recorded in sorted(source_sets[0].items()):
+ actual=h(r/path); matches=all(x.get(path)==recorded for x in source_sets) and actual==recorded
+ source_checks.append({'path':path,'recorded_sha256':recorded,'review_sha256':actual,'matches_all_four_cases_and_current_source':matches})
+ if not matches: issues.append({'source_path':path,'issue':'source hash mismatch'})
+assert all(set(x)==set(source_sets[0]) for x in source_sets)
+for item in raw_inputs.values():
+ if h(r/item['path'])!=item['sha256']: issues.append({'path':item['path'],'issue':'input changed during review'})
+all_formal=all(v['formal_test_status']=='PASSED' for v in results.values())
+report={'reviewed_at_utc':datetime.now(timezone.utc).isoformat(),'campaign':campaign.relative_to(r).as_posix(),'acceptance_pass':1,'fixture_basename':fixture,'source':expected,'verdict':'ISSUES_FOUND' if issues or secret_findings else ('FOUR_SAVED_CASES_CONSISTENT_AND_FORMALLY_PASSED' if all_formal else 'FOUR_SAVED_CASES_CONSISTENT_FORMAL_JUNIT_PENDING'),'formal_test_status':'PASSED_FOUR_LAB_CASES' if all_formal else 'PENDING_JUNIT','terminal_suite':suite,'overall_acceptance':'PENDING_SECOND_SUITE_AND_REMAINING_GATES','goal_status':'NOT_ACHIEVED','method':['Read only four current watcher JSONs plus exact raw stack/session/browser/source-hashes and happy blender-motion JSON; rehash all35 recorded source files.','Independently compare source, fixture/pass, identities, receipts, effect count, request ordering, recovery/delivery/business facts and saved errors.','Parse first-suite JUnit if terminal. Distinguish test-assertion attestation from raw standalone captures. No DBs, trace ZIPs, browser/tests/rendering or runtime actions.'],'cases':results,'source_checks':source_checks,'all_source_hashes_match':all(x['matches_all_four_cases_and_current_source'] for x in source_checks),'source_files_verified':len(source_checks),'case_count':4,'check_count':checks_total,'issues':issues,'secret_review':{'scope':'Only the four snapshot JSONs and exact raw session/browser/stack/source-hashes/motion JSONs. No ZIPs/logs/live payloads scanned.','method':'Known public fixture credential tokens, URL userinfo, bearer/private-key patterns, exact sensitive key/value fields; findings record field paths without values.','potential_findings':secret_findings,'global_secret_absence_claim':False},'limitations':['Pre-gate effect0 and API replay revision stability have no standalone saved before-journal/replay response in these files; exact terminal testcase attestation is separate.','Browser request listener does not record page.request API calls, including intentional physical-authorization replay; one browser POST is not a claim of only one HTTP request. Durable receipt/effect1 plus exact test assertion establish replay idempotence when JUnit passes.','No full DOM/caption/dropdown or trace secret audit performed; manual exact-source loop remains pending.','Saved DB hashes are capture-time metadata only; no DB opened or rehashed.','Real protocol lab fault cases use synthetic runtime; only happy has actual Blender evaluated-scene motion proof.','Whole campaign and remote gates are not passed by a first-suite result.'],'inputs':[raw_inputs[x] for x in sorted(raw_inputs)]}
+report['input_binding_finalization']={'supersedes':original_review,'scope':'Finalized input binding only; original review preserved. Expected watcher PENDING_JUNIT to PASSED promotion is not a product/test failure.','snapshot_directory':fixed.relative_to(r).as_posix(),'copy_receipt':ref(fixed/'copy-receipt.json'),'same_raw_checks_recomputed':checks_total,'manifest_and_status_are_fixed_copies':True}
+for n,v in report['cases'].items(): v['original_watcher_path']=(out/'pass-1'/f'{n}.json').relative_to(r).as_posix()
+assert h(out/'pass1-case-review.json')==original_review['sha256']
+target=out/'pass1-case-review-final.json'
+if not all_formal:
+ print(json.dumps({'ready_for_raw_review':True,'formal_status':report['formal_test_status'],'case_count':4,'checks':checks_total,'issues':issues,'secret_findings_count':len(secret_findings),'source_hashes':len(source_checks),'write_deferred_until_terminal_cases':True}))
+else:
+ assert not target.exists(),'Existing review preserved'
+ target.write_text(json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+ print(json.dumps({'output':ref(target),'verdict':report['verdict'],'suite':suite,'check_count':checks_total,'issues':issues,'secret_findings_count':len(secret_findings),'source_hashes':len(source_checks)},ensure_ascii=False))
+

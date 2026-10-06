@@ -1,0 +1,1164 @@
+{
+  "reviewed_at": "2026-10-05T23:43:41.897333+00:00",
+  "scope": "Independent read-only review of completed local acceptance artifacts. No services, browsers, tests or rendering started.",
+  "source": {
+    "expected_commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+    "expected_fingerprint": "101649c4c5835db2b4007011459752c2f9350ab91448b31b919eccbbbe299a73",
+    "manifest_start": {
+      "commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+      "dirty": false,
+      "source_sha256": "101649c4c5835db2b4007011459752c2f9350ab91448b31b919eccbbbe299a73"
+    },
+    "current": {
+      "commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+      "dirty": true,
+      "source_sha256": "101649c4c5835db2b4007011459752c2f9350ab91448b31b919eccbbbe299a73"
+    },
+    "current_dirty_explanation": "Generated ACCEPTANCE_REPORT.md and new evidence may make the working tree dirty; exact source fingerprint still matches. This does not alter the clean-start attestation."
+  },
+  "manifest": {
+    "path": "docs/evidence/acceptance/20261005T224038/manifest.json",
+    "sha256": "582c36b5675ec3ed9e63dde289cb9bccd818bb6d71f78e8932cdaebce5dc9cdb",
+    "bytes": 24060
+  },
+  "terminal_exit": {
+    "artifact": {
+      "path": "artifacts/acceptance-closed-readers-exit.json",
+      "sha256": "fb3c55339aee7ae0c79da0d5f300857c511e51a81ab7c397e652a65a8f8bd82c",
+      "bytes": 80
+    },
+    "exit_code": 0,
+    "ended_at": "2026-10-05T23:40:31.1478272Z"
+  },
+  "local_acceptance_passed": true,
+  "local_gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\.local\\bin\\uv.EXE",
+        "sync",
+        "--locked",
+        "--all-groups"
+      ],
+      "seconds": 0.029985799978021532,
+      "log": "docs/evidence/acceptance/20261005T224038/setup.log"
+    },
+    "browser_setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "playwright",
+        "install",
+        "chromium",
+        "--only-shell"
+      ],
+      "seconds": 0.37400890002027154,
+      "log": "docs/evidence/acceptance/20261005T224038/browser_setup.log"
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+        "--version"
+      ],
+      "seconds": 0.21458289999281988,
+      "log": "docs/evidence/acceptance/20261005T224038/blender_version.log"
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "security"
+      ],
+      "seconds": 6.2651370000094175,
+      "log": "docs/evidence/acceptance/20261005T224038/security.log"
+    },
+    "tests_1": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-gr3y5owm/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261005T224038\\tests-1.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261005T224038\\coverage-1.json",
+        "--cov-report=term"
+      ],
+      "seconds": 1809.0093367999943,
+      "log": "docs/evidence/acceptance/20261005T224038/tests_1.log"
+    },
+    "tests_2": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-2-xtyzawex/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261005T224038\\tests-2.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261005T224038\\coverage-2.json",
+        "--cov-report=term"
+      ],
+      "seconds": 1649.9420810000156,
+      "log": "docs/evidence/acceptance/20261005T224038/tests_2.log"
+    },
+    "repeatability": {
+      "passed": true,
+      "log": "docs/evidence/acceptance/20261005T224038/repeatability.json"
+    },
+    "lint": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "lint"
+      ],
+      "seconds": 0.2494136999885086,
+      "log": "docs/evidence/acceptance/20261005T224038/lint.log"
+    },
+    "typecheck": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "typecheck"
+      ],
+      "seconds": 0.5299949999898672,
+      "log": "docs/evidence/acceptance/20261005T224038/typecheck.log"
+    },
+    "demo_happy_path": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "happy_path",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\happy_path"
+      ],
+      "seconds": 9.717373699997552,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_happy_path.log"
+    },
+    "demo_lost_ack_after_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_after_effect",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\lost_ack_after_effect"
+      ],
+      "seconds": 9.853602199989837,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_lost_ack_after_effect.log"
+    },
+    "demo_lost_ack_before_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_before_effect",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\lost_ack_before_effect"
+      ],
+      "seconds": 1.0014904999989085,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_lost_ack_before_effect.log"
+    },
+    "demo_ambiguous": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "ambiguous",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\ambiguous"
+      ],
+      "seconds": 9.983608199981973,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_ambiguous.log"
+    },
+    "demo_restart": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "restart",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\restart"
+      ],
+      "seconds": 10.258068399998592,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_restart.log"
+    },
+    "demo_logical_estop": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "logical_estop",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\logical_estop"
+      ],
+      "seconds": 0.9520852999994531,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_logical_estop.log"
+    },
+    "demo_cell_fault": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "cell_fault",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\cell_fault"
+      ],
+      "seconds": 0.9349631000077352,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_cell_fault.log"
+    },
+    "demo_tool_showcase": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "tool_showcase",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261005T224038\\tool_showcase"
+      ],
+      "seconds": 61.24444790001144,
+      "log": "docs/evidence/acceptance/20261005T224038/demo_tool_showcase.log"
+    },
+    "drift": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.drift_check"
+      ],
+      "seconds": 0.8291035999718588,
+      "log": "docs/evidence/acceptance/20261005T224038/drift.log"
+    },
+    "publication": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 9.754244799987646,
+      "log": "docs/evidence/acceptance/20261005T224038/publication.log"
+    },
+    "publication_final": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 8.868796399998246,
+      "log": "docs/evidence/acceptance/20261005T224038/publication_final.log"
+    }
+  },
+  "local_gate_count": 20,
+  "remote_gates": {
+    "ci": {
+      "passed": false
+    },
+    "pages": {
+      "passed": false
+    },
+    "publication_remote": {
+      "passed": false
+    }
+  },
+  "suites": [
+    {
+      "run": 1,
+      "junit": {
+        "path": "docs/evidence/acceptance/20261005T224038/tests-1.xml",
+        "sha256": "c8713da9eb0f8352a3f35a05e66bd9debb8e1538e3bee3231b7e32d28e19b9dc",
+        "bytes": 122943
+      },
+      "testcase_count": 799,
+      "unique_testcase_count": 799,
+      "outcomes": {
+        "passed": 799
+      },
+      "testcase_id_outcome_sha256": "de08e41754de2d276be6f15f9f04580f779a6e7e44f4479ec2fa75cc8eaab397",
+      "declared_suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "799",
+          "time": "1807.596",
+          "timestamp": "2026-10-06T00:40:46.398715+02:00",
+          "hostname": "DESKTOP-AZDXEDL"
+        }
+      ],
+      "lab_browser_case_ids": [
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]"
+      ]
+    },
+    {
+      "run": 2,
+      "junit": {
+        "path": "docs/evidence/acceptance/20261005T224038/tests-2.xml",
+        "sha256": "c229df13dc70e0a4b32508c6ab81d5a782ee245b0a8eb28a826d24e1d312f276",
+        "bytes": 122941
+      },
+      "testcase_count": 799,
+      "unique_testcase_count": 799,
+      "outcomes": {
+        "passed": 799
+      },
+      "testcase_id_outcome_sha256": "de08e41754de2d276be6f15f9f04580f779a6e7e44f4479ec2fa75cc8eaab397",
+      "declared_suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "799",
+          "time": "1648.556",
+          "timestamp": "2026-10-06T01:10:55.844373+02:00",
+          "hostname": "DESKTOP-AZDXEDL"
+        }
+      ],
+      "lab_browser_case_ids": [
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]"
+      ]
+    }
+  ],
+  "same_testcase_ids_and_outcomes": true,
+  "coverage": [
+    {
+      "run": 1,
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/coverage-1.json",
+        "sha256": "4f123d67ab1293a9ca4f5839bf02208506c4e30d7d2fcf7e09b1e08d1b7e4704",
+        "bytes": 333942
+      },
+      "covered_lines": 4868,
+      "statements": 5327,
+      "percent_covered": 91.38351792753895,
+      "threshold": 85,
+      "passed": true
+    },
+    {
+      "run": 2,
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/coverage-2.json",
+        "sha256": "36cb3c3048881126f466c5fc14c8d8be884b920db37d994451da72d617d28117",
+        "bytes": 333946
+      },
+      "covered_lines": 4871,
+      "statements": 5327,
+      "percent_covered": 91.43983480382954,
+      "threshold": 85,
+      "passed": true
+    }
+  ],
+  "repeatability": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261005T224038/repeatability.json",
+      "sha256": "1b5771cca9f0167f4c73318c249f6351c77d4e582f934245e4695b6a77704d86",
+      "bytes": 207049
+    },
+    "matches_independent_junit": true,
+    "test_count": 799
+  },
+  "criteria": {
+    "must_count": 169,
+    "must_passed": 163,
+    "must_failed": {
+      "SC-DATA-005": {
+        "passed": false,
+        "failures": [
+          "ci"
+        ]
+      },
+      "SC-KB-006": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-007": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-008": {
+        "passed": false,
+        "failures": [
+          "pages",
+          "publication_remote"
+        ]
+      },
+      "HKM-VIS-MUST-025": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      },
+      "UI-INV-MUST-008": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      }
+    },
+    "must_failures_only_remote": true,
+    "lab_must_count": 51,
+    "lab_must_all_passed": true,
+    "should_count": 4,
+    "should_failed": {
+      "SC-BRAIN-005": {
+        "passed": false,
+        "failures": [
+          "optional_model_fallback"
+        ]
+      }
+    },
+    "mapping": {
+      "path": "docs/acceptance-map.json",
+      "sha256": "ee23a141c05313dcf15f4b22fe8cb2fd774a9c097839806219db6fc9dd3de9e2",
+      "bytes": 118785
+    },
+    "all_manifest_results_recomputed": true
+  },
+  "demos": [
+    {
+      "scenario": "happy_path",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-happy_path.json",
+        "sha256": "c3c2a42455084942da4b09927ab310f8a04646d7cb72950b0877d46f84cb3437",
+        "bytes": 91139
+      },
+      "runtime": "blender",
+      "initial_state": "COMPLETED",
+      "final_state": "COMPLETED",
+      "order_status": "COMPLETED",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 1,
+      "controller_pick_effect_events": 1,
+      "command_created_events": 1,
+      "command_count": 1,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "643942a26c4e31a193e63476653b4c45d9e0eb21cf7627014f9349c96b187bb1",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "VERIFIED_SUCCESS"
+        ]
+      ],
+      "reconciliation_command_ids": [],
+      "showcase": [],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true
+      }
+    },
+    {
+      "scenario": "lost_ack_after_effect",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-lost_ack_after_effect.json",
+        "sha256": "6ca5d82de744259acf8863fa6f3425767cdeece81fb65716f369596d324f9a78",
+        "bytes": 127163
+      },
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "COMPLETED",
+      "order_status": "COMPLETED",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 1,
+      "controller_pick_effect_events": 1,
+      "command_created_events": 1,
+      "command_count": 1,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "320b4d2d57cc1157e3ff166d35671ba2a9d803cd05c1166c771bf2d0003022df",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "VERIFIED_SUCCESS"
+        ]
+      ],
+      "reconciliation_command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "showcase": [],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true,
+        "original_command_reconciled": true
+      }
+    },
+    {
+      "scenario": "lost_ack_before_effect",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-lost_ack_before_effect.json",
+        "sha256": "da2a719886b631faaf3c783c54eb7f89a6d7bf157e0140e780489184aa8092a9",
+        "bytes": 101010
+      },
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "FAILED",
+      "order_status": "FAILED",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 0,
+      "controller_pick_effect_events": 0,
+      "command_created_events": 1,
+      "command_count": 1,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "REJECTED",
+          "reason": "PROVEN_NOT_STARTED",
+          "effect_count": 0,
+          "payload_hash": "8f61b364af10e680fcc03e0a5a39a4535907858271b7dbfaa4bdffc91da3ca17",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "VERIFIED_FAILURE"
+        ]
+      ],
+      "reconciliation_command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "showcase": [],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true,
+        "original_command_reconciled": true
+      }
+    },
+    {
+      "scenario": "ambiguous",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-ambiguous.json",
+        "sha256": "1c3720aa8911f5edfb4a5d18c94c0a7ed86d20844899018b781b66a998bf2ffc",
+        "bytes": 138643
+      },
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "REQUIRES_INTERVENTION",
+      "order_status": "REQUIRES_INTERVENTION",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 1,
+      "controller_pick_effect_events": 1,
+      "command_created_events": 1,
+      "command_count": 1,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "77dad5499d34d3832d195ab30c1bf7b6ea8fc583f6e793f63e9135cfdad80902",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "INCONCLUSIVE"
+        ]
+      ],
+      "reconciliation_command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "showcase": [],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true,
+        "original_command_reconciled": true
+      }
+    },
+    {
+      "scenario": "restart",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-restart.json",
+        "sha256": "09f0104ccdffe8fc0307f90ac6cb92f095552e7f42e9b3ca83330a57c78882ed",
+        "bytes": 127149
+      },
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "COMPLETED",
+      "order_status": "COMPLETED",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 1,
+      "controller_pick_effect_events": 1,
+      "command_created_events": 1,
+      "command_count": 1,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "c4aa4c852602732d1eeb8856a5d79f23afd835c882566fcc09d64dbacd41d166",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "VERIFIED_SUCCESS"
+        ]
+      ],
+      "reconciliation_command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "showcase": [],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true,
+        "original_command_reconciled": true
+      }
+    },
+    {
+      "scenario": "logical_estop",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-logical_estop.json",
+        "sha256": "02dc694cd93e14a8be8ebf27657431502c731110c1e4a8e84e5f0e60e55ed888",
+        "bytes": 67373
+      },
+      "runtime": "blender",
+      "initial_state": "FAILED",
+      "final_state": "FAILED",
+      "order_status": "FAILED",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 0,
+      "controller_pick_effect_events": 0,
+      "command_created_events": 1,
+      "command_count": 1,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "REJECTED",
+          "reason": "CELL_NOT_READY",
+          "effect_count": 0,
+          "payload_hash": "43912fc89742d4dc15a41aad2180cb296928b17e1ee3b4b8c14f2543501cb883",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "VERIFIED_FAILURE"
+        ]
+      ],
+      "reconciliation_command_ids": [],
+      "showcase": [],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true
+      }
+    },
+    {
+      "scenario": "cell_fault",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-cell_fault.json",
+        "sha256": "36200e13989071dfd8c885b605fa0da278a9d5f9caae6bd2250bc5789656c072",
+        "bytes": 67352
+      },
+      "runtime": "blender",
+      "initial_state": "FAILED",
+      "final_state": "FAILED",
+      "order_status": "FAILED",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 0,
+      "controller_pick_effect_events": 0,
+      "command_created_events": 1,
+      "command_count": 1,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "REJECTED",
+          "reason": "CELL_NOT_READY",
+          "effect_count": 0,
+          "payload_hash": "bcd1dd6b7f2d9ac5ea938b068cb00656f6c514db4d692d360572a229ad03e42b",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "VERIFIED_FAILURE"
+        ]
+      ],
+      "reconciliation_command_ids": [],
+      "showcase": [],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true
+      }
+    },
+    {
+      "scenario": "tool_showcase",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261005T224038/demo-tool_showcase.json",
+        "sha256": "8f8de82194359c1db4d2224fd17ad23b397126bef453294604292a1283f8566c",
+        "bytes": 620508
+      },
+      "runtime": "blender",
+      "initial_state": "COMPLETED",
+      "final_state": "COMPLETED",
+      "order_status": "COMPLETED",
+      "command_ids": [
+        "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+        "cdfacd7d-b800-52d8-854e-d25419c8b876",
+        "37543684-c4c5-53af-9de3-6f3839be20ca",
+        "eb173685-4d61-5b55-b52b-13c9c8560a4d",
+        "a06e2d00-3782-5de8-9016-ce59fd8a1552",
+        "7d7e583c-fd3a-5597-907c-d13e68f3e912"
+      ],
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "effect_count": 6,
+      "controller_pick_effect_events": 6,
+      "command_created_events": 6,
+      "command_count": 6,
+      "duplicate_physical_picks": 0,
+      "journals": [
+        {
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "540caac5f978d3d6f5e51d8ea459aeb54ce3a8df93f490d2ef587275d14927f8",
+          "journal_durable": true
+        },
+        {
+          "command_id": "cdfacd7d-b800-52d8-854e-d25419c8b876",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "6873652510d098c251befe2d51518c109969d35975ff65340ff7fdbc087d855e",
+          "journal_durable": true
+        },
+        {
+          "command_id": "37543684-c4c5-53af-9de3-6f3839be20ca",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "6f911795d6b2ae484c519d24dc10ae720342303a2420b2ed0e1d7bfb5d604ae6",
+          "journal_durable": true
+        },
+        {
+          "command_id": "eb173685-4d61-5b55-b52b-13c9c8560a4d",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "0053a633f8e2996d2bf5120537348f2e80ffc9965b004e79c512ab8477b85088",
+          "journal_durable": true
+        },
+        {
+          "command_id": "a06e2d00-3782-5de8-9016-ce59fd8a1552",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "221142c3fd12c636ace2728b0c5ee388daee8182887f55d4a1c4a52ee702f778",
+          "journal_durable": true
+        },
+        {
+          "command_id": "7d7e583c-fd3a-5597-907c-d13e68f3e912",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "07b631808f9d5978773a2c0f49e2ece2b2074a642c10c4bb9fd69f4493c29079",
+          "journal_durable": true
+        }
+      ],
+      "verification_verdicts": [
+        [
+          "VERIFIED_SUCCESS"
+        ],
+        [
+          "VERIFIED_SUCCESS"
+        ],
+        [
+          "VERIFIED_SUCCESS"
+        ],
+        [
+          "VERIFIED_SUCCESS"
+        ],
+        [
+          "VERIFIED_SUCCESS"
+        ],
+        [
+          "VERIFIED_SUCCESS"
+        ]
+      ],
+      "reconciliation_command_ids": [],
+      "showcase": [
+        {
+          "sku": "SKU-A",
+          "tool_id": "EE_VAC_SINGLE",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-B",
+          "tool_id": "EE_VAC_ARRAY",
+          "command_id": "cdfacd7d-b800-52d8-854e-d25419c8b876",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-C",
+          "tool_id": "EE_ADAPTIVE_SOFT",
+          "command_id": "37543684-c4c5-53af-9de3-6f3839be20ca",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-D",
+          "tool_id": "EE_PINCH_NARROW",
+          "command_id": "eb173685-4d61-5b55-b52b-13c9c8560a4d",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-E",
+          "tool_id": "EE_PINCH_WIDE",
+          "command_id": "a06e2d00-3782-5de8-9016-ce59fd8a1552",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-F",
+          "tool_id": "EE_SUPPORT_FORK",
+          "command_id": "7d7e583c-fd3a-5597-907c-d13e68f3e912",
+          "effect_count": 1
+        }
+      ],
+      "checks": {
+        "runtime_blender": true,
+        "expected_initial_final": true,
+        "order_and_jobs_expected_final": true,
+        "effects_match_declared_journals_events": true,
+        "one_original_command_per_job": true,
+        "original_primary_identity": true,
+        "journal_identities_durable": true,
+        "no_duplicate_effects": true,
+        "no_replacement_claim_and_reconciliation_ids": true,
+        "expected_verification": true,
+        "run_result_copy_identical": true,
+        "six_distinct_tools_and_skus": true
+      }
+    }
+  ],
+  "demo_scope": "These eight CLI scenarios use Blender plus the local workflow/runtime. They do not themselves attest separate-process real AMQP/OPC UA; lab browser/integration tests in both799-case suites supply that automated scope.",
+  "security": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261005T224038/security-review.json",
+      "sha256": "423e1927efc9af89e50ec33e0ac41f032233eeda1ebcdf07ced01244efa3b263",
+      "bytes": 2539
+    },
+    "passed": true,
+    "bandit_exit": 1,
+    "reviewed_findings": 5,
+    "all_findings_reviewed": true,
+    "pip_audit_exit": 0,
+    "npm_audit_exit": 0,
+    "vendor_integrity": true
+  },
+  "drift": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261005T224038/drift.json",
+      "sha256": "3e2751492ef4f5df3b872e4fc7a7604256424e082f9c30034578eec9f21175a1",
+      "bytes": 2867
+    },
+    "passed": true,
+    "errors": [],
+    "must_count": 169
+  },
+  "publication": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261005T224038/publication-build.json",
+      "sha256": "3de838d54ef2a2976bbaa1733be3f11c2ccf7c4832f695f6bc8c21a85199f1f0",
+      "bytes": 3586
+    },
+    "source_commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+    "reports": [
+      {
+        "report": "01-design",
+        "title": "Fr\u00c3\u00a5n kundorder till verifierad roboteffekt",
+        "pages": 35,
+        "words_approx": 5772,
+        "references": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S21",
+          "S22",
+          "S23",
+          "S24",
+          "S25",
+          "S26",
+          "S27",
+          "S28",
+          "S29",
+          "S30",
+          "S31"
+        ],
+        "pdf_sha256": "7b4a06d149c793edfb818ce79a252f908db101d3c3ed9705a9e22a2e20d4f6b8"
+      },
+      {
+        "report": "02-avgransning",
+        "title": "Simulatorn och den verkliga robotcellen",
+        "pages": 13,
+        "words_approx": 2500,
+        "references": [
+          "S01",
+          "S03",
+          "S04",
+          "S07",
+          "S08",
+          "S10",
+          "S11",
+          "S12",
+          "S17",
+          "S18",
+          "S19",
+          "S23",
+          "S24",
+          "S28",
+          "S29",
+          "S30"
+        ],
+        "pdf_sha256": "fadb7d9af4bde9897e099edcbece32fe551a51ffe0d1feeb5c65838e01b58751"
+      },
+      {
+        "report": "03-diskussion",
+        "title": "Teknisk dialog om RobotOps Twin",
+        "pages": 16,
+        "words_approx": 3253,
+        "references": [
+          "S01",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S10",
+          "S11",
+          "S20",
+          "S23",
+          "S25",
+          "S28",
+          "S29"
+        ],
+        "pdf_sha256": "6d03277a78cd660a193395acffd3dfbb73a628cfbf71eb909889338e63b3f21d"
+      }
+    ],
+    "combined_pdf_pages": 64,
+    "pdf_package_checks": {
+      "pages": 64,
+      "internal_links_checked": 210,
+      "destinations_preserved": true
+    },
+    "checks": [
+      "reference IDs resolved",
+      "figure placeholders resolved",
+      "SVG XML parsed",
+      "PDF text extractable",
+      "relative links and fragments validated",
+      "catalogue documentation generated from runtime source"
+    ]
+  },
+  "findings": [],
+  "remaining_scope": "Fresh manual final-loop proof, report/status updates, exact-source remote CI/publication and deployed Pages verification remain separate requirements. Local acceptance exit0 is not overall GOAL completion."
+}

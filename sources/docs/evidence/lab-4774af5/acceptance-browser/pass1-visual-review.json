@@ -1,0 +1,59 @@
+{
+  "reviewed_at_utc": "2026-10-05T23:18:18.711294+00:00",
+  "source_commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+  "acceptance_directory": "docs/evidence/acceptance/20261005T224038",
+  "scope": "Root visual inspection of four saved firstpass screenshots via view_image. No new browser, workload or stage execution. Supplemental automated-run visual evidence; final manual walkthrough remains pending.",
+  "observations": [
+    {
+      "path": "artifacts/lab-browser/20261005T230420012102/happy/physical-gate.png",
+      "sha256": "998ee272f10d56ea3cfb2541bf79bda71cda54f1177f8ab70a55199c363113d7",
+      "observed": [
+        "WAITING_AUTHORIZATION revision28",
+        "OPC UA/PLC current mini-map",
+        "explicit AUTHORIZE ROBOT EXECUTION gate with synthetic effect/non-safety explanation",
+        "static cell and physical execution not authorized; replay controls disabled",
+        "stage14 REAL PROTOCOL and earlier SIMULATED SYSTEM/SYNTHETIC SENSOR labels"
+      ]
+    },
+    {
+      "path": "artifacts/lab-browser/20261005T230420012102/happy/blender-motion.png",
+      "sha256": "87a540ed4a59c49394bf69f3b18d386e660576ccd4c342723d35f245e2c10455",
+      "observed": [
+        "WAITING_AUTHORIZATION revision32 with stage17 controller result pending",
+        "Robot current mini-map",
+        "stage16 output SUCCEEDED classified SIMULATED ROBOT",
+        "OPC UA DataChangeNotification evidence for original command",
+        "Blender frame6/133 and evaluated-poses caption; screenshot alone does not prove temporal movement"
+      ]
+    },
+    {
+      "path": "artifacts/lab-browser/20261005T230420012102/happy/completed.png",
+      "sha256": "14baaea1456eb37daf73d66ca76a2fe2017f447ad96c122f56a6be47a05cd3e7",
+      "observed": [
+        "COMPLETED revision44",
+        "Business current mini-map; stage22 final trace",
+        "pending authorization card hidden",
+        "neutral session-completed review guidance plus verified-pick next step",
+        "SIMULATED ROBOT/READ-ONLY REPLAY label; runtime pose versus business outcome distinguished"
+      ]
+    },
+    {
+      "path": "artifacts/lab-browser/20261005T230512221461/DROP_ACK_AFTER_EFFECT/unknown-outcome.png",
+      "sha256": "9d456b86dbad70055bc701a014540567a2648aacadee184869a5d11f6395791e",
+      "observed": [
+        "UNKNOWN_OUTCOME revision38",
+        "Outcome unproven and business completion blocked",
+        "advance awaiting reconciliation; original-command reconcile visible",
+        "next pick paused",
+        "synthetic stationary scene explicitly states no motion recording and stationary view is not proof of no effect",
+        "real OPC UA event labels distinct from simulated robot/read-only replay"
+      ]
+    }
+  ],
+  "limitations": [
+    "Not an all-screens pixel audit or direct manual walkthrough.",
+    "Screenshots do not independently prove effect count or movement; pair with current JUnit and saved journal/Blender-motion evidence.",
+    "Scenario select is next-order configuration; the selected pick caption identifies lost acknowledgement after effect."
+  ],
+  "issues_found": []
+}

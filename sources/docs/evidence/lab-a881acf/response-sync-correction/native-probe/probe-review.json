@@ -1,0 +1,464 @@
+{
+  "reviewed_at_utc": "2026-10-06T02:28:11.605691+00:00",
+  "scope": "Author interpretation of one explicitly authorized bounded native HTTP diagnostic, followed by saved-result analysis only. No browser, Blender, production source changes, original failed DB access or further probe runs.",
+  "status": "THREE_DIAGNOSTIC_CLEARS_PASS_ORIGINAL_LATENCY_NOT_REPRODUCED",
+  "command": ".venv\\Scripts\\python.exe artifacts\\clear-latency-20261006\\probe.py",
+  "observed_tool_exit_code": 0,
+  "started_at_utc": "2026-10-06T02:26:25.568045+00:00",
+  "finished_at_utc": "2026-10-06T02:26:35.038227+00:00",
+  "inputs": [
+    {
+      "path": "artifacts/clear-latency-20261006/probe.py",
+      "bytes": 14218,
+      "sha256": "3cb65495fe9c8932d3e68f07d11aad6d010da4d7a274e99542846bd869c2da24"
+    },
+    {
+      "path": "artifacts/clear-latency-20261006/probe-result.json",
+      "bytes": 4619236,
+      "sha256": "d68c58f5479094d2d20242d9663c38bf04e01af1dae79a7204d56f02f6a9734c"
+    }
+  ],
+  "probe_operations": [
+    {
+      "index": 1,
+      "mode": "no_stream",
+      "clear_http_ms": 158.88409997569397,
+      "projection_read_ms": 110.14330000034533,
+      "clear_status": 200,
+      "checks": {
+        "clear_complete": true,
+        "same_identity_number": true,
+        "revision_once": true,
+        "zero_orders": true,
+        "fresh_epoch": true,
+        "no_new_effect": true,
+        "old_evidence_removed": true
+      },
+      "original_command_id": "3353de48-2d81-5874-b55e-24b3b39fcbf0",
+      "original_session_id": "fc26af98-19f0-52b4-a8ab-9ffcbba9b73c",
+      "before_effect_count": 1,
+      "before_state": "UNKNOWN_OUTCOME",
+      "revision_before": 1,
+      "revision_after": 2,
+      "world_step_after": 0,
+      "method_ms": {
+        "TestRegistry.clear": [
+          157.20410001813434
+        ],
+        "TestRegistry._finish_clear": [
+          132.3221999919042
+        ],
+        "TestRegistry._remove_world": [
+          1.4229000080376863
+        ],
+        "TestRegistry.make_engine": [
+          116.83139999513514
+        ],
+        "SyntheticRuntime.__init__": [
+          76.41710000461899
+        ],
+        "SyntheticRuntime._reset": [
+          4.2400000093039125
+        ],
+        "Store.__init__": [
+          42.766299971845,
+          39.97169999638572
+        ],
+        "TestRegistry.history": [
+          5.895800015423447
+        ]
+      },
+      "sqlite_call_count": 101,
+      "sqlite_begin_calls": [
+        {
+          "database": "access.db",
+          "sql": "BEGIN EXCLUSIVE",
+          "elapsed_ms": 0.052799994591623545,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.006799993570894003,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.006999995093792677,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.007099995855242014,
+          "error": null
+        },
+        {
+          "database": "access.db",
+          "sql": "BEGIN",
+          "elapsed_ms": 0.00899998121894896,
+          "error": null
+        }
+      ],
+      "slowest_sqlite_calls": [
+        {
+          "database": "runtime.db",
+          "operation": "executescript",
+          "sql": "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS records ( kind TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id)); CREATE TABLE IF N",
+          "elapsed_ms": 36.40900002210401,
+          "error": null
+        },
+        {
+          "database": "workflow.db",
+          "operation": "executescript",
+          "sql": "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS records ( kind TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id)); CREATE TABLE IF N",
+          "elapsed_ms": 33.97160000167787,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "operation": "executescript",
+          "sql": "CREATE TABLE IF NOT EXISTS runtime_world (id INTEGER PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS controller_journal ( id TEXT PRIMARY KEY, payl",
+          "elapsed_ms": 12.969299976248294,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "operation": "commit",
+          "sql": null,
+          "elapsed_ms": 7.19169998774305,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "operation": "commit",
+          "sql": null,
+          "elapsed_ms": 7.104699994670227,
+          "error": null
+        }
+      ],
+      "clear_loop_lag_max_ms": 13.84559998405166,
+      "stream_closed": null
+    },
+    {
+      "index": 2,
+      "mode": "stream_closed_before_clear",
+      "clear_http_ms": 165.71260002092458,
+      "projection_read_ms": 95.12340000947006,
+      "clear_status": 200,
+      "checks": {
+        "clear_complete": true,
+        "same_identity_number": true,
+        "revision_once": true,
+        "zero_orders": true,
+        "fresh_epoch": true,
+        "no_new_effect": true,
+        "old_evidence_removed": true
+      },
+      "original_command_id": "c3931d65-77cb-58e4-a3e8-66a5f3cb7550",
+      "original_session_id": "3b8869bd-7ba9-5f3f-9842-a8df18949808",
+      "before_effect_count": 1,
+      "before_state": "UNKNOWN_OUTCOME",
+      "revision_before": 2,
+      "revision_after": 3,
+      "world_step_after": 0,
+      "method_ms": {
+        "TestRegistry.clear": [
+          163.88969999388792
+        ],
+        "TestRegistry._finish_clear": [
+          132.75000001885928
+        ],
+        "TestRegistry._remove_world": [
+          1.793500006897375
+        ],
+        "TestRegistry.make_engine": [
+          114.0847000060603
+        ],
+        "SyntheticRuntime.__init__": [
+          72.18220000504516
+        ],
+        "SyntheticRuntime._reset": [
+          3.492999996524304
+        ],
+        "Store.__init__": [
+          38.72899999259971,
+          41.46600002422929
+        ],
+        "TestRegistry.history": [
+          6.458200019551441
+        ]
+      },
+      "sqlite_call_count": 101,
+      "sqlite_begin_calls": [
+        {
+          "database": "access.db",
+          "sql": "BEGIN EXCLUSIVE",
+          "elapsed_ms": 0.06550000398419797,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.006799993570894003,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.008500006515532732,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.007599999662488699,
+          "error": null
+        },
+        {
+          "database": "access.db",
+          "sql": "BEGIN",
+          "elapsed_ms": 0.008200004231184721,
+          "error": null
+        }
+      ],
+      "slowest_sqlite_calls": [
+        {
+          "database": "workflow.db",
+          "operation": "executescript",
+          "sql": "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS records ( kind TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id)); CREATE TABLE IF N",
+          "elapsed_ms": 33.11719998600893,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "operation": "executescript",
+          "sql": "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS records ( kind TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id)); CREATE TABLE IF N",
+          "elapsed_ms": 33.06640000664629,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "operation": "executescript",
+          "sql": "CREATE TABLE IF NOT EXISTS runtime_world (id INTEGER PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS controller_journal ( id TEXT PRIMARY KEY, payl",
+          "elapsed_ms": 11.922900011995807,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "operation": "commit",
+          "sql": null,
+          "elapsed_ms": 7.504999986849725,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "operation": "commit",
+          "sql": null,
+          "elapsed_ms": 6.968100002268329,
+          "error": null
+        }
+      ],
+      "clear_loop_lag_max_ms": 6.381499988492578,
+      "stream_closed": null
+    },
+    {
+      "index": 3,
+      "mode": "stream_open_during_clear",
+      "clear_http_ms": 169.61020001326688,
+      "projection_read_ms": 100.63879998051561,
+      "clear_status": 200,
+      "checks": {
+        "clear_complete": true,
+        "same_identity_number": true,
+        "revision_once": true,
+        "zero_orders": true,
+        "fresh_epoch": true,
+        "no_new_effect": true,
+        "old_evidence_removed": true
+      },
+      "original_command_id": "b1fb3b6b-6090-5dd4-88a5-493e9629198f",
+      "original_session_id": "63deac83-9575-5b19-929d-a679deb4cf88",
+      "before_effect_count": 1,
+      "before_state": "UNKNOWN_OUTCOME",
+      "revision_before": 3,
+      "revision_after": 4,
+      "world_step_after": 0,
+      "method_ms": {
+        "TestRegistry.clear": [
+          167.77689999435097
+        ],
+        "TestRegistry._finish_clear": [
+          134.8637999908533
+        ],
+        "TestRegistry._remove_world": [
+          1.4650000084657222
+        ],
+        "TestRegistry.make_engine": [
+          120.43260000064038
+        ],
+        "SyntheticRuntime.__init__": [
+          79.27159999962896
+        ],
+        "SyntheticRuntime._reset": [
+          3.6761000228580087
+        ],
+        "Store.__init__": [
+          39.89929999806918,
+          40.734600013820454
+        ],
+        "TestRegistry.history": [
+          6.112199975177646
+        ]
+      },
+      "sqlite_call_count": 111,
+      "sqlite_begin_calls": [
+        {
+          "database": "access.db",
+          "sql": "BEGIN EXCLUSIVE",
+          "elapsed_ms": 0.08019999950192869,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.006699992809444666,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.007099995855242014,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "sql": "BEGIN IMMEDIATE",
+          "elapsed_ms": 0.007299997378140688,
+          "error": null
+        },
+        {
+          "database": "access.db",
+          "sql": "BEGIN",
+          "elapsed_ms": 0.007700000423938036,
+          "error": null
+        },
+        {
+          "database": "access.db",
+          "sql": "BEGIN",
+          "elapsed_ms": 0.019500002963468432,
+          "error": null
+        }
+      ],
+      "slowest_sqlite_calls": [
+        {
+          "database": "runtime.db",
+          "operation": "executescript",
+          "sql": "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS records ( kind TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id)); CREATE TABLE IF N",
+          "elapsed_ms": 33.886699995491654,
+          "error": null
+        },
+        {
+          "database": "workflow.db",
+          "operation": "executescript",
+          "sql": "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS records ( kind TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id)); CREATE TABLE IF N",
+          "elapsed_ms": 32.800399989355356,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "operation": "executescript",
+          "sql": "CREATE TABLE IF NOT EXISTS runtime_world (id INTEGER PRIMARY KEY, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS controller_journal ( id TEXT PRIMARY KEY, payl",
+          "elapsed_ms": 15.953099995385855,
+          "error": null
+        },
+        {
+          "database": "runtime.db",
+          "operation": "commit",
+          "sql": null,
+          "elapsed_ms": 7.129799982067198,
+          "error": null
+        },
+        {
+          "database": "catalog.db",
+          "operation": "commit",
+          "sql": null,
+          "elapsed_ms": 6.884500005980954,
+          "error": null
+        }
+      ],
+      "clear_loop_lag_max_ms": 14.964700007112697,
+      "stream_closed": {
+        "code": 4409,
+        "reason": ""
+      }
+    }
+  ],
+  "diagnostic_method": "One fresh owned workspace, three current guided Synthetic DROP_ACK_AFTER_EFFECT sessions via real loopback REST. Each reaches UNKNOWN_OUTCOME and one original durable effect before explicit clear. Runtime-only diagnostic wrappers record registry methods and SQLite execute/executescript/commit/rollback/close/connect timings without changing SQL, durability or timeouts. Shared configured Windows Selector HTTP loop; no global loop policy change.",
+  "cleanup": {
+    "server_thread_alive_after_10s": false,
+    "loop_errors": [],
+    "server_connections": 0,
+    "server_tasks": 0,
+    "retained_server_clients": [
+      0
+    ]
+  },
+  "source_scope": {
+    "recorded_source_unchanged": true,
+    "meaning": "Only the nine files in source_hashes were hashed before startup and after teardown, and matched then. This does not assert whole-tree immutability or equality with subsequent root edits. Root later edited the browser test for response synchronization; recorded source hashes remain the diagnostic input boundary.",
+    "source_hashes_at_start_and_verified_end": {
+      "apps/api/test_sessions.py": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+      "apps/api/app.py": "af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888",
+      "apps/api/guided.py": "c38c1858ee6946b27e64654e434c2d33bf2cefcece043b568dd68d33c28a855e",
+      "apps/api/playback.py": "7c5ab9bdc9a9355b4f0dedcde0daeb242b1715367d589a0a9fc3f67b12c98f28",
+      "robotops/cell/runtime.py": "985d07f69ca4fdc400a56493b3d06d04af0d3a08baad493900c9c5773f8f665f",
+      "robotops/workflow/store.py": "d9e32944c193f3aa78a59755abdac778d7e1084320ae4989379017ac418f6ea7",
+      "robotops/http_server.py": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "apps/erp_ui/app.js": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "tests/browser/test_investigation.py": "7f8bb8675a9090265f48d7c13326f89cbc783582ea3e917d77cb028dd3c1147e"
+    }
+  },
+  "warnings": [
+    "Tool output recorded two websockets.sync.client deprecation warnings: connect() should be used as a context manager or explicit legacy mode. Connections were explicitly closed; server finished with zero connections/tasks/retained clients. This is diagnostic API style, not a product warning or test failure."
+  ],
+  "conclusions": [
+    {
+      "fact": "All three clears returned200 and complete cleanup, preserving test identity/number and incrementing revision once. Each created a fresh epoch with zero orders/world step0 and made old job evidence404; original before-clear session/command/receipt/effect1 are retained.",
+      "evidence": "Raw operations and check dictionaries."
+    },
+    {
+      "fact": "Clear wall times158.884/165.713/169.610ms; projection data reads110.143/95.123/100.639ms. Registry make_engine114.085?120.433ms was the largest nonoverlapping stage; normal schema executescripts were33?36ms each. Exclusive access BEGIN was0.053?0.080ms.",
+      "evidence": "Measured method and SQLite rows; parent/child timing spans overlap and are not additive."
+    },
+    {
+      "fact": "Live stream during clear closed4409; clear-phase event-loop lag maxima6.381?14.965ms. No SQLite exception or loop error occurred.",
+      "evidence": "Third operation stream_closed and per-phase lag/cleanup."
+    },
+    {
+      "inference": "This isolated run provides no support for attributing the original4.914s request to a five-second SQLite lock, leaked WebSocket read lock or Selector failure. Original OS I/O/load/scheduling causes remain unproven.",
+      "evidence": "Observed original saved network timing versus diagnostic timings; original request had no per-method profile."
+    },
+    {
+      "assessment": "Exact POST response and completed JSON-body synchronization before the unchanged five-second dialog/UI assertions is appropriate. The failure budget began after click and included durable clear+reseed time before UI projection; ADR0013 five seconds applies to pre-POST read drain, not an end-to-end clear SLA. Keep fixture request timeout, no mutation retry, and all correctness assertions.",
+      "evidence": "Static app.js manageTests/confirm handler and browser test; independent synchronization assessment below."
+    },
+    {
+      "assessment": "refreshHistory revision change already selects/restores the test, and clear handler selects it again; unnecessary extra work is real but is separate from this demonstrated failure, whose first required refresh already crossed the assertion deadline. No product change proposed from this probe.",
+      "evidence": "apps/erp_ui/app.js153-186,633-643 and saved trace timing."
+    }
+  ],
+  "related_saved_failure_evidence": [
+    "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/trace-timing.json",
+    "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/failure-review.json",
+    "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/synchronization-independent-review.json"
+  ],
+  "bounds": [
+    "Three diagnostic operations are not three repository pytest cases and must not be added to acceptance counts.",
+    "No browser render performed; projection durations measure API reads only, not DOM/GPU work or duplicate selectTest work.",
+    "No original4.9s latency reproduction; no claim that Windows filesystem/antivirus caused it.",
+    "No general latency guarantee and no product timing/lock/durability changes.",
+    "a881 full acceptance remains failed by its original second-suite failure; diagnostic success does not upgrade it."
+  ]
+}

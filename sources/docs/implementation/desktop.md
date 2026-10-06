@@ -61,6 +61,12 @@ local API and opens the existing dashboard inside Microsoft Edge WebView2. Close
 the window to stop the API and its Blender children. There is no tray service,
 startup task, dependency installation or external model call when opening it.
 
+The backend uses the same explicit Windows HTTP selector loop as the API and lab
+services, avoiding a Proactor peer-reset cleanup failure during shutdown. It is
+limited to 512 sockets and has no asyncio subprocess support; Blender runs through
+synchronous worker-thread subprocess calls. This does not change the WebView2 or
+OPC UA event loops. See [native HTTP loop limits](../integration-lab-native.md).
+
 This is a launcher for the installed checkout, like Asset Director's desktop host;
 it is not a standalone bundle of Python and Blender. Keep the checkout and its
 `.venv` in place. Windows x64, .NET Framework 4.8, the installed WebView2 Runtime,

@@ -1,0 +1,137 @@
+"""Decode saved Playwright DOM snapshots only; no browser or rendering."""
+import collections
+import functools
+import hashlib
+import json
+import zipfile
+from pathlib import Path
+from audit_inputs import load_inventory, require
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = Path(__file__).resolve().parent
+IDS = {"execution-profile", "simulation-boundaries", "scenario-brief", "scenario-watch", "motion-scenario", "motion-state", "motion-renderer", "integration-live", "integration-live-state", "integration-protocol-live", "integration-session-state", "integration-pending", "integration-status", "integration-progress", "orders", "scenario"}
+
+
+def own_nodes(node, result):
+    if isinstance(node, str):
+        result.append(node)
+    elif isinstance(node, list) and node and isinstance(node[0], str):
+        for child in node[2:]:
+            own_nodes(child, result)
+        result.append(node)
+
+
+def review(path):
+    groups = collections.defaultdict(list)
+    output = []
+    errors = []
+    with zipfile.ZipFile(ROOT / path) as z:
+        for line in z.read("trace.trace").decode().splitlines():
+            event = json.loads(line)
+            if event.get("type") != "frame-snapshot":
+                continue
+            snapshot = event["snapshot"]
+            if not snapshot.get("isMainFrame"):
+                continue
+            nodes = []
+            own_nodes(snapshot["html"], nodes)
+            groups[snapshot["frameId"]].append((snapshot, nodes))
+    for frame, snapshots in groups.items():
+        @functools.lru_cache(maxsize=None)
+        def ref(sid, index):
+            return materialize(snapshots[sid][1][index], sid)
+
+        def materialize(node, sid):
+            if isinstance(node, str):
+                return node
+            if isinstance(node, list) and node:
+                if isinstance(node[0], list):
+                    delta, index = node[0]
+                    return ref(sid - delta, index)
+                return [node[0], node[1] if len(node) > 1 else {}, *[materialize(c, sid) for c in node[2:]]]
+            return node
+
+        def content(node):
+            if isinstance(node, str):
+                return node
+            return "".join(content(c) for c in node[2:]) if isinstance(node, list) else ""
+
+        def collect(node, selected, ancestor_hidden=False, closed_details=False):
+            if not isinstance(node, list) or not node or not isinstance(node[0], str):
+                return
+            attrs = node[1]
+            hidden = ancestor_hidden or "hidden" in attrs or attrs.get("aria-hidden") == "true"
+            if attrs.get("id") in IDS:
+                selected[attrs["id"]] = {"tag": node[0], "attrs": attrs, "text": content(node), "hidden_by_attribute_or_ancestor": hidden, "inside_closed_details": closed_details}
+            next_closed = closed_details or (node[0].upper() == "DETAILS" and "open" not in attrs)
+            for child in node[2:]:
+                collect(child, selected, hidden, next_closed)
+
+        for sid, (snapshot, _) in enumerate(snapshots):
+            selected = {}
+            try:
+                collect(materialize(snapshot["html"], sid), selected)
+            except (IndexError, RecursionError, TypeError, ValueError) as exc:
+                errors.append({"frame": frame, "snapshot_index": sid, "error": str(exc)})
+                continue
+            if selected:
+                output.append({"frame": frame, "snapshot_index": sid, "timestamp": snapshot["timestamp"], "call_id": snapshot.get("callId"), "phase": snapshot.get("phase"), "elements": selected})
+    grouped = {}
+    for row in output:
+        elements = {}
+        for ident, element in row["elements"].items():
+            value = {"text": element["text"], "hidden_by_attribute_or_ancestor": element["hidden_by_attribute_or_ancestor"], "inside_closed_details": element["inside_closed_details"]}
+            if ident == "integration-live":
+                value["simulated_readonly_label"] = "SIMULATED ROBOT" in value["text"] and "READ-ONLY REPLAY" in value["text"]
+                value["full_text_sha256"] = hashlib.sha256(value.pop("text").encode()).hexdigest()
+            elements[ident] = value
+        key = hashlib.sha256(json.dumps(elements, sort_keys=True).encode()).hexdigest()
+        checkpoint = {k: row[k] for k in ("frame", "snapshot_index", "timestamp", "call_id", "phase")}
+        if key in grouped:
+            grouped[key]["count"] += 1
+            grouped[key]["last_checkpoint"] = checkpoint
+        else:
+            grouped[key] = {"state_sha256": key, "count": 1, "first_checkpoint": checkpoint, "last_checkpoint": checkpoint, "elements": elements}
+    return {"trace": path, "snapshot_count": sum(map(len, groups.values())), "decoded_relevant_snapshots": len(output), "errors": errors, "grouped_states": list(grouped.values()), "last_snapshot": output[-1] if output else None}
+
+
+def main():
+    inventory = load_inventory(OUT, "grouped-saved-dom-review")
+    cases = []
+    for case in inventory["cases"]:
+        require(hashlib.sha256((ROOT / case["trace"]["path"]).read_bytes()).hexdigest() == case["trace"]["sha256"], "Trace hash changed")
+        row = review(case["trace"]["path"])
+        expected = inventory["presentation_expectations"][case["case"]]
+        elements = (row["last_snapshot"] or {}).get("elements", {})
+        states = row["grouped_states"]
+        briefs = {g["elements"].get("scenario-brief", {}).get("text", "") for g in states}
+        watches = {g["elements"].get("scenario-watch", {}).get("text", "") for g in states}
+        caption = elements.get("motion-scenario", {}).get("text", "")
+        labels = expected["caption_labels"]
+        checks = {
+            "all_snapshots_decoded": not row["errors"] and row["snapshot_count"] > 0,
+            "supported_brief_observed": any(b.startswith(expected["brief_prefix"]) for b in briefs),
+            "no_supported_case_fallback_brief": "Choose a supported scenario." not in briefs,
+            "no_supported_case_fallback_watch": "No behavior is defined for this selection." not in watches,
+            "final_caption_names_recorded_case": all(label in caption for label in labels) and caption.startswith(("Execution: ", "Delivery scenario: ")),
+            "fault_not_silently_happy": expected["fault"] is None or "Happy path" not in caption,
+            "final_profile_has_real_protocol_simulated_system_scope": all(v in elements.get("execution-profile", {}).get("text", "") for v in ("real AMQP / OPC UA", "simulated systems")),
+            "runtime_scope_matches_recording": elements.get("motion-state", {}).get("text") == ("Recorded 3D scenario" if case["runtime"] == "blender" else "Scenario events - stationary scene"),
+            "completed_copy_neutral": elements.get("integration-live-state", {}).get("text") == "Execution session completed. Review the recorded controller result, verification and business reconciliation.",
+        }
+        live_text = elements.get("integration-protocol-live", {}).get("text", "")
+        try:
+            live = json.loads(live_text)
+        except ValueError:
+            live = {}
+        checks["final_live_response_matches_current_command"] = live.get("command_id") == case["command_id"]
+        row.update({"case": case["case"], "acceptance_pass": case["acceptance_pass"], "runtime": case["runtime"], "session_id": case["session_id"], "job_id": case["job_id"], "command_id": case["command_id"], "expected": expected, "observed_final_caption": caption, "checks": checks, "findings": [k for k, v in checks.items() if not v]})
+        cases.append(row)
+        print(json.dumps({"case": row["case"], "pass": row["acceptance_pass"], "snapshots": row["snapshot_count"], "groups": len(states), "findings": row["findings"]}), flush=True)
+    result = {"source_commit": inventory["source_commit"], "source_sha256": inventory["source_sha256"], "audit_binding": inventory["_audit_binding"], "status": "SAVED_DOM_CHECKS_COMPLETE_REVIEW_REQUIRED", "method": "Complete saved main-frame delta-reference DOM decoding; equal relevant states grouped with first/last checkpoint and count. No browser replay/rendering/OCR.", "cases": cases,
+              "limits": ["DOM attributes do not establish computed CSS/pixel visibility.", "Snapshots are checkpoints, not every millisecond; final command equality cannot by itself rule out all transient stale responses.", "Scenario metadata is checked separately against saved current-source playback responses.", "State groups retain their complete relevant text; original ZIPs/member hashes remain authoritative."]}
+    (OUT / "final-trace-dom-review.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

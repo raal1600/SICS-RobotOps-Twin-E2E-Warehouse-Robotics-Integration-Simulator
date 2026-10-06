@@ -1,4 +1,188 @@
-# Goal Progress
+# Current Integration Lab evidence (2026-10-06)
+
+Integration Lab passed local acceptance at source 9e83fe7: two clean 815-test suites, 20 local gates and five fresh manual/CLI scenarios. A subsequent documentation correction fixes two report links and rejects links outside the publication root; its five regression tests pass. Final-source Linux CI, Windows checks and GitHub Pages verification remain pending.
+
+Accepted runtime baseline A is `9e83fe7d41a52a63ba65b77730e392dafca8fffe`, fingerprint `136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd`. The original two 815-case suites, five fresh manual/CLI cases and saved audits remain source-scoped. The subsequent publication candidate includes unchanged robot runtime plus publication validator/tests, two report hrefs and reviewed evidence/status documentation. It is not a status-only revision; its full suite remains pending until independently observed. Known-broken A is not the publication candidate. After the corrected candidate is committed and authorized, verify its own full Linux acceptance, Windows native workflow and publication/Pages before refreshing its exact CI manifest. Only then may a reviewed completion successor be created; that successor also needs its own exact-source workflows. **NOT DONE / NOT ACHIEVED** remains the current status.
+
+[Accepted local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Current archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Known publication-link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Reviewed local report](docs/integration-lab-final-report.md)
+
+Local checklist: 50 of 51 GOAL items have substantive local support; CI item TEST-10 / LAB-MUST-044 remains pending. Final-loop steps12/13 retain the publication correction and candidate checks; step14 is a local evidence report, not final completion. Public-payload review covers A and the frozen new evidence extension separately; final proposed P-tree binding remains required.
+
+## Preserved historical implementation log
+
+The following original entries retain their wording and status at their recorded source/date. Pending statements below are historical and do not override the current summary above.
+
+---
+
+# Goal Progress - Integration Lab
+
+Current objective: root [GOAL.md](GOAL.md), introduced at `814979d`.
+Status: **NOT ACHIEVED**. Earlier simulator acceptance remains historical.
+
+Milestones A-D are implemented on `feat/integration-lab`: bounded persisted stages
+and revision-guarded authorization, the guided console and shared automatic
+handlers, PostgreSQL/outbox durability, RabbitMQ and durable edge inbox, actual
+OPC UA traffic and retained PLC command identity, separate WMS HTTP acknowledgement,
+conservative recovery, Blender handoff, source/payload inspectors and telemetry.
+The requirement registry contains 169 MUSTs, including all 51 root GOAL checkboxes.
+
+## Final-loop evidence and corrections in progress
+
+The complete first acceptance suite on frozen implementation `f78985b` executed
+**799 tests: 796 passed, 3 failed, no skips**, with **91.44% coverage**. Setup,
+headless browser installation, Blender availability and configured security checks
+passed. All four separate-process lab browser cases passed: real Blender happy
+path, lost ACK after effect, duplicate delivery and WMS HTTP 503 recovery. Each
+retained the original command with one effect; Blender produced 133 evaluated
+frames, 118 distinct robot poses and visible rendered motion. These individual
+passes do not turn the failed full suite into accepted evidence.
+
+[The retained failure record](docs/evidence/lab-f78985b/summary.json) and
+[original acceptance manifest](docs/evidence/acceptance/20261005T195412/manifest.json)
+identify the exact source and commands. The second pass was deliberately stopped
+after the first failed, so it is explicitly interrupted, not passed. Original
+JUnit, coverage and logs remain unchanged.
+
+The synthetic guided browser failure repeatedly encountered observations older
+than the unchanged five-second freshness limit before any command existed.
+Two Blender investigation failures exposed test observation issues: one asserted
+the title before the actual UI action finished loading confirmed evidence; another
+read-only test GET received ECONNRESET while the server remained responsive.
+Corrections wait for the existing action completion, allow one bounded reset retry
+on test GETs only, and close the lab browser helper's SQLite readers. No robot
+operation, freshness limit, physical retry rule or outcome assertion is relaxed.
+Terminal console wording is also corrected so completed sessions invite review
+instead of incorrectly asking for further verification.
+
+Scoped correction verification passed: 109 dashboard tests, all three previously
+failing browser journeys (271.94 seconds), repository lint/formatting, strict mypy
+for 66 source files, and the 169-MUST documentation drift check.
+[Corrective results](docs/evidence/lab-f78985b/corrections/summary.json) identify
+the changed source bytes; these checks do not replace full acceptance.
+
+The next clean campaign on `f00ad15` was intentionally interrupted after a saved
+Playwright trace confirmed another investigation-test helper error. Its busy-label
+check used a literal question mark instead of the UI ellipsis, so it returned
+before the action completed; the next five-second enabled assertion expired
+after successful WMS reconciliation. The trace then showed the enabled Continue
+button. No backend error, extra physical effect, or connection reset was observed.
+The correction waits for the actual UI action to become idle within the helper's
+existing timeout budget. The incomplete campaign is not a full-suite result;
+[its interruption record](docs/evidence/acceptance/20261005T210653/interruption.json)
+preserves that distinction. The corrective run then passed all 16 scenario bodies
+across both browser files, but exited with one Blender-desktop server teardown
+error. Cleanup logged Windows Proactor `ConnectionResetError` before the unchanged
+20-second server shutdown assertion failed. A separate 48-case real TCP probe did
+not reproduce that exact callback race. The fixtures now explicitly close their
+Playwright contexts before closing the browser, following the documented graceful
+cleanup order. No event-loop replacement, exception suppression, or shutdown
+deadline increase was applied. Both Blender investigation layouts and the actual
+separate-process Blender lab happy path then passed: **3 passed, 5 deselected in
+381.80 seconds**, with no failures or teardown errors. The selection deliberately
+targeted the changed cleanup paths and does not replace the full suite.
+[The correction record](docs/evidence/lab-f00ad15/summary.json) preserves source
+hashes, failed/interrupted results, the probe limitation and passing rerun.
+The clean campaign on `dfb06bc` then passed the complete first suite:
+**799 passed, zero failures, errors or skips in 2300.346 seconds**, with
+**91.44% coverage**. All four separate-process lab browser cases passed and their
+captured runtime/PLC journals retain the original command with one effect.
+The acceptance runner subsequently exited during temporary-fixture cleanup with
+Windows sharing error 32, before starting the second pass. The ignored evidence
+watcher had used SQLite's transaction context without explicitly closing its
+connections. An isolated Windows probe reproduced that handle-retention mechanism
+and verified that explicit close releases both databases immediately, including
+the exception path. The historical locker was not identified at the failure
+instant; a later exclusive-read probe already found the file unlocked. This is a
+probable watcher cause, not a demonstrated product failure. No production code,
+acceptance cleanup rule or test assertion was changed. The watcher is corrected;
+a new clean full two-pass campaign is required. [The retained record](docs/evidence/lab-dfb06bc/summary.json)
+keeps the successful suite distinct from the incomplete acceptance runner.
+
+The next clean campaign on `4774af5` completed successfully: **799 passed twice,
+zero failures, errors or skips**, with coverage **91.3835% / 91.4398%**. Both
+case sets match. All 20 local gates passed, including eight actual Blender demos,
+security, lint/type checks and publication generation. The three remote gates
+remain pending; this proves 163 of 169 MUSTs locally, with six depending on remote
+attestation. The optional model SHOULD remains separate. The original results are
+in [the complete campaign](docs/evidence/acceptance/20261005T224038/manifest.json).
+
+A fresh native Blender lab then completed the manual browser happy, lost-ACK and
+duplicate-delivery journeys, plus both exact README CLI commands. Saved evidence
+proves the physical gate precedes the effect, reload preserves the authoritative
+session, six inspectors are read-only, and duplicate authorization preserves the
+original result. Lost-ACK reconciliation retained the original runtime receipt and
+one effect; the PLC legitimately gained its first retained result. Duplicate
+publication increased inbox deliveries from one to two with the same command/hash
+and one effect; its broker redelivered flags were false. The selected manual
+browser diagnostics contained no errors. These are simulator results, not a
+guarantee of exactly-once physical execution in an industrial installation.
+
+Manual screenshot inspection also found two presentation defects that prevent
+completion: supported distributed scenarios had no short explanation, and their
+replay could incorrectly say Happy path when no robot-runtime fault was injected.
+The correction supplies persisted per-job scenario metadata for historical replay
+and complete scenario summaries. A related source-level race also needs command-
+bound live-response guards; the old protocol text at the captured physical gate
+was hidden, not a visible false claim. These changes require regression checks
+and a new source-bound acceptance campaign. The successful `4774af5` campaign and
+manual evidence remain historical proof of their exact source, not proof of the
+correction. See [the retained record](docs/evidence/lab-4774af5/summary.json).
+
+The bounded correction now passes **90 targeted Python tests**, with the final
+JavaScript wrapper rerunning the same five files as the **160-pass Node check**.
+It also passes **10 focused browser/real-protocol cases in 223.25 seconds**; the
+Blender happy case was deliberately deselected from that focused lane. The saved
+duplicate and WMS screenshots show correct historical captions even after changing
+the next-order selector. Full repository typing and the 169-MUST drift check pass.
+[Correction evidence](docs/evidence/scenario-label-correction/summary.json) records
+the exact code hashes and the distinction from full acceptance. The complete
+saved lab trace scan found no credential candidates in its listed scope, while
+preserving the historical caption findings. All 64 generated PDF pages were
+visually reviewed before the final status rebuild.
+
+The clean corrected-source campaign on `b968586` passed all **811 test bodies**
+but failed one compact Blender investigation fixture teardown: the API thread
+did not stop within 20 seconds. Its JUnit therefore has **810 clean cases and one
+error**, with no test-body failures or skips; coverage is **91.4750%**. All four
+distributed browser cases passed, and six saved screenshots show the corrected
+captions. The second pass was stopped after the first failure and has no terminal
+result. [The failed campaign archive](docs/evidence/lab-b968586/summary.json)
+preserves these results without claiming full acceptance.
+
+The saved log contains a Windows Proactor socket-shutdown reset. A deterministic
+probe reproduced its cleanup mechanism: the exception skips socket close and
+transport detachment, leaving Uvicorn waiting for an accepted connection even
+after its request/connection sets are empty. Ordinary loopback resets did not
+reproduce the timing-sensitive Chromium trigger. The correction configures the
+same explicit Windows HTTP selector loop for native services and their fixtures;
+it does not change the global policy, OPC UA loop, Playwright loop or workflow.
+Existing shutdown bounds remain strict and fixture failures now include task and
+thread diagnostics. [Native loop limits](docs/integration-lab-native.md) document
+the 512-socket limit and lack of asyncio subprocess support; Blender continues to
+use synchronous worker-thread subprocess calls.
+
+Four real HTTP/WebSocket lifecycle regressions pass, as do the three existing
+desktop close/reopen/isolation cases (15.70 seconds), repository lint/formatting
+(201 files), strict typing (67 source files), and the 169-MUST drift check. The
+four selected Blender browser checks also pass in **223.46 seconds**, with six
+synthetic cases deliberately deselected: investigation at desktop and compact
+sizes, guided happy/reload, and the separate-service lab happy path. No failures,
+errors or skips were recorded, and the frozen source hashes are unchanged.
+An independent bounded review found no blocking issue. The
+[correction archive](docs/evidence/lab-b968586/http-loop-correction/summary.json)
+preserves the probe, exact focused results, source hashes and review receipts.
+These focused results do not replace a new clean, two-pass acceptance campaign
+or the final manual loop.
+
+Required next evidence: run full acceptance on the clean corrected source,
+repeat the final manual checks, finish trace/publication review,
+then update the final report and all requirement evidence. Exact-source CI, publication and
+Pages verification remain mandatory. Remote publication requires explicit approval
+following the earlier automatic approval rejection; no remote action is inferred
+from local results. See [the complete checklist](docs/integration-lab-requirements.md).
+
+## Historical pre-lab progress
+
 Last updated: 2026-10-05 UTC
 Current revision: delete removes a test completely; clear resets that same test for reuse.
 Base: `4da22d75bded35452f4bca1db03c57da5e9eb957` (clean).

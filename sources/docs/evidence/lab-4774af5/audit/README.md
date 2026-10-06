@@ -1,0 +1,7 @@
+The seven files in this directory, excluding this README, are byte-identical copies of the finalized ignored audit artifacts. The parent [inputs.json](../inputs.json) records original paths and SHA256 values.
+
+The audit covers eight exact historical 4774 lab ZIPs and the listed logs/manual captures. Original ZIPs remain in ignored artifacts; this archive stores their complete member/input hashes and review, not the ZIP data. Other local-mode browser ZIPs are outside scope. Binary screenshot contents were hashed without OCR or a new pixel review.
+
+The three `.py.txt` files are raw Python source snapshots, not active repository modules. They preserve their original bytes and original execution-location assumptions. To reproduce, restore them to the original `.py` filenames at the mapped `artifacts/final-evidence-pack/4774af5/` paths, with the exact inventoried input files, then run `scan_saved_traces.py`, `review_trace_dom.py`, and `finalize_saved_audit.py` in that order using the repository Python environment. Do not execute the archived copies in place: their relative root calculation expects the original location. They read saved files and write ignored review artifacts; they do not start browsers, services, tests, database connections or rendering. Reproduction on changed inputs yields new evidence, not an update to these archived bytes.
+
+The archived summary retains known historical duplicate/WMS brief and replay-caption defects. Semantic scope PASS does not certify presentation completion, corrected source or remote publication.

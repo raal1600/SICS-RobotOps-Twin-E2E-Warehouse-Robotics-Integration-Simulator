@@ -1,0 +1,94 @@
+"""Derive a scoped review from guarded current-source saved evidence only."""
+import collections
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+from audit_inputs import ROOT, load_inventory, load_ref, require
+
+OUT = Path(__file__).resolve().parent
+
+
+def output_ref(path):
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "bytes": path.stat().st_size}
+
+
+def main():
+    inventory = load_inventory(OUT, "finalize-saved-review")
+    source = inventory["source_commit"]
+    scan_path = OUT / "final-trace-audit-result.json"
+    dom_path = OUT / "final-trace-dom-review.json"
+    scan = json.loads(scan_path.read_text(encoding="utf-8-sig"))
+    dom = json.loads(dom_path.read_text(encoding="utf-8-sig"))
+    for result in (scan, dom):
+        require(result["source_commit"] == source and result["source_sha256"] == inventory["source_sha256"], "Stale output source")
+        require(result["audit_binding"]["inventory_sha256"] == inventory["_audit_binding"]["inventory_sha256"], "Outputs do not share the exact fresh inventory")
+    require(len(scan["inputs"]) == len(inventory["scan_entries"]), "Scan input coverage incomplete")
+    required_hashes = {e["path"]: e["sha256"] for e in inventory["scan_entries"]}
+    require({e["path"]: e["sha256"] for e in scan["inputs"]} == required_hashes, "Scan inputs differ from inventory")
+    case_keys = {(c["acceptance_pass"], c["case"]) for c in inventory["cases"]}
+    require({(c["acceptance_pass"], c["case"]) for c in dom["cases"]} == case_keys, "DOM case coverage incomplete")
+    findings = []
+    for category in ("decode_failures", "json_parse_failures", "changed_inputs", "truth_step_mismatches"):
+        if scan[category]:
+            findings.append({"scope": "scan", "check": category, "count": len(scan[category])})
+    potential = [c for c in scan["candidates"] if c["classification"] not in {"redaction_marker", "public_repository_demo_credential"}]
+    if potential:
+        findings.append({"scope": "credentials", "check": "potential_candidates_need_redacted_review", "count": len(potential)})
+    for case in dom["cases"]:
+        findings.extend({"scope": "presentation", "case": case["case"], "pass": case["acceptance_pass"], "check": k} for k, ok in case["checks"].items() if not ok)
+    scenario_bindings = []
+    for case in inventory["cases"]:
+        expected = inventory["presentation_expectations"][case["case"]]
+        matches = [x for x in scan["recorded_scenarios"] if x["job_id"] == case["job_id"] and x["session_id"] == case["session_id"]]
+        passed = bool(matches) and all(x["fault"] == expected["fault"] and x["source"] == "GUIDED_SESSION" for x in matches)
+        scenario_bindings.append({"case": case["case"], "pass": case["acceptance_pass"], "job_id": case["job_id"], "session_id": case["session_id"], "expected_fault": expected["fault"], "matches_saved_playback_metadata": passed, "saved_locations": [x["location"] for x in matches]})
+        if not passed:
+            findings.append({"scope": "presentation", "case": case["case"], "pass": case["acceptance_pass"], "check": "saved_guided_scenario_metadata_binding"})
+    manual = []
+    for case in inventory["manual"]["cases"]:
+        wrapper = load_ref(case["session"])
+        session = wrapper.get("session", wrapper)
+        journals = load_ref(case["journals"])
+        rows = journals["selected_command"]
+        runtime, plc = rows["runtime_journal"], rows["plc_commands"]
+        checks = {
+            "current_source": journals["source_commit_at_capture"] == source,
+            "completed_original_lab_session": session["profile"] == "lab" and session["status"] == "COMPLETED" and session["current_stage"] == 22 and session["session_id"] == case["session_id"] and session["command_id"] == case["command_id"],
+            "expected_recorded_scenario": session["fault"] == case["expected_fault"],
+            "all_22_stages_present": set(range(1, 23)).issubset({s["stage"] for s in session["steps"]}),
+            "one_original_runtime_row": len(runtime) == 1 and runtime[0]["command_id"] == case["command_id"],
+            "one_original_plc_row": len(plc) == 1 and plc[0]["command_id"] == case["command_id"],
+            "runtime_effect_one": len(runtime) == 1 and runtime[0]["receipt"]["effect_count"] == 1,
+            "plc_effect_one": len(plc) == 1 and plc[0]["result"]["effect_count"] == 1,
+            "same_original_receipt": len(runtime) == len(plc) == 1 and runtime[0]["receipt"] == plc[0]["result"] and runtime[0]["payload_hash"] == plc[0]["payload_hash"] == runtime[0]["receipt"]["payload_hash"],
+        }
+        if case.get("cli_exit"):
+            exit_info = load_ref(case["cli_exit"])
+            checks["cli_success_current_source_explicit_consent"] = exit_info.get("source") == source and exit_info.get("exit_code") == 0 and wrapper.get("explicit_physical_consent") is True
+        manual.append({"case": case["case"], "inputs": {k: case[k] for k in ("session", "journals")}, "checks": checks})
+        findings.extend({"scope": "manual", "case": case["case"], "check": k} for k, ok in checks.items() if not ok)
+    inspectors = []
+    for ref in inventory["manual"]["inspectors"]:
+        obj = load_ref(ref)
+        inspector = obj.get("inspector", obj.get("inspectors", obj))
+        checks = {
+            "six_tabs_saved": {x["tab"] for x in inspector["tabs"]} == {"What", "Wire", "Code", "State", "Why", "Failure semantics"},
+            "inspector_belongs_to_current_manual_case": inspector["before"]["sessionId"] in {c["session_id"] for c in inventory["manual"]["cases"]} and inspector["selectedStep"]["session_id"] == inspector["before"]["sessionId"],
+            "counts_revision_identity_unchanged": inspector["before"] == inspector["after"],
+            "source_matches_selected_step": inspector["source"] == inspector["selectedStep"]["source"],
+            "saved_helper_checks_pass": bool(inspector["checks"]) and all(x is True for x in inspector["checks"].values()),
+            "lab_truth_scope": all(x in inspector["truth"]["profile"] for x in ("Integration lab", "real AMQP / OPC UA", "simulated systems")),
+        }
+        inspectors.append({"input": ref, "checks": checks})
+        findings.extend({"scope": "manual_inspection", "path": ref["path"], "check": k} for k, ok in checks.items() if not ok)
+    credential_status = "REVIEW_REQUIRED" if potential else "NO_PRIVATE_CREDENTIAL_CANDIDATES_DETECTED_IN_SCOPED_SAVED_TEXT"
+    presentation_status = "REVIEW_REQUIRED" if any(f["scope"] in {"presentation", "manual_inspection"} for f in findings) else "PASS_CHECKED_SAVED_DOM_AND_INSPECTOR_SCOPE"
+    result = {"reviewed_at": dt.datetime.now(dt.timezone.utc).isoformat(), "source_commit": source, "source_sha256": inventory["source_sha256"], "audit_binding": inventory["_audit_binding"], "status": "REVIEW_REQUIRED" if findings else "PASS_EXPLICIT_SAVED_EVIDENCE_SCOPE", "credential_status": credential_status, "credential_classes": dict(collections.Counter(c["classification"] for c in scan["candidates"])), "presentation_status": presentation_status, "findings": findings, "scan": output_ref(scan_path), "dom": output_ref(dom_path), "scenario_metadata_bindings": scenario_bindings, "manual_cases": manual, "inspectors": inspectors, "goal_status": "NOT_PROMOTED_BY_THIS_AUDIT", "limits": ["No fresh browser/pixel/whole-publication review is performed here. DOM snapshot checkpoints cannot prove every transient frame.", "Scenario metadata describes recorded configuration, not physical effect; saved original receipts and effect evidence are checked separately.", "Known public demo credentials and redaction markers remain classified separately; heuristic absence is not a global secret-free guarantee.", "Only explicit inventory inputs are covered. No current runtime/DB/network action occurs; remote and whole-GOAL attestation remain separate.", "This eight-current-trace/manual audit is not a review of every historical file or ZIP in the proposed public payload. That requires a separately enumerated payload review."]}
+    destination = OUT / "final-saved-audit-review.json"
+    destination.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"result": output_ref(destination), "status": result["status"], "presentation_status": presentation_status, "findings": len(findings)}))
+
+
+if __name__ == "__main__":
+    main()

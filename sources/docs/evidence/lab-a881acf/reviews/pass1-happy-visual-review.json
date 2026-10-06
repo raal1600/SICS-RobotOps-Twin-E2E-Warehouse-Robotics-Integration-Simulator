@@ -1,0 +1,85 @@
+{
+  "reviewed_at_utc": "2026-10-06T01:47:36.832560+00:00",
+  "reviewer": "root",
+  "scope": "Viewed three actual saved first-pass screenshots using image tool; read captured motion/session summary. No new browser/renderer/DB operation.",
+  "source": {
+    "commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+    "dirty": false,
+    "source_sha256": "cc354a6e622b244619e4766280632822781ae974770122ed3850fe136f90150f"
+  },
+  "acceptance_directory": "docs/evidence/acceptance/20261006T012424",
+  "session": {
+    "session_id": "1b5b3b8a-d714-5e8c-89c3-b71df07821a2",
+    "correlation_id": "6a426ef7-0bac-5514-9e15-2fc57d265b0d",
+    "order_id": "order-d1a0c97e-6942-4513-9dbb-fd4c68fe0a96",
+    "job_id": "703ff83e-e8ab-5fa7-a912-07eb63789d50",
+    "command_id": "588be8df-fbf7-5de7-901f-6b6f4bf353e3",
+    "status": "COMPLETED",
+    "current_stage": 22,
+    "revision": 44,
+    "updated_at": "2026-10-06T01:46:20.006371Z"
+  },
+  "formal_test_status_at_review": "PENDING_JUNIT",
+  "observations": [
+    {
+      "screenshot": "physical-gate.png",
+      "observed": "WAITING_AUTHORIZATION revision28; OPC UA/PLC map group active; stage14 inspector; explicit AUTHORIZE ROBOT EXECUTION card states synthetic-world effect and not a safety function; viewport says static, unauthorized and playback disabled. No live protocol panel visible."
+    },
+    {
+      "screenshot": "blender-motion.png",
+      "observed": "Revision32 awaits controller result; Robot map group active; physical stage16 selected and classified SIMULATED ROBOT; actual command identifier matches captured session in live protocol panel; OPC UA DataChangeNotification entries shown separately from SIMULATED ROBOT/READ-ONLY REPLAY label and evaluated Blender viewport."
+    },
+    {
+      "screenshot": "completed.png",
+      "observed": "COMPLETED revision44; Business map group active; stage22 final trace selected; no pending authorization card; future-order dropdown Brain timeout while retained execution caption remains Happy path (no injected scenario). Read-only replay and simulated boundaries remain explicit."
+    }
+  ],
+  "motion_evidence": {
+    "source": "BLENDER_EVALUATED_SCENE",
+    "frames": 133,
+    "robot_poses": 118,
+    "rendered_position_changed": true,
+    "original_command_id": "588be8df-fbf7-5de7-901f-6b6f4bf353e3"
+  },
+  "physical_effect_count_captured": 1,
+  "visible_layout_result": "No blocking clipping, overlap or contradictory scenario/runtime label observed in these three saved screenshots.",
+  "inputs": [
+    {
+      "path": "artifacts/lab-browser/20261006T014533291610/happy/physical-gate.png",
+      "sha256": "4a046f6add5b9ead6f51fd3531d7770f37e154da57881975273e480d45048f47",
+      "bytes": 372040
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T014533291610/happy/blender-motion.png",
+      "sha256": "cc79b71f09732f16d118cb5fb89d9e168e9413446d29b1addd3bd3fe727db3bd",
+      "bytes": 413655
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T014533291610/happy/completed.png",
+      "sha256": "6564c11ec091a971c16180db2d1e21f4642ee4ed0f364f089c837d2f217a2e1e",
+      "bytes": 416403
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T014533291610/happy/blender-motion.json",
+      "sha256": "c42f12c684b747018ccd78ebe4d3184d35f9b8568ea9f5e484395a09229e6b97",
+      "bytes": 1507
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T014533291610/happy/browser.json",
+      "sha256": "02f49d4175aa2fbc9b6803354b7e86218fa8968c0a671c99b58210a184b133ea",
+      "bytes": 66300
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T014533291610/happy/session.json",
+      "sha256": "b439ba7895c309edf5468272f9c5010db232fca79de119f5cd6209bd5c015ffd",
+      "bytes": 190626
+    }
+  ],
+  "limits": [
+    "Formal JUnit is still pending; a completed captured session is not whole-suite acceptance.",
+    "Screenshots alone do not prove request counts or effect causality; current journals/raw transitions provide separate evidence.",
+    "This is automated-case screenshot review, not the mandatory fresh final manual browser loop.",
+    "Motion JSON records measured poses; this review does not assert that every screenshot frame label corresponds to its separate motion sample timestamp.",
+    "Full saved-DOM/secret trace scan, second pass and final publication review remain pending."
+  ]
+}

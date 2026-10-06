@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "lock_sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+  "bandit_exit": 1,
+  "pip_audit_exit": 0,
+  "npm_audit_exit": 0,
+  "vendor_integrity": true,
+  "findings": [
+    {
+      "path": "robotops/blender/adapter.py",
+      "scope": "import subprocess",
+      "test_id": "B404",
+      "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+      "reviewed": true,
+      "rationale": "Only fixed Blender executable invocations below; shell is never enabled. Configuration is trusted local operator input."
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "scope": "_invoke",
+      "test_id": "B603",
+      "ast_sha256": "7c87bab88cc2b24175e08a4e7454c37d7ac5802e595d855ab5bee4cb3e2aec07",
+      "reviewed": true,
+      "rationale": "Reviewed fixed Blender invocation: Windows adds only literal --qos high before the fixed Python entry point. No shell, model-controlled arguments, external code, system-policy changes or deadline extension. Disabled autoexec, bounded process timeout and confined read-only --record-existing export remain intact."
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "scope": "manifest",
+      "test_id": "B603",
+      "ast_sha256": "556d235eb3d3a7fab1325d6e625080f33b542fc0cf3d5071064b94f381c71a96",
+      "reviewed": true,
+      "rationale": "The sole process call remains the configured local Blender executable plus literal --version, without a shell. The added cpu_qos field records a platform-selected constant and does not execute code. Existing closure hashes and provenance remain unchanged."
+    },
+    {
+      "path": "robotops/demo.py",
+      "scope": "import subprocess",
+      "test_id": "B404",
+      "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+      "reviewed": true,
+      "rationale": "Demo restart invokes the current Python interpreter with the fixed committed module; no shell."
+    },
+    {
+      "path": "robotops/demo.py",
+      "scope": "run_demo",
+      "test_id": "B603",
+      "ast_sha256": "83b0f8d506fe0a0f6ada33703c368841e561147a2c80331c7d35d43bc7798552",
+      "reviewed": true,
+      "rationale": "Reviewed HKM tool-showcase and evidence additions; the sole subprocess call remains sys.executable -m robotops.demo --resume with argparse-controlled runtime and local directory arguments. Fixed argv, no shell, generated code or model input; outside robot command execution."
+    }
+  ]
+}

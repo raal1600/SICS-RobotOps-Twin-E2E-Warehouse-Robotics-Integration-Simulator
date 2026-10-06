@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="840" viewBox="0 0 900 840" role="img" aria-labelledby="title desc">
+<title id="title">Integration Lab: explicit boundaries</title><desc id="desc">Figure 13. Implemented Integration Lab topology, with acceptance tracked in the current report. The console sends explicit REST authorizations and reads a persisted WebSocket trace. PostgreSQL commits immutable command/outbox intent before RabbitMQ publication. The separate edge service commits its inbox before consumer ACK and owns real OPC UA sessions to the virtual PLC. Bounded API-to-edge REST control calls preserve guided gates. PLC acceptance alone cannot actuate the runtime: explicit physical authorization and the original durable execution claim are required. The PLC-to-runtime interface is simulated; the existing runtime is invoked by the shared bounded handler. Fresh synthetic observations and the verifier determine the outcome. WMS HTTP acknowledgement precedes committed ERP business completion. Lost replies cause original-identity reconciliation, never an automatic replacement pick. This does not claim safety certification or exactly-once physical execution.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526473"/></marker><marker id="red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a34838"/></marker></defs>
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="DejaVu Sans, Arial, sans-serif">
+<text x="28" y="34" font-size="23" text-anchor="start" fill="#182f43" font-weight="700">Integration Lab: explicit boundaries</text>
+<text x="28" y="62" font-size="16" text-anchor="start" fill="#526473" font-weight="400">Real SQL, AMQP and OPC UA; synthetic controller, robot and sensing</text>
+<path d="M 270 142.5 L 330 142.5" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 570 142.5 L 630 142.5" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 750 195 V 270" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 630 322.5 L 570 322.5" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 330 322.5 L 270 322.5" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 450 195 V 270" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M 150 375 V 450" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 270 502.5 L 330 502.5" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 570 502.5 L 630 502.5" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 750 555 V 602.5 H 450 V 650" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 330 702.5 L 270 702.5" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 750 555 V 650" fill="none" stroke="#526473" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="30" y="90" width="240" height="105" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
+<rect x="30" y="100" width="4" height="85" rx="2" fill="#182f43"/>
+<text x="150" y="136.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Guided Console</text>
+<text x="150" y="162.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">ERP demand / WMS task</text>
+<rect x="330" y="90" width="240" height="105" rx="7" fill="#edf6f5" stroke="#126b70" stroke-width="1.3"/>
+<rect x="330" y="100" width="4" height="85" rx="2" fill="#126b70"/>
+<text x="450" y="114.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">FastAPI / guided</text>
+<text x="450" y="137.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">stages</text>
+<text x="450" y="163.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">REST writes / read-only</text>
+<text x="450" y="184.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">stream</text>
+<rect x="630" y="90" width="240" height="105" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
+<rect x="630" y="100" width="4" height="85" rx="2" fill="#182f43"/>
+<text x="750" y="126" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">PostgreSQL</text>
+<text x="750" y="152" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Sessions / command /</text>
+<text x="750" y="173" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">outbox</text>
+<rect x="30" y="270" width="240" height="105" rx="7" fill="#f2f0f8" stroke="#63577a" stroke-width="1.3"/>
+<rect x="30" y="280" width="4" height="85" rx="2" fill="#63577a"/>
+<text x="150" y="306" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Virtual PLC</text>
+<text x="150" y="332" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Actual OPC UA / durable</text>
+<text x="150" y="353" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">journal</text>
+<rect x="330" y="270" width="240" height="105" rx="7" fill="#edf6f5" stroke="#126b70" stroke-width="1.3"/>
+<rect x="330" y="280" width="4" height="85" rx="2" fill="#126b70"/>
+<text x="450" y="294.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Separate Python</text>
+<text x="450" y="317.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">edge</text>
+<text x="450" y="343.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Durable inbox / OPC UA</text>
+<text x="450" y="364.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">client</text>
+<rect x="630" y="270" width="240" height="105" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
+<rect x="630" y="280" width="4" height="85" rx="2" fill="#182f43"/>
+<text x="750" y="306" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">RabbitMQ / AMQP</text>
+<text x="750" y="332" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Publisher confirm /</text>
+<text x="750" y="353" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">consumer ACK</text>
+<rect x="30" y="450" width="240" height="105" rx="7" fill="#fbf4e6" stroke="#896321" stroke-width="1.3"/>
+<rect x="30" y="460" width="4" height="85" rx="2" fill="#896321"/>
+<text x="150" y="474.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Physical</text>
+<text x="150" y="497.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">authorization</text>
+<text x="150" y="523.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Original command</text>
+<text x="150" y="544.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">execution claim</text>
+<rect x="330" y="450" width="240" height="105" rx="7" fill="#f2f0f8" stroke="#63577a" stroke-width="1.3"/>
+<rect x="330" y="460" width="4" height="85" rx="2" fill="#63577a"/>
+<text x="450" y="474.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Simulated</text>
+<text x="450" y="497.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">controller</text>
+<text x="450" y="523.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Synthetic or Blender</text>
+<text x="450" y="544.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">runtime</text>
+<rect x="630" y="450" width="240" height="105" rx="7" fill="#edf6f5" stroke="#126b70" stroke-width="1.3"/>
+<rect x="630" y="460" width="4" height="85" rx="2" fill="#126b70"/>
+<text x="750" y="486" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Fresh observation</text>
+<text x="750" y="512" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Synthetic sensors /</text>
+<text x="750" y="533" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">separate truth</text>
+<rect x="30" y="650" width="240" height="105" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
+<rect x="30" y="660" width="4" height="85" rx="2" fill="#182f43"/>
+<text x="150" y="686" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">WMS then ERP</text>
+<text x="150" y="712" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Durable ACK / business</text>
+<text x="150" y="733" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">outcome</text>
+<rect x="330" y="650" width="240" height="105" rx="7" fill="#edf6f5" stroke="#126b70" stroke-width="1.3"/>
+<rect x="330" y="660" width="4" height="85" rx="2" fill="#126b70"/>
+<text x="450" y="674.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">Verifier /</text>
+<text x="450" y="697.5" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">reconciliation</text>
+<text x="450" y="723.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Original journal +</text>
+<text x="450" y="744.5" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">fresh evidence</text>
+<rect x="630" y="650" width="240" height="105" rx="7" fill="#eef2f6" stroke="#182f43" stroke-width="1.3"/>
+<rect x="630" y="660" width="4" height="85" rx="2" fill="#182f43"/>
+<text x="750" y="686" font-size="19" text-anchor="middle" fill="#182f43" font-weight="700">3D view / trace</text>
+<text x="750" y="712" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">Read-only motion and</text>
+<text x="750" y="733" font-size="16" text-anchor="middle" fill="#526473" font-weight="400">evidence</text>
+</g></svg>

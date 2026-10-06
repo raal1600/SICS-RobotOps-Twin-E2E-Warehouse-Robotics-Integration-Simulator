@@ -1,0 +1,18 @@
+flowchart TD
+  command["Original PICK_AND_PLACE command<br/>Identity / payload / validated tool"]
+  requested["TOOL_CHANGE_REQUESTED<br/>Or persist NOT_REQUIRED"]
+  safe["MOVE_TO_SAFE_POSE<br/>Then move to current tool dock"]
+  release["RELEASE_CURRENT_TOOL<br/>Verify empty flange / rack occupied"]
+  engage["ENGAGE_REQUESTED_TOOL<br/>Verify tool identity / dock empty"]
+  retreat["RETREAT_FROM_TOOL_RACK<br/>TOOL_CHANGE_COMPLETED"]
+  pick["Validated pick trajectory<br/>Approach / grasp / lift / transfer"]
+  effect["PLACE / RELEASE / PICK_EFFECT<br/>Exactly one product-transfer effect"]
+  verify["Observation and verification<br/>Receipt alone cannot complete order"]
+  command --> requested
+  requested --> safe
+  safe --> release
+  release --> engage
+  engage --> retreat
+  retreat --> pick
+  pick --> effect
+  effect --> verify

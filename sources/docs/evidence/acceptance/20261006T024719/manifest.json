@@ -1,0 +1,1039 @@
+{
+  "started_at": "2026-10-06T02:47:20.134216+00:00",
+  "source": {
+    "commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "dirty": false,
+    "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+  },
+  "environment": {
+    "python": "3.13.15 (main, Sep  1 2026, 14:16:48) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "dependencies": {
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "pytest": "9.1.1",
+      "ruff": "0.16.10",
+      "mypy": "2.4.0",
+      "weasyprint": "70.0",
+      "bandit": "1.9.4",
+      "pip-audit": "2.10.1",
+      "playwright": "1.63.0"
+    },
+    "lock_sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1"
+  },
+  "gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\.local\\bin\\uv.EXE",
+        "sync",
+        "--locked",
+        "--all-groups"
+      ],
+      "seconds": 0.04331219999585301,
+      "log": "docs/evidence/acceptance/20261006T024719/setup.log"
+    },
+    "browser_setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "playwright",
+        "install",
+        "chromium",
+        "--only-shell"
+      ],
+      "seconds": 0.3898464999801945,
+      "log": "docs/evidence/acceptance/20261006T024719/browser_setup.log"
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+        "--version"
+      ],
+      "seconds": 0.22596929999417625,
+      "log": "docs/evidence/acceptance/20261006T024719/blender_version.log"
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "security"
+      ],
+      "seconds": 19.600753200007603,
+      "log": "docs/evidence/acceptance/20261006T024719/security.log"
+    },
+    "tests_1": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-to2atak6/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\tests-1.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\coverage-1.json",
+        "--cov-report=term"
+      ],
+      "seconds": 1651.2559275999956,
+      "log": "docs/evidence/acceptance/20261006T024719/tests_1.log"
+    },
+    "tests_2": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-2-3f0jwgdd/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\tests-2.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\coverage-2.json",
+        "--cov-report=term"
+      ],
+      "seconds": 1677.8736543999985,
+      "log": "docs/evidence/acceptance/20261006T024719/tests_2.log"
+    },
+    "repeatability": {
+      "passed": true,
+      "log": "docs/evidence/acceptance/20261006T024719/repeatability.json"
+    },
+    "lint": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "lint"
+      ],
+      "seconds": 0.9106053000141401,
+      "log": "docs/evidence/acceptance/20261006T024719/lint.log"
+    },
+    "typecheck": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "typecheck"
+      ],
+      "seconds": 0.613668099977076,
+      "log": "docs/evidence/acceptance/20261006T024719/typecheck.log"
+    },
+    "demo_happy_path": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "happy_path",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\happy_path"
+      ],
+      "seconds": 9.805350599985104,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_happy_path.log"
+    },
+    "demo_lost_ack_after_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_after_effect",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\lost_ack_after_effect"
+      ],
+      "seconds": 9.895965499978047,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_lost_ack_after_effect.log"
+    },
+    "demo_lost_ack_before_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_before_effect",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\lost_ack_before_effect"
+      ],
+      "seconds": 0.9802420999913011,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_lost_ack_before_effect.log"
+    },
+    "demo_ambiguous": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "ambiguous",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\ambiguous"
+      ],
+      "seconds": 9.997796199982986,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_ambiguous.log"
+    },
+    "demo_restart": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "restart",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\restart"
+      ],
+      "seconds": 10.101201000012225,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_restart.log"
+    },
+    "demo_logical_estop": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "logical_estop",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\logical_estop"
+      ],
+      "seconds": 0.9016031000064686,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_logical_estop.log"
+    },
+    "demo_cell_fault": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "cell_fault",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\cell_fault"
+      ],
+      "seconds": 0.8974745000014082,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_cell_fault.log"
+    },
+    "demo_tool_showcase": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "tool_showcase",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\tool_showcase"
+      ],
+      "seconds": 61.41089379999903,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_tool_showcase.log"
+    },
+    "ci": {
+      "passed": false
+    },
+    "publication_remote": {
+      "passed": false
+    },
+    "pages": {
+      "passed": false
+    },
+    "drift": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.drift_check"
+      ],
+      "seconds": 1.0607374999963213,
+      "log": "docs/evidence/acceptance/20261006T024719/drift.log"
+    },
+    "publication": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 9.731846900016535,
+      "log": "docs/evidence/acceptance/20261006T024719/publication.log"
+    },
+    "publication_final": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 8.915850899997167,
+      "log": "docs/evidence/acceptance/20261006T024719/publication_final.log"
+    }
+  },
+  "criteria": {
+    "SC-ARCH-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ARCH-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ARCH-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ARCH-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BLENDER-006": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-KB-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-KB-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-KB-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-KB-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-KB-010": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DOC-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DATA-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DATA-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DATA-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DATA-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DATA-005": {
+      "passed": false,
+      "failures": [
+        "ci"
+      ]
+    },
+    "SC-STATE-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-STATE-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-STATE-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-STATE-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-OBS-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-OBS-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-REC-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-STATE-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-FAULT-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-FAULT-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-STATE-006": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-FAULT-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-IDEM-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-IDEM-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-IDEM-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-IDEM-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-PERSIST-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DEMO-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DOC-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-PERSIST-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-PERSIST-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-PERSIST-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BRAIN-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BRAIN-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BRAIN-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DEMO-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BRAIN-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-FAULT-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BRAIN-005": {
+      "passed": false,
+      "failures": [
+        "optional_model_fallback"
+      ]
+    },
+    "SC-BLENDER-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BLENDER-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BLENDER-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BLENDER-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-BLENDER-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-OBS-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-OBS-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-OBS-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-REC-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-REC-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-REC-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-REC-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-REC-007": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DEMO-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-REC-006": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-FAULT-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-LOG-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-LOG-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-METRIC-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-METRIC-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DEMO-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DEMO-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-007": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-008": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-TEST-006": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-KB-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-KB-006": {
+      "passed": false,
+      "failures": [
+        "publication_remote"
+      ]
+    },
+    "SC-KB-007": {
+      "passed": false,
+      "failures": [
+        "publication_remote"
+      ]
+    },
+    "SC-KB-008": {
+      "passed": false,
+      "failures": [
+        "pages",
+        "publication_remote"
+      ]
+    },
+    "SC-KB-009": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ACC-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DOC-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DOC-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-DOC-005": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ACC-001": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ACC-002": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ACC-003": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ACC-004": {
+      "passed": true,
+      "failures": []
+    },
+    "SC-ACC-006": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-001": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-002": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-003": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-004": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-005": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-006": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-007": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-008": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-009": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-010": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-011": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-012": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-013": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-014": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-015": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-016": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-017": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-018": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-019": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-020": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-021": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-022": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-023": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-024": {
+      "passed": true,
+      "failures": []
+    },
+    "HKM-VIS-MUST-025": {
+      "passed": false,
+      "failures": [
+        "ci",
+        "publication_remote",
+        "pages"
+      ]
+    },
+    "UI-INV-MUST-001": {
+      "passed": true,
+      "failures": []
+    },
+    "UI-INV-MUST-002": {
+      "passed": true,
+      "failures": []
+    },
+    "UI-INV-MUST-003": {
+      "passed": true,
+      "failures": []
+    },
+    "UI-INV-MUST-004": {
+      "passed": true,
+      "failures": []
+    },
+    "UI-INV-MUST-005": {
+      "passed": true,
+      "failures": []
+    },
+    "UI-INV-MUST-006": {
+      "passed": true,
+      "failures": []
+    },
+    "UI-INV-MUST-007": {
+      "passed": true,
+      "failures": []
+    },
+    "UI-INV-MUST-008": {
+      "passed": false,
+      "failures": [
+        "ci",
+        "publication_remote",
+        "pages"
+      ]
+    },
+    "LAB-MUST-001": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-002": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-003": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-004": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-005": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-006": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-007": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-008": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-009": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-010": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-011": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-012": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-013": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-014": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-015": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-016": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-017": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-018": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-019": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-020": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-021": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-022": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-023": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-024": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-025": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-026": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-027": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-028": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-029": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-030": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-031": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-032": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-033": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-034": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-035": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-036": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-037": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-038": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-039": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-040": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-041": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-042": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-043": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-044": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-045": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-046": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-047": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-048": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-049": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-050": {
+      "passed": true,
+      "failures": []
+    },
+    "LAB-MUST-051": {
+      "passed": true,
+      "failures": []
+    }
+  }
+}

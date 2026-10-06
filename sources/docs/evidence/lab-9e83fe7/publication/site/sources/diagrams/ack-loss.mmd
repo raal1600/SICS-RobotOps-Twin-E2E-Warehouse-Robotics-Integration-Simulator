@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant integration as Integration
+  participant gateway as RobotGateway
+  participant blender as World + Observer
+  participant verifier as Verifierare
+  integration->>gateway: 1. Skicka CMD-17
+  gateway->>blender: 2. Utför samma kommando
+  Note over blender: 3. Objekt flyttas; effekt sparas
+  gateway--xintegration: 4. Kvittens försvinner
+  Note over integration: 5. UNKNOWN_OUTCOME
+  integration->>gateway: 6. Läs status för CMD-17
+  blender->>verifier: 7. Ny WorldObservation
+  gateway->>verifier: 8. Journal + samma epok
+  verifier->>integration: 9. Tillräcklig evidens → verifierat; annars granskning

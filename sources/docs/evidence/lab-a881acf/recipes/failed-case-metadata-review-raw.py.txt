@@ -1,0 +1,70 @@
+import collections,hashlib,io,json,zipfile,xml.etree.ElementTree as ET
+from datetime import datetime,timezone
+from pathlib import Path
+from urllib.parse import urlsplit
+r=Path('.').resolve();base=r/'artifacts/investigation-browser/20261006T020044578397/test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]'
+out=r/'artifacts/final-evidence-pack/a881acf/pass2-clear-failure';out.mkdir(exist_ok=False)
+campaign=r/'docs/evidence/acceptance/20261006T012424'
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def metadata(p,raw):return {'path':p.relative_to(r).as_posix(),'sha256':sha(raw),'bytes':len(raw)}
+def save(name,raw):
+ p=out/name
+ with p.open('xb') as f:f.write(raw)
+ assert p.read_bytes()==raw
+ return metadata(p,raw)
+def write(name,d):return save(name,(json.dumps(d,indent=2,ensure_ascii=False)+'\n').encode())
+browser_raw=(base/'browser.json').read_bytes();browser=json.loads(browser_raw)
+junit_raw=(campaign/'tests-2.xml').read_bytes();junit=ET.fromstring(junit_raw);cases=list(junit.iter('testcase'))
+target=[x for x in cases if x.attrib.get('classname')=='tests.browser.test_investigation' and x.attrib.get('name')=='test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]'];assert len(target)==1 and target[0].find('failure') is not None
+manifest_raw=(campaign/'manifest.json').read_bytes();manifest=json.loads(manifest_raw)
+terminal_path=r/'artifacts/acceptance-http-lifecycle-exit.json';terminal_raw=terminal_path.read_bytes();terminal=json.loads(terminal_raw.decode('utf-8-sig'));assert terminal['exit_code']==1
+zip_raw=(base/'trace.zip').read_bytes()
+inputs=[metadata(base/'browser.json',browser_raw),metadata(base/'trace.zip',zip_raw),metadata(campaign/'tests-2.xml',junit_raw),metadata(campaign/'manifest.json',manifest_raw),metadata(terminal_path,terminal_raw)]
+inventory=[]
+for p in sorted(base.iterdir()):
+ if p.is_file():
+  raw=browser_raw if p.name=='browser.json' else (zip_raw if p.name=='trace.zip' else p.read_bytes())
+  inventory.append({**metadata(p,raw),'inspection':'JSON_PARSED' if p.suffix=='.json' else ('ONLY_NETWORK_AND_ACTION_METADATA_MEMBERS' if p.suffix=='.zip' else 'BYTES_HASHED_ONLY_NOT_VIEWED')})
+selected_network=[];actions=[];member_refs=[];websocket_metadata_count=0
+with zipfile.ZipFile(io.BytesIO(zip_raw)) as z:
+ for member,limit in [('trace.network',1024*1024),('trace.trace',2*1024*1024)]:
+  info=z.getinfo(member);assert info.file_size<=limit;raw=z.read(member)
+  member_refs.append({'archive':inputs[1],'member':member,'sha256':sha(raw),'bytes':len(raw),'compressed_bytes':info.compress_size})
+  if member.endswith('.network'):
+   nets=[(i,json.loads(line)['snapshot']) for i,line in enumerate(raw.splitlines(),1) if line.strip()]
+   clear=[(i,s) for i,s in nets if s['request']['method']=='POST' and urlsplit(s['request']['url']).path=='/simulation-tests/original/clear'];assert len(clear)==1
+   clear_start=clear[0][1]['_monotonicTime']
+   for lineno,s in nets:
+    if s.get('_monotonicTime',0)>=clear_start:
+     req,res=s['request'],s['response'];t=s.get('timings',{});duration=s.get('time')
+     selected_network.append({'member_line_1based':lineno,'method':req['method'],'path':urlsplit(req['url']).path,'started_at_utc':s.get('startedDateTime'),'start_monotonic_ms':s.get('_monotonicTime'),'recorded_total_ms':duration,'status':res.get('status'),'status_text':res.get('statusText'),'timings_ms':t,'receive_completed_recorded':isinstance(t.get('receive'),(float,int)) and t['receive']>=0,'calculated_end_ms':s.get('_monotonicTime',0)+duration if isinstance(duration,(int,float)) and isinstance(t.get('receive'),(float,int)) and t['receive']>=0 else None,'failure_text':s.get('_failureText'),'response_body_read':False})
+  else:
+   for lineno,line in enumerate(raw.splitlines(),1):
+    if b'"type":"frame-snapshot"' in line or b'"type":"screencast-frame"' in line:continue
+    x=json.loads(line)
+    if x.get('callId') in ['call@439','call@441','call@443'] and x.get('type') in ['before','after','log']:
+     if x.get('type')!='log' or 'performing click action' in x.get('message','') or 'click action done' in x.get('message','') or ('unexpected value' in x.get('message','') and x.get('time',0)>14400):
+      v={k:x[k] for k in ['type','callId','startTime','endTime','time','class','method','title','params','message'] if k in x}
+      if 'error' in x:v['error']={k:x['error'][k] for k in ['name','message'] if k in x['error']}
+      actions.append({'member_line_1based':lineno,**v})
+    if (b'webSocket' in line or b'WebSocket' in line) and x.get('time',x.get('startTime',x.get('endTime',0)))>=9000:websocket_metadata_count+=1
+clear_network=next(x for x in selected_network if x['method']=='POST')
+click=next(x for x in actions if x.get('message')=='  performing click action')
+expect_begin=next(x for x in actions if x.get('type')=='before' and x.get('callId')=='call@441')
+expect_end=next(x for x in actions if x.get('type')=='after' and x.get('callId')=='call@441')
+timing={'scope':'Only trace.network resource-snapshot metadata and trace.trace action/log metadata. No resource bodies, headers/cookies, frame-snapshot DOM, images, screenshots or stacks read/inspected.','archive':inputs[1],'members':member_refs,'network':selected_network,'actions':actions,'derived':{'click_performing_to_clear_send_ms':clear_network['start_monotonic_ms']-click['time'],'clear_http_status':clear_network['status'],'clear_request_total_ms':clear_network['recorded_total_ms'],'clear_wait_ms':clear_network['timings_ms']['wait'],'dialog_expect_duration_ms':expect_end['endTime']-expect_begin['startTime'],'dialog_expect_timeout_ms':expect_begin['params']['timeout'],'dialog_assertion_failure_monotonic_ms':expect_end['endTime'],'post_clear_GETs_finishing_after_assertion':[x['path'] for x in selected_network if x['method']=='GET' and x['calculated_end_ms'] is not None and x['calculated_end_ms']>expect_end['endTime']],'websocket_metadata_events_after_9000ms':websocket_metadata_count},'timing_caveats':['HAR monotonic start plus total is approximate; adjacent requests can overlap by sub-millisecond instrumentation rounding.','GET /cell/scene status200 has receive=-1: response-body completion/end is not established.','No recorded WebSocket-close metadata in inspected action window; no close timing claim.']}
+timing_ref=write('trace-timing.json',timing)
+source_checks=[]
+for path,recorded in browser['source_sha256_at_start'].items():
+ p=(r/Path(path)).resolve();current=sha(p.read_bytes());source_checks.append({'path':p.relative_to(r).as_posix(),'recorded_sha256':recorded,'current_sha256':current,'matches':current==recorded})
+copies=[save('browser.json',browser_raw),save('tests-2.xml',junit_raw),save('terminal-manifest.json',manifest_raw),save('terminal-exit.json',terminal_raw)]
+case_failure={'testcase':target[0].attrib,'failure_type':target[0].find('failure').attrib,'failure_text':target[0].find('failure').text}
+failure_ref=write('junit-failure.json',case_failure)
+remote={'ci','publication_remote','pages'}
+outcomes=collections.Counter(next((kind for kind in ['failure','error','skipped'] if c.find(kind) is not None),'passed') for c in cases)
+clear_requests=[{'index':i,**x} for i,x in enumerate(browser['requests']) if '/simulation-tests/original/clear' in x['url']]
+report={'reviewed_at_utc':datetime.now(timezone.utc).isoformat(),'source':manifest['source'],'campaign':campaign.relative_to(r).as_posix(),'verdict':'FIRST_PASS_PASSED_SECOND_PASS_FAILED_LOCAL_ACCEPTANCE_FAILED','overall_acceptance_passed':False,'goal_status':'NOT_ACHIEVED','terminal':terminal,'local_gates_passed':sum(g['passed'] is True for n,g in manifest['gates'].items() if n not in remote),'local_gates_failed':[n for n,g in manifest['gates'].items() if n not in remote and g['passed'] is not True],'remote_gates_pending':sorted(remote),'junit':{'artifact':copies[1],'testcases':len(cases),'outcomes':dict(outcomes),'failed_case':target[0].attrib,'failure_artifact':failure_ref},'browser':{'artifact':copies[0],'request_count':len(browser['requests']),'page_errors':browser['page_errors'],'console_errors':browser['console_errors'],'clear_requests':clear_requests,'following_requests':[{'index':i,**x} for i,x in enumerate(browser['requests']) if i>clear_requests[0]['index']],'request_log_limit':'method/url/body only; timing/status comes from separately bounded trace metadata'},'timing_artifact':timing_ref,'findings':[{'kind':'OBSERVED','detail':'Confirm click reaches clear POST within about4.3ms; this instance does not show a5s pre-POST drain delay.'},{'kind':'OBSERVED','detail':'Clear POST succeeds with HTTP200 after4913.785ms;4913.316ms is recorded wait time.'},{'kind':'OBSERVED','detail':'The5s hidden-dialog assertion fails while subsequent refresh GETs are still completing; four completed refreshes finish after the assertion and cell/scene begins after it.'},{'kind':'LIMIT','detail':'The trace proves the expensive clear HTTP round trip and later refresh overlap, not the backend reason for that wait. Server read-drain/lock/fs attribution requires source/log evidence or focused measurement.'},{'kind':'LIMIT','detail':'No inference of eventual dialog closure, absent errors outside captured scope, fullDOM/secret audit, or manual proof.'}],'source_checks':source_checks,'all8_recorded_source_hashes_match':len(source_checks)==8 and all(x['matches'] for x in source_checks),'inputs':inputs,'preserved_copies':copies,'original_artifacts_modified':False,'preparation_helper_executed':False,'next_action':'Combine these actual timestamps with requirements_audit static clear/read-drain analysis before selecting a correction; preserve failure and use focused validation after source freeze is released.'}
+report_ref=write('failure-review.json',report)
+inventory_ref=write('inventory.json',{'source_directory':base.relative_to(r).as_posix(),'files':inventory,'generated':[timing_ref,failure_ref,report_ref,*copies],'whole_zip_extracted':False,'screenshots_viewed':False,'resource_or_DOM_scan':False})
+print(json.dumps({'review':report_ref,'inventory':inventory_ref,'timing':timing_ref,'source_hashes_match':report['all8_recorded_source_hashes_match'],'outcomes':dict(outcomes),'local_failed':report['local_gates_failed'],'derived':timing['derived']},indent=2))
+

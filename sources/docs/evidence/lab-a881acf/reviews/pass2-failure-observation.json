@@ -1,0 +1,61 @@
+{
+  "observed_at_utc": "2026-10-06T02:22:25.164973+00:00",
+  "source_commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+  "campaign": "docs/evidence/acceptance/20261006T012424",
+  "status": "SECOND_SUITE_FAILED_WHOLE_CAMPAIGN_STILL_RUNNING_REMAINING_GATES",
+  "tests": 815,
+  "unique_cases": 815,
+  "passed": 814,
+  "failed_cases": [
+    {
+      "classname": "tests.browser.test_investigation",
+      "name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+      "seconds": "15.818",
+      "outcomes": [
+        {
+          "kind": "failure",
+          "message": "AssertionError: Locator expected not to be visible\nActual value: visible \nCall log:\n  - Expect \"not_to_be_visible\" locator(\"#delete-test-dialog\") with timeout 5000ms\n  - waiting for locator(\"#delete-test-dialog\")\n    14 \u00d7 locator resolved to <dialog open=\"\" id=\"delete-test-dialog\" aria-labelledby=\"delete-test-title\">\u2026</dialog>\n       - unexpected value \"visible\"\n\nAria snapshot:\n- dialog \"Clear Test 1 and retry?\":\n  - heading \"Clear Test 1 and retry?\" [level=2]\n  - paragraph: Keep Test 1 \u00b7 HKM1800-inspired warehouse cell. Remove its orders and results, restore every product and make this the current test, ready to run again.\n  - paragraph: This removes this test's previous evidence and recordings, including unresolved outcomes. Other tests and your scenario choices stay unchanged. No pick is performed.\n  - alert\n  - button \"Cancel\" [disabled]\n  - button \"Clear test\" [disabled]",
+          "text": "server = ('http://127.0.0.1:52208', <apps.api.test_sessions.TestRegistry object at 0x000002BDC04FFE30>)\nbrowser_page = (<Page url='http://127.0.0.1:52208/'>, WindowsPath('artifacts/investigation-browser/20261006T020044578397/test_clear_r...e.js', 'body': None}, {'method': 'GET', 'url': 'http://127.0.0.1:52208/ui/integration-console.js', 'body': None}, ...])\nviewport = {'width': 1440, 'height': 1000}\n\n    @pytest.mark.parametrize(\"server\", [SyntheticRuntime, BlenderRuntime], indirect=True)\n    @pytest.mark.parametrize(\n        \"viewport\", [{\"width\": 1440, \"height\": 1000}, {\"width\": 390, \"height\": 844}]\n    )\n    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):\n        origin, registry = server\n        page, directory, errors, console_errors, requests = browser_page\n        open_ready(page, origin, viewport)\n        uncertain = choose_pick(page, \"DROP_ACK_AFTER_EFFECT\")\n        assert uncertain[\"state\"] == \"UNKNOWN_OUTCOME\"\n        assert registry.engine(\"original\").runtime.journal(uncertain[\"command_id\"]).effect_count == 1\n        epoch = registry.engine(\"original\").runtime.world().scene_epoch\n        page.locator(\".manage-data > summary\").click()\n        page.locator(\"#clear-test\").click()\n        expect(page.locator(\"#delete-test-title\")).to_have_text(\"Clear Test 1 and retry?\")\n        screenshot(page, directory, \"clear-same-test-confirmation\")\n        page.locator(\"#cancel-delete-test\").click()\n        assert (\n            registry.engine(\"original\").store.job(uncertain[\"job_id\"]).state.value == \"UNKNOWN_OUTCOME\"\n        )\n        page.locator(\"#clear-test\").click()\n        write_count = len([r for r in requests if physical_request(r)])\n        page.locator(\"#confirm-delete-test\").click()\n>       expect(page.locator(\"#delete-test-dialog\")).not_to_be_visible()\nE       AssertionError: Locator expected not to be visible\nE       Actual value: visible \nE       Call log:\nE         - Expect \"not_to_be_visible\" locator(\"#delete-test-dialog\") with timeout 5000ms\nE         - waiting for locator(\"#delete-test-dialog\")\nE           14 \u00d7 locator resolved to <dialog open=\"\" id=\"delete-test-dialog\" aria-labelledby=\"delete-test-title\">\u2026</dialog>\nE              - unexpected value \"visible\"\nE       \nE       Aria snapshot:\nE       - dialog \"Clear Test 1 and retry?\":\nE         - heading \"Clear Test 1 and retry?\" [level=2]\nE         - paragraph: Keep Test 1 \u00b7 HKM1800-inspired warehouse cell. Remove its orders and results, restore every product and make this the current test, ready to run again.\nE         - paragraph: This removes this test's previous evidence and recordings, including unresolved outcomes. Other tests and your scenario choices stay unchanged. No pick is performed.\nE         - alert\nE         - button \"Cancel\" [disabled]\nE         - button \"Clear test\" [disabled]\n\ntests\\browser\\test_investigation.py:493: AssertionError"
+        }
+      ]
+    }
+  ],
+  "declared_suites": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "0",
+      "tests": "815",
+      "time": "1642.800",
+      "timestamp": "2026-10-06T03:52:12.713284+02:00",
+      "hostname": "DESKTOP-AZDXEDL"
+    }
+  ],
+  "coverage": {
+    "covered_lines": 4898,
+    "num_statements": 5360,
+    "percent_covered": 91.38059701492537,
+    "percent_covered_display": "91",
+    "missing_lines": 462,
+    "excluded_lines": 17,
+    "percent_statements_covered": 91.38059701492537,
+    "percent_statements_covered_display": "91"
+  },
+  "input_files": [
+    {
+      "path": "docs/evidence/acceptance/20261006T012424/tests-2.xml",
+      "sha256": "a219cfb1ea61eea0553b0f05b1a35d5fdd376e2ce390fa5552f19feaa393a517"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T012424/coverage-2.json",
+      "sha256": "2484d367b14b42b1eb78b46e0395124b8200b733f5f423af1dce0def571be1f6"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T012424/tests_2.log",
+      "sha256": "f02939519744b6f61bc1872c549aa87879d2cbe568bc0a38f511d161fd0a7845"
+    }
+  ],
+  "cause": "UNDER_INVESTIGATION; visible busy clear dialog exceeded5s, no cause asserted from timeout alone",
+  "scope": "Read-only saved terminal second-suite artifacts; no product edit/retry/manual/PDF or PASS promotion."
+}

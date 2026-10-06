@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-05:** Test deletion and same-test clearing accepted at audited source 0d03402: all 118 MUSTs PASS, 693 tests twice on Windows and Linux, 146 UI checks, nine browser journeys per suite and eight Blender demos. Delete removes the test and releases its number; Clear restores the same test for retry. CI, native launcher and publication verified; earlier failures remain archived. Status: DONE.
+> **Implementation status, 2026-10-06:** Integration Lab passed local acceptance at source 9e83fe7: two clean 815-test suites, 20 local gates and five fresh manual/CLI scenarios. A subsequent documentation correction fixes two report links and rejects links outside the publication root; its five regression tests pass. Final-source Linux CI, Windows checks and GitHub Pages verification remain pending. Status: NOT DONE.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

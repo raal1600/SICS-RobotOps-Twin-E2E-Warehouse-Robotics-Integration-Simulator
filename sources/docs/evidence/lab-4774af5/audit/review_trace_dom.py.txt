@@ -1,0 +1,98 @@
+"""Decode saved Playwright DOM snapshots only; no browser or rendering."""
+import collections
+import functools
+import hashlib
+import json
+import zipfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = Path(__file__).resolve().parent
+IDS = {"execution-profile", "simulation-boundaries", "scenario-brief", "scenario-watch", "motion-scenario", "motion-state", "motion-renderer", "integration-live", "integration-live-state", "integration-protocol-live", "integration-session-state", "integration-pending", "integration-status", "integration-progress", "orders", "scenario"}
+
+
+def own_nodes(node, result):
+    if isinstance(node, str):
+        result.append(node)
+    elif isinstance(node, list) and node and isinstance(node[0], str):
+        for child in node[2:]:
+            own_nodes(child, result)
+        result.append(node)
+
+
+def review(path):
+    groups = collections.defaultdict(list)
+    output = []
+    errors = []
+    with zipfile.ZipFile(ROOT / path) as z:
+        for line in z.read("trace.trace").decode().splitlines():
+            event = json.loads(line)
+            if event.get("type") != "frame-snapshot":
+                continue
+            snapshot = event["snapshot"]
+            if not snapshot.get("isMainFrame"):
+                continue
+            nodes = []
+            own_nodes(snapshot["html"], nodes)
+            groups[snapshot["frameId"]].append((snapshot, nodes))
+    for frame, snapshots in groups.items():
+        @functools.lru_cache(maxsize=None)
+        def ref(sid, index):
+            return materialize(snapshots[sid][1][index], sid)
+
+        def materialize(node, sid):
+            if isinstance(node, str):
+                return node
+            if isinstance(node, list) and node:
+                if isinstance(node[0], list):
+                    delta, index = node[0]
+                    return ref(sid - delta, index)
+                return [node[0], node[1] if len(node) > 1 else {}, *[materialize(c, sid) for c in node[2:]]]
+            return node
+
+        def content(node):
+            if isinstance(node, str):
+                return node
+            return "".join(content(c) for c in node[2:]) if isinstance(node, list) else ""
+
+        def collect(node, selected, ancestor_hidden=False, closed_details=False):
+            if not isinstance(node, list) or not node or not isinstance(node[0], str):
+                return
+            attrs = node[1]
+            hidden = ancestor_hidden or "hidden" in attrs or attrs.get("aria-hidden") == "true"
+            if attrs.get("id") in IDS:
+                selected[attrs["id"]] = {"tag": node[0], "attrs": attrs, "text": content(node), "hidden_by_attribute_or_ancestor": hidden, "inside_closed_details": closed_details}
+            next_closed = closed_details or (node[0].upper() == "DETAILS" and "open" not in attrs)
+            for child in node[2:]:
+                collect(child, selected, hidden, next_closed)
+
+        for sid, (snapshot, _) in enumerate(snapshots):
+            selected = {}
+            try:
+                collect(materialize(snapshot["html"], sid), selected)
+            except (IndexError, RecursionError, TypeError, ValueError) as exc:
+                errors.append({"frame": frame, "snapshot_index": sid, "error": str(exc)})
+                continue
+            if selected:
+                output.append({"frame": frame, "snapshot_index": sid, "timestamp": snapshot["timestamp"], "call_id": snapshot.get("callId"), "phase": snapshot.get("phase"), "elements": selected})
+    uniques = {ident: sorted({row["elements"][ident]["text"] for row in output if ident in row["elements"]}) for ident in ["execution-profile", "scenario-brief", "scenario-watch", "motion-scenario", "motion-renderer", "integration-live-state"]}
+    return {"trace": path, "snapshot_count": sum(map(len, groups.values())), "decoded_relevant_snapshots": len(output), "errors": errors, "unique_labels": uniques, "last_snapshot": output[-1] if output else None,
+            "boundary_snapshots": [{"snapshot_index": r["snapshot_index"], "timestamp": r["timestamp"], "text": r["elements"]["simulation-boundaries"]["text"], "collapsed": "open" not in r["elements"]["simulation-boundaries"]["attrs"]} for r in output if "simulation-boundaries" in r["elements"]],
+            "known_unsupported_brief_snapshots": [{"snapshot_index": r["snapshot_index"], "timestamp": r["timestamp"], "brief": r["elements"]["scenario-brief"]} for r in output if "scenario-brief" in r["elements"] and r["elements"]["scenario-brief"]["text"] == "Choose a supported scenario."]}
+
+
+def main():
+    inventory = json.loads((OUT / "final-trace-audit-inventory.json").read_text())
+    cases = []
+    for case in inventory["cases"]:
+        row = review(case["trace"]["path"])
+        row.update({"case": case["case"], "acceptance_pass": case["acceptance_pass"], "runtime": case["runtime"], "session_id": case["session_id"]})
+        cases.append(row)
+        print(json.dumps({"case": row["case"], "pass": row["acceptance_pass"], "snapshots": row["snapshot_count"], "errors": len(row["errors"]), "unsupported_briefs": len(row["known_unsupported_brief_snapshots"])}), flush=True)
+    result = {"source_commit": inventory["source_commit"], "method": "Read-only reconstruction of explicit nodes and prior-snapshot delta references from saved main-frame trace.trace DOM snapshots; no browser replay, rendering or screenshot OCR.", "cases": cases,
+              "limits": ["DOM presence and hidden attributes are evidence, not computed CSS/pixel visibility.", "Snapshots are recorded interaction checkpoints, not every animation frame or every millisecond.", "Known historical scenario brief/replay captions remain presentation defects regardless of correct persisted scenario/protocol state."]}
+    (OUT / "final-trace-dom-review.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

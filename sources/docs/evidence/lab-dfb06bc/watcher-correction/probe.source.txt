@@ -1,0 +1,144 @@
+"""Isolated Windows SQLite lifetime probe; never opens acceptance fixture databases."""
+from __future__ import annotations
+
+import ast
+import datetime
+import gc
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import sqlite3
+import tempfile
+from contextlib import closing
+from types import SimpleNamespace
+
+HERE = Path(__file__).resolve().parent
+ORIGINAL = HERE / "watch_journals.before.py"
+FIXED = HERE.parents[1] / "f00ad15/watch_journals.py"
+
+
+def load_query(source, sqlite_module=sqlite3):
+    tree = ast.parse(source.read_text(encoding="utf-8"))
+    query = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "query_journals")
+    namespace = {"sqlite3": sqlite_module, "closing": closing, "json": json,
+                 "sha": lambda path: hashlib.sha256(path.read_bytes()).hexdigest()}
+    exec(compile(ast.Module(body=[query], type_ignores=[]), str(source), "exec"), namespace)
+    return namespace["query_journals"]
+
+
+def make_databases(directory, malformed=False):
+    directory.mkdir()
+    receipt = json.dumps({"command_id": "probe-command", "job_id": "probe-job", "effect_count": 1})
+    with closing(sqlite3.connect(directory / "runtime.db")) as db, db:
+        db.executescript("CREATE TABLE controller_journal(id TEXT,payload_hash TEXT,receipt TEXT); CREATE TABLE robot_events(id INTEGER);")
+        db.execute("INSERT INTO controller_journal VALUES (?,?,?)", ("probe-command", "probe-hash", "{" if malformed else receipt))
+        db.execute("INSERT INTO robot_events VALUES (1)")
+    with closing(sqlite3.connect(directory / "plc.db")) as db, db:
+        db.executescript("CREATE TABLE plc_commands(command_id TEXT,payload_hash TEXT,state TEXT,result_sequence INTEGER,acknowledged INTEGER,result TEXT); CREATE TABLE plc_results(command_id TEXT,sequence INTEGER,receipt TEXT);")
+        db.execute("INSERT INTO plc_commands VALUES (?,?,?,?,?,?)", ("probe-command", "probe-hash", "SUCCEEDED", 1, 0, receipt))
+        db.execute("INSERT INTO plc_results VALUES (?,?,?)", ("probe-command", 1, receipt))
+
+
+def try_remove(path, probe_root):
+    resolved = path.resolve()
+    if not resolved.is_relative_to(probe_root.resolve()) or resolved.name not in {"runtime.db", "plc.db"}:
+        raise RuntimeError("Refusing operation outside exact owned probe database paths")
+    try:
+        resolved.unlink()
+        return {"removed": True}
+    except OSError as error:
+        return {"removed": False, "exception": type(error).__name__, "winerror": getattr(error, "winerror", None), "errno": error.errno}
+
+
+def main():
+    if os.name != "nt":
+        raise SystemExit("This probe requires Windows handle/delete semantics")
+    root = Path(tempfile.mkdtemp(prefix="sqlite-lifetime-", dir=HERE)).resolve()
+    old_query, fixed_query = load_query(ORIGINAL), load_query(FIXED)
+    evidence = {"started_at_utc": datetime.datetime.now(datetime.UTC).isoformat(),
+                "platform": platform.platform(), "python": platform.python_version(),
+                "sqlite_version": sqlite3.sqlite_version, "probe_root": str(root),
+                "original_helper_sha256": hashlib.sha256(ORIGINAL.read_bytes()).hexdigest(),
+                "fixed_helper_sha256": hashlib.sha256(FIXED.read_bytes()).hexdigest(),
+                "scope": "Disposable databases constructed under this ignored evidence directory only. Exact helper AST function bodies executed; watcher main/poll never imported or run. No application fixture, browser, product test or service used.",
+                "gc_control": "Automatic cyclic GC disabled during each observation, making delayed resource lifetime reproducible; explicit gc.collect only at stated old-helper release step."}
+    gc_was_enabled = gc.isenabled()
+    gc.collect()
+    gc.disable()
+    try:
+        old_dir = root / "old-helper"
+        make_databases(old_dir)
+        old_facts = old_query(old_dir)
+        old_before = {name: try_remove(old_dir / name, root) for name in ("runtime.db", "plc.db")}
+        collected = gc.collect()
+        old_after = {name: try_remove(old_dir / name, root) for name, fact in old_before.items() if not fact["removed"]}
+        evidence["original_helper"] = {"returned_journal_facts": len(old_facts), "after_return_before_gc": old_before,
+                                       "explicit_gc_collected": collected, "after_explicit_gc": old_after}
+
+        fixed_dir = root / "fixed-helper"
+        make_databases(fixed_dir)
+        fixed_facts = fixed_query(fixed_dir)
+        fixed_after = {name: try_remove(fixed_dir / name, root) for name in ("runtime.db", "plc.db")}
+        evidence["fixed_helper"] = {"returned_journal_facts": len(fixed_facts), "after_return_without_gc": fixed_after}
+
+        events = []
+
+        class ObservedConnection(sqlite3.Connection):
+            def __exit__(self, exc_type, exc, traceback):
+                result = super().__exit__(exc_type, exc, traceback)
+                events.append({"event": "transaction_exit", "exception_type": exc_type.__name__ if exc_type else None,
+                               "in_transaction_after_exit": self.in_transaction,
+                               "query_only": self.execute("PRAGMA query_only").fetchone()[0]})
+                return result
+
+            def close(self):
+                super().close()
+                events.append({"event": "close"})
+
+        observed_query = load_query(FIXED, SimpleNamespace(connect=lambda *args, **kwargs: sqlite3.connect(*args, **kwargs, factory=ObservedConnection)))
+        error_dir = root / "fixed-error"
+        make_databases(error_dir, malformed=True)
+        try:
+            observed_query(error_dir)
+        except json.JSONDecodeError as error:
+            error_type = type(error).__name__
+        else:
+            raise AssertionError("Expected malformed receipt JSON to exercise rollback/close")
+        error_after = {name: try_remove(error_dir / name, root) for name in ("runtime.db", "plc.db")}
+        evidence["fixed_exception_path"] = {"exception_type": error_type, "connection_events": list(events), "after_exception_without_gc": error_after}
+
+        success_dir = root / "fixed-success-instrumented"
+        make_databases(success_dir)
+        events.clear()
+        observed_query(success_dir)
+        success_events = list(events)
+        success_after = {name: try_remove(success_dir / name, root) for name in ("runtime.db", "plc.db")}
+        evidence["fixed_success_context_order"] = {"connection_events": success_events, "after_return_without_gc": success_after}
+
+        checks = {
+            "original_return_keeps_both_files_locked": all(not item["removed"] and item.get("winerror") == 32 for item in old_before.values()),
+            "explicit_gc_releases_original_files": len(old_after) == 2 and all(item["removed"] for item in old_after.values()),
+            "fixed_return_releases_both_without_gc": all(item["removed"] for item in fixed_after.values()),
+            "fixed_exception_releases_without_gc": all(item["removed"] for item in error_after.values()),
+            "fixed_error_rolls_back_then_closes": evidence["fixed_exception_path"]["connection_events"] == [
+                {"event": "transaction_exit", "exception_type": "JSONDecodeError", "in_transaction_after_exit": False, "query_only": 1}, {"event": "close"}],
+            "fixed_success_commits_then_closes_each": success_events == [
+                {"event": "transaction_exit", "exception_type": None, "in_transaction_after_exit": False, "query_only": 1}, {"event": "close"}] * 2,
+        }
+        evidence["checks"] = checks
+        evidence["all_checks_passed"] = all(checks.values())
+        evidence["limits"] = ["Controlled reproduction establishes the original helper's resource-lifetime defect. Exact historical acceptance locker ownership requires root's separate before/after process-handle evidence.", "Disabling automatic GC exposes the indefinite-until-GC lifetime; normal GC scheduling can release handles earlier but is not a correctness guarantee."]
+        evidence["finished_at_utc"] = datetime.datetime.now(datetime.UTC).isoformat()
+        (HERE / "probe-result.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"all_checks_passed": evidence["all_checks_passed"], "checks": checks, "result": str(HERE / "probe-result.json")}, indent=2))
+        if not all(checks.values()):
+            raise SystemExit(1)
+    finally:
+        if gc_was_enabled:
+            gc.enable()
+
+
+if __name__ == "__main__":
+    main()

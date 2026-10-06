@@ -1,0 +1,474 @@
+"""Offline terminal acceptance review, pinned to one campaign; never runs tests/services."""
+import argparse
+from collections import Counter
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = Path(__file__).resolve().parent / "local-acceptance-review.json"
+COMMIT = "9e83fe7d41a52a63ba65b77730e392dafca8fffe"
+FINGERPRINT = "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+CAMPAIGN = ROOT / "docs/evidence/acceptance/20261006T024719"
+STARTED = "2026-10-06T02:47:20.134216+00:00"
+TERMINAL = ROOT / "artifacts/acceptance-response-sync-exit.json"
+LOCAL = (
+    "setup", "browser_setup", "blender_version", "security", "tests_1", "tests_2",
+    "repeatability", "lint", "typecheck", "demo_happy_path", "demo_lost_ack_after_effect",
+    "demo_lost_ack_before_effect", "demo_ambiguous", "demo_restart", "demo_logical_estop",
+    "demo_cell_fault", "demo_tool_showcase", "drift", "publication", "publication_final",
+)
+REMOTE = {"ci", "publication_remote", "pages"}
+REMOTE_MUST = {
+    "SC-DATA-005": {"ci"},
+    "SC-KB-006": {"publication_remote"},
+    "SC-KB-007": {"publication_remote"},
+    "SC-KB-008": {"pages", "publication_remote"},
+    "HKM-VIS-MUST-025": {"ci", "publication_remote", "pages"},
+    "UI-INV-MUST-008": {"ci", "publication_remote", "pages"},
+}
+LAB_CASES = [
+    "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[" + fault + "]"
+    for fault in ("", "DROP_ACK_AFTER_EFFECT", "DUPLICATE_DELIVERY", "WMS_UNAVAILABLE")
+]
+SELECTED = LAB_CASES + [
+    "tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-desktop]",
+    "tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-compact]",
+    "tests/browser/test_guided_console.py::test_guided_happy_reload_gate_trace_and_business_completion[blender]",
+    "tests/browser/test_guided_console.py::test_guided_lost_ack_reconciles_original_command_without_second_effect[blender]",
+]
+# Expected fault outcomes are success of the scenario, not all COMPLETED.
+DEMOS = {
+    "happy_path": ("COMPLETED", "COMPLETED", 1, 1, "VERIFIED_SUCCESS"),
+    "lost_ack_after_effect": ("UNKNOWN_OUTCOME", "COMPLETED", 1, 1, "VERIFIED_SUCCESS"),
+    "lost_ack_before_effect": ("UNKNOWN_OUTCOME", "FAILED", 0, 1, "VERIFIED_FAILURE"),
+    "ambiguous": ("UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION", 1, 1, "INCONCLUSIVE"),
+    "restart": ("UNKNOWN_OUTCOME", "COMPLETED", 1, 1, "VERIFIED_SUCCESS"),
+    "logical_estop": ("FAILED", "FAILED", 0, 1, "VERIFIED_FAILURE"),
+    "cell_fault": ("FAILED", "FAILED", 0, 1, "VERIFIED_FAILURE"),
+    "tool_showcase": ("COMPLETED", "COMPLETED", 6, 6, "VERIFIED_SUCCESS"),
+}
+INPUTS = {}
+
+
+def require(condition, label):
+    if not condition:
+        raise ValueError(label)
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def raw_file(path, nonempty=True):
+    path = Path(path).resolve()
+    require(path.is_relative_to(ROOT), "input path outside repository")
+    require(path.is_file(), "missing input: " + path.relative_to(ROOT).as_posix())
+    raw = path.read_bytes()
+    require(bool(raw) or not nonempty, "empty required input: " + path.relative_to(ROOT).as_posix())
+    item = {"path": path.relative_to(ROOT).as_posix(), "sha256": digest(raw), "bytes": len(raw)}
+    if item["path"] in INPUTS:
+        require(INPUTS[item["path"]] == item, "input changed during review: " + item["path"])
+    INPUTS[item["path"]] = item
+    return raw
+
+
+def decode(raw):
+    return raw.decode("utf-16" if raw.startswith((b"\xff\xfe", b"\xfe\xff")) else "utf-8-sig")
+
+
+def read_json(path):
+    return json.loads(decode(raw_file(path)))
+
+
+def ref(path):
+    return INPUTS[Path(path).resolve().relative_to(ROOT).as_posix()]
+
+
+def date(value):
+    result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    require(result.tzinfo is not None, "timestamp lacks timezone")
+    return result.astimezone(timezone.utc)
+
+
+def during(value, begin, end, label):
+    require(begin <= date(value) <= end, label + ": timestamp outside campaign")
+
+
+def git(*args):
+    return subprocess.check_output(["git", *args], cwd=ROOT, text=True, encoding="utf-8").strip()
+
+
+def source_identity():
+    names = git("ls-files", "--cached", "--others", "--exclude-standard").splitlines()
+    h = hashlib.sha256()
+    for name in sorted(set(names)):
+        path = ROOT / name
+        if path.is_file() and not name.startswith("docs/evidence/") and name != "ACCEPTANCE_REPORT.md":
+            h.update(name.encode() + b"\0" + path.read_bytes())
+    return {"commit": git("rev-parse", "HEAD"), "source_sha256": h.hexdigest(),
+            "dirty": bool(git("status", "--porcelain"))}
+
+
+def flag(command, prefix):
+    values = [arg[len(prefix):] for arg in command if arg.startswith(prefix)]
+    require(len(values) == 1 and bool(values[0]), "missing/duplicate command flag: " + prefix)
+    return values[0]
+
+
+def pair(command, name):
+    require(command.count(name) == 1, "missing/duplicate command option: " + name)
+    index = command.index(name)
+    require(index + 1 < len(command), "command option lacks value: " + name)
+    return command[index + 1]
+
+
+def junit(run, gate, begin, end):
+    path = CAMPAIGN / f"tests-{run}.xml"
+    command = gate["command"]
+    require(command[1:4] == ["-m", "tools.dev", "test"], "unexpected full-suite command")
+    require(Path(flag(command, "--junitxml=")).resolve() == path, "JUnit command path mismatch")
+    require(Path(flag(command, "--cov-report=json:")).resolve() == CAMPAIGN / f"coverage-{run}.json",
+            "coverage command path mismatch")
+    require("--cov=robotops" in command and "--cov=apps" in command, "required coverage scopes missing")
+    temp = Path(flag(command, "--basetemp="))
+    require(temp.name == "fixtures" and temp.parent.name.startswith(f"robotops-acceptance-{run}-"),
+            "wrong pass fixture basename")
+    require(len(command) == 10 and command[-1] == "--cov-report=term"
+            and command[4].startswith("--basetemp=") and command[5].startswith("--junitxml=")
+            and command[6:8] == ["--cov=robotops", "--cov=apps"]
+            and command[8].startswith("--cov-report=json:"),
+            "full-suite command includes unexpected selection/options")
+    document = ET.fromstring(raw_file(path))
+    require(document.tag in ("testsuites", "testsuite"), "unexpected JUnit root")
+    suites = list(document.iter("testsuite"))
+    require(bool(suites), "JUnit contains no suites")
+    # Reject nested suites rather than double-count their aggregate declarations.
+    require(not any(list(s.iter("testsuite"))[1:] for s in suites), "nested JUnit suite schema unsupported")
+    cases = {}
+    declared = []
+    counts = Counter()
+    for suite in suites:
+        children = list(suite.findall("testcase"))
+        require(int(suite.attrib["tests"]) == len(children), "declared/actual JUnit count differs")
+        require(all(int(suite.attrib[k]) == 0 for k in ("failures", "errors", "skipped")),
+                "JUnit declares failed/error/skipped cases")
+        during(suite.attrib["timestamp"], begin, end, "JUnit suite")
+        declared.append(dict(suite.attrib))
+        for case in children:
+            identity = case.attrib["classname"].replace(".", "/") + ".py::" + case.attrib["name"]
+            require(bool(case.attrib["classname"]) and bool(case.attrib["name"]), "empty JUnit identity")
+            require(identity not in cases, "duplicate exact JUnit testcase identity")
+            outcome = next((k for k in ("failure", "error", "skipped") if case.find(k) is not None), "passed")
+            counts[outcome] += 1
+            cases[identity] = outcome == "passed"
+    require(len(cases) == len(list(document.iter("testcase"))) > 0, "unowned/empty JUnit cases")
+    require(not any(list(document.iter(k)) for k in ("failure", "error", "skipped")),
+            "JUnit contains failure/error/skipped records")
+    require(all(cases.values()), "JUnit has unsuccessful cases")
+    require(all(cases.get(identity) is True for identity in SELECTED), "selected actual browser case missing/failed")
+    summary = {
+        "run": run, "junit": ref(path), "testcase_count": len(cases), "unique_testcase_count": len(cases),
+        "duplicate_testcase_count": 0, "outcomes": dict(counts), "declared_suites": declared,
+        "fixture_basename": temp.parent.name, "fixture_path": str(temp),
+        "testcase_id_outcome_sha256": digest(json.dumps(cases, sort_keys=True).encode()),
+        "lab_browser_case_ids": LAB_CASES,
+        "selected_browser_cases": {name: "PASSED" for name in SELECTED},
+    }
+    return cases, summary
+
+
+def coverage(run):
+    path = CAMPAIGN / f"coverage-{run}.json"
+    report = read_json(path)
+    require(report["meta"].get("branch_coverage") is False, "unsupported branch-coverage schema")
+    totals = report["totals"]
+    n, covered, missing = (totals[key] for key in ("num_statements", "covered_lines", "missing_lines"))
+    require(all(type(x) is int for x in (n, covered, missing)), "coverage counts are not integers")
+    require(n > 0 and 0 <= covered <= n and missing == n - covered, "invalid coverage totals")
+    actual = covered / n * 100
+    require(abs(actual - totals["percent_covered"]) < 1e-8, "recorded/recomputed coverage differs")
+    require(actual >= 85, "coverage below 85 percent")
+    return {"run": run, "artifact": ref(path), "totals": totals, "recomputed_percent": actual,
+            "minimum_percent": 85, "passed": True}
+
+
+def criteria(manifest, suites):
+    mapping_path, criteria_path = ROOT / "docs/acceptance-map.json", ROOT / "SUCCESS_CRITERIA.md"
+    mapping = read_json(mapping_path)
+    specification = decode(raw_file(criteria_path))
+    pattern = r"(?:SC-[A-Z]+-\d{3}|HKM-VIS-MUST-\d{3}|UI-INV-MUST-\d{3}|LAB-MUST-\d{3})"
+    levels = {}
+    for level, expected in (("MUST", 169), ("SHOULD", 4)):
+        found = re.findall(rf"\*\*({pattern}) {level}\*\*", specification)
+        require(len(found) == len(set(found)) == expected, "criterion IDs missing/duplicated: " + level)
+        levels[level] = set(found)
+    require(set(mapping) == levels["MUST"] | levels["SHOULD"], "criterion mapping coverage differs")
+    results = {}
+    for identity, item in mapping.items():
+        failures = [name for name in item["gates"] if manifest["gates"].get(name, {}).get("passed") is not True]
+        for test in item["tests"]:
+            for index, suite in enumerate(suites, 1):
+                matches = [value for name, value in suite.items() if name.split("::")[-1].split("[")[0] == test]
+                if not matches or not all(matches):
+                    failures.append(f"run {index}: {test} missing/failed/skipped")
+        results[identity] = {"passed": not failures, "failures": failures}
+    require(results == manifest["criteria"], "independent criteria differ from terminal manifest")
+    pending = {key: results[key] for key in sorted(levels["MUST"]) if not results[key]["passed"]}
+    require(set(pending) == set(REMOTE_MUST), "unexpected failed/pending MUST criteria")
+    require(all(set(item["failures"]) == REMOTE_MUST[key] for key, item in pending.items()),
+            "MUST failure includes non-remote evidence")
+    lab = sorted(key for key in levels["MUST"] if key.startswith("LAB-MUST-"))
+    require(len(lab) == 51 and all(results[key]["passed"] for key in lab), "51 LAB-MUST criteria not locally passed")
+    return {
+        "specification": ref(criteria_path), "mapping": ref(mapping_path),
+        "must_count": 169, "must_passed": 163, "must_remote_pending_count": 6,
+        "must_remote_pending": pending, "must_failures_only_remote": True,
+        "all_must_passed": False, "lab_must_count": 51, "lab_must_all_passed": True,
+        "should_count": 4, "should_results": {key: results[key] for key in sorted(levels["SHOULD"])},
+        "should_nonblocking_and_separate": True, "all_manifest_results_recomputed": True,
+        "all_results": results,
+    }
+
+
+def demo(scenario, gate, begin, end):
+    path = CAMPAIGN / f"demo-{scenario}.json"
+    directory = ROOT / "runs" / CAMPAIGN.name / scenario
+    command = gate["command"]
+    require(command[1:4] == ["-m", "tools.dev", "demo"], "unexpected demo command")
+    require(pair(command, "--runtime") == "blender" and pair(command, "--scenario") == scenario,
+            "demo command runtime/scenario mismatch")
+    require(Path(pair(command, "--directory")).resolve() == directory, "wrong current demo directory")
+    raw = raw_file(path)
+    run_path = directory / "result.json"
+    require(raw_file(run_path) == raw, "demo result copy differs from actual run result")
+    data = json.loads(decode(raw))
+    initial, final, effects, count, verdict = DEMOS[scenario]
+    require(data["scenario"] == scenario and data["runtime"] == "blender", "demo identity mismatch")
+    require((data["initial_state"], data["final_state"]) == (initial, final), "demo scenario states differ")
+    require(data["command_count"] == count and data["pick_effect_count"] == effects, "demo aggregate counts differ")
+    require(data["duplicate_physical_picks"] == 0 and data["no_replacement_commands"] is True,
+            "duplicate/replacement command claim fails")
+    evidence = data["evidence"]
+    require(len(evidence) == count, "wrong demo job/evidence count")
+    commands = [entry["command"]["command_id"] for entry in evidence]
+    jobs = [entry["job"]["job_id"] for entry in evidence]
+    require(len(set(commands)) == count and len(set(jobs)) == count, "demo duplicate original identity")
+    require(data["command_id"] == data["original_command_id"] == commands[0], "primary original command changed")
+    require(data["order"]["status"] == final and set(data["order"]["job_ids"]) == set(jobs)
+            and len(data["order"]["job_ids"]) == count, "order/jobs mismatch")
+    events = data["controller_events"]
+    event_ids = [event["event_id"] for event in events]
+    require(len(event_ids) == len(set(event_ids)), "duplicate controller event identity")
+    created = [event for event in events if event["event_type"] == "COMMAND_CREATED"]
+    applied = [event for event in events if event["event_type"] == "PICK_EFFECT"]
+    require(Counter(event["command_id"] for event in created) == Counter(commands), "created commands differ")
+    require(len(applied) == effects and all(event["command_id"] in commands for event in applied),
+            "effect events differ from original commands")
+    require(all(n == 1 for n in Counter(event["command_id"] for event in applied).values()),
+            "repeated physical effect event")
+    for event in events:
+        during(event["timestamp"], begin, end, "demo controller event")
+    journals = []
+    recovering = scenario in ("lost_ack_after_effect", "lost_ack_before_effect", "ambiguous", "restart")
+    for entry in evidence:
+        job, cmd, journal = entry["job"], entry["command"], entry["journal"]
+        cid, jid = cmd["command_id"], job["job_id"]
+        require(job["state"] == final and job["command_id"] == cid, "job command/state mismatch")
+        require(cmd["job_id"] == journal["job_id"] == jid and journal["command_id"] == cid,
+                "journal original identity mismatch")
+        require(job["run_id"] == cmd["run_id"] == journal["run_id"], "journal/job run identity mismatch")
+        require(cmd["order_id"] == job["order_id"] == data["order"]["order_id"], "order identity mismatch")
+        require(journal["journal_durable"] is True and re.fullmatch(r"[0-9a-f]{64}", journal["payload_hash"]),
+                "missing durable journal/payload hash")
+        require(journal["effect_count"] in (0, 1), "invalid per-command effect count")
+        require(sum(event["command_id"] == cid for event in applied) == journal["effect_count"],
+                "journal/effect event count mismatch")
+        if journal["effect_count"]:
+            require(journal["status"] == "SUCCEEDED" and journal["reason"] == "BLENDER_PICK_APPLIED",
+                    "positive effect lacks actual Blender receipt")
+            own_created = [event for event in created if event["command_id"] == cid]
+            dispatched = [event for event in events if event["event_type"] == "COMMAND_DISPATCHED"
+                          and event["command_id"] == cid]
+            require(len(own_created) == 1 and own_created[0]["reason"] == "DURABLE_BLENDER_INTENT",
+                    "positive effect lacks durable Blender intent")
+            require(len(dispatched) == 1 and dispatched[0]["reason"] == "BOUNDED_PROCESS",
+                    "positive effect lacks single bounded Blender dispatch")
+        else:
+            expected_reason = "PROVEN_NOT_STARTED" if scenario == "lost_ack_before_effect" else "CELL_NOT_READY"
+            require(journal["status"] == "REJECTED" and journal["reason"] == expected_reason,
+                    "zero-effect fault receipt differs")
+        for record in (job, cmd, journal):
+            during(record["timestamp"], begin, end, "demo job/command/journal")
+        verifications = entry["verifications"]
+        require(bool(verifications), "demo lacks verification")
+        for verification in verifications:
+            require(verification["command_id"] == cid and verification["job_id"] == jid
+                    and verification["verdict"] == verdict, "verification identity/verdict mismatch")
+            during(verification["timestamp"], begin, end, "demo verification")
+        reconciliations = entry["reconciliations"]
+        require(len(reconciliations) == int(recovering), "unexpected reconciliation count")
+        for recovery in reconciliations:
+            require(recovery["job_id"] == jid and recovery["command"]["command_id"] == cid
+                    and recovery["receipt"]["command_id"] == cid,
+                    "reconciliation replaced original command")
+            during(recovery["timestamp"], begin, end, "demo reconciliation")
+        journals.append({"job_id": jid, "command_id": cid, "run_id": cmd["run_id"],
+                         "payload_hash": journal["payload_hash"], "status": journal["status"],
+                         "reason": journal["reason"], "effect_count": journal["effect_count"],
+                         "journal_durable": True, "verdict": verdict,
+                         "reconciliation_count": len(reconciliations)})
+    require(sum(item["effect_count"] for item in journals) == effects, "summed journal effects mismatch")
+    showcase = data["tool_showcase"]
+    if scenario == "tool_showcase":
+        require(len(showcase) == 6 and len({x["sku"] for x in showcase}) == 6
+                and len({x["tool_id"] for x in showcase}) == 6
+                and {x["command_id"] for x in showcase} == set(commands)
+                and all(x["effect_count"] == 1 for x in showcase), "six-tool showcase evidence incomplete")
+    else:
+        require(showcase == [], "unexpected tool showcase records")
+    return {"scenario": scenario, "artifact": ref(path), "run_result": ref(run_path),
+            "run_result_copy_identical": True, "runtime": "blender", "initial_state": initial,
+            "final_state": final, "command_count": count, "pick_effect_count": effects,
+            "duplicate_physical_picks": 0, "original_command_id": commands[0],
+            "journals": journals, "tool_showcase": showcase, "passed": True,
+            "physical_execution": "BLENDER_RECEIPTS" if effects else "PROVEN_ZERO_EFFECT_FAULT_PATH"}
+
+
+def ancillary(manifest):
+    security_path = CAMPAIGN / "security-review.json"
+    security = read_json(security_path)
+    require(security["passed"] is True and security["pip_audit_exit"] == 0 and security["npm_audit_exit"] == 0
+            and security["vendor_integrity"] is True and all(x["reviewed"] is True for x in security["findings"]),
+            "security review incomplete/failed")
+    raw_file(ROOT / "uv.lock")
+    require(security["lock_sha256"] == ref(ROOT / "uv.lock")["sha256"] == manifest["environment"]["lock_sha256"],
+            "security/manifest/current lock hash mismatch")
+    drift_path = CAMPAIGN / "drift.json"
+    drift = read_json(drift_path)
+    require(drift["passed"] is True and drift["errors"] == [] and drift["must_count"] == 169, "drift review failed")
+    publication_path = CAMPAIGN / "publication-build.json"
+    publication = read_json(publication_path)
+    reports = publication["reports"]
+    require(publication["source_commit"] == COMMIT and len(reports) == 3
+            and len({x["report"] for x in reports}) == 3
+            and all(type(x["pages"]) is int and x["pages"] > 0
+                    and re.fullmatch(r"[0-9a-f]{64}", x["pdf_sha256"]) for x in reports),
+            "publication metadata source/reports incomplete")
+    require(sum(x["pages"] for x in reports) == publication["combined_pdf_pages"]
+            == publication["pdf_package_checks"]["pages"]
+            and publication["pdf_package_checks"]["destinations_preserved"] is True
+            and bool(publication["checks"]), "publication metadata checks incomplete")
+    return {
+        "security": {"artifact": ref(security_path), **security,
+                     "scope": "Saved security review; recorded Bandit findings may be reviewed exceptions."},
+        "drift": {"artifact": ref(drift_path), "passed": True, "errors": [], "must_count": 169},
+        "publication": {"artifact": ref(publication_path), "source_commit": COMMIT, "reports": reports,
+                        "combined_pdf_pages": publication["combined_pdf_pages"],
+                        "pdf_package_checks": publication["pdf_package_checks"], "checks": publication["checks"],
+                        "scope": "Saved build metadata only; no PDF rendering, visual review or remote publication claim."},
+    }
+
+
+def review():
+    # First gate is the exact terminal wrapper record; do not treat an in-progress manifest as terminal.
+    terminal = read_json(TERMINAL)
+    require(terminal["exit_code"] == 0 and terminal["source"] == COMMIT, "terminal wrapper failed/wrong source")
+    begin_wrapper, end = date(terminal["started_at"]), date(terminal["ended_at"])
+    require(begin_wrapper <= end <= datetime.now(timezone.utc), "invalid terminal time interval")
+    require(not OUT.exists(), "review output already exists; preserve it and review explicitly before another run")
+    manifest_path = CAMPAIGN / "manifest.json"
+    manifest = read_json(manifest_path)
+    require(manifest["started_at"] == STARTED, "wrong manifest campaign start")
+    require(manifest["source"] == {"commit": COMMIT, "dirty": False, "source_sha256": FINGERPRINT},
+            "manifest lacks exact clean-start source")
+    begin = date(manifest["started_at"])
+    require(begin_wrapper <= begin <= end, "manifest/terminal time binding differs")
+    current = source_identity()
+    require(current["commit"] == COMMIT and current["source_sha256"] == FINGERPRINT, "current source changed")
+    gates = manifest["gates"]
+    require(set(gates) == set(LOCAL) | REMOTE and len(LOCAL) == 20, "incomplete/unexpected gate set")
+    for name in LOCAL:
+        gate = gates[name]
+        require(gate["passed"] is True, "local gate not passed: " + name)
+        if name != "repeatability":
+            require(type(gate["exit_code"]) is int and gate["exit_code"] == 0, "local gate exit failure: " + name)
+        log_path = (ROOT / gate["log"]).resolve()
+        require(log_path.parent == CAMPAIGN, "gate log outside exact campaign: " + name)
+        raw_file(log_path, nonempty=False)
+    require(all(gates[name]["passed"] is False for name in REMOTE), "remote state differs from local-only campaign")
+    remote_path = CAMPAIGN / "remote.json"
+    remote = read_json(remote_path)
+    require(remote == {"reason": "Remote gates not run; NOT DONE until final commit is verified."},
+            "local remote-status receipt differs")
+    suite_maps, suite_summaries = [], []
+    for run in (1, 2):
+        cases, summary = junit(run, gates[f"tests_{run}"], begin, end)
+        suite_maps.append(cases)
+        suite_summaries.append(summary)
+    require(suite_maps[0] == suite_maps[1], "full JUnit testcase sets/outcomes differ between passes")
+    require(suite_summaries[0]["fixture_basename"] != suite_summaries[1]["fixture_basename"],
+            "test passes reuse fixture root")
+    repeatability_path = CAMPAIGN / "repeatability.json"
+    repeatability = read_json(repeatability_path)
+    require(repeatability["passed"] is True and repeatability["tests"] == suite_maps
+            and repeatability["test_count"] == len(suite_maps[0]), "repeatability does not match parsed JUnits")
+    report = {
+        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+        "scope": "Independent offline review of terminal local acceptance. No services/tests/browser/DB/rendering.",
+        "source": {"commit": COMMIT, "source_sha256": FINGERPRINT,
+                   "manifest_start": manifest["source"], "current": current,
+                   "current_dirty_note": "Generated evidence/ACCEPTANCE_REPORT may change dirty status; exact source hash required."},
+        "manifest": ref(manifest_path), "terminal_exit": {"artifact": ref(TERMINAL), **terminal},
+        "local_gates": {key: gates[key] for key in LOCAL}, "local_gate_count": 20,
+        "remote_gates": {key: {"status": "PENDING_NOT_RUN", **gates[key]} for key in sorted(REMOTE)},
+        "remote_evidence": {"artifact": ref(remote_path), **remote},
+        "suites": suite_summaries, "same_testcase_ids_and_outcomes": True,
+        "coverage": [coverage(run) for run in (1, 2)],
+        "repeatability": {"artifact": ref(repeatability_path), "passed": True, "test_count": len(suite_maps[0])},
+        "criteria": criteria(manifest, suite_maps),
+        "demos": [demo(scenario, gates["demo_" + scenario], begin, end) for scenario in DEMOS],
+        "demo_scope": "Eight CLI scenarios select Blender/local workflow. Positive effects require Blender journals/events; three fault paths prove zero effect. They do not themselves attest separate-process AMQP/OPC UA or manual UI proof.",
+        "selected_browser_scope": "Four separate-process lab cases per pass; lab happy uses Blender, lab fault cases use synthetic runtime. Additional selected browser cases explicitly use Blender. JUnit PASS is not a full saved-DOM/secret/manual audit.",
+        "findings": [],
+        "remaining_scope": ["Fresh exact-source manual UI and both README CLI proofs",
+                            "Saved UI/trace truth-label and secret audit; final PDF visual review",
+                            "Exact final-source remote CI, remote publication and Pages verification"],
+        "goal_status": "NOT_ACHIEVED",
+    }
+    report.update(ancillary(manifest))
+    # Recheck every input hash and exact source before creating an output. No prior PASS survives a refusal.
+    require(source_identity() == current, "source identity changed during review")
+    for item in list(INPUTS.values()):
+        raw_file(ROOT / item["path"], nonempty=False)
+    report["inputs"] = [INPUTS[key] for key in sorted(INPUTS)]
+    report["local_acceptance_passed"] = True
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--review-terminal", action="store_true", help="explicit opt-in after the wrapper has exited")
+    args = parser.parse_args()
+    require(args.review_terminal, "preparation only: --review-terminal required")
+    report = review()
+    # Exclusive creation: never overwrite a previous review; manifest and input artifacts stay read-only.
+    with OUT.open("x", encoding="utf-8", newline="\n") as stream:
+        json.dump(report, stream, indent=2, ensure_ascii=False)
+        stream.write("\n")
+    print(json.dumps({"output": OUT.relative_to(ROOT).as_posix(), "sha256": digest(OUT.read_bytes()),
+                      "local_acceptance_passed": True, "test_counts": [x["testcase_count"] for x in report["suites"]],
+                      "must_local_passed": 163, "must_remote_pending": 6, "goal_status": "NOT_ACHIEVED"}))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (ValueError, KeyError, TypeError, IndexError, OSError, ET.ParseError, subprocess.CalledProcessError) as exc:
+        print(f"REFUSED: no new acceptance PASS report written ({type(exc).__name__}: {exc})", file=sys.stderr)
+        sys.exit(2)

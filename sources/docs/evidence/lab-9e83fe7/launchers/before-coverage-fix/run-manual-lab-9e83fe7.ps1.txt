@@ -1,0 +1,69 @@
+# Preparation only. Explicitly run after the complete corrected local campaign passes.
+param([switch]$RunManual)
+if (!$RunManual) { throw 'Preparation only: use -RunManual after reviewing complete local acceptance.' }
+$ErrorActionPreference = 'Stop'
+Set-Location -LiteralPath 'C:\Users\ramis\source\repos\robotops-twin'
+$taskExpectedCommit = '9e83fe7d41a52a63ba65b77730e392dafca8fffe'
+$taskExpectedFingerprint = '136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd'
+$taskManifestPath = 'docs/evidence/acceptance/20261006T024719/manifest.json'
+$taskExpectedCampaignStart = '2026-10-06T02:47:20.134216+00:00'
+$taskExitPath = 'artifacts/acceptance-response-sync-exit.json'
+$taskReportPath = 'artifacts/lab-final-9e83fe7.json'
+$taskDataPath = 'artifacts/lab-final-9e83fe7'
+$taskActualCommit = (& git rev-parse HEAD).Trim()
+if ($LASTEXITCODE -ne 0 -or $taskActualCommit -ne $taskExpectedCommit) { throw 'Manual launcher requires the exact corrected commit.' }
+# The human acceptance report is the same documentation-only exception as the original launcher.
+& git diff --quiet HEAD -- . ':(exclude)ACCEPTANCE_REPORT.md'
+if ($LASTEXITCODE -ne 0) { throw 'Tracked source changed before final manual lab.' }
+if (!(Test-Path -LiteralPath $taskExitPath -PathType Leaf)) { throw 'Acceptance is not terminal; no manual lab may start.' }
+$taskAcceptanceExit = Get-Content -LiteralPath $taskExitPath -Raw | ConvertFrom-Json
+$taskAcceptanceManifest = Get-Content -LiteralPath $taskManifestPath -Raw | ConvertFrom-Json
+if ($taskAcceptanceExit.exit_code -ne 0 -or $taskAcceptanceExit.source -ne $taskExpectedCommit) { throw 'Corrected complete local acceptance did not exit0 on this source.' }
+if ($taskAcceptanceManifest.started_at -ne $taskExpectedCampaignStart) { throw 'Manifest is not the exact prepared campaign.' }
+if (!$taskAcceptanceExit.started_at -or !$taskAcceptanceExit.ended_at -or !$taskAcceptanceManifest.started_at) { throw 'Acceptance timestamps are incomplete.' }
+if ([DateTimeOffset]$taskAcceptanceExit.ended_at -lt [DateTimeOffset]$taskAcceptanceManifest.started_at -or [DateTimeOffset]$taskAcceptanceExit.started_at -gt [DateTimeOffset]$taskAcceptanceManifest.started_at) { throw 'Terminal record does not bracket this campaign.' }
+if ($taskAcceptanceManifest.source.commit -ne $taskExpectedCommit -or $taskAcceptanceManifest.source.dirty -ne $false -or $taskAcceptanceManifest.source.source_sha256 -ne $taskExpectedFingerprint) { throw 'Acceptance source identity differs from the expected clean corrected source.' }
+$taskCurrentSource = & '.venv\Scripts\python.exe' -c 'import json; from tools.acceptance import source_identity; print(json.dumps(source_identity()))' | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or $taskCurrentSource.source_sha256 -ne $taskExpectedFingerprint) { throw 'Current fingerprint differs from the accepted corrected source.' }
+$taskLocalGates = @('setup','browser_setup','blender_version','security','tests_1','tests_2','repeatability','lint','typecheck','demo_happy_path','demo_lost_ack_after_effect','demo_lost_ack_before_effect','demo_ambiguous','demo_restart','demo_logical_estop','demo_cell_fault','demo_tool_showcase','drift','publication','publication_final')
+foreach ($taskGateName in $taskLocalGates) {
+    $taskGate = $taskAcceptanceManifest.gates.$taskGateName
+    if ($null -eq $taskGate -or $taskGate.passed -ne $true) { throw ('Required local gate is not passed: ' + $taskGateName) }
+    if ($null -ne $taskGate.exit_code -and $taskGate.exit_code -ne 0) { throw ('Local gate has nonzero exit: ' + $taskGateName) }
+}
+$taskPassIdentities = @{}
+foreach ($taskPass in @(1,2)) {
+    $taskJUnitPath = 'docs/evidence/acceptance/20261006T024719/tests-' + $taskPass + '.xml'
+    if (!(Test-Path -LiteralPath $taskJUnitPath -PathType Leaf)) { throw ('Missing terminal JUnit: ' + $taskJUnitPath) }
+    [xml]$taskJUnit = Get-Content -LiteralPath $taskJUnitPath -Raw
+    $taskSuites = @($taskJUnit.SelectNodes('//testsuite'))
+    $taskCaseCount = 0
+    if (@($taskJUnit.SelectNodes('//testcase/failure | //testcase/error | //testcase/skipped')).Count -ne 0) { throw ('JUnit contains nonpassing testcase records: pass ' + $taskPass) }
+    if ($taskSuites.Count -eq 0) { throw 'JUnit has no test suite.' }
+    foreach ($taskSuite in $taskSuites) {
+        if ([int]$taskSuite.failures -ne 0 -or [int]$taskSuite.errors -ne 0 -or [int]$taskSuite.skipped -ne 0) { throw ('JUnit has nonpassing outcomes: pass ' + $taskPass) }
+        $taskCaseCount += [int]$taskSuite.tests
+    }
+    if ($taskCaseCount -le 0 -or @($taskJUnit.SelectNodes('//testcase')).Count -ne $taskCaseCount) { throw 'JUnit declared/actual test counts are incomplete.' }
+    $taskIdentities = @($taskJUnit.SelectNodes('//testcase') | ForEach-Object { $_.classname + '::' + $_.name } | Sort-Object)
+    if (@($taskIdentities | Select-Object -Unique).Count -ne $taskIdentities.Count) { throw 'JUnit contains duplicate testcase identities.' }
+    $taskPassIdentities[$taskPass] = $taskIdentities
+    $taskCoveragePath = 'docs/evidence/acceptance/20261006T024719/coverage-' + $taskPass + '.json'
+    $taskCoverage = Get-Content -LiteralPath $taskCoveragePath -Raw | ConvertFrom-Json
+    if ($null -eq $taskCoverage.totals.percent_covered -or [double]$taskCoverage.totals.percent_covered -lt 85) { throw ('Coverage is below 85 percent: pass ' + $taskPass) }
+}
+if (@(Compare-Object -ReferenceObject $taskPassIdentities[1] -DifferenceObject $taskPassIdentities[2]).Count -ne 0) { throw 'The two passing JUnits cover different testcase identities.' }
+foreach ($taskExisting in @($taskReportPath,$taskDataPath,'artifacts/lab-final-9e83fe7-exit.json','artifacts/final-manual-9e83fe7')) {
+    if (Test-Path -LiteralPath $taskExisting) { throw ('Existing manual evidence must be inspected before launch: ' + $taskExisting) }
+}
+# tools.lab_stack supplies the shared HTTP loop to API/WMS; edge and desktop use it in their native entry points.
+# Explicit isolated-lab demo credentials, unchanged from the original launcher.
+$env:ROBOTOPS_POSTGRES_DSN = 'postgresql://robotops:demo-only@127.0.0.1:5432/robotops'
+$env:ROBOTOPS_AMQP_URL = 'amqp://guest:guest@127.0.0.1:5672/%2F'
+$env:BLENDER_EXECUTABLE = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
+$env:PYTHONUNBUFFERED = '1'
+$taskStartedAt = [DateTime]::UtcNow.ToString('o')
+& '.venv\Scripts\python.exe' -u -m tools.lab_stack --fresh --runtime blender --data-dir $taskDataPath --report $taskReportPath
+$taskLabExit = $LASTEXITCODE
+@{source_commit=$taskActualCommit;source_sha256=$taskExpectedFingerprint;acceptance=$taskManifestPath;started_at=$taskStartedAt;ended_at=[DateTime]::UtcNow.ToString('o');exit_code=$taskLabExit} | ConvertTo-Json | Set-Content -LiteralPath 'artifacts/lab-final-9e83fe7-exit.json' -Encoding UTF8
+exit $taskLabExit

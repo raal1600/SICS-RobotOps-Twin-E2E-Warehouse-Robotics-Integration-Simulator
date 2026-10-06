@@ -1,0 +1,95 @@
+{
+  "recorded_at_utc": "2026-10-06T01:06:41.358813+00:00",
+  "scope": "Focused verification of shared HTTP event-loop lifecycle only. No Blender/browser/full-suite execution.",
+  "base_head_commit": "b9685864afb6f47e440bd051789052070456c7b2",
+  "source_state": "Uncommitted shared-loop correction; file hashes captured after passing final focused run. No clean-commit/full-acceptance claim.",
+  "command": [
+    "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests/integration/test_http_server_lifecycle.py",
+    "-q",
+    "--basetemp=artifacts/http-lifecycle-20261006/fixtures-final",
+    "-o",
+    "cache_dir=artifacts/http-lifecycle-20261006/cache-final",
+    "--junitxml=artifacts/http-lifecycle-20261006/tests-final.xml"
+  ],
+  "exit_code": 0,
+  "console_duration_seconds": 0.96,
+  "junit_suites": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "4",
+      "time": "0.955",
+      "timestamp": "2026-10-06T03:06:10.302413+02:00",
+      "hostname": "DESKTOP-AZDXEDL"
+    }
+  ],
+  "testcases": [
+    {
+      "classname": "tests.integration.test_http_server_lifecycle",
+      "name": "test_http_server_peer_reset_exits_cleanly[peer-reset-http]",
+      "time": "0.273"
+    },
+    {
+      "classname": "tests.integration.test_http_server_lifecycle",
+      "name": "test_http_server_peer_reset_exits_cleanly[peer-reset-websocket]",
+      "time": "0.216"
+    },
+    {
+      "classname": "tests.integration.test_http_server_lifecycle",
+      "name": "test_http_server_peer_reset_exits_cleanly[shutdown-reset-http]",
+      "time": "0.221"
+    },
+    {
+      "classname": "tests.integration.test_http_server_lifecycle",
+      "name": "test_http_server_peer_reset_exits_cleanly[shutdown-reset-websocket]",
+      "time": "0.219"
+    }
+  ],
+  "assertions": [
+    "Real HTTP200/WebSocket101 precedes actual peer TCP reset.",
+    "Both ordinary resets and socket.shutdown10054 injection use UVICORN_LOOP through Config.get_loop_factory.",
+    "Server finishes without force_exit, graceful timeout cancellation or leaked connection/task/asyncio transport.",
+    "No event-loop error captured; injected failing shutdown operation is never invoked by configured factory.",
+    "Failed-case private cleanup cannot turn a failed or timed-out case into a success."
+  ],
+  "checks": {
+    "ruff_check": "PASS for tests/integration/test_http_server_lifecycle.py",
+    "ruff_format_check": "PASS; final version1 file already formatted"
+  },
+  "prior_attempt": {
+    "result": "4 passed in0.96s before formatting; format-check requested two style-only rewrites",
+    "junit": "artifacts/http-lifecycle-20261006/tests.xml",
+    "log": "artifacts/http-lifecycle-20261006/pytest.log",
+    "distinct_test_count_note": "Same4 cases rerun after formatting, not8 distinct cases."
+  },
+  "negative_control": {
+    "artifact": "artifacts/repro-proactor-shutdown-result.json",
+    "sha256": "24f23a14f5939210d18cf741eb167c0963d1b9c11d0f40564cfd9932ee35cd0c",
+    "outcome": "Injected live HTTP/WS Proactor cases fail to close; each retains one asyncio transport with zero Uvicorn connections/tasks and is blocked in Server.wait_closed. Both corresponding Selector cases close cleanly. Ordinary peer resets were clean in 6/6 cases per loop and do not reproduce Chromium timing."
+  },
+  "evidence": {
+    "artifacts\\http-lifecycle-20261006\\tests-final.xml": "cfbdb57c4c89db70db558fa82b6d9ae608698e710ead1da2fd1534ce6e2e3108",
+    "artifacts\\http-lifecycle-20261006\\pytest-final.log": "79f5b3d70b7459d42ab214def574300c31c2c3c58f132a466c2d64576f496bcd"
+  },
+  "source_hashes": {
+    "robotops/http_server.py": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+    "tests/integration/test_http_server_lifecycle.py": "f7899f33c67a4a8d1664a3308d1e7bb8dc731cbecc58c2f7d18308fa823c4664"
+  },
+  "limits": [
+    "Windows CPython3.13.15 observed; test definitions contain no platform skips and adapt SO_LINGER encoding, but Linux was not executed here.",
+    "Minimal ASGI lifecycle does not replace affected application/browser journeys or fresh full acceptance.",
+    "The actual failed first-pass server stack was not dumped; the injected diagnostic proves the matching causal mechanism, not exact Chromium timing.",
+    "uv.lock has no uvloop package; locked Linux Uvicorn auto therefore uses the stdlib Selector loop. Private transport instrumentation is specific to this locked stdlib asyncio environment and does not claim optional uvloop compatibility."
+  ],
+  "goal_status": "NOT_ACHIEVED",
+  "lock_scope": {
+    "uvloop_in_locked_packages": false,
+    "uvicorn_version": "0.54.0",
+    "requires_python": "==3.13.*"
+  }
+}

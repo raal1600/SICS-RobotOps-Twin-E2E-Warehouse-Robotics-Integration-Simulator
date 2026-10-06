@@ -1,0 +1,38 @@
+param([switch]$RunDiagnostic)
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+if (-not $RunDiagnostic) { throw 'Preparation only. Root must explicitly supply -RunDiagnostic after other runs finish.' }
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).Path
+$runDirectory = Join-Path $PSScriptRoot 'run'
+if (Test-Path -LiteralPath $runDirectory) { throw 'Existing diagnostic run is preserved; no automatic retry or overwrite.' }
+$python = Join-Path $repoRoot '.venv\Scripts\python.exe'
+$nodeId = 'tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]'
+$arguments = @('-m', 'pytest', '-p', 'clear_response_delay_plugin', $nodeId, '--diagnostic-clear-response-body-delay', ('--basetemp=' + (Join-Path $runDirectory 'fixtures')), ('--junitxml=' + (Join-Path $runDirectory 'test.xml')), '-q')
+$originalPythonPath = [Environment]::GetEnvironmentVariable('PYTHONPATH', 'Process')
+$originalOutput = [Environment]::GetEnvironmentVariable('ROBOTOPS_CLEAR_DELAY_OUTPUT', 'Process')
+$exitCode = 1
+$process = $null
+New-Item -ItemType Directory -Path $runDirectory | Out-Null
+$utf8 = [System.Text.UTF8Encoding]::new($false)
+try {
+    $env:PYTHONPATH = if ($originalPythonPath) { $PSScriptRoot + ';' + $originalPythonPath } else { $PSScriptRoot }
+    $env:ROBOTOPS_CLEAR_DELAY_OUTPUT = $runDirectory
+    $prepared = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'preparation.json') -Raw | ConvertFrom-Json
+    $pluginPath = Join-Path $PSScriptRoot 'clear_response_delay_plugin.py'
+    $pluginHash = (Get-FileHash -LiteralPath $pluginPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($pluginHash -ne $prepared.plugin.sha256) { throw 'Plugin hash differs from preparation; refuse stale or modified diagnostic.' }
+    $start = [DateTime]::UtcNow.ToString('o')
+    $command = @{ executable=$python; arguments=$arguments; working_directory=$repoRoot; started_at_utc=$start; plugin_sha256=$pluginHash; source_hashes=$prepared.source_hashes; diagnostic_only=$true; expected_case_count=1; requested_delay_seconds=5.25 }
+    [IO.File]::WriteAllText((Join-Path $runDirectory 'command.json'), ($command | ConvertTo-Json -Depth 8), $utf8)
+    $process = Start-Process -FilePath $python -ArgumentList $arguments -WorkingDirectory $repoRoot -WindowStyle Hidden -RedirectStandardOutput (Join-Path $runDirectory 'stdout.log') -RedirectStandardError (Join-Path $runDirectory 'stderr.log') -PassThru
+    [IO.File]::WriteAllText((Join-Path $runDirectory 'owner.json'), (@{pid=$process.Id; started_at_utc=$start; command_file='command.json'; scope='single diagnostic pytest process; original fixtures own native HTTP server'} | ConvertTo-Json), $utf8)
+    $process.WaitForExit()
+    $process.Refresh()
+    $exitCode = [int]$process.ExitCode
+} finally {
+    [Environment]::SetEnvironmentVariable('PYTHONPATH', $originalPythonPath, 'Process')
+    [Environment]::SetEnvironmentVariable('ROBOTOPS_CLEAR_DELAY_OUTPUT', $originalOutput, 'Process')
+    $record = @{ finished_at_utc=[DateTime]::UtcNow.ToString('o'); exit_code=$exitCode; diagnostic_only=$true; process_id=if($process){$process.Id}else{$null}; process_exited=if($process){$process.HasExited}else{$null} }
+    [IO.File]::WriteAllText((Join-Path $runDirectory 'exit.json'), ($record | ConvertTo-Json), $utf8)
+}
+exit $exitCode

@@ -1,0 +1,1619 @@
+{
+  "generated_at_utc": "2026-10-05T20:52:52.026664+00:00",
+  "status": "DIAGNOSED READ-ONLY OBSERVATION TRANSPORT FAILURE; physical recovery evidence succeeded, complete test still FAILED",
+  "frozen_source": "f78985b3440a1800b4c3e0bccf25663628b05f56",
+  "inputs": [
+    {
+      "path": "artifacts/investigation-browser/20261005T201450496005/test_run_notice_investigate_and_return[blender-compact]/trace.zip",
+      "sha256": "7e0240430bcb5dbc264dfa0e077796203214ba1fcb10c5eca4d99a70a946e388"
+    },
+    {
+      "path": "artifacts/investigation-browser/20261005T201450496005/test_run_notice_investigate_and_return[blender-compact]/browser.json",
+      "sha256": "2e53f37a7c3eb9418c848c658c9c6a660ba60c4e2bf027b9bc9015a83413794e"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261005T195412/tests-1.xml",
+      "sha256": "9ad45665c5a5cf1f0479242205e28b8b531f965263a1caefabe66f071430f56a"
+    },
+    {
+      "path": "tests/browser/test_investigation.py",
+      "sha256": "135f7f8d0158c8d9f6222a03e70c751548fe1967daa1c1d00a2c1d3c641aa620"
+    }
+  ],
+  "failure": {
+    "test": "test_run_notice_investigate_and_return[blender-compact]",
+    "seconds": 98.666,
+    "message": "playwright._impl._errors.Error: APIRequestContext.get: read ECONNRESET\nCall log:\n  - → GET http://127.0.0.1:56307/integration/sessions/8809877a-efdc-5cc3-a171-c513c6ac0b5a\n    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36\n    - accept: */*\n    - accept-encoding: gzip,deflate,br",
+    "helper": "tests/browser/test_investigation.py:109",
+    "operation": "APIRequestContext.get; GET is performed by Playwright test helper, not application UI fetch",
+    "exact_api_request_visible_in_browser_network_trace": false,
+    "absence_explanation": "Browser trace records page network traffic; the APIRequestContext helper call and its socket details are absent. JUnit supplies the exact failure."
+  },
+  "observed_before_failure": {
+    "posts": [
+      {
+        "started_at_utc": "2026-10-05T20:16:15.640Z",
+        "url": "http://127.0.0.1:56307/integration/sessions/8809877a-efdc-5cc3-a171-c513c6ac0b5a/reconcile",
+        "http_status": 200,
+        "request_body": {
+          "request_id": "39ca7d9c-d348-4b0a-8e55-258ae26a1046",
+          "expected_revision": 40,
+          "fault": null
+        },
+        "session": {
+          "session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "status": "WAITING_AUTHORIZATION",
+          "current_stage": 20,
+          "revision": 42
+        },
+        "reconciliation": {
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "status": "COMPLETED",
+          "original_identity_queried": true,
+          "physical_resend": false
+        },
+        "last_persisted_stage": {
+          "schema_version": "1.0",
+          "step_id": "810aa863-1af5-5113-89f1-982f84fcb59a",
+          "session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "execution_session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "order_id": "order-da2210ee-9007-48ee-8dbb-f78164cf1017",
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+          "stage": 19,
+          "sequence": 21,
+          "revision": 41,
+          "title": "Original command reconciliation",
+          "summary": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+          "status": "COMPLETED",
+          "component": "reconciliation",
+          "protocol": "controller + sensor",
+          "classification": "REAL CODE",
+          "input": {
+            "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+            "observation_fault": null
+          },
+          "output": {
+            "schema_version": "1.0",
+            "run_id": "65561d26-b94f-4c77-b63a-a105a19d36fc",
+            "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+            "causation_id": "cd2d9c05-1e58-40c9-8c43-8a4850fd3d73",
+            "timestamp": "2026-10-05T20:16:16.193820Z",
+            "evidence_id": "8857bab1-f9f3-4f9b-bdef-c89ca720a2d2",
+            "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+            "command": {
+              "schema_version": "2.0",
+              "run_id": "65561d26-b94f-4c77-b63a-a105a19d36fc",
+              "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+              "causation_id": "d72c7518-2e11-43c7-8abd-f28337e75b7e",
+              "timestamp": "2026-10-05T20:15:32.539179Z",
+              "action_plan_id": "9233b31c-fdf0-565b-93a1-1cc4afc3b290",
+              "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+              "order_id": "order-da2210ee-9007-48ee-8dbb-f78164cf1017",
+              "order_line_id": "line-1",
+              "kind": "PICK_AND_PLACE",
+              "product_id": "product-SKU-B-01",
+              "source_id": "SRC_B",
+              "destination_id": "DESTINATION",
+              "target_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.17,
+                  1.02,
+                  0.22999999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "scene_epoch": "47459fd5-f39f-4d0a-a756-fb585b76bb88",
+              "observation_id": "d72c7518-2e11-43c7-8abd-f28337e75b7e",
+              "cell_generation": 0,
+              "brain_version": "deterministic-hkm-1",
+              "selected_tool_id": "EE_VAC_ARRAY",
+              "grasp_pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.10000000149011612,
+                  -1.2400000095367432,
+                  0.2800000190734863
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "trajectory": {
+                "schema_version": "2.0",
+                "trajectory_id": "trajectory-78a58d7dfa57f69d3494c2fda34aec0cf7595946160d23343b6bbdda17951b06",
+                "profile": "SAFE_PICK_PLACE_V1",
+                "required_tool_id": "EE_VAC_ARRAY",
+                "grasp_pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.10000000149011612,
+                    -1.2400000095367432,
+                    0.2800000190734863
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "target_tcp_pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.17,
+                    1.02,
+                    0.27999999999999997
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "product_attachment_offset_m": [
+                  0.0,
+                  0.0,
+                  -0.04999999999999999
+                ],
+                "waypoints": [
+                  {
+                    "schema_version": "2.0",
+                    "phase": "HOME",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.0,
+                        -0.6,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 0.0,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_SINGLE"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "TOOL_CHANGE_REQUESTED",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.0,
+                        -0.6,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 0.145833333,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_SINGLE"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "MOVE_TO_SAFE_POSE",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.0,
+                        -0.6,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 0.291666666,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_SINGLE"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "MOVE_TO_TOOL_DOCK",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        -0.27,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 0.437499999,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_SINGLE"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "MOVE_TO_TOOL_DOCK",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        -0.27,
+                        0.56
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 0.583333332,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_SINGLE"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "RELEASE_CURRENT_TOOL",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        -0.27,
+                        0.56
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 0.729166665,
+                    "attached": false,
+                    "active_tool_id": null
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "VERIFY_FLANGE_EMPTY",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        -0.27,
+                        0.56
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 0.874999998,
+                    "attached": false,
+                    "active_tool_id": null
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "MOVE_TO_SAFE_POSE",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        -0.27,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 1.020833331,
+                    "attached": false,
+                    "active_tool_id": null
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "MOVE_TO_TOOL_DOCK",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        0.0,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 1.166666664,
+                    "attached": false,
+                    "active_tool_id": null
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "ENGAGE_REQUESTED_TOOL",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        0.0,
+                        0.56
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 1.312499997,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "VERIFY_TOOL_ID",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        0.0,
+                        0.56
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 1.45833333,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "RETREAT_FROM_TOOL_RACK",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        0.0,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 1.604166663,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "TOOL_CHANGE_COMPLETED",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.98,
+                        0.0,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 1.749999996,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "PRE_GRASP",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.10000000149011612,
+                        -1.2400000095367432,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 2.349999996,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "APPROACH",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.10000000149011612,
+                        -1.2400000095367432,
+                        0.2800000190734863
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 2.949999996,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "GRASP",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.10000000149011612,
+                        -1.2400000095367432,
+                        0.2800000190734863
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 3.149999996,
+                    "attached": true,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "GRASP_CONFIRM",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.10000000149011612,
+                        -1.2400000095367432,
+                        0.2800000190734863
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 3.249999996,
+                    "attached": true,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "LIFT",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.10000000149011612,
+                        -1.2400000095367432,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 3.749999996,
+                    "attached": true,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "SAFE_TRANSFER",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.48483223438430595,
+                        -0.12083551615338096,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 4.736233365,
+                    "attached": true,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "SAFE_TRANSFER",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.17,
+                        1.02,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 5.722466734,
+                    "attached": true,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "PRE_PLACE",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.17,
+                        1.02,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 5.822466734,
+                    "attached": true,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "PLACE",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.17,
+                        1.02,
+                        0.27999999999999997
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 6.322466734,
+                    "attached": true,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "RELEASE",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.17,
+                        1.02,
+                        0.27999999999999997
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 6.472466734,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "RELEASE_CONFIRM",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.17,
+                        1.02,
+                        0.27999999999999997
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 6.572466734,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "RETRACT",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.17,
+                        1.02,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 7.072466734,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "phase": "HOME",
+                    "pose": {
+                      "schema_version": "1.0",
+                      "position": [
+                        0.0,
+                        -0.6,
+                        1.02
+                      ],
+                      "quaternion_xyzw": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ],
+                      "unit": "m",
+                      "frame_id": "cell_world",
+                      "calibration_version": "hkm-cal-1"
+                    },
+                    "sim_time_s": 7.672466734,
+                    "attached": false,
+                    "active_tool_id": "EE_VAC_ARRAY"
+                  }
+                ],
+                "estimated_sim_duration_s": 7.672466734,
+                "route_index": 2,
+                "trajectory_planner_version": "synthetic-trajectory-1",
+                "collision_check_version": "synthetic-aabb-preflight-1",
+                "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+                "calibration_version": "hkm-cal-1",
+                "frame_tree_version": "hkm-frame-tree-1"
+              },
+              "tool_selection": {
+                "schema_version": "2.0",
+                "product_id": "product-SKU-B-01",
+                "sku": "SKU-B",
+                "selected_tool_id": "EE_VAC_ARRAY",
+                "candidate_tools": [
+                  {
+                    "schema_version": "2.0",
+                    "tool_id": "EE_VAC_SINGLE",
+                    "compatibility": "C",
+                    "compatible": true,
+                    "eligible": false,
+                    "score": null,
+                    "reasons": [
+                      "COMPATIBLE_PRODUCT_FAMILY",
+                      "SIMULATED_MASS_LIMIT_EXCEEDED",
+                      "SYNTHETIC_GEOMETRY_COMPATIBLE"
+                    ]
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "tool_id": "EE_VAC_ARRAY",
+                    "compatibility": "P",
+                    "compatible": true,
+                    "eligible": true,
+                    "score": 110,
+                    "reasons": [
+                      "PREFERRED_FOR_PRODUCT_FAMILY",
+                      "MASS_WITHIN_SIMULATED_LIMIT",
+                      "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                      "TOOL_CHANGE_REQUIRED"
+                    ]
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "tool_id": "EE_PINCH_NARROW",
+                    "compatibility": "N",
+                    "compatible": false,
+                    "eligible": false,
+                    "score": null,
+                    "reasons": [
+                      "DISALLOWED_PRODUCT_TOOL_PAIR",
+                      "SIMULATED_MASS_LIMIT_EXCEEDED",
+                      "GEOMETRY_OUTSIDE_SIMULATED_GRASP_RANGE"
+                    ]
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "tool_id": "EE_PINCH_WIDE",
+                    "compatibility": "C",
+                    "compatible": true,
+                    "eligible": true,
+                    "score": 80,
+                    "reasons": [
+                      "COMPATIBLE_PRODUCT_FAMILY",
+                      "MASS_WITHIN_SIMULATED_LIMIT",
+                      "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                      "TOOL_CHANGE_REQUIRED"
+                    ]
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "tool_id": "EE_ADAPTIVE_SOFT",
+                    "compatibility": "C",
+                    "compatible": true,
+                    "eligible": false,
+                    "score": null,
+                    "reasons": [
+                      "COMPATIBLE_PRODUCT_FAMILY",
+                      "SIMULATED_MASS_LIMIT_EXCEEDED",
+                      "GEOMETRY_OUTSIDE_SIMULATED_GRASP_RANGE"
+                    ]
+                  },
+                  {
+                    "schema_version": "2.0",
+                    "tool_id": "EE_SUPPORT_FORK",
+                    "compatibility": "C",
+                    "compatible": true,
+                    "eligible": true,
+                    "score": 80,
+                    "reasons": [
+                      "COMPATIBLE_PRODUCT_FAMILY",
+                      "MASS_WITHIN_SIMULATED_LIMIT",
+                      "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                      "TOOL_CHANGE_REQUIRED"
+                    ]
+                  }
+                ],
+                "assessed_mass_kg": 1.2,
+                "tool_change_required": true,
+                "selection_version": "deterministic-tool-selector-1",
+                "product_catalog_version": "synthetic-products-1",
+                "tool_spec_version": "synthetic-tools-1"
+              },
+              "robot_profile_version": "hkm_inspired_v1",
+              "product_catalog_version": "synthetic-products-1",
+              "tool_spec_version": "synthetic-tools-1",
+              "frame_tree_version": "hkm-frame-tree-1",
+              "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+              "required_tool_id": "EE_VAC_ARRAY"
+            },
+            "receipt": {
+              "schema_version": "2.0",
+              "run_id": "65561d26-b94f-4c77-b63a-a105a19d36fc",
+              "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+              "causation_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+              "timestamp": "2026-10-05T20:15:55.031492Z",
+              "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+              "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+              "scene_epoch": "47459fd5-f39f-4d0a-a756-fb585b76bb88",
+              "status": "SUCCEEDED",
+              "reason": "BLENDER_PICK_APPLIED",
+              "effect_count": 1,
+              "payload_hash": "7ef2307b9532b3080eddfd08a883aa00ee42fd262e543d5fcaf71f14da51034e",
+              "journal_durable": true,
+              "active_tool_id": "EE_VAC_ARRAY",
+              "tool_change_performed": true,
+              "trajectory_id": "trajectory-78a58d7dfa57f69d3494c2fda34aec0cf7595946160d23343b6bbdda17951b06",
+              "runtime_profile_version": "hkm_inspired_v1"
+            },
+            "observation": {
+              "schema_version": "2.0",
+              "run_id": "65561d26-b94f-4c77-b63a-a105a19d36fc",
+              "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+              "causation_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+              "timestamp": "2026-10-05T20:16:16.150575Z",
+              "observation_id": "cd2d9c05-1e58-40c9-8c43-8a4850fd3d73",
+              "scene_epoch": "47459fd5-f39f-4d0a-a756-fb585b76bb88",
+              "step": 2,
+              "captured_at": "2026-10-05T20:16:16.150575Z",
+              "model_version": "synthetic-observer-2",
+              "calibration_version": "hkm-cal-1",
+              "objects": [
+                {
+                  "schema_version": "2.0",
+                  "product_id": "product-SKU-A-01",
+                  "location_id": "DESTINATION",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.3799999952316284,
+                      0.9399999976158142,
+                      0.20249998569488525
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0,
+                  "sensor_id": "overhead-observation",
+                  "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+                },
+                {
+                  "schema_version": "2.0",
+                  "product_id": "product-SKU-B-01",
+                  "location_id": "DESTINATION",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.17000000178813934,
+                      1.0199999809265137,
+                      0.23000001907348633
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0,
+                  "sensor_id": "overhead-observation",
+                  "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+                },
+                {
+                  "schema_version": "2.0",
+                  "product_id": "product-SKU-C-01",
+                  "location_id": "SRC_C",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -0.8500000238418579,
+                      -0.9200000166893005,
+                      0.2199999988079071
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0,
+                  "sensor_id": "overhead-observation",
+                  "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+                },
+                {
+                  "schema_version": "2.0",
+                  "product_id": "product-SKU-D-01",
+                  "location_id": "SRC_D",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -1.2599999904632568,
+                      -0.07999999821186066,
+                      0.29499998688697815
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0,
+                  "sensor_id": "overhead-observation",
+                  "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+                },
+                {
+                  "schema_version": "2.0",
+                  "product_id": "product-SKU-E-01",
+                  "location_id": "SRC_E",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -1.149999976158142,
+                      0.75,
+                      0.24000000953674316
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0,
+                  "sensor_id": "overhead-observation",
+                  "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+                },
+                {
+                  "schema_version": "2.0",
+                  "product_id": "product-SKU-F-01",
+                  "location_id": "SRC_F",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      1.1399999856948853,
+                      0.75,
+                      0.25
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "confidence": 1.0,
+                  "uncertainty_m": 0.0,
+                  "sensor_id": "overhead-observation",
+                  "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+                }
+              ],
+              "covered_locations": [
+                "SRC_A",
+                "SRC_B",
+                "SRC_C",
+                "SRC_D",
+                "SRC_E",
+                "SRC_F",
+                "DESTINATION"
+              ],
+              "cell_generation": 0,
+              "robot_profile_version": "hkm_inspired_v1",
+              "frame_tree_version": "hkm-frame-tree-1",
+              "sensors": [
+                {
+                  "schema_version": "2.0",
+                  "sensor_id": "overhead-observation",
+                  "frame_id": "camera_overhead",
+                  "calibration_version": "hkm-cal-1",
+                  "camera_model_version": "synthetic-orthographic-1",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      0.0,
+                      0.0,
+                      2.6
+                    ],
+                    "quaternion_xyzw": [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "presentation_only": false
+                },
+                {
+                  "schema_version": "2.0",
+                  "sensor_id": "side-inspection",
+                  "frame_id": "camera_side",
+                  "calibration_version": "hkm-cal-1",
+                  "camera_model_version": "synthetic-orthographic-1",
+                  "pose": {
+                    "schema_version": "1.0",
+                    "position": [
+                      -1.85,
+                      -0.65,
+                      1.25
+                    ],
+                    "quaternion_xyzw": [
+                      0.4164435022802413,
+                      -0.295082221134753,
+                      -0.4971755075060524,
+                      0.7016536231751722
+                    ],
+                    "unit": "m",
+                    "frame_id": "cell_world",
+                    "calibration_version": "hkm-cal-1"
+                  },
+                  "presentation_only": false
+                }
+              ],
+              "machine_telemetry": {
+                "schema_version": "2.0",
+                "source": "SIMULATED_CELL_TELEMETRY",
+                "tool_state": {
+                  "schema_version": "2.0",
+                  "active_tool_id": "EE_VAC_ARRAY",
+                  "changer_state": "READY",
+                  "rack_tool_ids": [
+                    "EE_VAC_SINGLE",
+                    "EE_PINCH_NARROW",
+                    "EE_PINCH_WIDE",
+                    "EE_ADAPTIVE_SOFT",
+                    "EE_SUPPORT_FORK"
+                  ],
+                  "tool_state_version": "synthetic-tool-state-1"
+                },
+                "tcp_pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    -0.6,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "captured_at": "2026-10-05T20:16:16.150575Z",
+                "cell_generation": 0
+              }
+            },
+            "verification": {
+              "schema_version": "1.0",
+              "run_id": "65561d26-b94f-4c77-b63a-a105a19d36fc",
+              "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+              "causation_id": "cd2d9c05-1e58-40c9-8c43-8a4850fd3d73",
+              "timestamp": "2026-10-05T20:16:16.192303Z",
+              "verification_id": "8a5aab9f-b57d-47f4-b189-e8ef595e07ec",
+              "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+              "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+              "observation_id": "cd2d9c05-1e58-40c9-8c43-8a4850fd3d73",
+              "verdict": "VERIFIED_SUCCESS",
+              "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+            }
+          },
+          "state_before": "REQUIRES_INTERVENTION",
+          "state_after": "COMPLETED",
+          "persistence_effect": "Original journal, fresh observation and verification evidence committed.",
+          "wire": {
+            "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+            "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+            "status": "COMPLETED",
+            "original_identity_queried": true,
+            "physical_resend": false
+          },
+          "source": {
+            "schema_version": "1.0",
+            "path": "robotops/workflow/engine.py",
+            "symbol": "Engine._reconcile",
+            "excerpt": "receipt = self.gateway.query(command)\nobservation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)\nresult = self.verifier.verify(command, observation, receipt)"
+          },
+          "invariant": "Reconciliation queries original command identity; it has no send operation.",
+          "failure_semantics": "Inconclusive evidence pauses for intervention; no physical retry.",
+          "timestamp": "2026-10-05T20:16:16.372703Z",
+          "duration_ms": 632.8855000028852,
+          "evidence_ids": [
+            "8857bab1-f9f3-4f9b-bdef-c89ca720a2d2"
+          ],
+          "authorization_required": true
+        }
+      },
+      {
+        "started_at_utc": "2026-10-05T20:16:18.102Z",
+        "url": "http://127.0.0.1:56307/integration/sessions/8809877a-efdc-5cc3-a171-c513c6ac0b5a/authorize",
+        "http_status": 200,
+        "request_body": {
+          "request_id": "c9307e3f-f8f2-4a3e-b40a-e1e470baed06",
+          "expected_revision": 42,
+          "stage": 20,
+          "decision": "approve"
+        },
+        "session": {
+          "session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "status": "WAITING_AUTHORIZATION",
+          "current_stage": 21,
+          "revision": 44
+        },
+        "reconciliation": {
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "status": "COMPLETED",
+          "original_identity_queried": true,
+          "physical_resend": false
+        },
+        "last_persisted_stage": {
+          "schema_version": "1.0",
+          "step_id": "730196de-fb6e-533b-8a4a-bb2db688067f",
+          "session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "execution_session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "order_id": "order-da2210ee-9007-48ee-8dbb-f78164cf1017",
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+          "stage": 20,
+          "sequence": 22,
+          "revision": 43,
+          "title": "WMS reconciliation",
+          "summary": "WMS reconciliation",
+          "status": "COMPLETED",
+          "component": "wms",
+          "protocol": "SQL",
+          "classification": "SIMULATED SYSTEM",
+          "input": {
+            "stage": 20,
+            "request_id": "c9307e3f-f8f2-4a3e-b40a-e1e470baed06",
+            "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b"
+          },
+          "output": {
+            "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+            "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+            "physical_retry": false,
+            "verified_outcome": "COMPLETED",
+            "wms_acknowledged": true
+          },
+          "state_before": "COMPLETED",
+          "state_after": "COMPLETED",
+          "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+          "wire": {
+            "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+            "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+            "physical_retry": false,
+            "verified_outcome": "COMPLETED",
+            "wms_acknowledged": true
+          },
+          "source": {
+            "schema_version": "1.0",
+            "path": "robotops/integration/engine.py",
+            "symbol": "GuidedEngine._execute",
+            "excerpt": "        if stage == 20:\n            if job.state not in {JobState.COMPLETED, JobState.FAILED}:\n                raise Conflict(\"VERIFIED_OUTCOME_REQUIRED_FOR_WMS\")\n            if not self.lab and session.fault == \"WMS_UNAVAILABLE\" and not context.get(\"wms_retry\"):\n                context[\"wms_retry\"] = 1\n                raise OSError(\n                    \"WMS_UNAVAILABLE: physical work retained; retry business acknowledgement only\"\n                )"
+          },
+          "invariant": "WMS retries never execute robot motion.",
+          "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+          "timestamp": "2026-10-05T20:16:18.209762Z",
+          "duration_ms": 42.866500007221475,
+          "evidence_ids": [
+            "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+            "a0ed44f0-7efb-55b0-8fdd-ddf8bb99c824"
+          ],
+          "authorization_required": false
+        }
+      },
+      {
+        "started_at_utc": "2026-10-05T20:16:21.630Z",
+        "url": "http://127.0.0.1:56307/integration/sessions/8809877a-efdc-5cc3-a171-c513c6ac0b5a/authorize",
+        "http_status": 200,
+        "request_body": {
+          "request_id": "51ab387e-f5dd-49c1-be90-7067031658b9",
+          "expected_revision": 44,
+          "stage": 21,
+          "decision": "approve"
+        },
+        "session": {
+          "session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "status": "WAITING_AUTHORIZATION",
+          "current_stage": 22,
+          "revision": 46
+        },
+        "reconciliation": {
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "status": "COMPLETED",
+          "original_identity_queried": true,
+          "physical_resend": false
+        },
+        "last_persisted_stage": {
+          "schema_version": "1.0",
+          "step_id": "bd4eca83-4dde-508f-bdd2-e1d02c661dfa",
+          "session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "execution_session_id": "8809877a-efdc-5cc3-a171-c513c6ac0b5a",
+          "order_id": "order-da2210ee-9007-48ee-8dbb-f78164cf1017",
+          "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+          "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+          "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+          "stage": 21,
+          "sequence": 23,
+          "revision": 45,
+          "title": "ERP business completion",
+          "summary": "ERP business completion",
+          "status": "COMPLETED",
+          "component": "erp",
+          "protocol": "SQL",
+          "classification": "SIMULATED SYSTEM",
+          "input": {
+            "stage": 21,
+            "request_id": "51ab387e-f5dd-49c1-be90-7067031658b9",
+            "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b"
+          },
+          "output": {
+            "order_id": "order-da2210ee-9007-48ee-8dbb-f78164cf1017",
+            "business_status": "COMPLETED",
+            "wms_acknowledged": true,
+            "wms_acknowledgement_ids": [
+              "65634597-5b3f-5d0a-a2ab-681dcf450172"
+            ]
+          },
+          "state_before": "RECONCILING",
+          "state_after": "COMPLETED",
+          "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+          "wire": {
+            "order_id": "order-da2210ee-9007-48ee-8dbb-f78164cf1017",
+            "business_status": "COMPLETED",
+            "wms_acknowledged": true,
+            "wms_acknowledgement_ids": [
+              "65634597-5b3f-5d0a-a2ab-681dcf450172"
+            ]
+          },
+          "source": {
+            "schema_version": "1.0",
+            "path": "robotops/integration/store.py",
+            "symbol": "IntegrationStore.complete_business",
+            "excerpt": "    def complete_business(self, session: ExecutionSession, ident: str) -> dict[str, Any]:\n        \"\"\"Commit ERP outcome only after each verified job has its durable WMS ACK.\"\"\"\n        with self.store.transaction() as db:\n            jobs = [self.store._job(db, job_id) for job_id in session.job_ids]\n            if not jobs or any(\n                job.state not in {JobState.COMPLETED, JobState.FAILED} for job in jobs\n            ):\n                raise Conflict(\"VERIFIED_ORDER_OUTCOMES_REQUIRED\")"
+          },
+          "invariant": "Business completion requires acknowledgement of verified outcome.",
+          "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+          "timestamp": "2026-10-05T20:16:21.966200Z",
+          "duration_ms": 250.73960001464002,
+          "evidence_ids": [
+            "768512b8-0336-5eb9-bf92-220aee6f3b19"
+          ],
+          "authorization_required": false
+        }
+      }
+    ],
+    "latest_authorized_stage": 21,
+    "session_current_stage": 22,
+    "session_revision": 46,
+    "session_status": "WAITING_AUTHORIZATION",
+    "meaning": "Original-command reconciliation, WMS acknowledgement and ERP business completion succeeded. The final stage22 summary still required authorization when the test observation failed."
+  },
+  "server_liveness": {
+    "page_errors": [],
+    "console_errors": [],
+    "http_4xx_5xx_in_saved_browser_trace": 0,
+    "failure_window_trace_monotonic_ms": {
+      "after_last_successful_ui_assertion": 93143.596,
+      "before_teardown_screenshot": 96231.52
+    },
+    "successful_requests_started_after_teardown_screenshot_began": [
+      {
+        "started_at_utc": "2026-10-05T20:16:26.458Z",
+        "trace_monotonic_ms": 96235.72,
+        "url": "http://127.0.0.1:56307/orders/order-da2210ee-9007-48ee-8dbb-f78164cf1017/timeline",
+        "http_status": 200,
+        "duration_ms": 342.949
+      },
+      {
+        "started_at_utc": "2026-10-05T20:16:26.671Z",
+        "trace_monotonic_ms": 96235.875,
+        "url": "http://127.0.0.1:56307/simulation-tests",
+        "http_status": 200,
+        "duration_ms": 170.295
+      },
+      {
+        "started_at_utc": "2026-10-05T20:16:26.457Z",
+        "trace_monotonic_ms": 96235.576,
+        "url": "http://127.0.0.1:56307/jobs/acb4f47d-bc52-56fc-b564-c888dc50a38b/evidence",
+        "http_status": 200,
+        "duration_ms": 426.085
+      }
+    ],
+    "conclusion": "Same-origin server demonstrably continued serving HTTP200 after the failing APIRequestContext GET; whole-server termination is inconsistent with these saved responses. No live health probe was performed."
+  },
+  "retained_effect_evidence_after_failure": {
+    "started_at_utc": "2026-10-05T20:16:26.457Z",
+    "http_status": 200,
+    "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+    "job_state": "COMPLETED",
+    "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+    "journal": {
+      "schema_version": "2.0",
+      "run_id": "65561d26-b94f-4c77-b63a-a105a19d36fc",
+      "correlation_id": "97737f8c-6dff-57a0-8533-d927f4482766",
+      "causation_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+      "timestamp": "2026-10-05T20:15:55.031492Z",
+      "command_id": "a5edc72d-852e-5c53-9b0e-6797f0b0c84b",
+      "job_id": "acb4f47d-bc52-56fc-b564-c888dc50a38b",
+      "scene_epoch": "47459fd5-f39f-4d0a-a756-fb585b76bb88",
+      "status": "SUCCEEDED",
+      "reason": "BLENDER_PICK_APPLIED",
+      "effect_count": 1,
+      "payload_hash": "7ef2307b9532b3080eddfd08a883aa00ee42fd262e543d5fcaf71f14da51034e",
+      "journal_durable": true,
+      "active_tool_id": "EE_VAC_ARRAY",
+      "tool_change_performed": true,
+      "trajectory_id": "trajectory-78a58d7dfa57f69d3494c2fda34aec0cf7595946160d23343b6bbdda17951b06",
+      "runtime_profile_version": "hkm_inspired_v1"
+    },
+    "reconciliation_count": 2,
+    "verification_results": [
+      {
+        "verdict": "VERIFIED_SUCCESS",
+        "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+      },
+      {
+        "verdict": "INCONCLUSIVE",
+        "reason": "CONTRADICTORY_OBSERVATION"
+      },
+      {
+        "verdict": "VERIFIED_SUCCESS",
+        "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+      }
+    ]
+  },
+  "installed_transport_source": [
+    {
+      "path": ".venv/Lib/site-packages/playwright/driver/package/lib/coreBundle.js:26360",
+      "fact": "APIRequestContext caches an HTTP(S) agent with keepAlive:true by protocol."
+    },
+    {
+      "path": ".venv/Lib/site-packages/playwright/driver/package/lib/coreBundle.js:26472",
+      "fact": "_sendRequestWithRetries defaults maxRetries to0; when configured, only ECONNRESET retries, with first backoff250ms. HTTP response status is not a retry trigger."
+    },
+    {
+      "path": ".venv/Lib/site-packages/playwright/sync_api/_generated.py:21303",
+      "fact": "Installed GET API documents max_retries: only ECONNRESET, no HTTPstatus retries, default0."
+    },
+    {
+      "path": ".venv/Lib/site-packages/uvicorn/config.py:234",
+      "fact": "Default timeout_keep_alive is5 seconds; browser server fixture does not override it."
+    },
+    {
+      "path": ".venv/Lib/site-packages/uvicorn/protocols/http/h11_impl.py:359",
+      "fact": "Idle keep-alive handler closes the transport."
+    },
+    {
+      "path": "tests/browser/test_investigation.py:35",
+      "fact": "Fixture starts uvicorn in a thread; service.should_exit is assigned only in fixture teardown."
+    }
+  ],
+  "read_only_route_evidence": [
+    {
+      "path": "apps/api/guided.py:41",
+      "fact": "GET session route calls GuidedEngine.get only."
+    },
+    {
+      "path": "robotops/integration/engine.py:276",
+      "fact": "get returns present(store.get(session_id)); present only copies pending-authorization display metadata."
+    },
+    {
+      "path": "robotops/integration/store.py:102",
+      "fact": "Store GET uses _read and SELECT body."
+    },
+    {
+      "path": "robotops/workflow/store.py:112",
+      "fact": "readonly_connect uses SQLite mode=ro and PRAGMA query_only=ON."
+    }
+  ],
+  "hypothesis": {
+    "classification": "PLAUSIBLE, NOT PROVEN",
+    "explanation": "Node HTTP keep-alive reuse racing Uvicorn idle close can explain an isolated ECONNRESET while other browser connections remain healthy. The preceding read finished before the enable assertion; approximately5.14s of UI/POST/assert work elapsed before the next read, consistent with the default5s idle boundary. No socket ID/close packet/server access log proves that this was the actual cause. Other transient transport resets remain possible.",
+    "ui_interval_between_previous_get_completion_upper_bound_and_next_get_lower_bound_ms": 5138.256999999998
+  },
+  "next_action": {
+    "now": "Keep frozen source; tests_2 is already the fresh isolated repeat. Read its terminal result before further tests.",
+    "prepared_patch": "artifacts/investigation-get-retry-proposal.patch",
+    "proposed_change": "Set max_retries=1 solely on the existing test-only GET helper. Keep HTTPsuccess assertion and JSON parsing unchanged. This tolerates one observed transport reset while preserving failure if reset repeats; it does not retry POST authorization/reconcile or HTTPerror statuses.",
+    "after_apply": "Run the relevant compact investigation browser case and required acceptance on the changed source. Keep original failure in the evidence trail.",
+    "not_proposed": [
+      "No robot or authorization retries",
+      "No application production changes",
+      "No keep-alive/observationTTL override",
+      "No broad exception suppression or success relabeling"
+    ],
+    "patch_validation": "git apply --check passed; patch has not been applied and touches only get() in tests/browser/test_investigation.py"
+  },
+  "scope": "Source/saved artifact inspection only; no source edits, tests, browser or services started.",
+  "recorded_ui_source_hash_comparisons": [
+    {
+      "path": "apps/erp_ui/app.js",
+      "recorded_sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/integration-console.js",
+      "recorded_sha256": "b53fe08871df507284b7de4f92f87bd361bd9a68f93cbe98ebf10ef87777c14d",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/playback.js",
+      "recorded_sha256": "87c48ca72312a0e6d10b815a95cd1dc3c8469b3646a674a71df087cf3c5b9251",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/scene-view.js",
+      "recorded_sha256": "f51ffb0711b8f5b3cb2d5c523a7d7cce1e4c8531deb61248ab89b5c3320be6e3",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/workflow-guide.js",
+      "recorded_sha256": "5b412df965a250a8626f260dc2a106305d8cbcfd1c5cc1965cf0e5ff41b85a01",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/index.html",
+      "recorded_sha256": "4567d2903b4093a91bead7de8f801532d94d84452442e66e9fc912551651c8f4",
+      "matches_current_file": true
+    },
+    {
+      "path": "apps/erp_ui/theme.css",
+      "recorded_sha256": "5b91370e31672fe4b64c49cf1c521f219bc5b790e98247658217a88243075503",
+      "matches_current_file": true
+    },
+    {
+      "path": "C:/Users/ramis/source/repos/robotops-twin/tests/browser/test_investigation.py",
+      "recorded_sha256": "135f7f8d0158c8d9f6222a03e70c751548fe1967daa1c1d00a2c1d3c641aa620",
+      "matches_current_file": true
+    }
+  ],
+  "installed_library_files": [
+    {
+      "path": ".venv/Lib/site-packages/playwright/driver/package/lib/coreBundle.js",
+      "sha256": "549070af3acabb3efcc4f55bfe6210f9f7c2fcf633cf7eaa59bfe60719969171"
+    },
+    {
+      "path": ".venv/Lib/site-packages/playwright/sync_api/_generated.py",
+      "sha256": "2fe12ee05ea24145f026c707e80d3502bd6cfca84a43e164339784c48c95b0ce"
+    },
+    {
+      "path": ".venv/Lib/site-packages/uvicorn/config.py",
+      "sha256": "cf91c6ffae283a2b2020da954b4cc4ed47d3246cb062afd09fb77d98e4c5ca87"
+    },
+    {
+      "path": ".venv/Lib/site-packages/uvicorn/protocols/http/h11_impl.py",
+      "sha256": "a3154a6c2cfaaaebe19ac7aa255dfe9b6b7b490de1da95274c033aa093e8c322"
+    }
+  ]
+}

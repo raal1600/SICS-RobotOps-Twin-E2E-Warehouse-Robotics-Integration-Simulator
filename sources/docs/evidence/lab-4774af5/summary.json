@@ -1,0 +1,234 @@
+{
+  "archived_at_utc": "2026-10-06T00:15:52.745312+00:00",
+  "scope": "Historical source4774 local acceptance, manual semantic proof and exact README CLI proof. Local file archive only; no publication or new runtime validation.",
+  "source": {
+    "commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+    "dirty": false,
+    "source_sha256": "101649c4c5835db2b4007011459752c2f9350ab91448b31b919eccbbbe299a73"
+  },
+  "status": "LOCAL_ACCEPTANCE_AND_MANUAL_SEMANTICS_PASS_PRESENTATION_NOT_PASS",
+  "goal_status": "NOT_ACHIEVED",
+  "local_acceptance": {
+    "directory": "docs/evidence/acceptance/20261005T224038",
+    "independent_review": "docs/evidence/lab-4774af5/local-acceptance-review.json",
+    "exit_code": 0,
+    "local_gates_passed": 20,
+    "total_manifest_gate_entries": 23,
+    "suites": [
+      {
+        "run": 1,
+        "tests": 799,
+        "passed": 799,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "junit": "docs/evidence/acceptance/20261005T224038/tests-1.xml",
+        "junit_sha256": "c8713da9eb0f8352a3f35a05e66bd9debb8e1538e3bee3231b7e32d28e19b9dc"
+      },
+      {
+        "run": 2,
+        "tests": 799,
+        "passed": 799,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "junit": "docs/evidence/acceptance/20261005T224038/tests-2.xml",
+        "junit_sha256": "c229df13dc70e0a4b32508c6ab81d5a782ee245b0a8eb28a826d24e1d312f276"
+      }
+    ],
+    "coverage": [
+      {
+        "run": 1,
+        "percent_covered": 91.38351792753895,
+        "covered_lines": 4868,
+        "statements": 5327
+      },
+      {
+        "run": 2,
+        "percent_covered": 91.43983480382954,
+        "covered_lines": 4871,
+        "statements": 5327
+      }
+    ]
+  },
+  "criteria": {
+    "must_count": 169,
+    "must_passed": 163,
+    "remote_dependent_must_pending_count": 6,
+    "remote_dependent_must": {
+      "SC-DATA-005": {
+        "passed": false,
+        "failures": [
+          "ci"
+        ]
+      },
+      "SC-KB-006": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-007": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-008": {
+        "passed": false,
+        "failures": [
+          "pages",
+          "publication_remote"
+        ]
+      },
+      "HKM-VIS-MUST-025": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      },
+      "UI-INV-MUST-008": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      }
+    },
+    "lab_must_count": 51,
+    "lab_must_all_passed_in_local_manifest": true,
+    "optional_should": {
+      "count": 4,
+      "failed": {
+        "SC-BRAIN-005": {
+          "passed": false,
+          "failures": [
+            "optional_model_fallback"
+          ]
+        }
+      },
+      "separate_from_must_and_not_overridden": true
+    }
+  },
+  "remote_gates": {
+    "ci": "PENDING",
+    "publication_remote": "PENDING",
+    "pages": "PENDING"
+  },
+  "manual_semantics": {
+    "happy": {
+      "status": "PASS_SAVED_EVIDENCE",
+      "session_id": "967b2a5a-56f6-58c3-a6e0-0cb466266b3f",
+      "command_id": "9637228d-9fc3-523d-9a84-78f4626a39f8",
+      "review": "docs/evidence/lab-4774af5/manual/happy-review.json"
+    },
+    "lost_ack": {
+      "status": "PASS_SAVED_EVIDENCE",
+      "session_id": "2fee4c64-51a4-570e-a777-2a378430153c",
+      "command_id": "6dc61fe0-7070-5020-a806-4f1df84d8548",
+      "review": "docs/evidence/lab-4774af5/manual/lost-review.json"
+    },
+    "duplicate_delivery": {
+      "status": "PASS_SAVED_EVIDENCE",
+      "session_id": "2052263b-74b4-55de-bdad-d8a339f9a8f9",
+      "command_id": "75762f23-96ce-5876-aad6-c36a18fd1888",
+      "review": "docs/evidence/lab-4774af5/manual/duplicate-review.json"
+    },
+    "readme_cli": {
+      "status": "TWO_EXACT_COMMANDS_PASS_SAVED_EVIDENCE",
+      "review": "docs/evidence/lab-4774af5/manual/cli-review.json",
+      "cases": [
+        {
+          "scenario": "happy_path",
+          "session_id": "5eed5ba0-cdeb-557a-8014-a7b358ca154c",
+          "command_id": "0d376b73-26bc-5de8-8a79-a98018d8c58a",
+          "status": "COMPLETED",
+          "revision": 44,
+          "effect_count": 1
+        },
+        {
+          "scenario": "lost_ack_after_effect",
+          "session_id": "edd9d949-c4db-5d6b-bc90-dc6c04736218",
+          "command_id": "7aead772-3c20-5170-9edf-5d4413eff392",
+          "status": "COMPLETED",
+          "revision": 46,
+          "effect_count": 1
+        }
+      ]
+    }
+  },
+  "presentation": {
+    "status": "NOT_PASS",
+    "known_defects": [
+      "Supported duplicate-delivery and WMS-unavailable scenarios show unsupported brief/watch copy in both acceptance passes.",
+      "The replay caption says Execution: Happy path for recorded duplicate-delivery and WMS-unavailable scenarios in both passes; this is the replay caption, not the scenario selector."
+    ],
+    "correction_plan": "docs/evidence/lab-4774af5/correction/scenario-label-fix-plan.md",
+    "corrected_source_validation": "PENDING_SEPARATE_SOURCE_AND_EVIDENCE",
+    "hidden_dom_note": "Prior-command protocol live text at duplicate gate was entirely hidden per root visual review; excluded from duplicate proof, not a visible false claim.",
+    "saved_dom_review": "docs/evidence/lab-4774af5/audit/final-trace-dom-review.json",
+    "source_race_note": "The prior-command protocol panel is hidden at the duplicate physical gate. Existing source review identifies a possible exposure after consent before fresh polling; no visibly stale stage-15 panel is claimed."
+  },
+  "archive": {
+    "copied_nonempty_files": 85,
+    "copied_bytes": 15604326,
+    "empty_inputs_not_copied": 2,
+    "missing_inputs": [],
+    "index": "docs/evidence/lab-4774af5/inputs.json",
+    "canonical_acceptance_references": 38,
+    "large_pdf_render_or_trace_zip_copies": 0,
+    "raw_audit_program_format": "Byte-identical .py.txt source snapshots; restore original ignored .py paths to reproduce."
+  },
+  "credential_audit": {
+    "status": "PASS_SCOPED_SAVED_TEXT_REVIEW",
+    "review": "docs/evidence/lab-4774af5/audit/final-trace-audit-result.json",
+    "summary": "docs/evidence/lab-4774af5/audit/final-trace-audit-summary.md",
+    "candidate_count": 0,
+    "public_demo_credential_matches": 0,
+    "finalized_at_utc": "2026-10-06T00:19:31.915008+00:00",
+    "coverage": {
+      "files": 173,
+      "input_bytes": 94807417,
+      "zip_members": 2541,
+      "zip_uncompressed_bytes": 271449919,
+      "dispositions": {
+        "complete_text_scanned": 1264,
+        "known_binary_hashed_not_text_scanned": 1442
+      },
+      "unique_persisted_steps": 292,
+      "unique_session_states": 370
+    },
+    "reviewed_scope": "Eight exact campaign-bound lab trace ZIPs, copied service/acceptance logs, and completed manual browser/CLI/stop text captures. Complete textual members and saved headers scanned; no actual credential candidate found.",
+    "limitations": "Other local-mode browser ZIPs, arbitrary encodings, unsaved traffic and external systems are outside scope. Binary members and manual screenshots were hashed, not OCR-scanned. This is not a global secret-free assertion or publication approval."
+  },
+  "limits": [
+    "Archived raw bytes are unchanged; their original references and then-pending status statements remain historical. inputs.json maps original paths to stable archived repo-relative paths.",
+    "Current corrected working source is not relabeled clean4774. Its checks/revalidation must be recorded separately before final claims.",
+    "Manual one-ULP export differences, absent transient stage16 mini-map snapshot, extra lost-ACK stage19, and hidden prior-command DOM are preserved in detailed reviews.",
+    "PLC result acknowledgement remains distinct from WMS acknowledgement; lost-ACK PLC result persistence is an expected change, not unchanged full journals.",
+    "CLI one stage16 record and one durable effect do not independently establish an exact HTTP request count.",
+    "Docker, final-source remote CI/publication/Pages and complete GOAL attainment are not established here."
+  ],
+  "updated_at_utc": "2026-10-06T00:24:21.732577+00:00",
+  "publication_baseline_review": {
+    "status": "PASS_HISTORICAL_BASELINE_VISUAL_REVIEW",
+    "review": "docs/evidence/lab-4774af5/publication-review/review.json",
+    "source_commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+    "combined_pages_reviewed": 64,
+    "contact_sheets_reviewed_by_root": 8,
+    "html_screenshots_reviewed_by_root": 3,
+    "checks": {
+      "combined_all_page_text_equals_three_parts": true,
+      "all64rendered_pages_reviewed": true,
+      "no_visible_clipping_overlap_missing_glyphs": true,
+      "diagram_and_table_layouts_legible": true,
+      "covers_tocs_page_numbers_and_sections_consistent": true,
+      "not_done_status_explicit": true
+    },
+    "corrected_final_source_publication_validation": "PENDING_FRESH_REBUILD_AND_CHANGED_PAGE_REVIEW",
+    "scope": "Unchanged review JSON archived; root visually reviewed eight contact sheets and three HTML screenshots. No PDF/render tree copied, and no remote publication claim."
+  }
+}

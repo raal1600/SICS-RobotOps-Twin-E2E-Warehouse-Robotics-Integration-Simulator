@@ -1,0 +1,96 @@
+﻿"""Bounded real Windows TCP reset/close probe; no application or policy mutation."""
+import asyncio
+import json
+import socket
+import struct
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+
+async def probe(loop_name):
+    loop = asyncio.get_running_loop()
+    exceptions = []
+    loop.set_exception_handler(lambda _loop, context: exceptions.append({
+        'message': context.get('message'),
+        'exception_type': type(context.get('exception')).__name__,
+        'exception': str(context.get('exception')),
+        'callback': str(context.get('handle', '')),
+    }))
+    results = []
+    # Each scheduling order is repeated four times, at most24 cases per loop.
+    schedules = [('reset_first', 0.0), ('reset_first', 0.001), ('reset_first', 0.01),
+                 ('close_first', 0.0), ('close_first', 0.001), ('simultaneous', 0.0)]
+    for repeat in range(4):
+        for ordering, delay in schedules:
+            connected = loop.create_future()
+            state = {'connection_lost': False, 'received_bytes': 0}
+            before_errors = len(exceptions)
+            class Protocol(asyncio.Protocol):
+                def connection_made(self, transport):
+                    self.transport = transport
+                    connected.set_result(transport)
+                def data_received(self, data):
+                    state['received_bytes'] += len(data)
+                def connection_lost(self, exc):
+                    state['connection_lost'] = True
+                    state['connection_lost_exception'] = repr(exc)
+            server = await loop.create_server(Protocol, '127.0.0.1', 0)
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client.settimeout(1)
+            await asyncio.to_thread(client.connect, server.sockets[0].getsockname())
+            transport = await asyncio.wait_for(connected, 1)
+            await asyncio.to_thread(client.sendall, b'actual tcp reset probe')
+            client.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('hh', 1, 0))
+            started = time.monotonic()
+            if ordering == 'reset_first':
+                client.close()
+                await asyncio.sleep(delay)
+                transport.close()
+            elif ordering == 'close_first':
+                transport.close()
+                await asyncio.sleep(delay)
+                client.close()
+            else:
+                loop.call_soon(client.close)
+                loop.call_soon(transport.close)
+            server.close()
+            closed = True
+            try:
+                await asyncio.wait_for(server.wait_closed(), 0.3)
+            except TimeoutError:
+                closed = False
+            record = {
+                'repeat': repeat, 'ordering': ordering, 'delay_seconds': delay,
+                'elapsed_seconds': round(time.monotonic() - started, 6),
+                'server_wait_closed_completed': closed,
+                'asyncio_attached_clients': len(server._clients),
+                'transport_is_closing': transport.is_closing(),
+                'transport_called_connection_lost': getattr(transport, '_called_connection_lost', None),
+                'socket_fileno': transport.get_extra_info('socket').fileno(),
+                'protocol': state,
+                'callback_exceptions': exceptions[before_errors:],
+            }
+            results.append(record)
+            # Record first; normal abort only releases resources from a failed probe.
+            # It never changes the recorded failure or extends the wait budget.
+            if not closed:
+                transport.abort()
+                await asyncio.sleep(0.02)
+    return {'loop': loop_name, 'cases': results,
+            'closure_failures': sum(not case['server_wait_closed_completed'] for case in results),
+            'callback_exceptions': exceptions}
+
+output = {'platform': sys.platform, 'python': sys.version, 'started_at': datetime.now(timezone.utc).isoformat(), 'loops': []}
+for label, factory in [('Proactor', asyncio.ProactorEventLoop), ('Selector', asyncio.SelectorEventLoop)]:
+    with asyncio.Runner(loop_factory=factory) as runner:
+        output['loops'].append(runner.run(probe(label)))
+output['ended_at'] = datetime.now(timezone.utc).isoformat()
+path = HERE / 'windows-tcp-reset-probe.json'
+path.write_text(json.dumps(output, indent=2) + '\n', encoding='utf-8')
+print(json.dumps({'artifact': str(path), 'loops': [
+    {'loop': entry['loop'], 'cases': len(entry['cases']), 'closure_failures': entry['closure_failures'], 'callback_exceptions': len(entry['callback_exceptions'])}
+    for entry in output['loops']
+]}))

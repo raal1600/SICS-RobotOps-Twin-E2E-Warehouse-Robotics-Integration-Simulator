@@ -1,0 +1,13 @@
+$ErrorActionPreference = 'Stop'
+Set-Location -LiteralPath 'C:\Users\ramis\source\repos\robotops-twin'
+$env:ROBOTOPS_POSTGRES_DSN = 'postgresql://robotops:demo-only@127.0.0.1:5432/robotops'
+$env:ROBOTOPS_AMQP_URL = 'amqp://guest:guest@127.0.0.1:5672/%2F'
+$env:ROBOTOPS_LAB_TESTS = '1'
+$env:BLENDER_EXECUTABLE = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
+$env:PYTEST_ADDOPTS = '-o cache_dir=artifacts/pytest-cache-scenario-fix -o faulthandler_timeout=300'
+$env:PYTHONUNBUFFERED = '1'
+$taskStarted = [DateTime]::UtcNow.ToString('o')
+& 'C:\Users\ramis\.local\bin\uv.exe' run --locked python -m pytest tests/browser/test_guided_console.py::test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly tests/lab/test_browser_lab.py tests/lab/test_guided_lab.py -m 'not blender' --basetemp=artifacts/pytest-scenario-fix-browsers --junitxml=artifacts/scenario-fix-browsers.xml -q
+$taskExit = $LASTEXITCODE
+[pscustomobject]@{exit_code=$taskExit;started_at=$taskStarted;ended_at=[DateTime]::UtcNow.ToString('o')} | ConvertTo-Json | Set-Content -LiteralPath 'artifacts/scenario-fix-browsers-exit.json' -Encoding UTF8
+exit $taskExit

@@ -1,0 +1,121 @@
+# Preparation only. One explicit invocation runs exactly one README scenario once.
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$true)]
+    [ValidateSet('happy_path','lost_ack_after_effect')]
+    [string]$Scenario,
+    [switch]$RunScenario
+)
+$ErrorActionPreference = 'Stop'
+if (!$RunScenario) { throw 'Preparation only: use -Scenario <one supported value> -RunScenario after reviewing the current manual lab.' }
+$taskRepo = 'C:\Users\ramis\source\repos\robotops-twin'
+$taskExpectedCommit = '9e83fe7d41a52a63ba65b77730e392dafca8fffe'
+$taskExpectedFingerprint = '136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd'
+$taskOutput = Join-Path $taskRepo 'artifacts\final-manual-9e83fe7'
+$taskPrefix = Join-Path $taskOutput ('cli-' + $Scenario)
+$taskAttemptPath = $taskPrefix + '-attempt.json'
+$taskStartPath = $taskPrefix + '-start.json'
+$taskStdoutPath = $taskPrefix + '.stdout.log'
+$taskStderrPath = $taskPrefix + '.stderr.log'
+$taskExitPath = $taskPrefix + '-exit.json'
+$taskReservedPaths = @($taskAttemptPath,$taskStartPath,$taskStdoutPath,$taskStderrPath,$taskExitPath)
+# Refuse reuse before any git/Python/health/CLI command. A partial attempt blocks repeats.
+foreach ($taskExisting in $taskReservedPaths) {
+    if (Test-Path -LiteralPath $taskExisting) { throw ('Existing attempt evidence; inspect the original session and do not rerun: ' + $taskExisting) }
+}
+Set-Location -LiteralPath $taskRepo
+$taskActualCommit = (& git rev-parse HEAD).Trim()
+if ($LASTEXITCODE -ne 0 -or $taskActualCommit -ne $taskExpectedCommit) { throw 'Unexpected source commit.' }
+& git diff --quiet HEAD -- . ':(exclude)ACCEPTANCE_REPORT.md'
+if ($LASTEXITCODE -ne 0) { throw 'Tracked source changed before the README CLI demonstration.' }
+$taskCurrentSource = & '.venv\Scripts\python.exe' -c 'import json; from tools.acceptance import source_identity; print(json.dumps(source_identity()))' | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or $taskCurrentSource.commit -ne $taskExpectedCommit -or $taskCurrentSource.source_sha256 -ne $taskExpectedFingerprint) { throw 'Current source fingerprint differs from the prepared source.' }
+$taskManifestPath = Join-Path $taskRepo 'docs\evidence\acceptance\20261006T024719\manifest.json'
+$taskAcceptanceExitPath = Join-Path $taskRepo 'artifacts\acceptance-response-sync-exit.json'
+$taskManifest = Get-Content -LiteralPath $taskManifestPath -Raw | ConvertFrom-Json
+$taskAcceptanceExit = Get-Content -LiteralPath $taskAcceptanceExitPath -Raw | ConvertFrom-Json
+if ($taskManifest.source.commit -ne $taskExpectedCommit -or $taskManifest.source.dirty -ne $false -or $taskManifest.source.source_sha256 -ne $taskExpectedFingerprint -or $taskManifest.started_at -ne '2026-10-06T02:47:20.134216+00:00') { throw 'Unexpected accepted source/campaign identity.' }
+if ($taskAcceptanceExit.exit_code -ne 0 -or $taskAcceptanceExit.source -ne $taskExpectedCommit -or !$taskAcceptanceExit.started_at -or !$taskAcceptanceExit.ended_at) { throw 'Current acceptance is not terminal exit0.' }
+if ([DateTimeOffset]$taskAcceptanceExit.started_at -gt [DateTimeOffset]$taskManifest.started_at -or [DateTimeOffset]$taskAcceptanceExit.ended_at -lt [DateTimeOffset]$taskManifest.started_at) { throw 'Terminal acceptance record does not bracket this campaign.' }
+$taskLocalGates = @('setup','browser_setup','blender_version','security','tests_1','tests_2','repeatability','lint','typecheck','demo_happy_path','demo_lost_ack_after_effect','demo_lost_ack_before_effect','demo_ambiguous','demo_restart','demo_logical_estop','demo_cell_fault','demo_tool_showcase','drift','publication','publication_final')
+foreach ($taskGateName in $taskLocalGates) {
+    $taskGate = $taskManifest.gates.$taskGateName
+    if ($null -eq $taskGate -or $taskGate.passed -ne $true -or ($null -ne $taskGate.exit_code -and $taskGate.exit_code -ne 0)) { throw ('Current local gate not passed: ' + $taskGateName) }
+}
+$taskReportPath = Join-Path $taskRepo 'artifacts\lab-final-9e83fe7.json'
+$taskOwnerPath = Join-Path $taskRepo 'artifacts\lab-final-9e83fe7-owner.json'
+$taskManualExitPath = Join-Path $taskRepo 'artifacts\lab-final-9e83fe7-exit.json'
+if (Test-Path -LiteralPath $taskManualExitPath) { throw 'The manual supervisor already exited; do not target a replacement service.' }
+$taskReport = Get-Content -LiteralPath $taskReportPath -Raw | ConvertFrom-Json
+$taskOwner = Get-Content -LiteralPath $taskOwnerPath -Raw | ConvertFrom-Json
+if ($taskReport.status -ne 'healthy' -or $taskReport.runtime -ne 'blender' -or $taskReport.api -ne 'http://127.0.0.1:8000') { throw 'Expected current healthy manual Blender lab on README default API port 8000.' }
+$taskLabRoot = [IO.Path]::GetFullPath((Join-Path $taskRepo 'artifacts\lab-final-9e83fe7'))
+$taskDataDirectory = [IO.Path]::GetFullPath([string]$taskReport.data_directory)
+if (!$taskDataDirectory.StartsWith($taskLabRoot + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or !(Test-Path -LiteralPath $taskDataDirectory -PathType Container)) { throw 'Manual report points outside the current lab data directory.' }
+$taskLabIdentity = [IO.Path]::GetFileName($taskDataDirectory)
+if ($taskLabIdentity -notmatch '^[0-9a-f]{32}$' -or $taskReport.queue -ne ('robotops.run.' + $taskLabIdentity) -or $taskReport.postgres_schema -ne ('lab_run_' + $taskLabIdentity)) { throw 'Manual report schema/queue/data identities disagree.' }
+if ($taskOwner.source -ne $taskExpectedCommit -or $taskOwner.launcher -ne 'artifacts/run-manual-lab-9e83fe7.ps1' -or !$taskOwner.started_at_utc -or [int]$taskOwner.pid -le 0) { throw 'Manual owner record differs from the current prepared launch.' }
+$taskOwnerProcess = Get-Process -Id ([int]$taskOwner.pid) -ErrorAction Stop
+$taskOwnerStarted = [DateTimeOffset]$taskOwner.started_at_utc
+if ([Math]::Abs(($taskOwnerProcess.StartTime.ToUniversalTime() - $taskOwnerStarted.UtcDateTime).TotalSeconds) -gt 0.01) { throw 'Manual supervisor PID was reused.' }
+$taskApiProcess = Get-Process -Id ([int]$taskReport.processes.api) -ErrorAction Stop
+if ($taskApiProcess.StartTime.ToUniversalTime() -lt $taskOwnerStarted.UtcDateTime) { throw 'API process predates the current manual supervisor.' }
+$taskHealthObservedAt = [DateTime]::UtcNow.ToString('o')
+$taskHealth = Invoke-RestMethod -Uri 'http://127.0.0.1:8000/health' -Method Get -TimeoutSec 20
+if ($taskHealth.status -ne 'ok' -or $taskHealth.profile -ne 'lab' -or $taskHealth.runtime -ne 'blender' -or $taskHealth.database -ne 'PostgreSQL' -or [int]$taskHealth.process_id -ne [int]$taskReport.processes.api) { throw 'Live API health does not match the current report/Blender lab process.' }
+$taskExecutable = 'C:\Users\ramis\.local\bin\uv.exe'
+if (!(Test-Path -LiteralPath $taskExecutable -PathType Leaf)) { throw 'Expected uv executable is missing.' }
+$taskArguments = @('run','--locked','python','-m','tools.integration_demo','--scenario',$Scenario,'--authorize-robot')
+$taskCommand = 'uv run --locked python -m tools.integration_demo --scenario ' + $Scenario + ' --authorize-robot'
+$taskReadmeCommands = [IO.File]::ReadAllLines((Join-Path $taskRepo 'README.md'))
+if ($taskReadmeCommands -notcontains $taskCommand) { throw 'Proposed command differs from the exact README command.' }
+# This function creates rather than overwrites; Flush(true) precedes every mutation command.
+function Write-TaskNewJson {
+    param([string]$Path,[object]$Value)
+    $taskEncoded = [Text.UTF8Encoding]::new($false).GetBytes(($Value | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
+    $taskFile = [IO.File]::Open($Path,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+    try { $taskFile.Write($taskEncoded,0,$taskEncoded.Length); $taskFile.Flush($true) }
+    finally { $taskFile.Dispose() }
+}
+# Runtime only: no preparation invocation creates the final-manual directory.
+[IO.Directory]::CreateDirectory($taskOutput) | Out-Null
+foreach ($taskExisting in $taskReservedPaths) {
+    if (Test-Path -LiteralPath $taskExisting) { throw ('Evidence appeared during guard checks; no command executed: ' + $taskExisting) }
+}
+$taskAttempt = [ordered]@{
+    state='ATTEMPT_RESERVED_DO_NOT_RETRY'; scenario=$Scenario; command=$taskCommand
+    executable=$taskExecutable; arguments=$taskArguments; working_directory=$taskRepo
+    source=$taskActualCommit; source_sha256=$taskExpectedFingerprint; current_source=$taskCurrentSource
+    reserved_at_utc=[DateTime]::UtcNow.ToString('o'); launcher_pid=$PID
+    launcher_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    acceptance_manifest=$taskManifestPath; acceptance_manifest_sha256=(Get-FileHash -LiteralPath $taskManifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    manual_report=$taskReportPath; manual_report_sha256=(Get-FileHash -LiteralPath $taskReportPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    manual_owner=$taskOwner; lab_identity=$taskLabIdentity; api=$taskReport.api
+    health_observed_at_utc=$taskHealthObservedAt; health=$taskHealth
+    stdout=$taskStdoutPath; stderr=$taskStderrPath; start=$taskStartPath; exit=$taskExitPath
+    rule='A partial, interrupted or failed attempt must be inspected by original identity; never invoke this scenario again.'
+}
+# Exclusive durable attempt wins races between two launchers and is never removed.
+Write-TaskNewJson -Path $taskAttemptPath -Value $taskAttempt
+foreach ($taskNewPath in @($taskStartPath,$taskStdoutPath,$taskStderrPath,$taskExitPath)) {
+    if (Test-Path -LiteralPath $taskNewPath) { throw ('Evidence appeared after reservation; no command executed: ' + $taskNewPath) }
+}
+$taskStartedAt = [DateTime]::UtcNow.ToString('o')
+Write-TaskNewJson -Path $taskStartPath -Value ([ordered]@{command=$taskCommand;source=$taskActualCommit;source_sha256=$taskExpectedFingerprint;scenario=$Scenario;started_at=$taskStartedAt;attempt=$taskAttemptPath;stdout=$taskStdoutPath;stderr=$taskStderrPath})
+$taskCliProcess = $null
+$taskCliExit = $null
+$taskLaunchError = $null
+try {
+    # Exactly one invocation, unchanged README arguments; no URL/output/session override.
+    $taskCliProcess = Start-Process -FilePath $taskExecutable -ArgumentList $taskArguments -WorkingDirectory $taskRepo -WindowStyle Hidden -PassThru -Wait -RedirectStandardOutput $taskStdoutPath -RedirectStandardError $taskStderrPath
+    $taskCliExit = $taskCliProcess.ExitCode
+}
+catch {
+    $taskLaunchError = $_.Exception.GetType().FullName
+}
+$taskEndedAt = [DateTime]::UtcNow.ToString('o')
+Write-TaskNewJson -Path $taskExitPath -Value ([ordered]@{command=$taskCommand;source=$taskActualCommit;source_sha256=$taskExpectedFingerprint;scenario=$Scenario;started_at=$taskStartedAt;ended_at=$taskEndedAt;exit_code=$taskCliExit;process_id=$(if ($null -ne $taskCliProcess) {$taskCliProcess.Id} else {$null});launch_error_type=$taskLaunchError;attempt=$taskAttemptPath;stdout=$taskStdoutPath;stderr=$taskStderrPath})
+if ($null -ne $taskLaunchError -or $null -eq $taskCliExit) { throw 'CLI launch/completion uncertain; preserve attempt and inspect its original session. Never rerun.' }
+if ($taskCliExit -ne 0) { throw ('CLI exited ' + $taskCliExit + '; inspect its original session and do not repeat the physical request.') }
+Write-Output ('CLI exited 0; review ' + $taskExitPath + ' and saved original session/effect evidence before any separate scenario invocation.')
+exit 0

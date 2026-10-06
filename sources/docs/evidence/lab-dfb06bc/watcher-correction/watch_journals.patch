@@ -1,0 +1,19 @@
+--- artifacts/final-evidence-pack/f00ad15/watch_journals.py.before
++++ artifacts/final-evidence-pack/f00ad15/watch_journals.py
+@@ -10,6 +10,7 @@
+ import sqlite3
+ import time
+ import xml.etree.ElementTree as ET
++from contextlib import closing
+ 
+ ROOT = pathlib.Path(__file__).resolve().parents[3]
+ OUT: pathlib.Path
+@@ -51,7 +52,7 @@
+     result = {}
+     for name in ("runtime.db", "plc.db"):
+         path = directory / name
+-        with sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True, timeout=2) as connection:
++        with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True, timeout=2)) as connection, connection:
+             connection.execute("PRAGMA query_only=ON")
+             connection.execute("BEGIN")
+             if name == "runtime.db":

@@ -1,0 +1,40 @@
+﻿{
+    "at_utc":  "2026-10-06T03:53:43.9850423Z",
+    "powershell_version":  "5.1.26100.9444",
+    "parsers":  [
+                    {
+                        "path":  "artifacts/run-manual-lab-9e83fe7.ps1",
+                        "parse_errors":  0,
+                        "sha256":  "81b20e45df77e48a80239e376722415d5e741c0c731c4392b0fac44989f12e42"
+                    },
+                    {
+                        "path":  "artifacts/run-final-cli-9e83fe7.ps1",
+                        "parse_errors":  0,
+                        "sha256":  "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150"
+                    }
+                ],
+    "actual_coverage_extractions":  [
+                                        {
+                                            "pass":  1,
+                                            "path":  "docs/evidence/acceptance/20261006T024719/coverage-1.json",
+                                            "percent_covered":  91.38059701492537,
+                                            "python_exit_code":  0,
+                                            "threshold":  85,
+                                            "passed":  true,
+                                            "input_sha256":  "6ace26dd946895fd16504886d8761ee7ce9a00ce4246a22b870cebf144d6c317"
+                                        },
+                                        {
+                                            "pass":  2,
+                                            "path":  "docs/evidence/acceptance/20261006T024719/coverage-2.json",
+                                            "percent_covered":  91.43656716417911,
+                                            "python_exit_code":  0,
+                                            "threshold":  85,
+                                            "passed":  true,
+                                            "input_sha256":  "8acbd04c4c4773e4d61a74f46cd6c6c839c0f0ae3db37cf5a1836b468e684b94"
+                                        }
+                                    ],
+    "extracted_fragment_only":  true,
+    "launcher_executed":  false,
+    "services_started":  false,
+    "fragment":  "    $taskCoverageJson = \u0026 \u0027.venv\\Scripts\\python.exe\u0027 -c \"import json, math, sys; from pathlib import Path; value = json.loads(Path(sys.argv[1]).read_text(encoding=\u0027utf-8-sig\u0027))[\u0027totals\u0027][\u0027percent_covered\u0027]; assert type(value) in (int, float) and math.isfinite(value), \u0027Coverage total must be finite and numeric\u0027; print(json.dumps({\u0027totals\u0027: {\u0027percent_covered\u0027: value}}, allow_nan=False))\" $taskCoveragePath\r\n    if ($LASTEXITCODE -ne 0 -or !$taskCoverageJson) { throw (\u0027Unable to extract finite coverage total: pass \u0027 + $taskPass) }\r\n    $taskCoverage = $taskCoverageJson | ConvertFrom-Json\r\n    if ($null -eq $taskCoverage.totals.percent_covered -or [double]$taskCoverage.totals.percent_covered -lt 85) { throw (\u0027Coverage is below 85 percent: pass \u0027 + $taskPass) }"
+}

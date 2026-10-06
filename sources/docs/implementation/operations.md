@@ -21,7 +21,9 @@ their own profile; opening a historical three-product test does not upgrade it.
 The previous test remains unchanged in **Simulation test** history,
 including uncertain/intervention outcomes. Review its evidence and full replay
 in the same window; **Return to current test** resumes the active world.
-Startup recovers only that active world, without replaying uncertain commands.
+Startup recovers only that active world. Automatic jobs use the existing
+conservative recovery; guided jobs remain at their saved authorization boundary
+and never auto-run after restart.
 Retained archives remain read-only during ordinary inspection. Under **Manage test
 data**, **Clear test and retry** keeps the selected test's number/cell and your
 scenario choices, removes its old orders/evidence and restores products. It makes
@@ -40,7 +42,11 @@ only anonymous request digests after deletion, not hidden test records. See
 This local demo has no
 production authentication/authorization boundary and binds to loopback only.
 
-The dark workspace follows **Set up / Watch / Investigate / Continue**. A short
+The workspace follows **Set up / Authorize integration stages / Watch / Verify /
+Acknowledge business outcome / Investigate**. Create starts a persisted guided
+session at stage 1, with no physical effect. The console records meaningful
+boundaries and distinguishes continuation from dispatch, PLC-submission and
+mandatory physical-execution gates. A short
 scenario purpose and **Watch for** line explain what to expect before running.
 The cell stays central; an amber guide and highlighted **Investigate this pick**
 button identify unusual outcomes. The operator opens the bounded panel explicitly;
@@ -68,10 +74,14 @@ service failures are labelled **App request problem**, separately from simulatio
 results. Cell & diagnostics, advanced replay selection and test-data management
 are progressive disclosures; technical depth remains available.
 
-Choose a product and fault, then Create and run order. Lost acknowledgement after
-effect displays UNKNOWN_OUTCOME even though Blender has moved the product. Use
+Choose a product and fault, then **Create and run order**. Continue the bounded
+console stages; **AUTHORIZE ROBOT EXECUTION** must precede the physical stage and
+3D handoff. Post-execution observation and verification follow movement. Lost
+acknowledgement after effect displays UNKNOWN_OUTCOME even though the runtime
+has moved the product. Use
 the named Reconcile [product] action in the investigation panel (or Reconcile selected job)
-with a normal fresh observation to complete it. An uncertain pick pauses the
+with a normal fresh observation to resolve the original job. Then continue WMS
+acknowledgement, ERP/business status and the final trace to complete the session. An uncertain pick pauses the
 whole cell, so choosing another product cannot bypass this step. Each pick in
 the lost-ack scenario requires reconciliation before the next explicit order. Selecting
 contradictory/missing/low-confidence/stale evidence instead yields intervention.
@@ -93,7 +103,11 @@ Interrupted fixture preparation resumes the same durable reset identity on start
 The optional **Restock this test** section exposes this guarded operation;
 it is distinct from creating another test (ADR 0007).
 
-The dashboard exposes ERP order, job and logical cell status separately, plus
+The dashboard exposes integration session, ERP business stage, order, job and
+logical cell status separately. A guided order with verified physical outcomes
+remains RECONCILING until stage 21 commits ERP completion after every WMS acknowledgement.
+A completed robot job with a pending WMS step is not completed business integration.
+It also exposes
 original command identity, journal status, verifier reason, causal timeline,
 observation/reconciliation JSON, an always-visible 3D cell, scenario events, live
 machine/product motion. The selected order's saved Blender snapshot is available
@@ -109,11 +123,14 @@ The Evidence tab’s expandable technical details add the observed tool and obse
 The replay phase/tool display identifies the currently viewed frame, which may
 belong to an earlier delivery item. **Why this tool?** reads the persisted six
 candidate scores and mass/geometry/availability reasons. **Run six-tool showcase
-(happy path)** explicitly picks and verifies all six SKUs in order; it cannot
-bypass unresolved work. Operator, Overhead, Side inspection and Follow TCP are
+(happy path)** starts a six-line guided order. Each SKU needs its own explicit
+physical gate and WMS acknowledgement; the showcase cannot bypass unresolved work. Operator, Overhead, Side inspection and Follow TCP are
 presentation cameras, not evidence-capture actions.
 
-`GET /metrics` derives counters from persisted events. Received/completed/failed/
+`GET /metrics` derives counters from persisted events and guided sessions.
+`robotops_guided_sessions_current` exposes waiting/running/unknown/retry/final
+counts; stage duration count/sum, failed attempts, retries and reconciliation
+counts come from committed steps. Reading metrics creates no stages or effects. Received/completed/failed/
 unknown/intervention totals count entries into those states; current-state gauges
 reflect present status. Reconciliation is labelled by verdict. Commands count
 durable intents, duplicates count journal suppression, injected failures count
@@ -137,9 +154,34 @@ Configuration: pass `--settings path.json` using Settings schema (thresholds,
 freshness, bounds/frame/calibration, timeouts, lease, seed/noise, products/locations,
 retry policy). CLI controls database directory, runtime and port. No secret is
 required. Retry policy is manual after proven no-effect; arbitrary values do not
-enable automatic retries. Optional remote ERP/model/hardware work is non-blocking.
+enable automatic retries. Real hardware, external production ERP and remote model integrations remain out
+of scope; the lab profile below supplies real protocols between synthetic systems.
 
 Historical guided-workspace captures and validation remain in
 `docs/evidence/guided-workflow-local.json`; they do not depict the current layout.
 The current browser suite writes screenshots, traces and results under
 `artifacts/investigation-browser/`, with revision-scoped acceptance evidence.
+
+
+## Distributed integration-lab profile
+
+Use [integration-lab startup and smoke checks](../integration-lab.md) for Docker
+Compose and [native service startup](../integration-lab-native.md) where Docker is
+unavailable. The lab uses PostgreSQL application/outbox/inbox durability, RabbitMQ
+publisher confirms and manual consumer ACK, a real OPC UA client/server with a
+virtual PLC journal, and a synthetic WMS REST acknowledgement service. Local
+SQLite mode remains the fast deterministic option and makes no AMQP/OPC UA claim.
+The lab's shared process/service scope does not offer the local test-catalog
+lifecycle controls; inspect `/health` capabilities and the documented lab reset.
+
+Browser mutations use REST. `/integration/sessions/{id}/stream` streams only saved
+session state; `/integration/sessions/{id}/live` reads current protocol evidence.
+Neither endpoint authorizes a stage or calls the physical-effect adapter.
+During execution the viewer is labelled simulated/recorded motion, with protocol
+state alongside it; playback controls and observing a stream cannot repeat work.
+
+HTTP 202, database commit, publisher confirm, consumer ACK, PLC acceptance,
+controller success, sensor verification, WMS acknowledgement and ERP completion
+are distinct events. A response lost after potential physical effect requires
+querying the original command and fresh evidence. There is no exactly-once
+physical guarantee and no database/broker transaction spanning a physical effect.

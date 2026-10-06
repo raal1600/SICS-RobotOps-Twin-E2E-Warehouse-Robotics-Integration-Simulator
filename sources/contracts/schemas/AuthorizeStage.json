@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "const": "approve",
+      "default": "approve",
+      "title": "Decision",
+      "type": "string"
+    },
+    "expected_revision": {
+      "minimum": 0,
+      "title": "Expected Revision",
+      "type": "integer"
+    },
+    "request_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "pattern": "^1\\.0$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stage": {
+      "maximum": 22,
+      "minimum": 1,
+      "title": "Stage",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "request_id",
+    "expected_revision",
+    "stage"
+  ],
+  "title": "AuthorizeStage",
+  "type": "object"
+}

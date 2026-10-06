@@ -1,0 +1,89 @@
+{
+  "reviewed_at_utc": "2026-10-06T01:50:28.773018+00:00",
+  "reviewer": "root",
+  "source_commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+  "scope": "Viewed three actual saved first-pass fault screenshots using image tool. No new browser, renderer, DB or workflow operation.",
+  "cases": [
+    {
+      "case": "drop_ack_after_effect",
+      "session": {
+        "session_id": "d3cf4ba2-7de5-56b5-b5b9-c457a1867720",
+        "correlation_id": "eb2393bb-10f6-50b8-91e0-b8eafd71c9eb",
+        "order_id": "order-25b0ac0e-f509-4d4c-9549-00da1f952cbe",
+        "job_id": "cfe58164-7368-5e6f-90ed-013e7664adb2",
+        "command_id": "7482ab1c-4474-5ca2-9e50-80cc7f547383",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-06T01:47:02.825811Z"
+      },
+      "screenshot": {
+        "path": "artifacts/lab-browser/20261006T014626368025/DROP_ACK_AFTER_EFFECT/unknown-outcome.png",
+        "sha256": "7447cfae0af6ab5c048d20b2628c7bd48641f6a2b40c73969beb97cd7b66db86",
+        "bytes": 437548
+      },
+      "formal_test_status_at_review": "PENDING_JUNIT",
+      "observed": "UNKNOWN_OUTCOME revision38; explicit outcome-unproven/original-command reconciliation card, blocked next pick, stage19 verification selected. Live protocol command matches original captured identity. Recorded execution caption says Lose acknowledgement after effect even though the future-order selector is Happy path.",
+      "runtime": "synthetic",
+      "captured_effect_count": 1
+    },
+    {
+      "case": "duplicate_delivery",
+      "session": {
+        "session_id": "7879277b-e8aa-5511-9f4f-3d0e7f6a88ad",
+        "correlation_id": "0ee17a4c-f4b4-5bdd-a1e6-306915e78365",
+        "order_id": "order-b1764bbd-e0d8-4369-bd17-e87098daa1d5",
+        "job_id": "0d094cd4-12a7-5d7e-8114-250d83383fdb",
+        "command_id": "5150bba5-079e-5829-914f-fa763ccfec23",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "updated_at": "2026-10-06T01:47:38.999546Z"
+      },
+      "screenshot": {
+        "path": "artifacts/lab-browser/20261006T014707397728/DUPLICATE_DELIVERY/completed.png",
+        "sha256": "4e9bd0e67563b3a7995acf2366ece7c32b043f519e033ab5b63d6dacfb7d60bc",
+        "bytes": 412378
+      },
+      "formal_test_status_at_review": "PENDING_JUNIT",
+      "observed": "COMPLETED revision44; Business map group and stage22 inspector; no pending card; future-order dropdown Brain timeout while saved execution caption stays Duplicate command delivery.",
+      "runtime": "synthetic",
+      "captured_effect_count": 1
+    },
+    {
+      "case": "wms_unavailable",
+      "session": {
+        "session_id": "5b24175b-a27a-5619-af9d-65ad30e24efd",
+        "correlation_id": "7ad346e1-d8da-5d29-b518-efefd2220d88",
+        "order_id": "order-c0d02d45-ffc3-451b-9e40-610641b61551",
+        "job_id": "1e641d0d-06c6-5dfc-996b-a1b84eb951b5",
+        "command_id": "384f2c3a-36e0-5db2-833c-61c5b1f179f1",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-06T01:48:16.495089Z"
+      },
+      "screenshot": {
+        "path": "artifacts/lab-browser/20261006T014743512789/WMS_UNAVAILABLE/completed.png",
+        "sha256": "a90a31284e1962b9fcbabdb2e7b0bdb1a58bcb9ecf25f3865440f31808cb2de2",
+        "bytes": 412800
+      },
+      "formal_test_status_at_review": "PENDING_JUNIT",
+      "observed": "COMPLETED revision46; Business map group and stage22 inspector; no pending card; future-order dropdown Brain timeout while saved execution caption stays WMS unavailable after verified pick.",
+      "runtime": "synthetic",
+      "captured_effect_count": 1
+    }
+  ],
+  "common_observations": [
+    "Profile explicitly names PostgreSQL/real AMQP/OPC UA and simulated systems.",
+    "SIMULATED ROBOT/READ-ONLY REPLAY label is visible.",
+    "All three fault cases show stationary scenario events and state no Blender motion recording is available; stationary view is not proof of no effect.",
+    "No blocking layout overlap, clipping or contradictory saved-execution caption observed in these selected screenshots."
+  ],
+  "limits": [
+    "Formal JUnit still pending at review; no whole-suite or mandatory manual PASS is inferred.",
+    "Pixel review alone does not establish request counts, effect causality or WMS wire outcome; those require raw records/test assertions.",
+    "Actual duplicate_publish versus broker redelivery interpretation comes from raw transport facts, not screenshots.",
+    "Full saved-DOM/credential audit, second pass and final manual/publication remain pending."
+  ]
+}

@@ -1,0 +1,222 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+cachedir: artifacts\pytest-cache-http-lifecycle
+rootdir: C:\Users\ramis\source\repos\robotops-twin
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.2, cov-7.1.0
+collected 815 items
+
+tests\blender\test_blender_runtime.py .....                              [  0%]
+tests\blender\test_hkm_runtime.py ..............                         [  2%]
+tests\blender\test_playback.py ..............                            [  4%]
+tests\browser\test_guided_console.py ......                              [  4%]
+tests\browser\test_investigation.py ......F...                           [  6%]
+tests\contract\test_api.py ..                                            [  6%]
+tests\contract\test_completion.py ...                                    [  6%]
+tests\contract\test_governance.py ........                               [  7%]
+tests\contract\test_hkm_boundaries.py ........                           [  8%]
+tests\contract\test_hkm_catalogue.py ................................    [ 12%]
+tests\contract\test_legacy_revision.py ..                                [ 12%]
+tests\contract\test_pdf_package.py .                                     [ 12%]
+tests\contract\test_robotics_documentation.py ..                         [ 13%]
+tests\contract\test_schemas.py ......................................... [ 18%]
+.........................                                                [ 21%]
+tests\e2e\test_hkm_scenarios.py ..................                       [ 23%]
+tests\e2e\test_observability.py .                                        [ 23%]
+tests\e2e\test_reobservation.py .......                                  [ 24%]
+tests\e2e\test_workflow.py ......................                        [ 27%]
+tests\integration\test_delivery_replay.py .........                      [ 28%]
+tests\integration\test_demo_driver.py ..                                 [ 28%]
+tests\integration\test_desktop_backend.py ...                            [ 28%]
+tests\integration\test_fresh_scene.py ...........                        [ 30%]
+tests\integration\test_guided.py ...................                     [ 32%]
+tests\integration\test_guided_business.py ......                         [ 33%]
+tests\integration\test_guided_playback.py ...........                    [ 34%]
+tests\integration\test_guided_readonly.py ........                       [ 35%]
+tests\integration\test_guided_recovery.py .............................. [ 39%]
+...                                                                      [ 39%]
+tests\integration\test_hkm_api.py ..........                             [ 40%]
+tests\integration\test_http_server_lifecycle.py ....                     [ 41%]
+tests\integration\test_process_restart.py .                              [ 41%]
+tests\integration\test_runtime.py .............                          [ 43%]
+tests\integration\test_simulation_tests.py ............................. [ 46%]
+........................................................................ [ 55%]
+.                                                                        [ 55%]
+tests\integration\test_store.py .....                                    [ 56%]
+tests\integration\test_test_management.py .............................. [ 59%]
+...................                                                      [ 62%]
+tests\lab\test_browser_lab.py ....                                       [ 62%]
+tests\lab\test_distributed.py .....                                      [ 63%]
+tests\lab\test_guided_boot_recovery.py ...                               [ 63%]
+tests\lab\test_guided_lab.py .....                                       [ 64%]
+tests\lab\test_opc_health_probe.py ..                                    [ 64%]
+tests\lab\test_plc.py .......                                            [ 65%]
+tests\lab\test_plc_process_restart.py .                                  [ 65%]
+tests\lab\test_source_map.py .                                           [ 65%]
+tests\lab\test_supervisor.py ..                                          [ 65%]
+tests\unit\test_action_validation.py ................                    [ 67%]
+tests\unit\test_blender_adapter.py ..........                            [ 69%]
+tests\unit\test_hkm_brain.py ...........                                 [ 70%]
+tests\unit\test_hkm_geometry.py ........................................ [ 75%]
+.                                                                        [ 75%]
+tests\unit\test_hkm_robotics.py ...........................              [ 78%]
+tests\unit\test_hkm_runtime_defenses.py ................................ [ 82%]
+......                                                                   [ 83%]
+tests\unit\test_observation_verifier.py ...                              [ 83%]
+tests\unit\test_states.py .............................................. [ 89%]
+........................................................................ [ 98%]
+...                                                                      [ 98%]
+tests\unit\test_visualization.py ...........                             [100%]
+
+================================== FAILURES ===================================
+_ test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime] _
+
+server = ('http://127.0.0.1:52208', <apps.api.test_sessions.TestRegistry object at 0x000002BDC04FFE30>)
+browser_page = (<Page url='http://127.0.0.1:52208/'>, WindowsPath('artifacts/investigation-browser/20261006T020044578397/test_clear_r...e.js', 'body': None}, {'method': 'GET', 'url': 'http://127.0.0.1:52208/ui/integration-console.js', 'body': None}, ...])
+viewport = {'width': 1440, 'height': 1000}
+
+    @pytest.mark.parametrize("server", [SyntheticRuntime, BlenderRuntime], indirect=True)
+    @pytest.mark.parametrize(
+        "viewport", [{"width": 1440, "height": 1000}, {"width": 390, "height": 844}]
+    )
+    def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_page, viewport):
+        origin, registry = server
+        page, directory, errors, console_errors, requests = browser_page
+        open_ready(page, origin, viewport)
+        uncertain = choose_pick(page, "DROP_ACK_AFTER_EFFECT")
+        assert uncertain["state"] == "UNKNOWN_OUTCOME"
+        assert registry.engine("original").runtime.journal(uncertain["command_id"]).effect_count == 1
+        epoch = registry.engine("original").runtime.world().scene_epoch
+        page.locator(".manage-data > summary").click()
+        page.locator("#clear-test").click()
+        expect(page.locator("#delete-test-title")).to_have_text("Clear Test 1 and retry?")
+        screenshot(page, directory, "clear-same-test-confirmation")
+        page.locator("#cancel-delete-test").click()
+        assert (
+            registry.engine("original").store.job(uncertain["job_id"]).state.value == "UNKNOWN_OUTCOME"
+        )
+        page.locator("#clear-test").click()
+        write_count = len([r for r in requests if physical_request(r)])
+        page.locator("#confirm-delete-test").click()
+>       expect(page.locator("#delete-test-dialog")).not_to_be_visible()
+E       AssertionError: Locator expected not to be visible
+E       Actual value: visible 
+E       Call log:
+E         - Expect "not_to_be_visible" locator("#delete-test-dialog") with timeout 5000ms
+E         - waiting for locator("#delete-test-dialog")
+E           14 � locator resolved to <dialog open="" id="delete-test-dialog" aria-labelledby="delete-test-title">�</dialog>
+E              - unexpected value "visible"
+E       
+E       Aria snapshot:
+E       - dialog "Clear Test 1 and retry?":
+E         - heading "Clear Test 1 and retry?" [level=2]
+E         - paragraph: Keep Test 1 � HKM1800-inspired warehouse cell. Remove its orders and results, restore every product and make this the current test, ready to run again.
+E         - paragraph: This removes this test's previous evidence and recordings, including unresolved outcomes. Other tests and your scenario choices stay unchanged. No pick is performed.
+E         - alert
+E         - button "Cancel" [disabled]
+E         - button "Clear test" [disabled]
+
+tests\browser\test_investigation.py:493: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\ramis\source\repos\robotops-twin\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261006T012424\tests-2.xml -
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.13.15-final-0 _______________
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+apps\__init__.py                          0      0   100%
+apps\api\__init__.py                      0      0   100%
+apps\api\__main__.py                     20      1    95%   34
+apps\api\app.py                         195      5    97%   123-124, 174, 179, 337
+apps\api\cell_profiles.py                24      0   100%
+apps\api\guided.py                       75      2    97%   28, 50
+apps\api\playback.py                     79      6    92%   31-35, 66
+apps\api\test_sessions.py               487     23    95%   49, 118, 341, 352, 354, 401, 403, 410, 484, 506, 532, 600, 621, 629, 663, 686, 693-696, 718-719, 772-773
+apps\desktop\__init__.py                  0      0   100%
+apps\desktop\backend.py                  49     49     0%   3-81
+robotops\__init__.py                      0      0   100%
+robotops\blender\__init__.py              0      0   100%
+robotops\blender\adapter.py             217     22    90%   35-38, 115, 139, 182, 185, 192, 195, 197, 200, 394-401, 426, 452
+robotops\blender\visualization.py       185     19    90%   50, 53, 55, 57, 70, 72, 133, 136, 141, 183, 187, 190, 192, 199, 207, 211, 230, 233, 235
+robotops\brain\__init__.py                0      0   100%
+robotops\brain\deterministic.py          45      1    98%   65
+robotops\brain\validation.py             71     10    86%   58, 82, 92, 96, 105, 108, 115, 117, 123, 128
+robotops\cell\__init__.py                 0      0   100%
+robotops\cell\controller.py              12      0   100%
+robotops\cell\hkm_execution.py           48      5    90%   25, 32, 43, 81, 106
+robotops\cell\runtime.py                177      9    95%   67, 165, 267, 269, 271, 278, 390-394
+robotops\config.py                       67      7    90%   87, 94, 96, 100, 105, 110, 117
+robotops\demo.py                         74     74     0%   3-196
+robotops\domain\__init__.py               0      0   100%
+robotops\domain\base.py                  57      1    98%   59
+robotops\domain\models.py               317     24    92%   60, 145, 147, 149, 153, 156, 164, 169, 188, 237, 239, 244, 247, 249, 253, 255, 302, 304, 317, 329, 374, 379, 381, 385
+robotops\domain\ports.py                  6      0   100%
+robotops\faults\__init__.py               0      0   100%
+robotops\faults\injection.py              3      0   100%
+robotops\hkm_geometry.py                317     18    94%   81, 104, 107, 116, 119, 141, 367, 369, 608, 623-631
+robotops\http_server.py                   8      1    88%   20
+robotops\integration\__init__.py          0      0   100%
+robotops\integration\engine.py          389     26    93%   281, 290, 292, 294, 298, 307, 382, 409, 417, 432, 441, 541, 588-594, 644, 666, 692, 708, 768, 978, 981, 1074
+robotops\integration\models.py           88      0   100%
+robotops\integration\store.py           159     12    92%   100, 140, 148, 152, 175, 235, 258, 292, 326, 344, 362, 367
+robotops\lab\__init__.py                  0      0   100%
+robotops\lab\__main__.py                 42     42     0%   3-64
+robotops\lab\api.py                      43      5    88%   27, 59-61, 79
+robotops\lab\business.py                 48      3    94%   41-43
+robotops\lab\config.py                   18      0   100%
+robotops\lab\edge.py                    150     25    83%   67-69, 105, 109-110, 117, 121, 143-144, 166, 176-186, 192, 198, 205-207
+robotops\lab\edge_rpc.py                 29      0   100%
+robotops\lab\journal.py                 119      7    94%   117, 120, 123, 157, 193, 195, 198
+robotops\lab\opcua.py                   129      2    98%   201-202
+robotops\lab\postgres.py                 70      1    99%   75
+robotops\lab\transport.py               178     18    90%   84, 136-137, 154, 162, 175-177, 195-196, 241-242, 276, 291, 296, 337-338, 342
+robotops\observability\__init__.py        0      0   100%
+robotops\observability\metrics.py        49      0   100%
+robotops\observation\__init__.py          0      0   100%
+robotops\observation\model.py            36      1    97%   88
+robotops\observation\quality.py          22      2    91%   16, 31
+robotops\presentation_io.py              14      0   100%
+robotops\robot_gateway\__init__.py        0      0   100%
+robotops\robot_gateway\gateway.py        32      1    97%   16
+robotops\robotics\__init__.py             0      0   100%
+robotops\robotics\catalogue.py          106      1    99%   140
+robotops\robotics\catalogue_data.py       8      0   100%
+robotops\robotics\models.py             184      7    96%   59, 177, 182, 211, 272, 274, 284
+robotops\robotics\selector.py            59      0   100%
+robotops\robotics\trajectory.py         280     12    96%   190, 255, 486, 509, 512, 517, 519, 530, 541, 554, 563, 638
+robotops\scene_geometry.py               30      0   100%
+robotops\verification\__init__.py         0      0   100%
+robotops\verification\verifier.py        35      3    91%   39, 43, 54
+robotops\workflow\__init__.py             0      0   100%
+robotops\workflow\engine.py             187      4    98%   182, 200, 267, 301
+robotops\workflow\states.py              25      2    92%   49, 53
+robotops\workflow\store.py              298     11    96%   124, 150, 236, 249, 265-268, 462, 518, 555, 604, 606
+-------------------------------------------------------------------
+TOTAL                                  5360    462    91%
+Coverage JSON written to file C:\Users\ramis\source\repos\robotops-twin\docs\evidence\acceptance\20261006T012424\coverage-2.json
+Required test coverage of 85.0% reached. Total coverage: 91.38%
+=========================== short test summary info ===========================
+FAILED tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]
+============ 1 failed, 814 passed, 1 warning in 1642.82s (0:27:22) ============
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\ramis\source\repos\robotops-twin\tools\dev.py", line 49, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\ramis\source\repos\robotops-twin\tools\dev.py", line 30, in main
+    run("-m", "pytest", *rest)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramis\source\repos\robotops-twin\tools\dev.py", line 9, in run
+    subprocess.run([sys.executable, *args], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ramis\AppData\Roaming\uv\python\cpython-3.13.15-windows-x86_64-none\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe', '-m', 'pytest', '--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-2-u0ub5jhh/fixtures', '--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T012424\\tests-2.xml', '--cov=robotops', '--cov=apps', '--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T012424\\coverage-2.json', '--cov-report=term']' returned non-zero exit status 1.

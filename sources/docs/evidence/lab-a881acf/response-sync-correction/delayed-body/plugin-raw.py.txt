@@ -1,0 +1,151 @@
+"""Opt-in, one-case diagnostic plugin; no permanent test or product change."""
+from __future__ import annotations
+import asyncio
+from datetime import datetime, timezone
+import functools
+import hashlib
+import json
+import os
+from pathlib import Path
+import sys
+import time
+import pytest
+
+ROOT = Path(__file__).resolve().parents[2]
+NODE = "tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]"
+TARGET = "/simulation-tests/original/clear"
+DELAY_SECONDS = 5.25
+EXPECTED_SOURCE_HASHES = {'tests/browser/test_investigation.py': '1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5', 'tests/conftest.py': 'ff23b5cbd01f1d2ba3004c842c50e625dd618340e8507d8e1b54d9b3db1cdda0', 'apps/api/app.py': 'af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888', 'apps/api/test_sessions.py': 'f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8', 'apps/api/guided.py': 'c38c1858ee6946b27e64654e434c2d33bf2cefcece043b568dd68d33c28a855e', 'apps/erp_ui/app.js': '9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab', 'robotops/cell/runtime.py': '985d07f69ca4fdc400a56493b3d06d04af0d3a08baad493900c9c5773f8f665f', 'robotops/workflow/store.py': 'd9e32944c193f3aa78a59755abdac778d7e1084320ae4989379017ac418f6ea7', 'robotops/http_server.py': '3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f'}
+STATE = {"diagnostic": "one existing case with successful clear final-body delay", "requested_delay_seconds": DELAY_SECONDS, "nodeid": NODE, "matching_requests": 0, "delay_count": 0, "delays": [], "reports": [], "issues": []}
+ORIGINAL = None
+PATCHED_MODULE = None
+OUTPUT = None
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+def source_hashes():
+    return {path: hashlib.sha256((ROOT/path).read_bytes()).hexdigest() for path in EXPECTED_SOURCE_HASHES}
+
+def require(condition, message):
+    if not condition:
+        raise RuntimeError(message)
+
+class DelayedClearResponseBody:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope['type'] != 'http' or scope['method'] != 'POST' or scope['path'] != TARGET:
+            return await self.app(scope, receive, send)
+        STATE['matching_requests'] += 1
+        require(STATE['matching_requests'] == 1, 'Diagnostic permits one clear request; no retry')
+        entry = {'path':scope['path'], 'method':scope['method'], 'request_seen_at_utc':utc(), 'request_seen_monotonic':time.monotonic(), 'chunks':0}
+        chunks = []
+        status = None
+        async def delayed_send(message):
+            nonlocal status
+            if message['type'] == 'http.response.start':
+                status = message['status']
+                entry['status'] = status
+                entry['headers_ready_at_utc'] = utc()
+                entry['headers_ready_monotonic'] = time.monotonic()
+                await send(message)
+                entry['headers_sent_at_utc'] = utc()
+                entry['headers_sent_monotonic'] = time.monotonic()
+                return
+            if message['type'] == 'http.response.body':
+                chunks.append(message.get('body', b''))
+                entry['chunks'] += 1
+                if not message.get('more_body', False):
+                    body = b''.join(chunks)
+                    entry['body_ready_at_utc'] = utc()
+                    entry['body_ready_monotonic'] = time.monotonic()
+                    require(status == 200, 'Clear must actually succeed before diagnostic delay')
+                    value = json.loads(body)
+                    require(value['test_id'] == 'original' and value['cleanup_pending'] is False, 'Clear is not durably complete')
+                    tests = value['history']['tests']
+                    require(len(tests) == 1 and tests[0]['test_id'] == 'original' and tests[0]['number'] == 1 and tests[0]['revision'] == 2 and tests[0]['order_count'] == 0 and tests[0]['clearing'] is False, 'Clear response does not contain expected fresh same-test state')
+                    require(STATE['delay_count'] == 0, 'Final body delay must occur exactly once')
+                    STATE['delay_count'] += 1
+                    entry['request_id'] = value['request_id']
+                    entry['durable_clear_summary'] = {'test_id':value['test_id'], 'cleanup_pending':value['cleanup_pending'], 'revision':tests[0]['revision'], 'order_count':tests[0]['order_count'], 'clearing':tests[0]['clearing']}
+                    entry['response_body_sha256'] = hashlib.sha256(body).hexdigest()
+                    entry['response_body_bytes'] = len(body)
+                    entry['requested_delay_seconds'] = DELAY_SECONDS
+                    entry['delay_started_at_utc'] = utc()
+                    entry['delay_started_monotonic'] = time.monotonic()
+                    STATE['delays'].append(entry)
+                    # Real durable clear has completed; headers were sent normally.
+                    # Only final body delivery is deliberately held, with no data change.
+                    await asyncio.sleep(DELAY_SECONDS)
+                    entry['delay_finished_at_utc'] = utc()
+                    entry['delay_finished_monotonic'] = time.monotonic()
+                    entry['actual_delay_seconds'] = entry['delay_finished_monotonic'] - entry['delay_started_monotonic']
+                    await send(message)
+                    entry['body_sent_at_utc'] = utc()
+                    entry['body_sent_monotonic'] = time.monotonic()
+                    return
+            await send(message)
+        await self.app(scope, receive, delayed_send)
+        entry['request_finished_at_utc'] = utc()
+        entry['request_finished_monotonic'] = time.monotonic()
+
+def pytest_addoption(parser):
+    parser.addoption('--diagnostic-clear-response-body-delay', action='store_true', default=False)
+
+def pytest_configure(config):
+    global OUTPUT
+    if not config.getoption('--diagnostic-clear-response-body-delay'):
+        raise pytest.UsageError('Explicit diagnostic flag required; plugin must not affect ordinary tests')
+    value = os.environ.get('ROBOTOPS_CLEAR_DELAY_OUTPUT')
+    if not value:
+        raise pytest.UsageError('Launcher-owned output directory required')
+    OUTPUT = Path(value).resolve()
+    require(OUTPUT == Path(__file__).resolve().parent/'run', 'Wrong diagnostic output location')
+    require(OUTPUT.is_dir() and not (OUTPUT/'diagnostic-result.json').exists(), 'Missing or already used output directory')
+    current = source_hashes()
+    require(current == EXPECTED_SOURCE_HASHES, 'Prepared source/test hashes changed; do not run stale diagnostic')
+    STATE.update({'started_at_utc':utc(), 'pid':os.getpid(), 'argv':sys.argv, 'source_hashes_at_start':current, 'plugin_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), 'runtime_scope':'Original native HTTP fixtures, SyntheticRuntime, configured HTTP loop and permanent journal/physical assertions retained; no browser route mocking or mutation retry'})
+
+def pytest_collection_modifyitems(session, config, items):
+    global ORIGINAL, PATCHED_MODULE
+    require(len(items) == 1 and items[0].nodeid == NODE, 'Only the exact existing synthetic desktop lifecycle case is permitted')
+    STATE['collected_nodeids'] = [item.nodeid for item in items]
+    PATCHED_MODULE = items[0].module
+    ORIGINAL = PATCHED_MODULE.create_workspace_app
+    @functools.wraps(ORIGINAL)
+    def workspace_with_delay(*args, **kwargs):
+        app = ORIGINAL(*args, **kwargs)
+        app.add_middleware(DelayedClearResponseBody)
+        return app
+    PATCHED_MODULE.create_workspace_app = workspace_with_delay
+
+def pytest_runtest_logreport(report):
+    STATE['reports'].append({'nodeid':report.nodeid,'when':report.when,'outcome':report.outcome,'duration_seconds':report.duration,'longrepr':str(report.longrepr) if report.failed else None})
+
+def pytest_sessionfinish(session, exitstatus):
+    if OUTPUT is None:
+        return
+    current = source_hashes()
+    STATE['source_hashes_at_end'] = current
+    STATE['source_inputs_unchanged'] = current == EXPECTED_SOURCE_HASHES
+    STATE['pytest_exitstatus_before_diagnostic_checks'] = int(exitstatus)
+    reports = STATE['reports']
+    normal_reports = len(reports) == 3 and {row['when'] for row in reports} == {'setup','call','teardown'} and all(row['nodeid'] == NODE and row['outcome'] == 'passed' for row in reports)
+    delay = STATE['delays'][0] if len(STATE['delays']) == 1 else {}
+    checks = {'one_exact_collected_case':STATE.get('collected_nodeids') == [NODE], 'existing_case_setup_call_teardown_passed':normal_reports, 'one_target_request':STATE['matching_requests'] == 1, 'one_successful_body_delay':STATE['delay_count'] == 1 and len(STATE['delays']) == 1 and delay.get('status') == 200, 'requested_5_25_seconds':delay.get('requested_delay_seconds') == 5.25, 'actual_delay_at_least_requested':delay.get('actual_delay_seconds',0) >= 5.25, 'headers_sent_before_delay':delay.get('headers_sent_monotonic',float('inf')) <= delay.get('delay_started_monotonic',0), 'body_sent_after_delay':delay.get('body_sent_monotonic',0) >= delay.get('delay_finished_monotonic',float('inf')), 'source_inputs_unchanged':STATE['source_inputs_unchanged'], 'pytest_exit0':int(exitstatus) == 0}
+    STATE['checks'] = checks
+    STATE['passed'] = all(checks.values())
+    STATE['finished_at_utc'] = utc()
+    STATE['clean_exit_scope'] = 'Passed original server fixture teardown enforces thread stopped, no loop/server errors, no owned server shutdown leak. No separate private fixture state inspection performed.'
+    STATE['limits'] = ['Explicit delayed-body diagnostic of one existing test, not an ordinary acceptance-suite result or additional unique repository testcase.', 'Requested sleep is exactly5.25s; observed wall duration may exceed it due scheduler timing.', 'Original4.914s delay cause remains unproven; no old-source rerun or claim this is its cause.', 'Original20s request wait and five-second UI assertions are unchanged; no mutation retry, no product edit.', 'Source equality is limited to the nine listed hashes, not whole-tree identity.']
+    if not STATE['passed']:
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+    STATE['final_pytest_exitstatus'] = int(session.exitstatus)
+    with (OUTPUT/'diagnostic-result.json').open('x',encoding='utf-8',newline='\n') as stream:
+        json.dump(STATE,stream,indent=2);stream.write('\n')
+
+def pytest_unconfigure(config):
+    if PATCHED_MODULE is not None and ORIGINAL is not None:
+        PATCHED_MODULE.create_workspace_app = ORIGINAL

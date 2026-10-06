@@ -1,0 +1,130 @@
+{
+  "kind": "independent_static_preparation_review",
+  "reviewed_at_utc": "2026-10-06T03:32:32.759841+00:00",
+  "source_commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+  "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd",
+  "launcher_sha256": "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150",
+  "outcome": "NO_BLOCKING_STATIC_SCHEMA_OR_COMMAND_MISMATCH_FOUND",
+  "runtime_execution_performed": false,
+  "scope": "Saved launcher/runbook and relevant source only. No health/network requests, process inspection/launch, browser, test, database, PDF or ZIP operations.",
+  "checks": [
+    {
+      "subject": "Actual API PID versus Windows venv launcher",
+      "result": "MATCH",
+      "evidence": [
+        "tools/lab_stack.py:111",
+        "tools/lab_stack.py:217",
+        "tools/lab_stack.py:218",
+        "robotops/lab/api.py:45"
+      ],
+      "finding": "report.processes.api is the API health process_id, not the Popen wrapper PID. launcher_processes holds wrapper handles separately. The new launcher compares the correct field."
+    },
+    {
+      "subject": "Lab health response",
+      "result": "MATCH",
+      "evidence": [
+        "robotops/lab/api.py:35",
+        "robotops/lab/api.py:39"
+      ],
+      "finding": "The lab application removes the inherited local health route and supplies status=ok, profile=lab, database=PostgreSQL, runtime and os.getpid(). The launcher does not assume these fields exist in the ordinary local API health schema."
+    },
+    {
+      "subject": "Fresh lab UUID identity",
+      "result": "MATCH",
+      "evidence": [
+        "tools/lab_stack.py:261",
+        "tools/lab_stack.py:269",
+        "tools/lab_stack.py:272",
+        "tools/lab_stack.py:281"
+      ],
+      "finding": "--fresh creates uuid4().hex, lab_run_<uuid> PostgreSQL schema, robotops.run.<uuid> queue and a UUID child of the requested data directory. The prepared manual launcher supplies --fresh --runtime blender and the expected new data/report paths; default API port is 8000."
+    },
+    {
+      "subject": "Owner creation precision",
+      "result": "MATCH",
+      "evidence": [
+        "artifacts/manual-9e83fe7-runbook.md:21",
+        "artifacts/manual-9e83fe7-runbook.md:22"
+      ],
+      "finding": "The owner record captures the actual Start-Process returned process StartTime in UTC with round-trip o formatting. It does not record write time or a rounded timestamp. The later Get-Process StartTime comparison with 10 ms tolerance is consistent with that producer; no live-process precision test was performed."
+    },
+    {
+      "subject": "Exact README commands",
+      "result": "MATCH",
+      "evidence": [
+        "README.md:87",
+        "README.md:88",
+        "tools/integration_demo.py:146",
+        "tools/integration_demo.py:148"
+      ],
+      "finding": "Argument arrays are uv run --locked python -m tools.integration_demo --scenario happy_path/lost_ack_after_effect --authorize-robot, with no URL, session or output override. Both exact command strings occur as complete README lines."
+    },
+    {
+      "subject": "One invocation and evidence reservation",
+      "result": "MATCH",
+      "evidence": [
+        "artifacts/run-final-cli-9e83fe7.ps1"
+      ],
+      "finding": "Opt-in and supported scenario required. Existing attempt/start/stdout/stderr/exit paths refuse execution. An exclusive CreateNew attempt file is flushed before Start-Process, never removed, and a partial attempt blocks replay. Exactly one Start-Process call executes the README driver. Exit evidence records uncertainty or failure without rerunning."
+    },
+    {
+      "subject": "Accepted-source precondition",
+      "result": "MATCH_STATIC_ONLY",
+      "evidence": [
+        "artifacts/run-final-cli-9e83fe7.ps1",
+        "artifacts/run-manual-lab-9e83fe7.ps1"
+      ],
+      "finding": "CLI preparation binds exact HEAD, fingerprint, clean-source campaign identity/start, terminal exit0 and all20 local gates. The manual launcher additionally validates the two clean equal nonempty unique JUnit identity sets and >=85 percent coverage before starting the new lab. These guards were read, not executed, and this review asserts no current whole-acceptance PASS."
+    }
+  ],
+  "actionable_findings": [],
+  "required_execution_review_limits": [
+    "Health has no schema, queue, data directory or source fields. Those values are checked for consistency in the freshly created report, while health is tied to its recorded actual API PID. Do not describe this as an independent database/schema probe.",
+    "The CLI guard verifies owner PID creation time and that the API PID is not older than that owner. It does not walk process ancestry. Retain the runbook command-line/creation-time/parentage inspection before stopping the owned tree; never stop PostgreSQL or RabbitMQ dependency services.",
+    "tools.integration_demo.main writes its result and exits normally even when drive returns a non-COMPLETED session. Launcher exit0 is command completion, not scenario success. Before either separate subsequent scenario or final proof, inspect the exact stdout-selected runs/integration-demos/<SID>.json, status COMPLETED, stage22, original command identity, consent and authoritative journal effect_count=1; for lost ACK also inspect same-command uncertainty/reconciliation evidence.",
+    "Actual CLI output filenames use cli-happy_path-* and cli-lost_ack_after_effect-*; runbook cli-happy-* and cli-lost-* are descriptive placeholders, not literal capture paths.",
+    "The result does not attest runtime availability, successful manual scenarios, terminal acceptance, source publication or proof from a later edited launcher."
+  ],
+  "inputs": [
+    {
+      "path": "artifacts/run-final-cli-9e83fe7.ps1",
+      "bytes": 11306,
+      "sha256": "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150"
+    },
+    {
+      "path": "artifacts/run-manual-lab-9e83fe7.ps1",
+      "bytes": 6804,
+      "sha256": "a3116840fda22f7ea6506852db92cb3f34010bc80c4c98a5a5735e2616c7bc59"
+    },
+    {
+      "path": "artifacts/manual-9e83fe7-runbook.md",
+      "bytes": 15589,
+      "sha256": "f6a355b61d33b6685c674e4006c0bd5f3b72dab8cae6ab92345d27ad4742f3dc"
+    },
+    {
+      "path": "tools/lab_stack.py",
+      "bytes": 11073,
+      "sha256": "e5eab0ed7fabdcda4b0c093f23734231df9eea31f8333a091ffb8aaa34462eea"
+    },
+    {
+      "path": "robotops/lab/api.py",
+      "bytes": 3057,
+      "sha256": "2677fb5058476eeb0fde6491d10f76cdab77488991a6d06dee83e2199bf7f15b"
+    },
+    {
+      "path": "apps/api/app.py",
+      "bytes": 14743,
+      "sha256": "af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888"
+    },
+    {
+      "path": "tools/integration_demo.py",
+      "bytes": 6471,
+      "sha256": "3dbef1a582e0a97a18c5825e8a5df2164c8aaa72c26914d4580899e8dc046252"
+    },
+    {
+      "path": "README.md",
+      "bytes": 19835,
+      "sha256": "3c3c72ea5aa6835f7d8c78d0c27923359f0bf631f5ff34053e1de660bc2c8b57"
+    }
+  ]
+}

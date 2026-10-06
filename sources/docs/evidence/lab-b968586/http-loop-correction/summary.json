@@ -1,0 +1,206 @@
+{
+  "archived_at_utc": "2026-10-06T01:19:29.602343+00:00",
+  "status": "FOCUSED_HTTP_LOOP_CORRECTION_PASS_NEW_FULL_ACCEPTANCE_PENDING",
+  "goal_status": "NOT_ACHIEVED",
+  "source_base": "b9685864afb6f47e440bd051789052070456c7b2",
+  "source_state": "Uncommitted correction with all 11 Python source/test hashes frozen before the browser lane and compared to current bytes during archive. Not a clean corrected commit/full-acceptance claim.",
+  "problem": "The b968 first full suite had 811 passed test bodies and 1 teardown error: installed Windows Proactor socket.shutdown raised 10054 before closing/detaching a transport; test API server remained alive. Original failed campaign remains in the parent archive.",
+  "correction": "Shared per-server HTTP loop factory selects stdlib Selector on Windows and preserves Uvicorn auto elsewhere; actual API/desktop/edge/native HTTP launchers and relevant fixtures use it. Playwright/OPC UA loops and global event-loop policy are unchanged. No runtime dispatch/gate/journal/verifier semantics changed.",
+  "diagnostic": {
+    "path": "docs/evidence/lab-b968586/http-loop-correction/probe-result.json",
+    "repository_test_count_claim": false,
+    "ordinary_real_tcp_reset_cases": 12,
+    "ordinary_real_tcp_reset_result": "Six Proactor and six Selector cases clean; this does not reproduce the Chromium timing.",
+    "injected_real_transport_cases": 4,
+    "injected_proactor": "HTTP and WebSocket each block in Server.wait_closed with 0 Uvicorn connections/tasks and 1 retained asyncio transport; diagnostic cleanup required.",
+    "injected_selector": "HTTP and WebSocket each complete cleanly without loop errors or retained transports.",
+    "deterministic_fake_ordering": "Installed Proactor cleanup skips socket.close/server._detach after injected 10054; Selector closes/detaches without invoking shutdown.",
+    "scope_limit": "Ignored diagnostic, not added to repository test counts and not proof of exact original Chromium timing."
+  },
+  "focused_results": {
+    "lifecycle": {
+      "junit": {
+        "path": "docs/evidence/lab-b968586/http-loop-correction/lifecycle-tests.xml",
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "0",
+            "failures": "0",
+            "skipped": "0",
+            "tests": "4",
+            "time": "0.955",
+            "timestamp": "2026-10-06T03:06:10.302413+02:00",
+            "hostname": "DESKTOP-AZDXEDL"
+          }
+        ],
+        "cases": [
+          {
+            "classname": "tests.integration.test_http_server_lifecycle",
+            "name": "test_http_server_peer_reset_exits_cleanly[peer-reset-http]",
+            "time": "0.273"
+          },
+          {
+            "classname": "tests.integration.test_http_server_lifecycle",
+            "name": "test_http_server_peer_reset_exits_cleanly[peer-reset-websocket]",
+            "time": "0.216"
+          },
+          {
+            "classname": "tests.integration.test_http_server_lifecycle",
+            "name": "test_http_server_peer_reset_exits_cleanly[shutdown-reset-http]",
+            "time": "0.221"
+          },
+          {
+            "classname": "tests.integration.test_http_server_lifecycle",
+            "name": "test_http_server_peer_reset_exits_cleanly[shutdown-reset-websocket]",
+            "time": "0.219"
+          }
+        ],
+        "problem_children": 0
+      },
+      "passed": 4,
+      "console_seconds": 0.96,
+      "junit_seconds": 0.955,
+      "exit_code": 0,
+      "earlier_preformat_run": "The same four cases passed before two style-only formatting changes; retained separately, not eight distinct cases."
+    },
+    "desktop": {
+      "junit": {
+        "path": "docs/evidence/lab-b968586/http-loop-correction/desktop-tests.xml",
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "0",
+            "failures": "0",
+            "skipped": "0",
+            "tests": "3",
+            "time": "15.667",
+            "timestamp": "2026-10-06T03:08:28.666465+02:00",
+            "hostname": "DESKTOP-AZDXEDL"
+          }
+        ],
+        "cases": [
+          {
+            "classname": "tests.integration.test_desktop_backend",
+            "name": "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick[False]",
+            "time": "5.510"
+          },
+          {
+            "classname": "tests.integration.test_desktop_backend",
+            "name": "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick[True]",
+            "time": "5.198"
+          },
+          {
+            "classname": "tests.integration.test_desktop_backend",
+            "name": "test_desktop_instances_use_distinct_owned_ports_and_independent_stop_files",
+            "time": "4.843"
+          }
+        ],
+        "problem_children": 0
+      },
+      "passed": 3,
+      "console_seconds": 15.7,
+      "junit_seconds": 15.667,
+      "exit": {
+        "exit_code": 0,
+        "ended_at": "2026-10-06T01:08:44.4537517Z",
+        "started_at": "2026-10-06T01:08:28.0625512Z"
+      }
+    },
+    "browser": {
+      "junit": {
+        "path": "docs/evidence/lab-b968586/http-loop-correction/browser-tests.xml",
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "0",
+            "failures": "0",
+            "skipped": "0",
+            "tests": "4",
+            "time": "223.458",
+            "timestamp": "2026-10-06T03:09:19.633072+02:00",
+            "hostname": "DESKTOP-AZDXEDL"
+          }
+        ],
+        "cases": [
+          {
+            "classname": "tests.browser.test_investigation",
+            "name": "test_run_notice_investigate_and_return[blender-desktop]",
+            "time": "77.433"
+          },
+          {
+            "classname": "tests.browser.test_investigation",
+            "name": "test_run_notice_investigate_and_return[blender-compact]",
+            "time": "69.967"
+          },
+          {
+            "classname": "tests.browser.test_guided_console",
+            "name": "test_guided_happy_reload_gate_trace_and_business_completion[blender]",
+            "time": "24.816"
+          },
+          {
+            "classname": "tests.lab.test_browser_lab",
+            "name": "test_full_lab_browser_authorization_recovery_and_business_completion[]",
+            "time": "51.074"
+          }
+        ],
+        "problem_children": 0
+      },
+      "passed": 4,
+      "deselected": 6,
+      "console_seconds": 223.46,
+      "junit_seconds": 223.458,
+      "exit": {
+        "ended_at": "2026-10-06T01:13:03.5074566Z",
+        "scope": "Selected Blender investigation desktop/compact, guided reload/happy, and separate-service lab happy cases; explicit marker excludes synthetic lane",
+        "started_at": "2026-10-06T01:09:18.4665712Z",
+        "source_base": "b9685864afb6f47e440bd051789052070456c7b2",
+        "exit_code": 0
+      },
+      "scope": "Blender investigation desktop/compact; guided Blender happy/reload; separate-service lab Blender happy. Six non-Blender selections intentionally deselected, not skipped/passed.",
+      "source_hashes_all11_unchanged": true
+    },
+    "lint": {
+      "result": "PASS",
+      "formatted_files": 201,
+      "log": "lint.log"
+    },
+    "typecheck": {
+      "result": "PASS",
+      "source_files": 67,
+      "log": "typecheck.log"
+    },
+    "drift": {
+      "result": "PASS",
+      "must_count": 169,
+      "errors": [],
+      "log": "drift-check.log"
+    },
+    "invalid_drift_command": {
+      "result": "COMMAND_ERROR_NOT_PASS",
+      "log": "drift-command-error.log",
+      "meaning": "tools.dev drift is not a supported command; argparse rejected it. Separate tools.drift_check output above passed. Original failed-command log retained byte-for-byte."
+    }
+  },
+  "review_attribution": {
+    "implementation_ready": "Author preparation receipt, retained with its original then-pending wording.",
+    "implementation_self_review": "Helper author self-review, not independent.",
+    "root_scope_review": "Root source/diff and saved result review.",
+    "independent_review": "Included as independent-review.json: evidence_pack performed an independent static source/parity review and checked saved scoped JUnits/source hashes; no blocking finding. Linux, new full acceptance, final manual and remote proof remain pending."
+  },
+  "archive": {
+    "copied_inputs": 28,
+    "bytes": 81320,
+    "inventory": "inputs.json",
+    "all_copies_byte_identical": true,
+    "parent_archive_index_unchanged": true,
+    "script_snapshots": "Python/PowerShell source stored as .py.txt/.ps1.txt so archived code is not an active lint/test input."
+  },
+  "limitations": [
+    "New clean-source complete acceptance, corrected final manual loop/PDF review and exact-source remote attestation remain required.",
+    "These are focused scopes; diagnostic loops and repeated pre-format invocations are not added to unique repository test totals.",
+    "Tests observed on Windows CPython3.13.15; locked Python3.13/Linux stdlib Selector is intended, but Linux was not run here and optional uvloop compatibility is not claimed.",
+    "Raw logs/receipts retain original encodings, absolute paths and historical status wording; inputs.json provides stable archive mappings.",
+    "The browser launcher contains already-documented local demo-only service configuration; this archive is not a new secret/security audit or publication approval."
+  ],
+  "updated_at_utc": "2026-10-06T01:23:31.509089+00:00"
+}

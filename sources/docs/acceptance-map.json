@@ -2193,5 +2193,1112 @@
       "docs/adr/0012-evidence-driven-investigation.md"
     ],
     "explanation": "Real Chromium journeys with both runtimes and both viewports retain screenshots/traces/results, verify no unexpected browser errors, and preserve exactly one original effect; usability limitations are documented separately."
+  },
+  "LAB-MUST-001": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_authorization_is_bounded_durable_and_physically_gated",
+      "test_guided_happy_reload_gate_trace_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "Create/Run Order starts guided execution rather than secretly running the full robot workflow. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-002": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_authorization_is_bounded_durable_and_physically_gated",
+      "test_guided_network_stack_recovers_without_repeating_motion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "Each displayed stage maps to actual backend work/state/protocol evidence. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-003": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_authorization_is_bounded_durable_and_physically_gated"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "Authorization advances only the intended bounded stage. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-004": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_revision_guard_and_double_click_are_idempotent",
+      "test_reconciliation_idempotency_binds_observation_fault"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "tests/integration/test_guided_recovery.py"
+    ],
+    "explanation": "Authorizations are idempotent/revision-guarded against double click/replay. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-005": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_authorization_is_bounded_durable_and_physically_gated",
+      "test_revision_guard_and_double_click_are_idempotent"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "No DB transaction remains open while waiting for a human. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-006": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_automatic_driver_requires_explicit_physical_consent_and_resumes_original"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/workflow/engine.py",
+      "tools/integration_demo.py",
+      "tests/integration/test_demo_driver.py"
+    ],
+    "explanation": "Automatic and guided modes use the same stage handlers. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-007": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_happy_path",
+      "test_lost_ack_before_effect"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "Existing correctness invariants and scenarios remain functional. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-008": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_revision_guard_and_double_click_are_idempotent",
+      "test_guided_network_stack_recovers_without_repeating_motion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "WMS-style versioned REST task intake exists with idempotency. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-009": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_postgres_full_repository_intake_and_atomic_outbox",
+      "test_guided_network_stack_recovers_without_repeating_motion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Integration-lab persistence uses PostgreSQL or a documented equivalent lab profile. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-010": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_postgres_full_repository_intake_and_atomic_outbox"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      "robotops/workflow/store.py"
+    ],
+    "explanation": "Transactional outbox is real, not a log message. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. Store.prepare commits command and application outbox in one transaction; the mapped PostgreSQL test verifies durable pending intent and payload conflict, not an injected transaction rollback."
+  },
+  "LAB-MUST-011": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "RabbitMQ/AMQP path is real in lab mode. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-012": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Publisher confirm and consumer ACK are represented distinctly. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-013": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Edge adapter persists/handles delivery identity robustly. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-014": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_opcua_browse_subscription_acceptance_gate_and_result",
+      "test_full_lab_browser_authorization_recovery_and_business_completion",
+      "test_slow_real_server_state_probe_preserves_original_execution_session",
+      "test_sustained_real_server_state_delay_is_bounded_without_a_second_execution"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      "tests/lab/test_browser_lab.py",
+      "robotops/lab/edge.py",
+      "robotops/lab/edge_rpc.py",
+      "tools/lab_stack.py",
+      "tests/lab/test_plc.py",
+      "tests/lab/test_opc_health_probe.py"
+    ],
+    "explanation": "OPC UA client/server communication is real in lab mode. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-015": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_opc_server_process_restart_does_not_regrant_effect",
+      "test_acknowledgement_cannot_mark_a_concurrently_advanced_result"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      "tests/lab/test_plc.py"
+    ],
+    "explanation": "Virtual PLC has durable-enough command identity/journal semantics for demonstrated recovery. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-016": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Same command ID + same payload cannot cause a second physical effect. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-017": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_journal_rejects_payload_and_result_conflicts"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Same command ID + different payload is rejected. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-018": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_happy_reload_gate_trace_and_business_completion",
+      "test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "Console shows What/Wire/Code/State/Why/failure semantics. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. The mapped browser test covers the guided flow. Final manual evidence must also inspect each of the six tabs against persisted step fields; this test does not assert every tab."
+  },
+  "LAB-MUST-019": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_network_stack_recovers_without_repeating_motion",
+      "test_guided_happy_reload_gate_trace_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "Protocol and real-vs-simulated badges are accurate. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-020": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_network_stack_recovers_without_repeating_motion",
+      "test_every_displayed_source_symbol_actually_executed_and_excerpt_matches_file",
+      "test_every_lab_stage_source_symbol_executes_and_excerpt_matches"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py",
+      "tests/integration/test_guided_business.py",
+      "tests/lab/test_source_map.py",
+      "robotops/lab/edge_rpc.py"
+    ],
+    "explanation": "Source references point to code that actually executes. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-021": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "security"
+    ],
+    "tests": [
+      "test_trace_sanitizes_exception_text_headers_and_credentials"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "Payloads are derived from actual execution data and secrets are redacted. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-022": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_happy_reload_gate_trace_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "Architecture mini-map follows the current stage. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. Final manual evidence must record the active mini-map position at stage boundaries and after historical-step inspection; the mapped browser test alone does not assert the mini-map."
+  },
+  "LAB-MUST-023": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_happy_reload_gate_trace_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "In-progress session survives browser reload. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-024": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_authorization_is_bounded_durable_and_physically_gated",
+      "test_guided_happy_reload_gate_trace_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "Final physical gate precedes robot side effect. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-025": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_happy_reload_gate_trace_and_business_completion",
+      "test_guided_lost_ack_reconciles_original_command_without_second_effect"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "3D viewer runs only after that gate and post-execution flow returns to verification/reconciliation. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-026": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_readonly_routes_and_stream_do_not_advance",
+      "test_deleted_guided_store_reads_do_not_recreate_database",
+      "test_active_stream_closes_when_world_is_cleared_or_deleted",
+      "test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_and_readonly"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py",
+      "apps/api/guided.py",
+      "robotops/workflow/store.py",
+      "tests/integration/test_guided_readonly.py"
+    ],
+    "explanation": "Read-only viewing/streaming cannot mutate robot/workflow state. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-027": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "ACK-before-effect loss scenario is demonstrated. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-028": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack",
+      "test_guided_lost_ack_reconciles_original_command_without_second_effect"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "ACK-after-effect loss scenario reaches uncertainty/reconciliation without duplicate physical action. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-029": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Duplicate/redelivery scenario proves effect_count remains one. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-030": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_broker_failure_retains_outbox_and_opc_disconnect_never_executes",
+      "test_boot_change_before_dispatch_rechecks_then_requires_renewed_physical_consent",
+      "test_boot_change_after_dispatch_intent_remains_uncertain_without_repeat",
+      "test_interrupted_unstarted_lab_dispatch_returns_to_preconditions",
+      "test_restart_invalidates_readiness_until_fresh_checks",
+      "test_opc_server_process_restart_does_not_regrant_effect",
+      "test_acknowledgement_cannot_mark_a_concurrently_advanced_result",
+      "test_slow_real_server_state_probe_preserves_original_execution_session",
+      "test_sustained_real_server_state_delay_is_bounded_without_a_second_execution"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      "tests/lab/test_guided_boot_recovery.py",
+      "tests/lab/test_plc.py",
+      "tests/lab/test_plc_process_restart.py",
+      "tests/lab/test_opc_health_probe.py",
+      "robotops/lab/edge.py"
+    ],
+    "explanation": "OPC UA/network interruption has deterministic documented behavior. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-031": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_uncertain_run_queries_original_identity_and_never_repeats_effect"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Inconclusive observation can prevent false success. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-032": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_network_stack_recovers_without_repeating_motion",
+      "test_wms_outage_cannot_complete_erp_order_before_business_stage",
+      "test_erp_completion_requires_durable_acknowledgement_for_every_order_line"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      "tests/integration/test_guided_business.py",
+      "robotops/lab/business.py"
+    ],
+    "explanation": "WMS outage after verified execution retries business reconciliation, not robot motion. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-033": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_lost_ack_reconciles_original_command_without_second_effect"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "UNKNOWN_OUTCOME is visible and explainable. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-034": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_lost_ack_reconciles_original_command_without_second_effect"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Reconciliation queries the original command instead of issuing a fresh pick. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-035": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_authorization_is_bounded_durable_and_physically_gated",
+      "test_revision_guard_and_double_click_are_idempotent"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "Unit tests cover new state/domain logic. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-036": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack",
+      "test_guided_network_stack_recovers_without_repeating_motion",
+      "test_full_lab_browser_authorization_recovery_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      "tests/lab/test_browser_lab.py",
+      "robotops/lab/edge.py",
+      "robotops/lab/edge_rpc.py",
+      "tools/lab_stack.py"
+    ],
+    "explanation": "Integration tests cover DB/outbox/broker/edge/OPC UA/virtual PLC path. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-037": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_happy_reload_gate_trace_and_business_completion",
+      "test_full_lab_browser_authorization_recovery_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py",
+      "tests/lab/test_browser_lab.py",
+      "robotops/lab/edge.py",
+      "robotops/lab/edge_rpc.py",
+      "tools/lab_stack.py"
+    ],
+    "explanation": "Browser E2E test drives a complete guided happy path through authorization -> 3D execution -> verification -> reconciliation. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-038": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_lost_ack_reconciles_original_command_without_second_effect",
+      "test_full_lab_browser_authorization_recovery_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py",
+      "tests/lab/test_browser_lab.py",
+      "robotops/lab/edge.py",
+      "robotops/lab/edge_rpc.py",
+      "tools/lab_stack.py"
+    ],
+    "explanation": "Browser/integration E2E test drives at least ACK-after-effect/UNKNOWN_OUTCOME/reconciliation. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-039": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_happy_reload_gate_trace_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "apps/erp_ui/integration-console.js",
+      "apps/erp_ui/app.js",
+      "tests/browser/test_guided_console.py"
+    ],
+    "explanation": "Browser reload/resume is tested. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-040": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_revision_guard_and_double_click_are_idempotent",
+      "test_reconciliation_idempotency_binds_observation_fault"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "tests/integration/test_guided_recovery.py"
+    ],
+    "explanation": "Double authorization/idempotency is tested. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-041": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_real_pg_rabbit_edge_opc_duplicate_and_lost_ack"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py"
+    ],
+    "explanation": "Duplicate AMQP/OPC command does not duplicate physical effect and is asserted. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-042": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_happy_path"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "Existing test suite passes. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-043": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "lint",
+      "typecheck"
+    ],
+    "tests": [
+      "test_knowledge_base_links_ids_sources_and_status"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py"
+    ],
+    "explanation": "Lint/type checks pass at repository policy level. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-044": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_network_stack_recovers_without_repeating_motion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      ".github/workflows/ci.yml"
+    ],
+    "explanation": "CI runs the relevant tests or documents any environment-specific Blender limitation with a deterministic headless substitute. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. Workflow source inspection proves the configured PostgreSQL/RabbitMQ/Blender test lane; a successful remote CI run for the final source requires its own run evidence."
+  },
+  "LAB-MUST-045": {
+    "gates": [
+      "tests_1",
+      "tests_2"
+    ],
+    "tests": [
+      "test_guided_network_stack_recovers_without_repeating_motion",
+      "test_full_lab_browser_authorization_recovery_and_business_completion"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "robotops/lab/transport.py",
+      "robotops/lab/postgres.py",
+      "robotops/lab/opcua.py",
+      "robotops/lab/journal.py",
+      "tests/lab/test_distributed.py",
+      "tests/lab/test_guided_lab.py",
+      "tests/lab/test_browser_lab.py",
+      "robotops/lab/edge.py",
+      "robotops/lab/edge_rpc.py",
+      "tools/lab_stack.py",
+      "compose.yaml",
+      "docs/integration-lab.md",
+      "docs/integration-lab-native.md",
+      "tools/lab-services.ps1",
+      "robotops/lab/__main__.py"
+    ],
+    "explanation": "Docker/integration-lab startup has a documented smoke test and health checks. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. The separate-process browser lane starts and probes the complete native lab. The Windows workstation has no Docker/WSL; Compose execution is not claimed by native evidence."
+  },
+  "LAB-MUST-046": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift"
+    ],
+    "tests": [
+      "test_knowledge_base_links_ids_sources_and_status"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "README.md",
+      "docs/integration-lab.md",
+      "tools/integration_demo.py",
+      "tests/integration/test_demo_driver.py",
+      "docs/integration-lab-native.md"
+    ],
+    "explanation": "README architecture matches implementation. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. Drift tests validate references and status consistency, not semantic accuracy; final documentation-to-implementation inspection is separate evidence."
+  },
+  "LAB-MUST-047": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift"
+    ],
+    "tests": [
+      "test_knowledge_base_links_ids_sources_and_status"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "README.md",
+      "docs/integration-lab.md",
+      "tools/integration_demo.py",
+      "tests/integration/test_demo_driver.py",
+      "docs/integration-lab-native.md"
+    ],
+    "explanation": "Clearly label simulated vs real-protocol components. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. Drift tests validate references and status consistency, not semantic accuracy; final documentation-to-implementation inspection is separate evidence."
+  },
+  "LAB-MUST-048": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift"
+    ],
+    "tests": [
+      "test_knowledge_base_links_ids_sources_and_status"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "README.md",
+      "docs/integration-lab.md",
+      "tools/integration_demo.py",
+      "tests/integration/test_demo_driver.py",
+      "docs/integration-lab-native.md"
+    ],
+    "explanation": "Document local fast mode and full integration-lab mode. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. Drift tests validate references and status consistency, not semantic accuracy; final documentation-to-implementation inspection is separate evidence."
+  },
+  "LAB-MUST-049": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift"
+    ],
+    "tests": [
+      "test_knowledge_base_links_ids_sources_and_status"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "README.md",
+      "docs/integration-lab.md",
+      "tools/integration_demo.py",
+      "tests/integration/test_demo_driver.py",
+      "docs/integration-lab-native.md"
+    ],
+    "explanation": "Document all acknowledgement meanings and uncertainty model. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. Drift tests validate references and status consistency, not semantic accuracy; final documentation-to-implementation inspection is separate evidence."
+  },
+  "LAB-MUST-050": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift"
+    ],
+    "tests": [
+      "test_automatic_lost_ack_demo_queries_original_without_another_pick"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "README.md",
+      "docs/integration-lab.md",
+      "tools/integration_demo.py",
+      "tests/integration/test_demo_driver.py"
+    ],
+    "explanation": "Include a reproducible demo script for happy path and lost-ACK recovery. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop."
+  },
+  "LAB-MUST-051": {
+    "gates": [
+      "tests_1",
+      "tests_2",
+      "drift"
+    ],
+    "tests": [
+      "test_domain_boundary_has_no_blender_or_network_dependency"
+    ],
+    "files": [
+      "GOAL.md",
+      "robotops/integration/engine.py",
+      "robotops/integration/store.py",
+      "tests/integration/test_guided.py",
+      "README.md",
+      "docs/integration-lab.md",
+      "tools/integration_demo.py",
+      "tests/integration/test_demo_driver.py"
+    ],
+    "explanation": "No claim implies proprietary SICS.AI knowledge, exact HKM1800 behavior, or safety certification. Final manual evidence must be indexed in the Integration Lab delivery report; source/test mappings are not a substitute for the mandatory final agent loop. The domain dependency test is only a boundary check. Final text/UI inspection must separately prove the independent synthetic, nonproprietary and noncertified claims."
   }
 }

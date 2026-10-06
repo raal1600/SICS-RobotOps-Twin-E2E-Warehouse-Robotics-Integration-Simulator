@@ -1,0 +1,149 @@
+"""Read-only A publication review preparation; --render-after-terminal opts in."""
+
+import argparse
+import hashlib
+import json
+import subprocess
+import sys
+from datetime import UTC, datetime
+from pathlib import Path
+from audit_inputs import load_inventory
+
+ROOT = Path(__file__).resolve().parents[3]
+COMMIT = "9e83fe7d41a52a63ba65b77730e392dafca8fffe"
+FINGERPRINT = "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+CAMPAIGN = ROOT / "docs/evidence/acceptance/20261006T024719"
+EXIT = ROOT / "artifacts/acceptance-response-sync-exit.json"
+SITE = ROOT / "_site"
+POPPLER = Path("C:/Users/ramis/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/bin/pdftoppm.exe")
+GATES = (
+    "setup browser_setup blender_version security tests_1 tests_2 repeatability lint typecheck "
+    "demo_happy_path demo_lost_ack_after_effect demo_lost_ack_before_effect demo_ambiguous "
+    "demo_restart demo_logical_estop demo_cell_fault demo_tool_showcase drift publication publication_final"
+).split()
+PARTS = ["01-design", "02-avgransning", "03-diskussion"]
+
+
+def read(path):
+    return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def require(condition, message):
+    if not condition:
+        raise RuntimeError(message)
+
+
+def git(*args):
+    return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
+
+
+def guarded_inputs():
+    require(EXIT.is_file(), "Acceptance not terminal; do not render")
+    terminal, manifest = read(EXIT), read(CAMPAIGN / "manifest.json")
+    require(terminal["exit_code"] == 0 and terminal["source"] == COMMIT, "Wrong/failed terminal campaign")
+    started = datetime.fromisoformat(manifest["started_at"])
+    require(datetime.fromisoformat(terminal["started_at"]) <= started <= datetime.fromisoformat(terminal["ended_at"]), "Terminal timestamps do not bracket campaign")
+    require(manifest["source"] == {"commit": COMMIT, "dirty": False, "source_sha256": FINGERPRINT}, "Wrong clean acceptance identity")
+    require(git("rev-parse", "HEAD") == COMMIT, "HEAD differs from A; B needs its own review")
+    require(not git("diff", "--name-only", "HEAD", "--", ".", ":(exclude)ACCEPTANCE_REPORT.md"), "Tracked source differs from A")
+    sys.path.insert(0, str(ROOT))
+    from tools.acceptance import source_identity
+
+    require(source_identity()["source_sha256"] == FINGERPRINT, "Current source fingerprint differs from A")
+    for name in GATES:
+        gate = manifest["gates"].get(name, {})
+        require(gate.get("passed") is True and gate.get("exit_code", 0) == 0, "Missing/failed local gate: " + name)
+    build = read(SITE / "build.json")
+    require(build["source_commit"] == COMMIT, "Stale/different-source _site")
+    require(digest(SITE / "build.json") == digest(CAMPAIGN / "publication-build.json"), "_site is not the archived final acceptance build")
+    require(build["simulator_status"]["status"] == "NOT DONE", "A review expects pre-remote NOT DONE publication; do not reuse for B")
+    require([item["report"] for item in build["reports"]] == PARTS, "Unexpected publication parts/order")
+    for item in build["reports"]:
+        require(digest(SITE / "downloads" / (item["report"] + ".pdf")) == item["pdf_sha256"], "PDF differs from bound build manifest")
+    return manifest, build
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--render-after-terminal", action="store_true")
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--inventory", required=True, help="Exact current finalized evidence inventory; shared full-acceptance/manual guard")
+    args = parser.parse_args()
+    require(args.render_after_terminal, "Preparation only unless --render-after-terminal is explicit")
+    out = args.output.resolve()
+    require(out.parent == (ROOT / "artifacts").resolve() and out.name.startswith("publication-review-9e83fe7-"), "Use a fresh artifacts/publication-review-9e83fe7-<UTC> directory")
+    require(not out.exists(), "Existing review output refused; originals are never overwritten")
+    evidence = load_inventory(Path(__file__).resolve().parent, "publication-render-prerequisites", inventory_path_arg=args.inventory, execution_opt_in=args.render_after_terminal)
+    manifest, build = guarded_inputs()
+    require(POPPLER.is_file(), "Configured Poppler missing; no dependency install attempted")
+    from PIL import Image, ImageDraw
+    from pypdf import PdfReader
+
+    out.mkdir()
+    inputs = [CAMPAIGN / "manifest.json", EXIT, CAMPAIGN / "publication-build.json", SITE / "build.json"]
+    inputs.extend(SITE / (name + ".html") for name in ["index", "governance", "design", "avgransning", "diskussion", "diagram", "kallor"])
+    pdfs, part_text, part_offset = [], [], 0
+    for name in PARTS + ["robotops-twin-samlat"]:
+        path = SITE / "downloads" / (name + ".pdf")
+        inputs.append(path)
+        with path.open("rb") as stream:
+            reader = PdfReader(stream)
+            texts = [page.extract_text() or "" for page in reader.pages]
+        pdfs.append({"path": path.relative_to(ROOT).as_posix(), "sha256": digest(path), "pages": len(texts), "page_text_sha256": [hashlib.sha256(t.encode()).hexdigest() for t in texts]})
+        if name in PARTS:
+            item = next(item for item in build["reports"] if item["report"] == name)
+            require(len(texts) == item["pages"], "Part page count differs from bound manifest")
+            pdfs[-1]["combined_page_range"] = [part_offset + 1, part_offset + len(texts)]
+            part_offset += len(texts)
+            part_text.extend(texts)
+        else:
+            require(texts == part_text, "Combined per-page extracted text differs from concatenated parts")
+            require(len(texts) == build["combined_pdf_pages"] == part_offset, "Combined page count mismatch")
+    before = {p.relative_to(ROOT).as_posix(): digest(p) for p in inputs}
+    # Full-resolution 85dpi pages, sequential batches bounded to eight pages each.
+    commands, renders = [], []
+    combined = SITE / "downloads/robotops-twin-samlat.pdf"
+    for start in range(1, part_offset + 1, 8):
+        last = min(start + 7, part_offset)
+        command = [str(POPPLER), "-f", str(start), "-l", str(last), "-r", "85", "-png", str(combined), str(out / "page")]
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60)
+        (out / f"render-{start:03}-{last:03}.log").write_text(result.stdout + result.stderr, encoding="utf-8")
+        require(result.returncode == 0, "Poppler batch failed; preserve partial output")
+        commands.append(command)
+        print(f"Rendered combined pages {start}-{last}", flush=True)
+    pages = sorted(out.glob("page-*.png"), key=lambda p: int(p.stem.split("-")[-1]))
+    require([int(p.stem.split("-")[-1]) for p in pages] == list(range(1, part_offset + 1)), "Missing/duplicate rendered page")
+    for start in range(0, len(pages), 8):
+        batch = pages[start : start + 8]
+        with Image.open(batch[0]) as first:
+            width, height = first.size
+        sheet = Image.new("RGB", (2 * (width + 20) + 20, 4 * (height + 44) + 20), "#d6dae0")
+        draw = ImageDraw.Draw(sheet)
+        for index, path in enumerate(batch):
+            with Image.open(path) as page:
+                require(page.size == (width, height), "Unexpected page-size variation; review individual images")
+                x, y = 20 + (index % 2) * (width + 20), 40 + (index // 2) * (height + 44)
+                sheet.paste(page.convert("RGB"), (x, y))
+                draw.text((x, y - 20), f"Combined page {start + index + 1}", fill="black")
+        target = out / f"contact-{start + 1:03}-{start + len(batch):03}.png"
+        sheet.save(target)
+        renders.append({"path": target.relative_to(ROOT).as_posix(), "sha256": digest(target), "pages": [start + 1, start + len(batch)], "visually_reviewed": False})
+    html = []
+    for name in ["index", "governance", "design", "avgransning", "diskussion", "diagram", "kallor"]:
+        path = SITE / (name + ".html")
+        html.append({"path": path.relative_to(ROOT).as_posix(), "sha256": digest(path), "capture": None, "visually_reviewed": False})
+    require(before == {p.relative_to(ROOT).as_posix(): digest(p) for p in inputs}, "Publication/acceptance inputs changed during review")
+    guarded_inputs()
+    final_evidence = load_inventory(Path(__file__).resolve().parent, "publication-render-prerequisites", inventory_path_arg=args.inventory, execution_opt_in=args.render_after_terminal)
+    require(final_evidence["_audit_binding"]["inventory_sha256"] == evidence["_audit_binding"]["inventory_sha256"], "Evidence inventory changed during rendering")
+    result = {"status": "RENDERED_STRUCTURAL_CHECKS_PASS_VISUAL_REVIEW_PENDING", "source": manifest["source"], "evidence_prerequisite_binding": evidence["_audit_binding"], "created_at_utc": datetime.now(UTC).isoformat(), "inputs": before, "pdfs": pdfs, "combined_text_and_page_count_match": True, "render_dpi": 85, "rendered_page_count": len(pages), "page_images": [{"path": p.relative_to(ROOT).as_posix(), "sha256": digest(p)} for p in pages], "contact_sheets": renders, "html": html, "render_commands": commands, "visual_review": "PENDING_ROOT_ALL_SHEETS_AND_SELECTED_HTML", "limitations": ["Read-only local A publication; no build, browser or deployment performed by script.", "All combined pages rendered; text equality and hashes do not prove visual quality.", "Root must view every sheet at original resolution and inspect individual pages when unclear; 85dpi may conceal fine defects.", "Combined PDF has no expected digest in build.json; its observed hash and exact per-page text/page equivalence are retained, not mislabeled as prior digest verification.", "Selected HTML capture scope and hashes must be recorded by root; no HTML screenshots created here.", "Publication remains NOT DONE before exact-source remote gates; successor B status/build needs its own fresh review."]}
+    (out / "structural-review.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"output": str(out), "pages": len(pages), "sheets": len(renders), "visual_review": "PENDING"}))
+
+
+if __name__ == "__main__":
+    main()

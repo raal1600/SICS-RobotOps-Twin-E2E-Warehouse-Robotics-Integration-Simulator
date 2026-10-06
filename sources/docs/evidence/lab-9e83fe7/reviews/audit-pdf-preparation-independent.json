@@ -1,0 +1,121 @@
+{
+  "reviewed_at_utc": "2026-10-06T03:01:25.359363+00:00",
+  "verdict": "TWO_STATIC_INTEGRITY_FINDINGS_RESOLVED_NO_BLOCKING_FINDINGS",
+  "source_commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+  "scope": "Independent bounded static review of audit/PDF guard adaptation and requested byte-binding corrections. Read program/diff/preparation text only; AST parse and built-in compile only. No imports, guard/scanner execution, ZIP/PDF content read, render, browser, test, database or network activity.",
+  "initial_findings": [
+    {
+      "id": "I1",
+      "location": "audit_inputs.load_inventory",
+      "finding": "Inventory parsed on first read but bound hash was reread at return; changed bytes could describe different checked fields.",
+      "resolution": "Inventory and preparation parsed/hashed from original buffers; differing rereads refuse before return. Binding includes both hashes.",
+      "status": "RESOLVED_STATICALLY"
+    },
+    {
+      "id": "I2",
+      "location": "review_publication guarded_inputs/PDF extraction",
+      "finding": "JSON/PDF facts parsed before initial hash capture; later reads could bind different bytes.",
+      "resolution": "First-read buffers/hash cache for JSON/PDF/HTML; JSON and PdfReader(BytesIO(raw)) use bound buffers. Changed bytes refused before render/output. Cached hashes populate evidence. Final inventory/preparation binding compared in full.",
+      "status": "RESOLVED_STATICALLY"
+    }
+  ],
+  "guard_review": {
+    "explicit_inventory_API_avoids_secondCLIparse": true,
+    "execution_opt_in_required": true,
+    "exact_source_fingerprint_clean_manifest_required": true,
+    "all20_gates_wrapper_exit0_required": true,
+    "two815_clean_unique_equalJUnit_sets_required": true,
+    "source_bound_independent_terminal_review_required": true,
+    "two164check_final_case_reviews_and_eight_immutable_snapshot_hash_ID_fixture_JUnit_bindings_required": true,
+    "five_fresh_complete_manualCLI_original_receipts_oneeffect_exactREADMEcommands_required": true,
+    "manual_after_acceptance_and_owned_stop_remaining_empty_required": true,
+    "missing_inventory_manual_or_scanbindings_refuse": true,
+    "PDF_currentNOT_DONE_build_matches_archivedsource_and_threepart_hashes": true,
+    "combinedPDF_text_pageequivalence_not_mislabeled_expected_digest": true,
+    "structural_output_keeps_visual_review_pending": true,
+    "public_payload_scope_separate_from_eightcurrentZIPs": true
+  },
+  "initial8files_preserved_hashverified": true,
+  "minimal_fix_diffs_match_exact_program_text": true,
+  "syntax_validation_only": true,
+  "blocking_findings": [],
+  "limits": [
+    "No observed input mutation alleged; findings concern binding gaps found before execution.",
+    "No positive/negative race test or readiness guard was run.",
+    "No filesystem lock; external Poppler reads retain bound before/after byte checks as documented.",
+    "No actual acceptance, saved audit, PDF visual, manual, payload scan or remote PASS asserted."
+  ],
+  "inputs": [
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/preparation-before-byte-binding-fix/audit_inputs.py.txt",
+      "sha256": "9178af9bdd2fb8153e8d3b0eab9385cec40ab3bb47213e77ee9f8d1b9c2b6388",
+      "bytes": 19936
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/audit_inputs.py",
+      "sha256": "25a7f94bc0bea2c51a0ad9cb6f0d38fa89b0f5137cf8c92ca36202c2f21ca2c1",
+      "bytes": 20404
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/audit_inputs.py.byte-binding-fix.diff.txt",
+      "sha256": "6b4511b7d3e5010d95d0b96a7d851581adaa91a1014fe2f23c9096d57979ed1f",
+      "bytes": 3020
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/preparation-before-byte-binding-fix/review_publication.py.txt",
+      "sha256": "6d3249e30e36688af2da4b0ea056f9502f2ed4dbe22059e180d60454a481bba5",
+      "bytes": 10326
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/review_publication.py",
+      "sha256": "98f2e4b1fc848c41a0a193f48438863e04d9d2442aaeee1427dc51910265b8f8",
+      "bytes": 11499
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/review_publication.py.byte-binding-fix.diff.txt",
+      "sha256": "9bdaaa50a12d772755acd472e562c86a7bc0eb701dfdda0e74f5c96fb0fca199",
+      "bytes": 10456
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/audit-programs-preparation.json",
+      "sha256": "e3a848576f2945419ceeb7acfecbdd9293545fbebab7652409241349eac5a7a2",
+      "bytes": 6545
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-review-preparation.json",
+      "sha256": "1715d46516a1262d6a46d20dba1c4bfea9a19dfc2b1648a2a9532a752f0f7a7b",
+      "bytes": 3495
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/byte-binding-fix-preparation.json",
+      "sha256": "acbd578fa720d69ddfb4407055143b826fe2b12bdf484a0edabe83eeb5013c66",
+      "bytes": 2326
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/inventory-template.json",
+      "sha256": "fea8427b32af7ac085c3879d82151f34b613f33cdb5235a228af342abd3a2405",
+      "bytes": 2671
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/audit-programs-usage.md",
+      "sha256": "697b60240779017ef882aab424fe876ade793126a8bd097d1f027eef8dbca045",
+      "bytes": 7680
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-review-usage.md",
+      "sha256": "c5585e3da70463b1392aca82e542eb57479500d95011302dfafd0c684b6c73c2",
+      "bytes": 6770
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/public-payload-review-plan.md",
+      "sha256": "681a45c1195d3010c726854257dcbbe46f6afe11aba0f383cc0e407035fbb46a",
+      "bytes": 4246
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/preparation-before-byte-binding-fix/snapshot-receipt.json",
+      "sha256": "97cad2eb8148808fed987f5a827e07bb1d6a29aac5eef71dd38a87ccd5e2e6bd",
+      "bytes": 2931
+    }
+  ],
+  "goal_status": "NOT_ACHIEVED"
+}

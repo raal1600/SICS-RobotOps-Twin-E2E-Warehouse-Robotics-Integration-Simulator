@@ -1,0 +1,85 @@
+{
+  "recorded_at_utc": "2026-10-06T02:36:18.600999+00:00",
+  "scope": "Root records actual completed tool-call outputs from configured commands after test+ADR edit. No command rerun or wholeacceptance promotion by this receipt.",
+  "source_identity_at_recording": {
+    "commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+    "dirty": true,
+    "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+  },
+  "commands": [
+    {
+      "command": "uv run --locked python -m tools.dev lint",
+      "observed_exit_code": 0,
+      "observed_output": "All checks passed!\n203 files already formatted"
+    },
+    {
+      "command": "uv run --locked python -m tools.dev typecheck",
+      "observed_exit_code": 0,
+      "observed_output": "Success: no issues found in 67 source files"
+    },
+    {
+      "command": "uv run --locked python -m tools.drift_check",
+      "observed_exit_code": 0,
+      "observed_passed": true,
+      "errors": [],
+      "must_count": 169,
+      "source_count": 31,
+      "diagram_count": 13
+    }
+  ],
+  "focused_browser": {
+    "tests": 4,
+    "passed": 4,
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "junit_seconds": 122.443,
+    "console_seconds": 122.45,
+    "distinct_existing_cases": 4,
+    "exit_code": 0,
+    "test_sha256_unchanged": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5"
+  },
+  "input_files": [
+    {
+      "path": "tests/browser/test_investigation.py",
+      "sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "bytes": 28449
+    },
+    {
+      "path": "docs/adr/0013-reusable-test-lifecycle.md",
+      "sha256": "82de3af2aed10155ef61313c48b14c226e736e726306a6139baa62c3710433ee",
+      "bytes": 6870
+    },
+    {
+      "path": "robotops/http_server.py",
+      "sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "bytes": 712
+    },
+    {
+      "path": "apps/erp_ui/app.js",
+      "sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "bytes": 50834
+    },
+    {
+      "path": "apps/api/test_sessions.py",
+      "sha256": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+      "bytes": 35454
+    },
+    {
+      "path": "artifacts/lifecycle-response-sync.xml",
+      "sha256": "337be62d12a3295a68481d3d0fe99e7d8e4dad96f486571391da05c5d002412a",
+      "bytes": 913
+    },
+    {
+      "path": "artifacts/lifecycle-response-sync-exit.json",
+      "sha256": "40af3fcc5de15c176944b6e4740eacd78e52ded92b1f46db29fdb232807f1898",
+      "bytes": 673
+    }
+  ],
+  "source_scope": "Only test synchronization and ADR explanation edited; original failedcampaign/ACCEPTANCE_REPORT remain failed. API/UI/controller/timeouts unchanged.",
+  "limits": [
+    "Diagnostic delayed-body result pending at receipt creation.",
+    "Firstsinglefileformatcheckreportedmixedlineendings; formattercorrectedthem, subsequentcheckpassed.",
+    "No fullcorrected-sourceacceptance yet."
+  ]
+}

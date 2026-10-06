@@ -1,0 +1,187 @@
+"""Exact frozen evidence extension; not a claim of a committed successor tree."""
+import datetime as dt
+import importlib.util
+import json
+import re
+from pathlib import Path
+from urllib.parse import parse_qsl, unquote, urlsplit
+
+P = Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location("payload_b_scan", P / "scan_public_payload_A.py")
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+ROOT = m.ROOT
+ARCHIVE = ROOT / "docs/evidence/lab-9e83fe7"
+CAMPAIGN = ROOT / "docs/evidence/acceptance/20261006T024719"
+BEGAN = dt.datetime.now(dt.UTC).isoformat()
+EXPECTED = {
+    "docs/evidence/lab-9e83fe7/inputs.json": "5a45946aec7894a32e38ab9dab2b30f52b7bd0ad2c7d1da4a33a0ee11e7300d5",
+    "docs/evidence/lab-9e83fe7/extension-inputs.json": "db44e4b1c083cde79f551839b53fafd713073f364728733d343b7fdb7a95a275",
+    "artifacts/final-evidence-pack/9e83fe7/public-payload-A-review.json": "7d666a95c06ea3fabf2753851c6ae748cd49e7ffac9241e19043b474337a939f",
+    "artifacts/final-evidence-pack/9e83fe7/final-saved-audit-review.json": "f1aeda11049852e01b59f9b9111e6466dd237dab98f5dcc5e76d26c32d288da9",
+}
+
+
+def relative(path):
+    return str(path.relative_to(ROOT)).replace("\\", "/")
+
+
+def load_bound(path):
+    data = path.read_bytes()
+    return json.loads(data), {"path": relative(path), "bytes": len(data), "sha256": m.sha(data)}
+
+
+inputs = []
+for path, expected in EXPECTED.items():
+    data = (ROOT / path).read_bytes()
+    if m.sha(data) != expected:
+        raise RuntimeError("Frozen input differs: " + path)
+    inputs.append({"path": path, "sha256": expected, "bytes": len(data)})
+archive_index, _ = load_bound(ARCHIVE / "inputs.json")
+a_review, _ = load_bound(P / "public-payload-A-review.json")
+a_inventory, a_ref = load_bound(P / "public-payload-A-inventory.json")
+a_history, a_hist_ref = load_bound(P / "public-payload-A-history-inventory.json")
+prior_review, _ = load_bound(P / "final-saved-audit-review.json")
+prior_result, prior_ref = load_bound(ROOT / prior_review["scan"]["path"])
+if prior_ref != prior_review["scan"]:
+    raise RuntimeError("Prior full trace proof differs")
+if prior_result["status"] != "COMPLETE_SAVED_ARTIFACT_SCAN" and not prior_result["status"].startswith("PASS"):
+    # Actual status is source-bound and separately checked below for errors.
+    print(json.dumps({"prior_result_status": prior_result["status"]}), flush=True)
+for key in ["candidates", "decode_failures", "json_parse_failures", "truth_step_mismatches", "changed_inputs"]:
+    if prior_result[key]:
+        raise RuntimeError("Cannot reuse prior incomplete trace proof: " + key)
+if prior_review["status"] != "PASS_EXPLICIT_SAVED_EVIDENCE_SCOPE":
+    raise RuntimeError("Prior final trace review not passed")
+inputs += [a_ref, a_hist_ref, prior_ref]
+prior_zips = {}
+for item in prior_result["inputs"]:
+    if item["path"].endswith(".zip"):
+        if not item["stable_during_read"] or item["disposition"] != "all_members_read_crc_verified_and_accounted":
+            raise RuntimeError("Incomplete ZIP proof")
+        if not all("sha256" in member and "crc32" in member and "bytes" in member for member in item["members"]):
+            raise RuntimeError("Missing member hash/CRC")
+        prior_zips[item["sha256"]] = item
+if len(prior_zips) != 8 or sum(len(x["members"]) for x in prior_zips.values()) != 2588:
+    raise RuntimeError("Prior ZIP scope mismatch")
+a_hashes = {}
+for entry in a_inventory["files"]:
+    a_hashes[entry["scan"]["sha256"]] = entry["scan"]
+for entry in a_history["new_blobs"]:
+    a_hashes[entry["scan"]["sha256"]] = entry["scan"]
+assert a_review["unresolved_private_candidates"] == 0
+files = sorted([x for x in ARCHIVE.rglob("*") if x.is_file()])
+if len(files) != 900 or sum(x.stat().st_size for x in files) != 131040308:
+    raise RuntimeError("Frozen archive total differs")
+for entry in archive_index["copied"]:
+    path = ROOT / entry["archive_path"]
+    data = path.read_bytes()
+    if len(data) != entry["bytes"] or m.sha(data) != entry["sha256"]:
+        raise RuntimeError("Archive copy differs: " + entry["archive_path"])
+for entry in archive_index["canonical_references"]:
+    path = ROOT / entry["path"]
+    data = path.read_bytes()
+    if len(data) != entry["bytes"] or m.sha(data) != entry["sha256"]:
+        raise RuntimeError("Canonical reference differs: " + entry["path"])
+files += sorted([x for x in CAMPAIGN.rglob("*") if x.is_file()])
+files = sorted(set(files))
+original_scan = m.scan_text
+url_errors = []
+url_occurrences = 0
+url_regex = re.compile(r"\b(?:https?|amqps?|postgres(?:ql)?|mongodb(?:\+srv)?)://[^\s\"'<>]+", re.I)
+
+
+def scan_text(text, location, pointer="", structured=True):
+    global url_occurrences
+    for match in url_regex.finditer(text):
+        url_occurrences += 1
+        try:
+            parsed = urlsplit(match.group())
+            if parsed.password is not None:
+                m.candidate("uri_decoded_userinfo", unquote(parsed.username or "") + ":" + unquote(parsed.password), location, pointer + "/url-char:" + str(match.start()))
+            for key, value in parse_qsl(parsed.query, keep_blank_values=True):
+                normalized = re.sub(r"[^a-z0-9]", "", key.lower())
+                if normalized in m.SENSITIVE or normalized in {"accesskey", "credential", "credentials"}:
+                    m.candidate("uri_query:" + normalized, value, location, pointer + "/url-char:" + str(match.start()))
+        except ValueError as exc:
+            url_errors.append({"location": location, "pointer": pointer + "/url-char:" + str(match.start()), "uri_sha256": m.sha(match.group().encode()), "error": str(exc)})
+    original_scan(text, location, pointer, structured)
+
+
+m.scan_text = scan_text
+records = []
+seen = {}
+for i, path in enumerate(files):
+    before = path.read_bytes()
+    digest = m.sha(before)
+    location = relative(path)
+    entry = {"path": location, "bytes": len(before), "sha256": digest, "publication_scope": "frozen_current_evidence_archive" if path.is_relative_to(ARCHIVE) else "canonical_current_acceptance_campaign"}
+    if digest in prior_zips:
+        proof = prior_zips[digest]
+        if len(before) != proof["bytes"]:
+            raise RuntimeError("ZIP length mismatch")
+        entry["disposition"] = {
+            "kind": "REUSED_EXACT_FULL_ZIP_PROOF",
+            "proof_path": prior_ref["path"], "proof_sha256": prior_ref["sha256"],
+            "original_path": proof["path"], "original_zip_sha256": digest,
+            "members": proof["members"], "member_count": len(proof["members"]),
+            "member_uncompressed_bytes": sum(x["bytes"] for x in proof["members"]),
+            "method": prior_result["scan_method"],
+            "no_fresh_member_scan_claim": True,
+        }
+    elif digest in a_hashes:
+        proof = a_hashes[digest]
+        entry["disposition"] = {
+            "kind": "REUSED_EXACT_A_FULL_CONTENT_PROOF",
+            "proof_review": "artifacts/final-evidence-pack/9e83fe7/public-payload-A-review.json",
+            "proof_review_sha256": EXPECTED["artifacts/final-evidence-pack/9e83fe7/public-payload-A-review.json"],
+            "git_oid": proof["git_oid"], "original_scan_location": proof["scan_location"],
+            "original_disposition": proof["disposition"],
+        }
+    elif digest in seen:
+        entry["disposition"] = {"kind": "REUSED_EXACT_CONTENT_FROM_THIS_EXTENSION", "first_path": seen[digest]}
+    else:
+        entry["disposition"] = m.inspect_bytes(before, location, digest)
+    after = path.read_bytes()
+    if before != after:
+        raise RuntimeError("Input changed while scanning: " + location)
+    entry["stable_during_read"] = True
+    records.append(entry)
+    seen.setdefault(digest, location)
+    if i % 150 == 0:
+        print(json.dumps({"evidence_extension_paths": i + 1, "total": len(files), "candidate_groups": len(m.candidate_groups)}), flush=True)
+# Fail if any appended/removed file or frozen content changed after its individual read.
+current_paths = set([x for x in ARCHIVE.rglob("*") if x.is_file()] + [x for x in CAMPAIGN.rglob("*") if x.is_file()])
+if current_paths != set(files):
+    raise RuntimeError("Frozen path set changed")
+for entry in records:
+    data = (ROOT / entry["path"]).read_bytes()
+    if len(data) != entry["bytes"] or m.sha(data) != entry["sha256"]:
+        raise RuntimeError("Input changed after scan: " + entry["path"])
+result = {
+    "status": "FROZEN_EVIDENCE_EXTENSION_FULL_SCAN_COMPLETE_CONTEXT_REVIEW_PENDING",
+    "source_A": m.A, "source_fingerprint": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd",
+    "started_utc": BEGAN, "finished_utc": dt.datetime.now(dt.UTC).isoformat(),
+    "scanner_sha256": m.sha(Path(__file__).read_bytes()),
+    "shared_full_extractor_sha256": m.sha((P / "scan_public_payload_A.py").read_bytes()),
+    "inputs": inputs, "files": records,
+    "totals": {"paths": len(records), "path_bytes": sum(x["bytes"] for x in records), "unique_payload_hashes": len(seen), "new_scan_counts": dict(m.counts), "URI_occurrences_in_newly_scanned_text": url_occurrences},
+    "candidates": list(m.candidate_groups.values()),
+    "url_parse_errors": url_errors, "json_parse_errors": m.json_errors,
+    "embedded_json_depth_limits": m.embedded_depth_limits,
+    "newly_extracted_PDFs": m.pdf_details, "newly_extracted_SQLite": m.db_details,
+    "newly_scanned_ZIPs": m.zip_details,
+    "publication_defect": "The immutable A publication preserves2 broken relative documentation links in design.html. Root's visual review covers rendered pages; it does not establish link closure. Proposed B docs-only fix is outside this frozen evidence extension.",
+    "limits": [
+        "This is concrete working-file byte inventory of the frozen archive and canonical campaign, not a committed final B tree or a publication approval.",
+        "Exact8 prior ZIP full-member proofs reused only after full archive byte hash/size equality and source/method/result bindings; no new member-scan claim.",
+        "New plaintext and structured strings/URLs scanned fully. New PDF metadata and every page text extracted without rendering/OCR. Binary resources fully hashed/raw literal checked without pixel interpretation.",
+        "Current proposed status/report/link-fix files, later B additions, normalization into committed Git blobs, and exact final successor tree still require their own extension/check.",
+        "No tests, runtime services, live databases, browsers, renderer, network publication or remote attestation executed.",
+    ],
+}
+destination = P / "public-payload-B-evidence-inventory.json"
+if destination.exists():
+    raise RuntimeError("Refuse overwrite")
+destination.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+print(json.dumps({"path": relative(destination), "sha256": m.sha(destination.read_bytes()), "files": len(records), "candidate_groups": len(m.candidate_groups), "json_errors": len(m.json_errors), "uri_errors": len(url_errors)}))

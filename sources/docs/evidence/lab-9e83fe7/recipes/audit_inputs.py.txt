@@ -1,0 +1,224 @@
+"""Guards for explicitly authorized, terminal, saved-file auditing only."""
+import argparse
+import datetime as dt
+import hashlib
+import json
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+REQUIRED_GATES = ["setup", "browser_setup", "blender_version", "security", "tests_1", "tests_2", "repeatability", "lint", "typecheck", "demo_happy_path", "demo_lost_ack_after_effect", "demo_lost_ack_before_effect", "demo_ambiguous", "demo_restart", "demo_logical_estop", "demo_cell_fault", "demo_tool_showcase", "drift", "publication", "publication_final"]
+CASES = {"happy", "drop_ack_after_effect", "duplicate_delivery", "wms_unavailable"}
+LEGACY_PATHS = ("a881acf", "20261006T012424", "b968586", "4774af5", "dfb06bc", "f00ad15", "f78985b", "20261006T002816", "20261005T224038")
+
+
+def require(ok, message):
+    if not ok:
+        raise RuntimeError(message)
+
+
+def resolve(path):
+    require(isinstance(path, str) and bool(path), "Missing explicit repository-relative path")
+    require(not Path(path).is_absolute(), "Absolute input paths are not accepted")
+    require(not any(x in path.replace("\\", "/") for x in LEGACY_PATHS), "Historical source/campaign fallback rejected")
+    result = (ROOT / path).resolve()
+    require(result.is_relative_to(ROOT), "Input path escapes repository")
+    require(result.is_file(), "Missing saved input: " + path)
+    return result
+
+
+def load_raw_ref(ref):
+    require(isinstance(ref, dict), "Missing bound file reference")
+    path = resolve(ref.get("path"))
+    raw = path.read_bytes()
+    require(hashlib.sha256(raw).hexdigest() == ref.get("sha256"), "Saved input hash mismatch: " + str(path))
+    return raw
+
+
+def load_ref(ref):
+    raw = load_raw_ref(ref)
+    encoding = "utf-16" if raw.startswith((b"\xff\xfe", b"\xfe\xff")) else "utf-8-sig"
+    return json.loads(raw.decode(encoding))
+
+
+def utc(value):
+    parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    require(parsed.tzinfo is not None, "Timestamp must include timezone")
+    return parsed
+
+
+def load_inventory(out, operation, *, inventory_path_arg=None, execution_opt_in=False):
+    parser = argparse.ArgumentParser(description="Read-only saved evidence audit; never operates a running stack")
+    parser.add_argument("--inventory", required=True, help="Explicit fresh inventory path relative to repository")
+    parser.add_argument("--run-saved-audit", action="store_true", help="Opt in only after root authorizes terminal saved-file auditing")
+    args = parser.parse_args() if inventory_path_arg is None else argparse.Namespace(inventory=inventory_path_arg, run_saved_audit=execution_opt_in)
+    require(args.run_saved_audit, "Execution opt-in absent; preparation is not authorization")
+    output_names = {"complete-text-scan": "final-trace-audit-result.json", "grouped-saved-dom-review": "final-trace-dom-review.json", "finalize-saved-review": "final-saved-audit-review.json"}
+    require(operation not in output_names or not (out / output_names[operation]).exists(), "Existing audit output refused; preserve original proof")
+    preparation_path = out / "audit-programs-preparation.json"
+    preparation_raw = preparation_path.read_bytes()
+    preparation = json.loads(preparation_raw.decode("utf-8-sig"))
+    inventory_path = resolve(args.inventory)
+    require(inventory_path.parent == out, "Inventory belongs to a different output pack")
+    inventory_raw = inventory_path.read_bytes()
+    inventory = json.loads(inventory_raw.decode("utf-8-sig"))
+    require(inventory.get("status") == "READY_FOR_FINAL_SAVED_AUDIT", "Fresh inventory is not marked ready")
+    expected = preparation["source"]
+    require(subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip() == expected["commit"], "Current HEAD differs; a successor source requires separate review")
+    require(not subprocess.check_output(["git", "diff", "--name-only", "HEAD", "--", ".", ":(exclude)ACCEPTANCE_REPORT.md"], cwd=ROOT, text=True).strip(), "Tracked source changed before audit")
+    sys.path.insert(0, str(ROOT))
+    from tools.acceptance import source_identity
+    require(source_identity()["source_sha256"] == expected["source_sha256"], "Current source fingerprint differs from intended source")
+
+    require(inventory.get("source_commit") == expected["commit"], "Wrong source commit")
+    require(inventory.get("source_sha256") == expected["source_sha256"], "Wrong source fingerprint")
+    require(inventory.get("acceptance_directory") == preparation["acceptance_directory"], "Wrong acceptance campaign")
+    manifest = load_ref(inventory.get("manifest"))
+    require(inventory["manifest"]["path"] == inventory["acceptance_directory"] + "/manifest.json", "Manifest path/campaign mismatch")
+    require(manifest["source"] == {"commit": expected["commit"], "dirty": False, "source_sha256": expected["source_sha256"]}, "Manifest is not the intended clean source")
+    require(all(manifest.get("gates", {}).get(g, {}).get("passed") is True for g in REQUIRED_GATES), "Required local gates are not all terminal PASS")
+    terminal = load_ref(inventory.get("terminal_exit"))
+    require(inventory["terminal_exit"]["path"] == preparation["terminal_exit_path"], "Wrong campaign terminal path")
+    require(terminal.get("exit_code") == 0 and terminal.get("source") == expected["commit"], "Acceptance wrapper/source did not finish successfully")
+    require(utc(terminal["started_at"]) <= utc(manifest["started_at"]) <= utc(terminal["ended_at"]), "Terminal timestamps do not bracket this campaign")
+    require(all(manifest["gates"][g].get("exit_code", 0) == 0 for g in REQUIRED_GATES), "Passed gate contains nonzero exit")
+    junit_refs = inventory.get("junit", [])
+    require(len(junit_refs) == 2 and {r["path"] for r in junit_refs} == {inventory["acceptance_directory"] + f"/tests-{p}.xml" for p in (1, 2)}, "Both explicit campaign JUnits required")
+    junit_cases = {}
+    fixture_roots = {}
+    for number in (1, 2):
+        reference = next(r for r in junit_refs if r["path"].endswith(f"/tests-{number}.xml"))
+        xml = ET.fromstring(load_raw_ref(reference))
+        suites, records = xml.findall(".//testsuite"), xml.findall(".//testcase")
+        require(bool(suites) and bool(records), "JUnit has no terminal suite/cases")
+        require(len(records) == preparation["expected_testcase_count"] == 815, "Expected exactly 815 full-suite testcases")
+        require(sum(int(s.get("tests", "0")) for s in suites) == len(records), "JUnit actual/declared count mismatch")
+        require(all(int(s.get(k, "0")) == 0 for s in suites for k in ("errors", "failures", "skipped")), "JUnit has nonpassing declared outcomes")
+        require(not any(c.find(k) is not None for c in records for k in ("error", "failure", "skipped")), "JUnit has nonpassing testcase outcomes")
+        keys = [(c.get("classname"), c.get("name")) for c in records]
+        require(len(keys) == len(set(keys)), "Duplicate testcase identities in JUnit")
+        junit_cases[number] = set(keys)
+        command = manifest["gates"][f"tests_{number}"].get("command", [])
+        temps = [x.split("=", 1)[1] for x in command if x.startswith("--basetemp=")]
+        require(len(temps) == 1, "Terminal test gate lacks exact fixture root")
+        fixture_roots[number] = Path(temps[0]).resolve()
+    require(junit_cases[1] == junit_cases[2], "Acceptance passes contain different full testcase sets")
+    require(fixture_roots[1] != fixture_roots[2], "Acceptance passes reused a fixture root")
+    review = load_ref(inventory.get("local_acceptance_review"))
+    require(inventory["local_acceptance_review"]["path"] == (out / "local-acceptance-review.json").relative_to(ROOT).as_posix(), "Wrong terminal-review pack")
+    require(review.get("local_acceptance_passed") is True, "Independent terminal local review missing")
+    require(review.get("source", {}).get("commit") == expected["commit"] and review["source"].get("source_sha256") == expected["source_sha256"], "Independent local review source mismatch")
+    case_review_refs = inventory.get("case_reviews", [])
+    require(len(case_review_refs) == 2 and {ref["path"] for ref in case_review_refs} == {(out / f"pass{p}-case-review-final.json").relative_to(ROOT).as_posix() for p in (1, 2)}, "Both finalized case reviews required")
+    case_reviews = {}
+    for ref in case_review_refs:
+        case_review = load_ref(ref)
+        number = case_review.get("acceptance_pass")
+        require(number in (1, 2) and number not in case_reviews, "Duplicate/invalid formal case review")
+        require(case_review.get("source") == manifest["source"] and case_review.get("campaign") == inventory["acceptance_directory"], "Formal case review source/campaign mismatch")
+        require(case_review.get("formal_test_status") == "PASSED_FOUR_LAB_CASES" and case_review.get("case_count") == 4 and case_review.get("check_count") == 164, "Formal raw-case checks incomplete")
+        require(case_review.get("all_source_hashes_match") is True and case_review.get("issues") == [] and case_review.get("secret_review", {}).get("potential_findings") == [], "Formal case review has outstanding findings")
+        require(case_review.get("input_binding", {}).get("manifest_and_status_are_fixed_copies") is True, "Case review lacks immutable input binding")
+        if number == 2:
+            require(case_review["input_binding"].get("same_full_testcase_sets_across_passes") is True, "Second case review has not verified matching full JUnit sets")
+        case_reviews[number] = case_review
+    manual = inventory.get("manual", {})
+    require(manual.get("status") == "SAVED_COMPLETE_AND_STOPPED", "Current manual proof remains pending/live")
+    require(manual.get("source_commit") == expected["commit"], "Manual source mismatch")
+    require(isinstance(manual.get("directory"), str) and bool(manual["directory"]) and not Path(manual["directory"]).is_absolute(), "Missing explicit relative manual directory")
+    directory = ROOT / manual["directory"]
+    require(directory.resolve().is_relative_to(ROOT) and directory.is_dir(), "Missing explicit manual directory")
+    require(not any(x in str(directory).replace("\\", "/") for x in LEGACY_PATHS), "Historical manual fallback rejected")
+    stopped = load_ref(manual.get("stopped_processes"))
+    require(bool(stopped.get("stopped_ids")), "Missing saved owned-process stop record")
+    require(utc(stopped["at"]) >= utc(manual["completed_at"]) >= utc(terminal["ended_at"]), "Manual/stop timestamps do not follow complete acceptance")
+    require(stopped.get("remaining") == [], "Saved stop record must explicitly show no remaining owned processes")
+    require(resolve(manual["stopped_processes"]["path"]).is_relative_to(directory.resolve()), "Stop proof is outside current manual directory")
+    cases = inventory.get("cases", [])
+    require(len(cases) == 8 and {(c["acceptance_pass"], c["case"]) for c in cases} == {(p, c) for p in (1, 2) for c in CASES}, "Need exactly four case bindings for each completed pass")
+    for field in ("session_id", "job_id", "command_id"):
+        require(len({c[field] for c in cases}) == 8, "Eight case identities must be fresh and distinct: " + field)
+    for case in cases:
+        saved = load_ref(case["case_json"])
+        number = case["acceptance_pass"]
+        expected_snapshot = (out / f"pass{number}-finalized-snapshots" / (case["case"] + ".json")).relative_to(ROOT).as_posix()
+        require(case["case_json"]["path"] == expected_snapshot, "Mutable watcher or historical case snapshot refused")
+        reviewed_case = case_reviews[number]["cases"][case["case"]]
+        require(reviewed_case.get("formal_test_status") == "PASSED", "Selected finalized case did not pass")
+        require(all(reviewed_case["snapshot"][key] == case["case_json"][key] for key in ("path", "sha256")), "Finalized case review/snapshot binding differs")
+        require(all(reviewed_case["session"][key] == case[key] for key in ("session_id", "job_id", "command_id")), "Formal case review identity differs")
+
+        suffix = "" if case["case"] == "happy" else case["case"].upper()
+        test_key = ("tests.lab.test_browser_lab", f"test_full_lab_browser_authorization_recovery_and_business_completion[{suffix}]")
+        require(test_key in junit_cases[number], "Exact lab testcase absent from corresponding clean JUnit")
+        require(saved.get("capture_complete") is True and saved.get("formal_test_status") == "PASSED", "Case capture/formal outcome incomplete")
+        require(saved.get("source", {}).get("dirty") is False, "Case was captured from dirty source")
+        require(saved.get("runtime") == case["runtime"] == ("blender" if case["case"] == "happy" else "synthetic"), "Case runtime scope mismatch")
+        require(saved.get("physical_effect_count") == 1 and saved.get("session", {}).get("status") == "COMPLETED" and saved["session"].get("current_stage") == 22, "Case has no completed one-effect outcome")
+        require(Path(saved["stack"]["data_directory"]).resolve().is_relative_to(fixture_roots[number]), "Case belongs to another fixture root")
+        require(utc(saved["captured_at_utc"]) >= utc(manifest["started_at"]), "Historical case capture rejected")
+        require(saved["source"]["commit"] == expected["commit"] and saved["source"]["source_sha256"] == expected["source_sha256"], "Case source mismatch")
+        require(saved.get("acceptance_pass") == case["acceptance_pass"] and saved.get("acceptance_directory") == inventory["acceptance_directory"], "Case campaign/pass mismatch")
+        require(saved.get("session", {}).get("session_id") == case["session_id"], "Case session identity mismatch")
+        require(saved["session"].get("command_id") == case["command_id"], "Case command identity mismatch")
+        require(saved["session"].get("job_id") == case["job_id"], "Case job identity mismatch")
+        require(case["trace"]["path"] == saved["artifact_directory"].rstrip("/") + "/trace.zip", "Trace not bound to case artifact directory")
+    entries = inventory.get("scan_entries", [])
+    require(bool(entries) and len({e["path"] for e in entries}) == len(entries), "Missing or duplicate scan entries")
+    for entry in entries:
+        resolve(entry["path"])
+        require(isinstance(entry.get("sha256"), str) and len(entry["sha256"]) == 64, "Every input needs its prebound SHA256")
+    require({c["trace"]["path"] for c in cases} == {e["path"] for e in entries if e["kind"] == "playwright_zip"}, "ZIP inventory/case bindings disagree")
+    bound = {e["path"]: e["sha256"] for e in entries}
+    required_refs = [inventory["manifest"], inventory["terminal_exit"], inventory["local_acceptance_review"], *junit_refs, *case_review_refs, manual["stopped_processes"]] + list(manual.get("inspectors", []))
+    for case in cases:
+        required_refs.extend([case["case_json"], case["trace"]])
+    expected_manual = {"happy", "lost", "duplicate", "cli-happy_path", "cli-lost_ack_after_effect"}
+    require(len(manual.get("cases", [])) == 5 and {c["case"] for c in manual["cases"]} == expected_manual and bool(manual.get("inspectors")), "Fresh five-case manual/CLI proof and inspectors are required")
+    for field in ("session_id", "command_id"):
+        require(len({c[field] for c in manual["cases"]}) == 5, "Five manual/CLI original identities must be distinct")
+        require(not ({c[field] for c in manual["cases"]} & {c[field] for c in cases}), "Manual proof cannot reuse acceptance identities")
+    manual_faults = {"happy": None, "lost": "DROP_ACK_AFTER_EFFECT", "duplicate": "DUPLICATE_DELIVERY", "cli-happy_path": None, "cli-lost_ack_after_effect": "DROP_ACK_AFTER_EFFECT"}
+    for row in manual["cases"]:
+        wrapper = load_ref(row["session"])
+        session = wrapper.get("session", wrapper)
+        journals = load_ref(row["journals"])
+        require(row.get("expected_fault") == manual_faults[row["case"]] == session.get("fault"), "Manual case scenario mismatch")
+        require(session.get("profile") == "lab" and session.get("status") == "COMPLETED" and session.get("current_stage") == 22, "Manual/CLI session not completed in real lab")
+        require(session.get("session_id") == row["session_id"] and session.get("command_id") == row["command_id"], "Manual original identity mismatch")
+        require(set(range(1, 23)).issubset({step["stage"] for step in session["steps"]}), "Manual 22-stage proof incomplete")
+        require(journals.get("source_commit_at_capture") == expected["commit"], "Historical manual journal source rejected")
+        require(utc(terminal["ended_at"]) <= utc(journals["captured_at_utc"]) <= utc(manual["completed_at"]), "Manual journal capture is outside the new settled manual interval")
+        require(journals["session"]["session_id"] == row["session_id"] and journals["session"]["command_id"] == row["command_id"], "Journal/session original identity mismatch")
+        selected = journals["selected_command"]
+        runtime, plc = selected["runtime_journal"], selected["plc_commands"]
+        require(len(runtime) == len(plc) == 1 and selected["physical_effect_count"] == 1, "Manual original one-effect journals missing")
+        require(runtime[0]["command_id"] == plc[0]["command_id"] == row["command_id"] and runtime[0]["receipt"]["job_id"] == session["job_id"], "Manual journal command/job mismatch")
+        require(runtime[0]["receipt"] == plc[0]["result"] and runtime[0]["receipt"]["effect_count"] == 1, "Manual runtime/PLC original receipt mismatch")
+        for name in ("session", "journals"):
+            require(resolve(row[name]["path"]).is_relative_to(directory.resolve()), "Manual case reference outside explicit new manual directory")
+            load_ref(row[name])
+            required_refs.append(row[name])
+        if row.get("cli_exit"):
+            exit_info = load_ref(row["cli_exit"])
+            scenario = row["case"].removeprefix("cli-")
+            require(exit_info.get("source") == expected["commit"] and exit_info.get("exit_code") == 0, "CLI terminal source/outcome mismatch")
+            require(exit_info.get("command") == f"uv run --locked python -m tools.integration_demo --scenario {scenario} --authorize-robot", "CLI proof is not exact README command")
+            require(wrapper.get("explicit_physical_consent") is True, "CLI explicit physical consent missing")
+            require(utc(terminal["ended_at"]) <= utc(exit_info["started_at"]) <= utc(exit_info["ended_at"]) <= utc(manual["completed_at"]), "CLI chronology mismatch")
+            required_refs.append(row["cli_exit"])
+        require(not row["case"].startswith("cli-") or bool(row.get("cli_exit")), "CLI case requires exact-command exit evidence")
+    for item in manual["inspectors"]:
+        load_ref(item)
+    require(all(bound.get(ref["path"]) == ref["sha256"] for ref in required_refs), "Referenced case/manual proof must be included in the full scan with matching hashes")
+    require(len(manual.get("log_paths", [])) >= 6 and all(path in bound for path in manual["log_paths"]), "Explicit service/launcher log scope is incomplete")
+    discovered = {p.relative_to(ROOT).as_posix() for p in directory.rglob("*") if p.is_file() and p.suffix.lower() in {".json", ".jsonl", ".log", ".md", ".txt", ".png"}}
+    require(discovered.issubset(bound), "Manual directory has unlisted saved text/image inputs; refresh after it settles")
+    require(set(inventory.get("expected_lab_stage_classification", {})) == {str(i) for i in range(1, 23)}, "Stage truth expectations missing")
+    require(set(inventory.get("presentation_expectations", {})) == CASES, "Current-case presentation expectations missing")
+    require(inventory_path.read_bytes() == inventory_raw, "Inventory changed while its fields were being checked")
+    require(preparation_path.read_bytes() == preparation_raw, "Preparation changed while its guards were being checked")
+    inventory["_audit_binding"] = {"inventory_path": args.inventory, "inventory_sha256": hashlib.sha256(inventory_raw).hexdigest(), "preparation_path": preparation_path.relative_to(ROOT).as_posix(), "preparation_sha256": hashlib.sha256(preparation_raw).hexdigest(), "operation": operation, "guard": "exact source/campaign;20 terminal local gates;2 clean equal 815-case JUnits;8 immutable formal case bindings;5 complete fresh manual/CLI cases and explicit stopped record"}
+    return inventory

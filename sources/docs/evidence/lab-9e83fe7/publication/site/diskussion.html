@@ -1,0 +1,304 @@
+<!doctype html><html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Teknisk dialog om RobotOps Twin | RobotOps Twin</title><meta name="author" content="Rami Halabi"><meta name="description" content="Öppningsberättelse, källgrundade frågor, tekniska avvägningar, whiteboardfall och samtalsprotokoll."><link rel="stylesheet" href="style.css"></head><body><a class="skip" href="#main">Hoppa till innehållet</a><header class="site-header"><a class="brand" href="index.html">ROBOTOPS TWIN<span>FORSKNING · SYSTEMDESIGN · DIALOG</span></a><nav class="top-nav" aria-label="Huvudmeny"><a href="index.html">Översikt</a><a href="design.html">Designstudie</a><a href="avgransning.html">Avgränsning</a><a href="diskussion.html" aria-current="page">Diskussion</a><a href="kallor.html">Källor</a><a href="diagram.html">Diagram</a></nav></header><div class="shell"><aside class="sidebar"><details open><summary>Innehåll</summary><ol><li><a href="#section-1">Så använder du underlaget</a></li><li><a href="#section-2">1. Din kärnberättelse på 90 sekunder</a></li><li><a href="#section-3">2. Ett bra upplägg för samtalet</a></li><li><a href="#section-4">3. Förklara arkitekturen utan att fastna i termer</a></li><li><a href="#section-6">4. Samtalsområden med Axel Kaliff</a></li><li><a href="#section-12">5. Samtalsområden med Per-Eric Olsson</a></li><li><a href="#section-19">6. Gemensamt whiteboardfall: kvittensen försvinner</a></li><li><a href="#section-20">7. Designbeslut du bör kunna försvara</a></li><li><a href="#section-21">8. Frågor du kan få och en bra svarsriktning</a></li><li><a href="#section-31">9. Frågor om rollen som projektet hjälper dig ställa</a></li><li><a href="#section-32">10. Det du ska ha redo före en faktisk demo</a></li><li><a href="#section-33">11. Samtalsprotokoll att fylla i</a></li><li><a href="#section-34">12. Avslutning</a></li><li><a href="#section-35">Granska det nya undersökningsflödet (2026-10-05)</a></li><li><a href="#referenser">Referenser och källbegränsningar</a></li></ol></details><div class="side-meta">Rapport 03 / 03<br>Version 1.5 · Svenska<br>Aktuell status i rapportens revisionsruta<br><a href="downloads/03-diskussion.pdf">Ladda ned PDF</a></div></aside><main id="main" class="document"><section class="cover"><div class="eyebrow">Rapport 03 / 03 · RobotOps Twin</div><h1>Teknisk dialog om RobotOps Twin</h1><p class="subtitle">Diskussionsunderlag för Axel Kaliff och Per-Eric Olsson</p><div class="metadata">Rami Halabi<br>Version 1.5 · 5 oktober 2026<br>Oberoende tekniskt rapportpaket · Svenska</div><div class="status"><strong>Status: se aktuell revisionsruta.</strong> Aktuella resultat anges i rapportens statusruta och på governance-sidan. Acceptans gäller endast den källrevision som anges i evidensen; tidigare resultat bevaras separat. Inga fysiska robotresultat eller säkerhetsgarantier hävdas.</div><div class="buttons"><a class="button" href="downloads/03-diskussion.pdf" download>Ladda ned PDF</a><a class="button secondary" href="sources/03-diskussion.md" download>Markdown-källa</a></div><p class="print-label">AI-assisterad text- och publiceringsframställning.<br>Ej sakkunniggranskad. Inte framtagen av eller godkänd av SICS AI.<br>Rapporternas källor, diagram och byggskript finns i projektets repository.</p></section><nav class="print-toc" aria-label="Innehållsförteckning"><h2>Innehåll</h2><ol><li><a href="#section-1">Så använder du underlaget</a></li><li><a href="#section-2">1. Din kärnberättelse på 90 sekunder</a></li><li><a href="#section-3">2. Ett bra upplägg för samtalet</a></li><li><a href="#section-4">3. Förklara arkitekturen utan att fastna i termer</a></li><li><a href="#section-6">4. Samtalsområden med Axel Kaliff</a></li><li><a href="#section-12">5. Samtalsområden med Per-Eric Olsson</a></li><li><a href="#section-19">6. Gemensamt whiteboardfall: kvittensen försvinner</a></li><li><a href="#section-20">7. Designbeslut du bör kunna försvara</a></li><li><a href="#section-21">8. Frågor du kan få och en bra svarsriktning</a></li><li><a href="#section-31">9. Frågor om rollen som projektet hjälper dig ställa</a></li><li><a href="#section-32">10. Det du ska ha redo före en faktisk demo</a></li><li><a href="#section-33">11. Samtalsprotokoll att fylla i</a></li><li><a href="#section-34">12. Avslutning</a></li><li><a href="#section-35">Granska det nya undersökningsflödet (2026-10-05)</a></li><li><a href="#referenser">Referenser och källbegränsningar</a></li></ol></nav><!-- implementation-status:start -->
+<blockquote>
+<p><strong>Implementation status, 2026-10-05:</strong> Integration Lab implementation is undergoing final recovery, real-service, browser and Blender verification. Historical simulator acceptance does not prove the new GOAL.md; all 51 additional MUSTs and the mandatory final loop remain required. Status: NOT DONE.
+Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
+The research below records design rationale, not real-world robot validation.</p>
+</blockquote>
+<!-- implementation-status:end -->
+<h2 id="section-1">Så använder du underlaget</h2>
+<p>Det här dokumentet är ett <strong>arbetsunderlag för teknisk dialog</strong>, inte ett manus som ska läsas upp ord för ord. Det hjälper projektägaren att presentera RobotOps Twin, förklara sina beslut och pröva antaganden tillsammans med Axel Kaliff och Per-Eric Olsson.</p>
+<p>Det ursprungliga designunderlaget kompletteras av aktuell implementationsevidens i statusrutan ovan. Formuleringar som ”jag har byggt”, ”testerna visar” eller ”det fungerar” får användas först när de motsvarar körbar kod och sparade resultat. Den deterministiska kärnan och Blender-flödet finns nu; statusrutan och ACCEPTANCE_REPORT.md anger vad som har verifierats. För valfria modell- och hårdvarutillägg är ”jag föreslår” och ”jag vill testa” rätt ord.</p>
+<p>Samtalet ska visa förståelse, inte bara att många källor har lästs. En bra diskussion kan sluta med att ett eget designval behöver ändras. Det är ett användbart resultat.</p>
+<h2 id="section-2">1. Din kärnberättelse på 90 sekunder</h2>
+<blockquote>
+<p>Jag läste rollen som ett uppdrag att få AI, robotcell och kundsystem att fungera tillsammans, inte bara att koppla in en modell. Därför har jag specificerat en liten integrationssimulator där ett ERP/WMS skapar plockuppdrag och Blender ersätter den fysiska världen.</p>
+<p>Jag har medvetet inte försökt återskapa er proprietära AI. Jag skiljer på kundens avsikt, ett modellförslag, ett robotkommando och den observerade effekten. Modell och robot är utbytbara gränssnitt, men deras garantier måste vara uttryckliga.</p>
+<p>Huvudfallet jag vill testa är att ett plock genomförs men att kvittensen försvinner. Då ska systemet inte automatiskt plocka igen, utan visa att utfallet är okänt och stämma av journal och observation. Jag vill också visa ett fall där informationen inte räcker och systemet måste stanna för granskning.</p>
+<p>Det jag gärna vill pröva med er är vilka av dessa gränser som motsvarar verkliga problem hos er, och vad jag har förenklat för mycket.</p>
+</blockquote>
+<p>Bakgrunden till fokus på kundintegration finns i rollannonsen. Det betyder inte att simulatorn uppfyller alla anställningskrav eller återger den verkliga implementationen. <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a></p>
+<h2 id="section-3">2. Ett bra upplägg för samtalet</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Del</th>
+<th>Vad du visar</th>
+<th>Vad du vill lära dig</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Öppning</td>
+<td>Syftet och en ärlig statusruta.</td>
+<td>Är problemet rätt valt?</td>
+</tr>
+<tr>
+<td>Arkitektur</td>
+<td>Kund, integration, modell, cell, Blender och verifierare.</td>
+<td>Var går motsvarande gränser hos dem?</td>
+</tr>
+<tr>
+<td>Normalflöde</td>
+<td>En order och dess beständiga tidslinje genom systemet.</td>
+<td>Vilka kvittenser och observationer behövs?</td>
+</tr>
+<tr>
+<td>Felväg</td>
+<td>Förlorad kvittens efter effekt.</td>
+<td>Hur hanterar de osäkra eller delvisa utfall?</td>
+</tr>
+<tr>
+<td>Fördjupning</td>
+<td>En designavvägning, inte tio verktygsnamn.</td>
+<td>Vad skulle de ändra och varför?</td>
+</tr>
+<tr>
+<td>Avslutning</td>
+<td>Viktigaste lärdomen och nästa test.</td>
+<td>Vad skulle vara ett relevant första arbetsresultat?</td>
+</tr>
+</tbody>
+</table></div>
+<p>Planera en kärnpresentation på ungefär tio minuter, men följ deras frågor. Det är ett förslag till disposition, inte en uppgift om mötets faktiska längd eller intervjuformat.</p>
+<h2 id="section-4">3. Förklara arkitekturen utan att fastna i termer</h2>
+<figure id="fig-context"><img src="assets/context.svg" alt="Från kundorder till verifierad effekt. Figur 1. Egen konceptmodell. Ett plock passerar flera ansvar; kundstatus ändras först efter observerad effekt och hanterad kvittens. Pilarna visar informations- och exekveringsflöde, inte verkliga SICS-gränssnitt." width="900" height="670"><figcaption>Figur 1. Egen konceptmodell. Ett plock passerar flera ansvar; kundstatus ändras först efter observerad effekt och hanterad kvittens. Pilarna visar informations- och exekveringsflöde, inte verkliga SICS-gränssnitt.</figcaption><div class="figure-tools"><a href="assets/context.svg">Öppna stor SVG</a><a href="sources/diagrams/context.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p>En möjlig förklaring är:</p>
+<blockquote>
+<p>ERP:t vet vilken order kunden vill ha plockad. Integrationslagret håller reda på uppdraget och dess historik. Brain-komponenten föreslår en handling utifrån en observation. Validatorn kontrollerar att förslaget passar aktuell cell och aktuellt tillstånd. Robotadaptern utför kommandot i Blender. Verifieraren bedömer resultatet innan ERP:t får en slutlig kvittens.</p>
+</blockquote>
+<p>Förbered en mening om varje ansvar. Börja inte med alla bibliotek, processer eller klassnamn. Om de frågar om implementation går du vidare till ett konkret kontrakt, en tillståndsövergång och ett test.</p>
+<h3 id="section-5">Tre skillnader som du ska kunna förklara</h3>
+<p><strong>Accepterat är inte utfört.</strong> En robotcontroller kan ha tagit emot kommandot utan att ha avslutat det.</p>
+<p><strong>Utfört är inte lyckat.</strong> En rörelsesekvens kan vara färdig utan att rätt objekt hamnat rätt.</p>
+<p><strong>Verifierat är inte kundsynkat.</strong> Plocket kan vara korrekt medan uppdateringen av WMS fortfarande väntar. Då ska bara kommunikationen återförsökas, inte plocket.</p>
+<p>Detta är resonemanget i vår design, inte påståenden om vilka fel SICS AI har i produktion.</p>
+<h2 id="section-6">4. Samtalsområden med Axel Kaliff</h2>
+<p>Axel är medförfattare till R900, och AutoGrasper-materialet beskriver separata roller för uppgift, datainsamling, återställning och felåterhämtning. Det gör dessa ämnen till relevanta, källgrundade ingångar. Det säger inte vilka frågor han kommer att ställa på en intervju. <a class="cite" href="#ref-S05" aria-label="Källa S05">[S05]</a><a class="cite" href="#ref-S06" aria-label="Källa S06">[S06]</a></p>
+<h3 id="section-7">4.1 Verifiering av faktisk uppgiftsframgång</h3>
+<p><strong>Säg:</strong> ”I min design är verifieraren en egen komponent. Jag vill inte att samma funktion som flyttar objektet också ska vara enda beviset för att uppgiften lyckades.”</p>
+<p><strong>Fråga:</strong> ”Vilken evidens brukar vara mest användbar för att skilja en avslutad rörelse från en lyckad uppgift? Hur hanterar ni ett resultat där sensorerna inte räcker för att avgöra?”</p>
+<p><strong>Följ upp:</strong> Be om ett avgränsat, icke-konfidentiellt exempel på falskt godkännande respektive falskt underkännande. Fråga om toleranserna beror på artikel, uppgift eller cell.</p>
+<p><strong>Ta med dig:</strong> Vilka observationer, tidsfönster och eftervillkor du bör modellera. Anta inte att en enda kamerabild räcker.</p>
+<h3 id="section-8">4.2 Ground truth och en begränsad observation</h3>
+<p><strong>Säg:</strong> ”Blender vet allt om scenen, men jag vill inte ge beslutsvägen samma tillgång. Test-oraklet får läsa facit; ordinarie verifiering ska arbeta med en begränsad observation.”</p>
+<p><strong>Fråga:</strong> ”Vilka gemensamma antaganden skulle ändå kunna göra mitt test missvisande? Hur skulle du konstruera ett scenario där verifieraren får fel trots att simulatorns metadata är konsekventa?”</p>
+<p><strong>Följ upp:</strong> Diskutera skymning, identitetsförväxling, gammal observation och fel kalibrering. Be inte bara om en bättre modell; försök förstå vilken informationslucka som orsakar felet.</p>
+<p><strong>Ta med dig:</strong> Minst ett testfall som inte kan lösas genom att bara läsa ett objekt-ID.</p>
+<h3 id="section-9">4.3 Återställning som en del av försöket</h3>
+<p><strong>Säg:</strong> ”AutoGrasper skiljer mellan normal uppgift, reset och recovery. Jag använder det som inspiration för egna tillstånd, inte som om det vore er produktionskod.” <a class="cite" href="#ref-S05" aria-label="Källa S05">[S05]</a></p>
+<p><strong>Fråga:</strong> ”Vad brukar en automatisk reset behöva verifiera innan nästa episod startar? Vilka fel bör göra att en episod underkänns i stället för att återställas i tysthet?”</p>
+<p><strong>Följ upp:</strong> Hur undviks att misslyckade återställningar förorenar nästa försök? Ska övergången till nästa episod kräva känd objektplacering, känd robotpose eller båda?</p>
+<p><strong>Ta med dig:</strong> Ett konkret startvillkor och en loggpost som behövs för reproduktion.</p>
+<h3 id="section-10">4.4 Datainsamling och försöksdesign</h3>
+<p><strong>Säg:</strong> ”Jag vill spara misslyckade körningar lika noggrant som lyckade. Annars riskerar demonstrationen att bli ett urval av bra sekvenser.”</p>
+<p><strong>Fråga:</strong> ”Vilka metadata är lättast att glömma men viktigast när ett robotförsök senare ska förstås eller jämföras?”</p>
+<p><strong>Följ upp:</strong> Fråga om versionsspårning, kamerakalibrering, tidsstämplar, återställningsstatus och hur försöken delas upp vid utvärdering. R900 används här som inspiration för experimentdisciplin, inte som ett dataset vi har reproducerat. <a class="cite" href="#ref-S06" aria-label="Källa S06">[S06]</a></p>
+<p><strong>Ta med dig:</strong> En minimal men användbar körningsmanifeststruktur.</p>
+<h3 id="section-11">4.5 Examensarbetets koppling: formulera dig försiktigt</h3>
+<p>En lämplig formulering är: ”Jag såg examensarbetstiteln om Simulation In The Loop och action-success verification. Jag har inte kunnat granska hela fulltexten, så jag vill inte likställa min design med din metod. Vilken del av problemet tycker du är viktigast att skilja från en enkel efterhandskontroll?” <a class="cite" href="#ref-S04" aria-label="Källa S04">[S04]</a></p>
+<p>Det ger honom möjlighet att förklara skillnaden. Undvik att säga att examensarbetet visar att vår Blender-arkitektur fungerar eller att just hans metod har implementerats.</p>
+<h2 id="section-12">5. Samtalsområden med Per-Eric Olsson</h2>
+<p>Per-Eric presenteras av företaget som Chief AI Architect. HYPER-materialet ger en anledning att diskutera världsrepresentation, feedback och gränssnitt, men det ger inte insyn i alla tekniska detaljer. <a class="cite" href="#ref-S20" aria-label="Källa S20">[S20]</a><a class="cite" href="#ref-S03" aria-label="Källa S03">[S03]</a></p>
+<h3 id="section-13">5.1 Världsmodell kontra tillståndslagring</h3>
+<p><strong>Säg:</strong> ”Jag skiljer på simulatorns verkliga tillstånd, det observerade tillståndet, modellens interna representation och uppdragets mål. Min objektlista är ett integrationsformat; jag kallar den inte en reproduktion av er inlärda världsmodell.”</p>
+<p><strong>Fråga:</strong> ”På den nivå ni kan beskriva offentligt: vad ligger i modellens representation och vad ligger i vanlig systemlogik runt modellen?”</p>
+<p><strong>Följ upp:</strong> Hur hanteras tid, beständighet och osäker information? Hur märker integrationslagret att en plan bygger på gammalt tillstånd?</p>
+<p><strong>Ta med dig:</strong> En tydligare gräns mellan modellansvar och systemingenjörens ansvar, inte proprietära algoritmdetaljer.</p>
+<h3 id="section-14">5.2 Gränsen mellan uppgift och rörelse</h3>
+<p><strong>Säg:</strong> ”Jag har sett både beskrivningar av lednära styrning och av en separat motion-plattform. Därför har jag inte antagit att AI:n alltid returnerar en plockpunkt eller alltid en ledtrajektoria.” <a class="cite" href="#ref-S03" aria-label="Källa S03">[S03]</a><a class="cite" href="#ref-S07" aria-label="Källa S07">[S07]</a></p>
+<p><strong>Fråga:</strong> ”Vilken nivå bör en integrationsingenjör normalt tänka på: uppgiftsavsikt, greppose, bana eller tidsatta ledkommandon? Var valideras respektive nivå?”</p>
+<p><strong>Följ upp:</strong> Är samma gränssnitt relevant för alla robotar, eller finns profiler och kapabiliteter? Vem bestämmer när något ligger utanför en robots förmåga?</p>
+<p><strong>Ta med dig:</strong> Rätt abstraktionsnivå för MVP. Två möjliga kontrakt betyder inte att två fullständiga controllers måste byggas.</p>
+<h3 id="section-15">5.3 Feedback och ändrat beteende</h3>
+<p><strong>Säg:</strong> ”För en deterministisk baslinje kan jag återskapa logiken med samma version och indata. Om beteendet ändras under drift behöver jag veta vad som ändrats för att kunna felsöka.”</p>
+<p><strong>Fråga:</strong> ”Hur exponeras förändringar som är viktiga för drift: modellversion, representation, minne eller konfiguration? Vad behöver loggas för att en incident ska gå att återskapa?”</p>
+<p><strong>Följ upp:</strong> Finns en gräns mellan insamling, träning och godkänd modell för körning? Hur hanteras rollback och validering av ändrade beteenden?</p>
+<p><strong>Ta med dig:</strong> En begriplig livscykel för modell- och systemversioner. Anta inte att ”kontinuerligt lärande” betyder att vikter uppdateras fritt efter varje plock.</p>
+<h3 id="section-16">5.4 Determinism, korrekthet och tidskrav</h3>
+<p><strong>Säg:</strong> ”Jag behandlar reproducerbarhet, rätt resultat och rätt tid som olika egenskaper. Ett system kan ge samma fel konsekvent.”</p>
+<p><strong>Fråga:</strong> ”När ni använder ordet deterministisk, vilken nivå syftar ni på: modellens inferens, planeringen, exekveringen eller tidsbeteendet?”</p>
+<p><strong>Följ upp:</strong> Vilka delar behöver hårda tidsgränser och vilka får vänta? Hur skiljer man en långsam modell från kötid, sensorfördröjning eller ett väntande cellvillkor?</p>
+<p><strong>Ta med dig:</strong> En faktisk tidsbudget och en tydlig terminologi, inte en abstrakt diskussion om huruvida AI ”är deterministisk”.</p>
+<h3 id="section-17">5.5 LLM/VLM runt den egna modellen</h3>
+<p><strong>Säg:</strong> ”Jag vill lägga en valfri modell bakom ett schema och låta den lämna ett förslag. Den får inte fri exekveringsrätt i Blender.”</p>
+<p><strong>Fråga:</strong> ”Vilka LLM/VLM-uppgifter ligger runt kärnmodellen i den här rollen? Är nyttan främst perception, tolkning av kunddata, diagnos, planering eller utvecklingsverktyg?”</p>
+<p><strong>Följ upp:</strong> Hur hanteras avvisade svar, hallucinering och otillräcklig evidens? Vad ska vara möjligt att köra utan extern modellanslutning?</p>
+<p><strong>Ta med dig:</strong> En konkret integrationsuppgift som motsvarar rollen, inte ett antagande att Codex ska ersätta deras robotbrain.</p>
+<h3 id="section-18">5.6 Compute utan att fastna i specifikationer</h3>
+<p><strong>Fråga:</strong> ”Vilka steg körs centralt och vilka måste fungera lokalt i cellen? Hur påverkar en förlorad nätverksförbindelse modellkörning och fortsatt drift?”</p>
+<p><strong>Följ upp:</strong> Fråga vem som äger paketering, drivrutiner, kapacitetsplanering och modellutrullning. LUMI- och DGX-källorna visar beräkningsarbete men besvarar inte rollens exakta ansvar. <a class="cite" href="#ref-S10" aria-label="Källa S10">[S10]</a><a class="cite" href="#ref-S11" aria-label="Källa S11">[S11]</a></p>
+<p><strong>Ta med dig:</strong> Gränsen mellan träningsinfrastruktur, inferenstjänst och cellnära integration. Du behöver inte lova att du kan administrera deras kluster utan att ha sett kraven.</p>
+<h2 id="section-19">6. Gemensamt whiteboardfall: kvittensen försvinner</h2>
+<figure id="fig-ack-loss"><img src="assets/ack-loss.svg" alt="Utfört plock — förlorad kvittens. Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning. Efter otillräcklig evidens kan operatören uttryckligen upprepa steg 6–9 för samma kommando. Varje bedömning sparas; ingen ny plockeffekt begärs. Verktygsförberedelse i HKM-revisionen hör till samma kommando och ändrar inte denna avstämningsregel." width="900" height="795"><figcaption>Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning. Efter otillräcklig evidens kan operatören uttryckligen upprepa steg 6–9 för samma kommando. Varje bedömning sparas; ingen ny plockeffekt begärs. Verktygsförberedelse i HKM-revisionen hör till samma kommando och ändrar inte denna avstämningsregel.</figcaption><div class="figure-tools"><a href="assets/ack-loss.svg">Öppna stor SVG</a><a href="sources/diagrams/ack-loss.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p>Beskriv först bara observationen: ”Klienten fick timeout efter ett plockkommando.” Be dem sedan resonera tillsammans med dig om vilka händelser som kan ligga bakom.</p>
+<p>Ditt eget förslag:</p>
+<blockquote>
+<p>Jag registrerar avsikten före sändning och använder ett stabilt kommandokontrakt. Efter timeout vet jag inte om effekten uteblev. Jag vill fråga efter samma kommando och ta en ny observation. Om journalen är konsistent och objektet verifieras i destinationen behöver jag inte utföra plocket igen. Om underlaget är motstridigt eller saknas ska ärendet bli synligt oavgjort.</p>
+</blockquote>
+<p>Bra följdfrågor är: ”Hur länge behåller kontrollern kommandostatus?”, ”Vad betyder not found efter omstart?”, ”Kan ett objekt ligga kvar i griparen?” och ”Vad krävs för att ett nytt försök ska vara tillåtet?”</p>
+<p>Undvik att lova exactly-once utan att definiera vilken gräns och felmodell garantin gäller för. Poängen är inte att vinna en diskussion om terminologi, utan att undvika en ogrundad fysisk sidoeffekt.</p>
+<h2 id="section-20">7. Designbeslut du bör kunna försvara</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Beslut</th>
+<th>Ditt motiv</th>
+<th>Kostnad eller begränsning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>En cell och ett aktivt plock</td>
+<td>Gör ägarskap och felvägar begripliga.</td>
+<td>Ingen flerrobotskalning demonstreras.</td>
+</tr>
+<tr>
+<td>SQLite i första versionen</td>
+<td>Liten, beständig lokal miljö.</td>
+<td>Inte bevis för distribuerad hög tillgänglighet.</td>
+</tr>
+<tr>
+<td>Separat kundkvittens</td>
+<td>Skiljer fysisk effekt från affärssystemets uppdatering.</td>
+<td>Fler tillstånd och fler tester.</td>
+</tr>
+<tr>
+<td>Deterministisk Brain-baslinje</td>
+<td>Gör E2E-fel reproducerbara utan modellkonto.</td>
+<td>Visar inte egen inlärd robotpolicy.</td>
+</tr>
+<tr>
+<td>Begränsad Blender-runtime</td>
+<td>Tydliga operationer och felsökningsbarhet.</td>
+<td>Mindre frihet än godtycklig agentkod.</td>
+</tr>
+<tr>
+<td>MCP bara vid utveckling</td>
+<td>Skiljer kraftfulla författarverktyg från exekveringskontrakt.</td>
+<td>Två separata arbetssätt måste dokumenteras.</td>
+</tr>
+<tr>
+<td>Verifierare och test-orakel</td>
+<td>Gör felaktiga slutsatser möjliga att mäta.</td>
+<td>Delade simulatorantaganden kvarstår.</td>
+</tr>
+<tr>
+<td>UNKNOWN som eget tillstånd</td>
+<td>Undviker att gissa vid otillräcklig evidens.</td>
+<td>Kräver ett arbetssätt för granskning och återhämtning.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Fråga gärna vilket av dessa val de först skulle ändra. Ett bra svar från dig kan vara: ”Det verkar rimligt; då behöver jag ändra det här kontraktet och lägga till det här testfallet.”</p>
+<h2 id="section-21">8. Frågor du kan få och en bra svarsriktning</h2>
+<h3 id="section-22">”Varför Blender och inte en full robotsimulator?”</h3>
+<p>”Jag optimerar första versionen för att synliggöra integrationsflödet och felvägarna. Jag gör inga påståenden om realistiska kontaktkrafter. Om frågan blir fysik, styrnoggrannhet eller sim-to-real behöver simulatorvalet och testmodellen omprövas.”</p>
+<p>För HKM-revisionen kan du lägga till: ”Länkarna följer en egen TCP-baserad visuell modell. Vi kontrollerar ett syntetiskt arbetsområde och geometriska marginaler; vi har inte validerat riktig HKM-kinematik. PyBullet och Isaac Sim är relevanta vid andra fysik- eller planeringskrav, men är inte beroenden i denna demo.” <a class="cite" href="#ref-S23" aria-label="Källa S23">[S23]</a><a class="cite" href="#ref-S28" aria-label="Källa S28">[S28]</a><a class="cite" href="#ref-S29" aria-label="Källa S29">[S29]</a></p>
+<h3 id="section-23">”Varför valde roboten just det verktyget?”</h3>
+<p>Visa det ursprungliga jobbets sparade kandidater, filterorsaker och rangordning. Förklara skillnaden mellan katalogens P/C/N-kompatibilitet, mass-/geometrikrav och faktisk tillgänglighet. Visa därefter rack- och monteringshändelser under samma command_id. Ett verktygsbyte är ingen extra produktförflyttning. Säg endast att detta är demonstrerat när den aktuella revisionens tester och artefakter finns.</p>
+<h3 id="section-24">”Är detta Nowastes cell?”</h3>
+<p>”Nej. Nowaste beskriver en HKM1800/SICS-pilot i Tostarp, och Cognibotics rapporterade senare en beställning av en andra cell. Det ger användningskontext. Vår layout, produktkatalog, verktyg och rörelsemodell är egna simulatorval; vi kopierar inte kundens konstruktion eller interna programvara.” <a class="cite" href="#ref-S07" aria-label="Källa S07">[S07]</a><a class="cite" href="#ref-S25" aria-label="Källa S25">[S25]</a></p>
+<h3 id="section-25">”Är detta verkligen AI?”</h3>
+<p>”Baslinjen är deterministisk planeringslogik. Den är medvetet inte ett forskningsbidrag inom robotinlärning. AI-adaptern är valfri och får lämna strukturerade förslag. Det jag vill demonstrera är systemansvaret runt en sådan komponent.”</p>
+<h3 id="section-26">”Hur vet du att plocket lyckades?”</h3>
+<p>”Jag behöver en definierad framgångsregel och observation efter handling. I test kan ett separat orakel kontrollera om verifieraren gjorde rätt. I verklig utrustning måste sensor- och verifieringskedjan valideras på nytt.”</p>
+<h3 id="section-27">”Varför inte bara retry?”</h3>
+<p>”För att samma timeout kan betyda att ingenting hände eller att handlingen redan utfördes. Jag börjar med att bestämma vad mottagaren garanterar och hur utfallet kan stämmas av.”</p>
+<h3 id="section-28">”Vad händer om modellen returnerar ett giltigt men felaktigt kommando?”</h3>
+<p>”Schema är bara första kontrollen. Förslaget måste också passa aktuell observation, objektidentitet, celltillstånd, kalibrering och tillåtna operationer. Även efter det kan uppgiften misslyckas, så resultatet behöver verifieras.”</p>
+<h3 id="section-29">”Hur mycket av detta gjorde AI åt dig?”</h3>
+<p>”Jag använder AI för utkast och implementation, men ansvarar för att förstå och granska ändringarna. Jag ska kunna förklara den kod jag visar, vilka antaganden den gör och vilka tester som faktiskt har körts.”</p>
+<p>Visa gärna en konkret diff, ett test som först misslyckades och hur du verifierade ändringen. Säg inte att du har gjort detta om det ännu inte finns.</p>
+<h3 id="section-30">”Kan vi byta Blender mot vår robot direkt?”</h3>
+<p>”Inte utan nytt integrationsarbete. Affärsgränsen är avsiktligt separerad, men adapter, tidskrav, kalibrering, säkerhetsansvar och hårdvarutester måste specificeras för er miljö.”</p>
+<h2 id="section-31">9. Frågor om rollen som projektet hjälper dig ställa</h2>
+<p>Be om ett konkret exempel på ett första uppdrag: vilket kundflöde som ska fungera, vilka system som finns och vem som accepterar leveransen. Det är mer användbart än en allmän fråga om teknikstack.</p>
+<p>Fråga också hur ansvaret delas mellan modellutveckling, integration, robotleverantör och drift. Vem prioriterar när en kundanpassning konkurrerar med plattformsarbete? Vilken hjälp finns inom områden som är nya för dig? Vilka delar förväntas du äga själv efter tre månader?</p>
+<p>En bra avslutande rollfråga är:</p>
+<blockquote>
+<p>”Vilken av de här integrationsfrågorna skulle ni vilja att jag kan lösa självständigt först, och hur skulle ni avgöra att lösningen är tillräckligt bra för kund?”</p>
+</blockquote>
+<p>Detta är frågor om arbetsinnehåll och leveransförväntningar, inte ett löfte från dig om kompetens som du ännu inte kan belägga.</p>
+<h2 id="section-32">10. Det du ska ha redo före en faktisk demo</h2>
+<p>Förbered en ärlig statusruta med implementerat, simulerat, testat och återstående. Ha versionsnumret synligt. Visa ett litet dataexempel, en tillståndsövergång och minst ett relevant feltest. Rensa bort nycklar och privata kunddata från skärmen och terminalhistoriken som du visar.</p>
+<p>Om programmet fungerar: skapa ordern live, följ ID:t genom systemet och visa Blender-effekten. Visa sedan kvittensbortfall och ett oavgjort fall. Om programmet inte är färdigt: använd diagrammen och säg att det är designgranskning. En inspelad sekvens ska tydligt presenteras som inspelad.</p>
+<p>För ett nytt oberoende försök: välj ”Start new test”, granska ”Robot cell” och bekräfta ”Create test”. För att köra om samma försök: välj ”Manage test data → Clear test and retry”. Bekräftelsen kasserar gamla resultat/evidens och återställer produkter, men behåller numret, cellen och scenariovalet. ”Delete selected test” tar bort försöket helt; ”Delete all tests” den bekräftade samlingen. Efter en helt tömd lista får nästa nya försök nummer 1. Dessa åtgärder avgör inte ett osäkert plock. Ett arkiv blir bara aktivt efter ett uttryckligt val att rensa och återanvända det. Använd separat demodata när du visar raderings-/rensningsflödet (ADR 0013).</p>
+<p>Appen avslutar först sin pågående läsning av vyn. Om den fastnar görs ingen dataändring; vänta och välj att försöka igen. Kontrollerna blir tillgängliga efter att den uppdaterade vyn har lästs in.</p>
+<p>Ha en reservversion av rapporterna som PDF. Börja inte installera nya drivrutiner eller flytta runtime till en okänd miljö precis före presentationen. Det är en praktisk rekommendation för denna demo, inte en uppgift om SICS interna rutiner.</p>
+<h2 id="section-33">11. Samtalsprotokoll att fylla i</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Fråga eller antagande</th>
+<th>Vad de faktiskt sade</th>
+<th>Designkonsekvens</th>
+<th>Nästa verifiering</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Var slutar modellens ansvar?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Vad räknas som lyckat plock?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Vilka fel är vanligast?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Vad lagras vid en omstart?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Vilka observationer är tillförlitliga?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Vilka protokoll används i relevant cell?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Vad bör MVP inte försöka göra?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Vad är en rimlig första leverans i rollen?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Anteckna deras faktiska formuleringar och skilj dem från din tolkning. Publicera inte nya mötesuppgifter eller interna detaljer i det offentliga repot utan att först stämma av vad som får delas.</p>
+<h2 id="section-34">12. Avslutning</h2>
+<p>En möjlig sammanfattning efter samtalet är:</p>
+<blockquote>
+<p>Jag ville använda projektet för att göra mina antaganden synliga, inte för att låtsas känna er implementation. Det viktigaste jag tar med mig är var ni sätter gränsen mellan modell, integration och robot, och vilken evidens som behövs för att ett uppdrag ska räknas som lyckat. Nästa steg för mig är att pröva de antagandena med ett litet reproducerbart test.</p>
+</blockquote>
+<p><strong>Det starkaste du kan visa är inte att du redan kan allt. Det är att du kan avgränsa ett problem, formulera ett testbart kontrakt, förklara en avvägning och ändra uppfattning när bättre information kommer fram.</strong></p>
+<h2 id="section-35">Granska det nya undersökningsflödet (2026-10-05)</h2>
+<p>Kör först ett normalfall och därefter kvittensbortfall efter effekt. Följ den
+markerade åtgärden till symptom, originaljournal och exakt bedömd observation.
+Öppna manuell inspektion och kontrollera att API-adress, export och kommandots ID
+hör till samma test. Återgå utan att tappa uppspelningen. Visa sedan hur ett
+motstridigt sensorunderlag förblir oavgjort och en senare normal observation kan
+avgöra samma kommando utan ett nytt plock. Be en ny granskare försöka detta utan
+handledning: fungerande automation är inte bevis för intuitiv förståelse.</p>
+<section class="references" aria-label="Referenser"><h2 id="referenser">Referenser och källbegränsningar</h2><p>Referenserna avser avgränsade sakuppgifter. Diagram, kontrakt och testfall är simulatorns egna designval. Basgranskning: 1 oktober 2026; komplettering för HKM-revisionen: 4 oktober 2026. Varje post anger sitt kontrolldatum.</p><section class="reference" id="ref-S01"><h3>[S01] Systemingenjör — annons 4464336388</h3><span class="ref-kind">Arbetsgivarens rollbeskrivning · COMPANY_REPORTED_CLAIM</span><p>Superintelligence Computing Systems. Utan säkert publiceringsdatum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4464336388">https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4464336388</a></p><p>Offentligt sökindexerad annons kontrollerad. Används som kravunderlag; inte som bevis för intern teknikstack. Direktsidan kunde inte återläsas konsekvent.</p></section><section class="reference" id="ref-S03"><h3>[S03] Foundation AGI model for Industrial Robots — HYPER: reporting</h3><span class="ref-kind">Självrapporterat projektarbete · COMPANY_REPORTED_CLAIM</span><p>SICS AI, deltagarrapport hos Europeiska kommissionen/CORDIS. Uppdaterad 1 juni 2026. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://cordis.europa.eu/project/id/101218436/reporting">https://cordis.europa.eu/project/id/101218436/reporting</a></p><p>Project ID 101218436, coordinator reporting period 2025-07-01 to 2026-03-31. Structured world model and control of joint angles, trajectories, speed, acceleration and grip force are SICS/coordinator-reported claims hosted by CORDIS, not EC validation of performance. No proprietary model or AGI implementation is inferred. Project DOI: 10.3030/101218436.</p></section><section class="reference" id="ref-S04"><h3>[S04] Simulation In The Loop: Real-Time Robot Action Success Verification with a Digital Twin</h3><span class="ref-kind">Examensarbete — bibliografisk uppgift · VERIFIED_PUBLIC_FACT</span><p>Axel Kaliff, KTH. 2025. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A1988006">https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A1988006</a></p><p>Title/author/academic relationship is corroborated by examiner Florian Pokorny&#x27;s public research listing (the previous KTH homepage redirects there). DiVA full text was not retrieved during the enhancement review; no detailed thesis method, algorithm or experimental result is reproduced.</p><p class="ref-url">Kompletterande primärkälla: <a href="https://florianpokorny.com/">https://florianpokorny.com/</a></p></section><section class="reference" id="ref-S05"><h3>[S05] Project Autograsper: Custom Grasper Development Guide</h3><span class="ref-kind">Öppen primärdokumentation · VERIFIED_PUBLIC_FACT</span><p>CloudGripper-projektet. Löpande repositorydokumentation. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://github.com/cloudgripper/autograsper/blob/main/README.md">https://github.com/cloudgripper/autograsper/blob/main/README.md</a></p><p>Primary research-software README separates STARTUP, ACTIVE and RESETTING and perform_task, reset_task and recover_after_fail. The earlier review pinned Git blob 3cb1da256bc5147ef52a56327da476f110c4e6c2; the 2026-10-04 review re-read the current README but does not relabel that historical blob as a new commit. Conceptual inspiration only; no remote robot execution or proprietary SICS code.</p></section><section class="reference" id="ref-S06"><h3>[S06] R900: Understanding the Cost-Effectiveness of Random Exploration from 900 Hours of Robotic Data Collection</h3><span class="ref-kind">Forskningspreprint · VERIFIED_PUBLIC_FACT</span><p>Shutong Jin, Axel Kaliff, Ruiyu Wang, Muhammad Zahid och Florian T. Pokorny. arXiv v2, 17 september 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://arxiv.org/abs/2503.23571">https://arxiv.org/abs/2503.23571</a></p><p>DOI: 10.48550/arXiv.2503.23571. Används för datainsamling, episodhantering och återställning som designinspiration. Projektet reproducerar inte experimenten eller resultaten.</p></section><section class="reference" id="ref-S07"><h3>[S07] Nowaste Logistics Advances Automation with Cognibotics Robot Picking Cell</h3><span class="ref-kind">Manufacturer-reported second-cell order and first-cell production context · COMPANY_REPORTED_CLAIM</span><p>Cognibotics. 5 januari 2026. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/articles/nowaste-logistics-advances-automation-with-cognibotics-robot-picking-cell">https://www.cognibotics.com/en/articles/nowaste-logistics-advances-automation-with-cognibotics-robot-picking-cell</a></p><p>The 5 January 2026 release reports an ORDER for a second cell following the first pilot; it does not establish that the second cell was already installed. AutoStore, SICS AI vision and Juliet &amp; Romeo roles are manufacturer descriptions, not an independently audited installation or proprietary interface specification.</p></section><section class="reference" id="ref-S10"><h3>[S10] SICS AI: HPC Access to LUMI Supercomputer for AI and Robotics</h3><span class="ref-kind">Teknisk samarbetsbeskrivning · COMPANY_REPORTED_CLAIM</span><p>ENCCS. 12 september 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://enccs.se/2025/09/news/sics-hpc-access-lumi-supercomputer-ai-robotics-3/">https://enccs.se/2025/09/news/sics-hpc-access-lumi-supercomputer-ai-robotics-3/</a></p><p>Dokumenterar arbete med beräkningsmiljö och GPU-träning. Fastställer inte kundernas aktuella inferensarkitektur.</p></section><section class="reference" id="ref-S11"><h3>[S11] SICS AI investerar i NVIDIA DGX B200 från Aixia</h3><span class="ref-kind">Leverantörens pressmeddelande · COMPANY_REPORTED_CLAIM</span><p>Aixia Group AB. 17 juni 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://news.cision.com/se/aixia-group-ab--publ-/r/sics-ai-investerar-i-nvidia-dgx-b200-fran-aixia---accelererar-utvecklingen-av-ai-hjarna-for-nasta-ge%2Cc4165473">https://news.cision.com/se/aixia-group-ab--publ-/r/sics-ai-investerar-i-nvidia-dgx-b200-fran-aixia---accelererar-utvecklingen-av-ai-hjarna-for-nasta-ge%2Cc4165473</a></p><p>Bekräftar offentliggjord DGX B200-affär med drifttjänster. Inte ett test av modeller eller belägg för var dagens maskin är placerad.</p></section><section class="reference" id="ref-S20"><h3>[S20] About Us</h3><span class="ref-kind">Företagets egen presentation · COMPANY_REPORTED_CLAIM</span><p>SICS AI. Utan datum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://sics.ai/about/">https://sics.ai/about/</a></p><p>Används endast för den uppgivna rollen Chief AI Architect för Per-Eric Olsson. Övriga karriär- och AGI-påståenden övertas inte som verifierade meriter.</p></section><section class="reference" id="ref-S23"><h3>[S23] Hybrid Kinematic Machine (HKM)</h3><span class="ref-kind">Manufacturer mechanism overview · COMPANY_REPORTED_CLAIM</span><p>Cognibotics. Undated. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/articles/hybrid-kinematic-machine">https://www.cognibotics.com/en/articles/hybrid-kinematic-machine</a></p><p>Describes base-located drives and combined serial/parallel rod members. Used only for general visual inspiration. RobotOps uses original TCP-driven illustrative links, not reverse-engineered lengths, joint equations or controller parameters.</p></section><section class="reference" id="ref-S25"><h3>[S25] Revolutionerande AI-teknik testas hos Nowaste Logistics</h3><span class="ref-kind">Customer/company press release · COMPANY_REPORTED_CLAIM</span><p>Nowaste Logistics. 2024-01-26. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://press.nowaste.se/posts/pressreleases/revolutionerande-ai-teknik-testas-hos-nowaste">https://press.nowaste.se/posts/pressreleases/revolutionerande-ai-teknik-testas-hos-nowaste</a></p><p>Reports an HKM1800/SICS software production-environment pilot in Tostarp. Supports warehouse-picking use-case context only; no proprietary layout, throughput result, autonomy/AGI claim or internal architecture is imported into our design.</p></section><section class="reference" id="ref-S28"><h3>[S28] PyBullet Quickstart Guide</h3><span class="ref-kind">Primary physics/robotics library documentation · VERIFIED_PUBLIC_FACT</span><p>Bullet Physics maintainers. Current repository documentation. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://github.com/bulletphysics/bullet3/blob/master/docs/pybullet_quickstart_guide/PyBulletQuickstartGuide.md.html">https://github.com/bulletphysics/bullet3/blob/master/docs/pybullet_quickstart_guide/PyBulletQuickstartGuide.md.html</a></p><p>Documents articulated-body simulation, inverse kinematics and collision facilities. Scope comparison only: richer physics/IK might motivate another adapter later. PyBullet is not a RobotOps dependency and these capabilities do not validate the current Blender abstraction.</p></section><section class="reference" id="ref-S29"><h3>[S29] Isaac Sim Motion Generation (Experimental)</h3><span class="ref-kind">Official robotics simulation documentation · VERIFIED_PUBLIC_FACT</span><p>NVIDIA. Current documentation, reviewed 2026-10-04. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://docs.isaacsim.omniverse.nvidia.com/latest/motion_generation/index.html">https://docs.isaacsim.omniverse.nvidia.com/latest/motion_generation/index.html</a></p><p>The current API documents robotics motion-generation facilities and marks this interface experimental. Used to distinguish model-based robotics planning from RobotOps conservative synthetic preflight, not to imply an installed dependency or real-world safety guarantee.</p></section></section></main></div><footer class="site-footer">Rami Halabi · Version 1.5 · 5 oktober 2026.<br>Oberoende, AI-assisterad simulator och forskningsunderlag. Inte SICS AI:s dokumentation eller validerad fysisk robotprestanda. <a href="https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator">Källfiler på GitHub</a> · <a href="downloads/robotops-twin-samlat.pdf">Samtliga rapporter som PDF</a></footer></body></html>

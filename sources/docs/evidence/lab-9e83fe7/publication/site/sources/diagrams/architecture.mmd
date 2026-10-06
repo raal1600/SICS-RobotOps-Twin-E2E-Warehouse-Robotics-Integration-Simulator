@@ -1,0 +1,26 @@
+flowchart TD
+  erp["ERP / WMS<br/>Current test / retained history"]
+  core["API / durable workflow<br/>Typed plans / cell and test scope"]
+  gateway["RobotGateway<br/>Typade kommandon och status"]
+  brain["Deterministic Brain<br/>Catalogue / tool / trajectory"]
+  db["Beständig lagring<br/>Catalog / reset intent / evidence"]
+  world["Bounded Blender runtime<br/>Private world / tool checkpoints"]
+  monitor["Operationsvy<br/>Timeline / cell choice / retention"]
+  verify["Verifierare<br/>Observation → bedömning"]
+  cell["Cell / command journal<br/>Logical interlocks / tool state"]
+  observation["ObservationModel<br/>Sensors / labelled telemetry"]
+  replay["Read-only 3D replay<br/>Versioned transforms / phase / tool"]
+  erp <--> core
+  core <--> gateway
+  core <--> db
+  gateway <--> world
+  world <--> cell
+  verify --> db
+  verify --> monitor
+  brain <--> core
+  cell -.-> gateway
+  world --> observation
+  observation --> verify
+  world -.-> replay
+  replay -.-> erp
+  db -.-> replay

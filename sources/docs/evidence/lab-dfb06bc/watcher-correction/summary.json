@@ -1,0 +1,97 @@
+{
+  "recorded_at_utc": "2026-10-05T22:36:06.159154+00:00",
+  "helper_path": "artifacts/final-evidence-pack/f00ad15/watch_journals.py",
+  "original_helper_sha256": "ae06dea0ebe15425f2565cd806a2756238753a6dc55f3ddc7abd17db4d36cd94",
+  "fixed_helper_sha256": "7bc11b35236f5194aadbb594615c7e985b8332d0c487cfad37e521cf3dc93955",
+  "original_bytes": "artifacts/final-evidence-pack/dfb06bc/watcher-handle-correction/watch_journals.before.py",
+  "diff": "artifacts/final-evidence-pack/dfb06bc/watcher-handle-correction/watch_journals.patch",
+  "source_commit": "dfb06bcda710f3603951a3bb79ec778c08d5a493",
+  "acceptance_directory": "docs/evidence/acceptance/20261005T215547",
+  "tests_1_terminal": {
+    "junit": "docs/evidence/acceptance/20261005T215547/tests-1.xml",
+    "sha256": "00582581025c6937b7db9acb207998bce46d19e72483d50cedb5c2a89e09b2d0",
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "799",
+    "time": "2300.346",
+    "timestamp": "2026-10-05T23:55:56.635588+02:00",
+    "hostname": "DESKTOP-AZDXEDL",
+    "passed": 799,
+    "coverage_percent_from_root": 91.4398348
+  },
+  "acceptance_owner_exit": {
+    "exit_code": 1,
+    "ended_utc_from_root": "2026-10-05T22:34:18Z",
+    "basis": "Root report; saved stderr confirms tools.acceptance nonzero exit1 during TemporaryDirectory cleanup."
+  },
+  "failure": {
+    "type": "PermissionError",
+    "winerror": 32,
+    "operation": "TemporaryDirectory cleanup unlink of fixtures/test_full_lab_browser_authoriz0/process-stack/plc.db",
+    "stderr_copy": "artifacts/final-evidence-pack/dfb06bc/watcher-handle-correction/acceptance-ui-idle.stderr.log",
+    "stderr_sha256": "30ce456384c050e700a8b17e86bf930dc62f6b55b731fb60e77132b6b0eab9a1"
+  },
+  "diagnosis": "Original query_journals used sqlite3.Connection context manager for transaction finalization but never explicitly closed its database connection. Windows handle ownership is being inspected separately by root; this defect alone does not identify the exact live locker.",
+  "correction": "contextlib.closing wraps the connection, with the existing connection transaction context nested inside. Read-only URI, query_only=ON and explicit BEGIN unchanged. On success commit then close; on exception rollback then close.",
+  "source_frozen": true,
+  "tracked_source_edits": false,
+  "tests_2": "NOT_STARTED",
+  "overall_acceptance": "INCOMPLETE_NONZERO_EXIT",
+  "goal_status": "NOT_ACHIEVED",
+  "isolated_probe": {
+    "script": "artifacts/final-evidence-pack/dfb06bc/watcher-handle-correction/probe_connection_lifetime.py",
+    "script_sha256": "c40eecb83709b503fd418889af984795704a2054ef070105b96413c75f88fa5f",
+    "result": "artifacts/final-evidence-pack/dfb06bc/watcher-handle-correction/probe-result.json",
+    "result_sha256": "a3dfc2a085ed9ded1ac0506c28d86a132828e71b054dbf4775aa5da8e142e941",
+    "all_checks_passed": true,
+    "checks": {
+      "original_return_keeps_both_files_locked": true,
+      "explicit_gc_releases_original_files": true,
+      "fixed_return_releases_both_without_gc": true,
+      "fixed_exception_releases_without_gc": true,
+      "fixed_error_rolls_back_then_closes": true,
+      "fixed_success_commits_then_closes_each": true
+    },
+    "scope": "Exact old and fixed helper function AST executed on private disposable SQLite DBs under the ignored correction directory; no application/acceptance DBs opened."
+  },
+  "actual_fixture_lock_probes": [
+    {
+      "path": "artifacts/final-evidence-pack/dfb06bc/lock-after-watcher-stop.json",
+      "sha256": "64b12d530f8a09793831748d2dd84a3af371d589df69ed34c1b17240873bd610",
+      "facts": {
+        "phase": "after_watcher_stop",
+        "path": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-m_88nhx2\\fixtures\\test_full_lab_browser_authoriz0\\process-stack\\plc.db",
+        "opened": true,
+        "operation": "exclusive READ open, no write/delete",
+        "at_utc": "2026-10-05T22:36:18.8474907Z"
+      }
+    },
+    {
+      "path": "artifacts/final-evidence-pack/dfb06bc/lock-before-watcher-stop.json",
+      "sha256": "b13cd2802a83ee12a5aa3197602d2b6794f871cbca3be549d98674e2619dd1f8",
+      "facts": {
+        "phase": "before_watcher_stop",
+        "path": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-m_88nhx2\\fixtures\\test_full_lab_browser_authoriz0\\process-stack\\plc.db",
+        "opened": true,
+        "operation": "exclusive READ open, no write/delete",
+        "at_utc": "2026-10-05T22:36:18.4260614Z"
+      }
+    }
+  ],
+  "actual_failure_attribution": {
+    "certainty": "PROBABLE_WATCHER_CONNECTION_LIFETIME_CAUSE_NOT_CONCLUSIVE_PID_OWNERSHIP",
+    "facts": [
+      "Original helper never explicitly closes SQLite connections.",
+      "Isolated Windows probe reproduces exact WinError32 on both DBs after the original function returns; fixed helper releases immediately.",
+      "Root reports exact acceptance plc.db exclusive-read probe succeeded both before and after stopping watcher at approximately22:36:18UTC; the earlier lock had already released.",
+      "Root verified watcher owner4820/actualPython12228 stopped."
+    ],
+    "inference": "Delayed cyclic garbage collection can explain later release before the live probe, but that specific historical release mechanism is not proven.",
+    "no_claim": "The actual PID holding the failed cleanup handle at22:34:18 was not conclusively identified."
+  },
+  "watcher_restart": "NOT_STARTED_BY_THIS_AGENT; root owns any new campaign",
+  "manual_helper": "capture_manual_journals.py imports this query_journals helper and inherits its explicit-close correction.",
+  "syntax_validation": "ast.parse succeeded for corrected helper and isolated probe; no bytecode or product test run."
+}

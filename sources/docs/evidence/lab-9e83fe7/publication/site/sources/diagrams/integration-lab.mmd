@@ -1,0 +1,25 @@
+flowchart TD
+  operator["Guided Console<br/>ERP demand / WMS task"]
+  api["FastAPI / guided stages<br/>REST writes / read-only stream"]
+  postgres["PostgreSQL<br/>Sessions / command / outbox"]
+  plc["Virtual PLC<br/>Actual OPC UA / durable journal"]
+  edge["Separate Python edge<br/>Durable inbox / OPC UA client"]
+  rabbit["RabbitMQ / AMQP<br/>Publisher confirm / consumer ACK"]
+  gate["Physical authorization<br/>Original command execution claim"]
+  runtime["Simulated controller<br/>Synthetic or Blender runtime"]
+  observation["Fresh observation<br/>Synthetic sensors / separate truth"]
+  business["WMS then ERP<br/>Durable ACK / business outcome"]
+  verify["Verifier / reconciliation<br/>Original journal + fresh evidence"]
+  replay["3D view / trace<br/>Read-only motion and evidence"]
+  operator --> api
+  api --> postgres
+  postgres --> rabbit
+  rabbit --> edge
+  edge --> plc
+  api <--> edge
+  plc --> gate
+  gate --> runtime
+  runtime --> observation
+  observation --> verify
+  verify --> business
+  observation --> replay

@@ -4,7 +4,8 @@ These are deliberately injected simulator faults, not diagnoses of real hardware
 Descriptions assume the standard fixture settings. The persisted journal and
 assessed WorldObservation determine each actual outcome; the 3D view is illustration.
 
-**Execution scenario** applies when Create and run order starts a new pick. It can
+**Execution scenario** is persisted when Create and run order creates a guided
+session. It takes effect only when its corresponding authorized stage executes. It can
 change planning, cell control, acknowledgement delivery or the first observation
 after movement. **Sensor report for the next check** in the investigation panel applies only when Reconcile or
 Observe again captures new evidence for the original command. It does not repeat
@@ -46,6 +47,25 @@ the path from an unusual result to exact records and manual inspection.
 | Cell fault | A simulated detected error puts the cell into its faulted state before movement. | An error rather than an operator stop; both need an explicit logical reset. |
 | Invalid Brain output | A planner reply violates the required action-plan format and is rejected. | A reply arrived but was invalid; no robot command is created. |
 | Brain timeout | The planner is treated as having missed its response deadline. | No usable plan in time, instead of a malformed reply. This is before command creation, unlike a lost acknowledgement. |
+| Duplicate delivery | Reuses the original command identity and payload. Lab mode republishes through RabbitMQ and waits for an increased durable inbox delivery count. | Delivery may repeat; the command journal must suppress any second physical effect. |
+| Broker transient failure | A deterministic failure is injected before the publish attempt. The committed outbox remains pending. | Explicit retry performs only publication; no new command or pick is created. |
+| Edge transient failure | A deterministic edge-stage interruption retains durable command/inbox identity. | Explicit retry completes delivery acknowledgement separately from publisher confirmation. |
+| OPC UA interruption | The demonstration interrupts the session boundary before connecting; actual unavailable-server/restart tests separately exercise failed wire connections. | Safe retry reconnects before submission; an uncertain physical dispatch always reconciles the original identity instead. |
+| Virtual PLC restart | Lab mode changes the virtual PLC boot identity through its OPC UA restart method; local mode reloads the simulated controller from durable storage. | Querying the original command after restart preserves its journal and execution claim without another effect. |
+| WMS unavailable | Verification succeeds but business acknowledgement fails. Lab mode receives an actual HTTP 503 from the synthetic WMS service on the first attempt. | Retry acknowledges the verified result; effect count and original robot command remain unchanged. |
+
+
+The `PLC_RESTART` scenario calls the virtual PLC's OPC UA
+restart method, changes its simulated boot identity and retains its command
+journal/execution claims. Local mode reconstructs the controller adapter from
+its durable journal. These model controller lifecycle; an actual OPC UA server
+process restart is checked separately by integration tests. Neither is a real
+hardware reset or a safety-rated operation.
+
+Failed pre-network injections are labelled **SIMULATED SYSTEM**, not successful
+wire traffic. A later successful lab retry records its actual protocol evidence.
+When a human pause makes the pre-plan observation stale, the workflow returns to
+fresh observation, planning and validation; it does not extend the freshness limit.
 
 The before/after lost-ack cases deliberately have the same uncertain business
 status despite different physical results. Silence cannot tell them apart. Logical
@@ -71,7 +91,8 @@ assessments. Repeated bad evidence remains inconclusive; changing to Normal only
 changes the next capture mode and requires an explicit review action.
 
 Implementation: `apps/erp_ui/workflow-guide.js` owns the UI descriptions and
-comparison data. Fault semantics remain in `robotops/workflow/engine.py`,
+comparison data. Bounded stage/retry semantics live in `robotops/integration/engine.py` and the
+real-protocol adapters in `robotops/lab/`. Core fault semantics remain in `robotops/workflow/engine.py`,
 `robotops/cell/runtime.py`, `robotops/blender/adapter.py`,
 `robotops/observation/model.py` and `robotops/observation/quality.py`.
 See [operator workflow](operations.md) and [reconciliation rules](reconciliation.md).

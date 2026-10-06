@@ -1,0 +1,121 @@
+{
+  "updated_at_utc": "2026-10-05T21:54:19.735687+00:00",
+  "completion": "NOT ACHIEVED",
+  "scope": "Interrupted f00ad15 acceptance and subsequent dirty-working-tree test synchronization/cleanup corrections. Earlier f78985b evidence remains separately archived.",
+  "interrupted_acceptance": {
+    "source_commit": "f00ad15fa1c711dcf036dd32e5532bc17978fb20",
+    "status": "INTERRUPTED_AFTER_CONFIRMED_BROWSER_TEST_FAILURE",
+    "evidence": "docs/evidence/acceptance/20261005T210653/interruption.json",
+    "tests_1": "Incomplete; no terminal whole-suite pass",
+    "tests_2": "Not started",
+    "distributed_lab_cases": "Not reached"
+  },
+  "ui_idle_correction": {
+    "evidence": "docs/evidence/lab-f00ad15/investigation-guided-wait-diagnosis.json",
+    "failure": "The test negatively matched a question-mark busy label while the UI displayed an ellipsis; it continued during an awaited refresh and reached a premature five-second enabled assertion.",
+    "change": "Wait for both global busy and integration.busy to clear at the documented creation/resume, authorization and reconciliation boundaries. Semantic assertions and existing deadlines remain.",
+    "source": "Uncommitted changes on f00ad15",
+    "validation": {
+      "status": "FAILED_DUE_TO_TEARDOWN_ERROR",
+      "test_bodies_passed": 16,
+      "test_failures": 0,
+      "teardown_errors": 1,
+      "exit_code": 1,
+      "pytest_seconds": 647.79,
+      "junit_seconds": 647.739,
+      "raw_evidence": "docs/evidence/lab-f00ad15/ui-idle-correction"
+    }
+  },
+  "teardown_diagnosis": {
+    "evidence": "docs/evidence/lab-f00ad15/investigation-teardown-diagnosis.json",
+    "observed": "Blender desktop body passed; server thread remained alive after its existing20-second join. The Proactor connection_lost callback logged WinError10054 during socket.shutdown.",
+    "inference": "That exception can skip transport detachment and block server.wait_closed. No blocked server task stack was captured; the exact cause is not proven.",
+    "not_claimed": "No demonstrated application/WebSocket/SQLite lock leak."
+  },
+  "tcp_probe": {
+    "evidence": "docs/evidence/lab-f00ad15/windows-tcp-reset-probe.json",
+    "cases": 48,
+    "loops": [
+      {
+        "name": "Proactor",
+        "cases": 24,
+        "closure_failures": 0,
+        "callback_exceptions": 0
+      },
+      {
+        "name": "Selector",
+        "cases": 24,
+        "closure_failures": 0,
+        "callback_exceptions": 0
+      }
+    ],
+    "interpretation": "All48 closures succeeded. The probe did NOT reproduce the exact observed race and does not establish that replacing the event loop is necessary."
+  },
+  "graceful_context_correction": {
+    "change": "Explicitly close created BrowserContext instances before browser.close, retaining finally cleanup, in the investigation and lab browser fixtures.",
+    "source_files": [
+      "tests/browser/test_investigation.py",
+      "tests/lab/test_browser_lab.py"
+    ],
+    "official_guidance": {
+      "url": "https://playwright.dev/python/docs/api/class-browser#browser-close",
+      "checked_on": "2026-10-05",
+      "paraphrase": "Playwright recommends closing explicitly created contexts before closing the browser so pages close gracefully."
+    },
+    "limits": "No event-loop replacement, timeout increase, cleanup-error suppression or production-code change.",
+    "validation": {
+      "status": "PASSED_TARGETED_CORRECTION_ONLY",
+      "passed": 3,
+      "deselected": 5,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 381.8,
+      "exit_code": 0,
+      "ended_at": "2026-10-05T21:50:50.4034566Z",
+      "evidence": "docs/evidence/lab-f00ad15/graceful-correction/result.json",
+      "tested_source": {
+        "base_commit": "f00ad15fa1c711dcf036dd32e5532bc17978fb20",
+        "tested_source_was_clean_commit": false,
+        "identity": "Uncommitted corrective working tree on f00ad15; not clean f00ad15 validation.",
+        "files": [
+          {
+            "path": "tests/browser/test_guided_console.py",
+            "sha256": "7b91025c5c524ba9255d7142ea3aef15ba74df7d25e178732190f30f24e10f68"
+          },
+          {
+            "path": "tests/browser/test_investigation.py",
+            "sha256": "0fba00809a6177d2da0445d8a11533a18aeecc5624299406287c6a9a39e95a4a"
+          },
+          {
+            "path": "tests/lab/test_browser_lab.py",
+            "sha256": "33c29e6d16136b3b97a5d5446579ed9ec223a2381c51089a901291cfc435daa4"
+          }
+        ],
+        "patch": "docs/evidence/lab-f00ad15/graceful-correction/test-source.patch",
+        "patch_sha256": "1f2cbb079e4e095b432779ceac97e5ee57157195f246ca4194176e0a38a60a0c"
+      },
+      "lab_happy": {
+        "case": "lab-happy",
+        "evidence": "docs/evidence/lab-f00ad15/graceful-correction/lab-happy.json",
+        "all_recorded_sources_match": true,
+        "session": {
+          "session_id": "82a88e9a-ea97-5c26-8dc7-9358ad991263",
+          "job_id": "7fef91a7-c787-5c52-9895-4fe54eeb90b8",
+          "command_id": "26b25731-03e8-5cdf-8920-15a1a465741f",
+          "status": "COMPLETED",
+          "current_stage": 22,
+          "revision": 44
+        },
+        "effect_count": 1,
+        "frames": 133,
+        "distinct_robot_poses": 118,
+        "rendered_position_changed": true
+      }
+    }
+  },
+  "remaining": [
+    "Commit corrections as a new source revision.",
+    "Run full mandatory acceptance on the clean successor, including both complete suites and all remaining gates.",
+    "Complete final manual/CLI and exact-source remote CI/publication/Pages proof."
+  ]
+}

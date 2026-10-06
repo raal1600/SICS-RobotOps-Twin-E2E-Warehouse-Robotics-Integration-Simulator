@@ -1,0 +1,210 @@
+{
+  "$defs": {
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "excerpt": {
+          "title": "Excerpt",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "symbol",
+        "excerpt"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "authorization_required": {
+      "default": false,
+      "title": "Authorization Required",
+      "type": "boolean"
+    },
+    "classification": {
+      "title": "Classification",
+      "type": "string"
+    },
+    "command_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Command Id"
+    },
+    "component": {
+      "title": "Component",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "duration_ms": {
+      "default": 0,
+      "title": "Duration Ms",
+      "type": "number"
+    },
+    "evidence_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "execution_session_id": {
+      "title": "Execution Session Id",
+      "type": "string"
+    },
+    "failure_semantics": {
+      "title": "Failure Semantics",
+      "type": "string"
+    },
+    "input": {
+      "additionalProperties": true,
+      "title": "Input",
+      "type": "object"
+    },
+    "invariant": {
+      "title": "Invariant",
+      "type": "string"
+    },
+    "job_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Job Id"
+    },
+    "order_id": {
+      "title": "Order Id",
+      "type": "string"
+    },
+    "output": {
+      "additionalProperties": true,
+      "title": "Output",
+      "type": "object"
+    },
+    "persistence_effect": {
+      "title": "Persistence Effect",
+      "type": "string"
+    },
+    "protocol": {
+      "title": "Protocol",
+      "type": "string"
+    },
+    "revision": {
+      "title": "Revision",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "pattern": "^1\\.0$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sequence": {
+      "title": "Sequence",
+      "type": "integer"
+    },
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceReference"
+    },
+    "stage": {
+      "title": "Stage",
+      "type": "integer"
+    },
+    "state_after": {
+      "title": "State After",
+      "type": "string"
+    },
+    "state_before": {
+      "title": "State Before",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "step_id": {
+      "title": "Step Id",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "wire": {
+      "additionalProperties": true,
+      "title": "Wire",
+      "type": "object"
+    }
+  },
+  "required": [
+    "step_id",
+    "session_id",
+    "execution_session_id",
+    "order_id",
+    "job_id",
+    "command_id",
+    "correlation_id",
+    "stage",
+    "sequence",
+    "revision",
+    "title",
+    "summary",
+    "status",
+    "component",
+    "protocol",
+    "classification",
+    "state_before",
+    "state_after",
+    "persistence_effect",
+    "source",
+    "invariant",
+    "failure_semantics"
+  ],
+  "title": "ExecutionStep",
+  "type": "object"
+}

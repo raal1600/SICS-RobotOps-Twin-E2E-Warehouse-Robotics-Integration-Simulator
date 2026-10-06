@@ -1,0 +1,2131 @@
+{
+  "reviewed_at": "2026-10-06T03:46:06.415978+00:00",
+  "scope": "Independent offline review of terminal local acceptance. No services/tests/browser/DB/rendering.",
+  "source": {
+    "commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd",
+    "manifest_start": {
+      "commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+      "dirty": false,
+      "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+    },
+    "current": {
+      "commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+      "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd",
+      "dirty": true
+    },
+    "current_dirty_note": "Generated evidence/ACCEPTANCE_REPORT may change dirty status; exact source hash required."
+  },
+  "manifest": {
+    "path": "docs/evidence/acceptance/20261006T024719/manifest.json",
+    "sha256": "caf31b7306a13007432bf86f63eb8b92b88ef8a738a407e8ec7827cc36ce9bca",
+    "bytes": 24057
+  },
+  "terminal_exit": {
+    "artifact": {
+      "path": "artifacts/acceptance-response-sync-exit.json",
+      "sha256": "9dbc305aaf738927a5a62065c1fd11a3dea549f8b099929f82b1b260743b00b9",
+      "bytes": 192
+    },
+    "source": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "started_at": "2026-10-06T02:47:19.5256375Z",
+    "ended_at": "2026-10-06T03:45:16.7213113Z",
+    "exit_code": 0
+  },
+  "local_gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\.local\\bin\\uv.EXE",
+        "sync",
+        "--locked",
+        "--all-groups"
+      ],
+      "seconds": 0.04331219999585301,
+      "log": "docs/evidence/acceptance/20261006T024719/setup.log"
+    },
+    "browser_setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "playwright",
+        "install",
+        "chromium",
+        "--only-shell"
+      ],
+      "seconds": 0.3898464999801945,
+      "log": "docs/evidence/acceptance/20261006T024719/browser_setup.log"
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+        "--version"
+      ],
+      "seconds": 0.22596929999417625,
+      "log": "docs/evidence/acceptance/20261006T024719/blender_version.log"
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "security"
+      ],
+      "seconds": 19.600753200007603,
+      "log": "docs/evidence/acceptance/20261006T024719/security.log"
+    },
+    "tests_1": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-to2atak6/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\tests-1.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\coverage-1.json",
+        "--cov-report=term"
+      ],
+      "seconds": 1651.2559275999956,
+      "log": "docs/evidence/acceptance/20261006T024719/tests_1.log"
+    },
+    "tests_2": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-2-3f0jwgdd/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\tests-2.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T024719\\coverage-2.json",
+        "--cov-report=term"
+      ],
+      "seconds": 1677.8736543999985,
+      "log": "docs/evidence/acceptance/20261006T024719/tests_2.log"
+    },
+    "repeatability": {
+      "passed": true,
+      "log": "docs/evidence/acceptance/20261006T024719/repeatability.json"
+    },
+    "lint": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "lint"
+      ],
+      "seconds": 0.9106053000141401,
+      "log": "docs/evidence/acceptance/20261006T024719/lint.log"
+    },
+    "typecheck": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "typecheck"
+      ],
+      "seconds": 0.613668099977076,
+      "log": "docs/evidence/acceptance/20261006T024719/typecheck.log"
+    },
+    "demo_happy_path": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "happy_path",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\happy_path"
+      ],
+      "seconds": 9.805350599985104,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_happy_path.log"
+    },
+    "demo_lost_ack_after_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_after_effect",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\lost_ack_after_effect"
+      ],
+      "seconds": 9.895965499978047,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_lost_ack_after_effect.log"
+    },
+    "demo_lost_ack_before_effect": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "lost_ack_before_effect",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\lost_ack_before_effect"
+      ],
+      "seconds": 0.9802420999913011,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_lost_ack_before_effect.log"
+    },
+    "demo_ambiguous": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "ambiguous",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\ambiguous"
+      ],
+      "seconds": 9.997796199982986,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_ambiguous.log"
+    },
+    "demo_restart": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "restart",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\restart"
+      ],
+      "seconds": 10.101201000012225,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_restart.log"
+    },
+    "demo_logical_estop": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "logical_estop",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\logical_estop"
+      ],
+      "seconds": 0.9016031000064686,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_logical_estop.log"
+    },
+    "demo_cell_fault": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "cell_fault",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\cell_fault"
+      ],
+      "seconds": 0.8974745000014082,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_cell_fault.log"
+    },
+    "demo_tool_showcase": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "demo",
+        "--runtime",
+        "blender",
+        "--scenario",
+        "tool_showcase",
+        "--directory",
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\runs\\20261006T024719\\tool_showcase"
+      ],
+      "seconds": 61.41089379999903,
+      "log": "docs/evidence/acceptance/20261006T024719/demo_tool_showcase.log"
+    },
+    "drift": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.drift_check"
+      ],
+      "seconds": 1.0607374999963213,
+      "log": "docs/evidence/acceptance/20261006T024719/drift.log"
+    },
+    "publication": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 9.731846900016535,
+      "log": "docs/evidence/acceptance/20261006T024719/publication.log"
+    },
+    "publication_final": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "docs"
+      ],
+      "seconds": 8.915850899997167,
+      "log": "docs/evidence/acceptance/20261006T024719/publication_final.log"
+    }
+  },
+  "local_gate_count": 20,
+  "remote_gates": {
+    "ci": {
+      "status": "PENDING_NOT_RUN",
+      "passed": false
+    },
+    "pages": {
+      "status": "PENDING_NOT_RUN",
+      "passed": false
+    },
+    "publication_remote": {
+      "status": "PENDING_NOT_RUN",
+      "passed": false
+    }
+  },
+  "remote_evidence": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261006T024719/remote.json",
+      "sha256": "246409c1a08cceb397e4f3b3c9c55ab63f200e6730f783cfc03e27e10df50e35",
+      "bytes": 84
+    },
+    "reason": "Remote gates not run; NOT DONE until final commit is verified."
+  },
+  "suites": [
+    {
+      "run": 1,
+      "junit": {
+        "path": "docs/evidence/acceptance/20261006T024719/tests-1.xml",
+        "sha256": "7899f43724ec15a2ec4fa7be612fd7eb95c60e690fbeb3af9dbb6ed5e073e5af",
+        "bytes": 125497
+      },
+      "testcase_count": 815,
+      "unique_testcase_count": 815,
+      "duplicate_testcase_count": 0,
+      "outcomes": {
+        "passed": 815
+      },
+      "declared_suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "815",
+          "time": "1649.757",
+          "timestamp": "2026-10-06T04:47:41.512942+02:00",
+          "hostname": "DESKTOP-AZDXEDL"
+        }
+      ],
+      "fixture_basename": "robotops-acceptance-1-to2atak6",
+      "fixture_path": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-to2atak6\\fixtures",
+      "testcase_id_outcome_sha256": "86a5d28a11425ededcd2e9c3c284037b029d2046d18369ebf6b57b6782d83924",
+      "lab_browser_case_ids": [
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]"
+      ],
+      "selected_browser_cases": {
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[]": "PASSED",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]": "PASSED",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]": "PASSED",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]": "PASSED",
+        "tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-desktop]": "PASSED",
+        "tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-compact]": "PASSED",
+        "tests/browser/test_guided_console.py::test_guided_happy_reload_gate_trace_and_business_completion[blender]": "PASSED",
+        "tests/browser/test_guided_console.py::test_guided_lost_ack_reconciles_original_command_without_second_effect[blender]": "PASSED"
+      }
+    },
+    {
+      "run": 2,
+      "junit": {
+        "path": "docs/evidence/acceptance/20261006T024719/tests-2.xml",
+        "sha256": "51bfac934f503a91efbbe965fcb1e7d4b34bafb853c47a9a87aaf25a86d23213",
+        "bytes": 125498
+      },
+      "testcase_count": 815,
+      "unique_testcase_count": 815,
+      "duplicate_testcase_count": 0,
+      "outcomes": {
+        "passed": 815
+      },
+      "declared_suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "815",
+          "time": "1675.043",
+          "timestamp": "2026-10-06T05:15:14.760686+02:00",
+          "hostname": "DESKTOP-AZDXEDL"
+        }
+      ],
+      "fixture_basename": "robotops-acceptance-2-3f0jwgdd",
+      "fixture_path": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-2-3f0jwgdd\\fixtures",
+      "testcase_id_outcome_sha256": "86a5d28a11425ededcd2e9c3c284037b029d2046d18369ebf6b57b6782d83924",
+      "lab_browser_case_ids": [
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]"
+      ],
+      "selected_browser_cases": {
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[]": "PASSED",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]": "PASSED",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]": "PASSED",
+        "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]": "PASSED",
+        "tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-desktop]": "PASSED",
+        "tests/browser/test_investigation.py::test_run_notice_investigate_and_return[blender-compact]": "PASSED",
+        "tests/browser/test_guided_console.py::test_guided_happy_reload_gate_trace_and_business_completion[blender]": "PASSED",
+        "tests/browser/test_guided_console.py::test_guided_lost_ack_reconciles_original_command_without_second_effect[blender]": "PASSED"
+      }
+    }
+  ],
+  "same_testcase_ids_and_outcomes": true,
+  "coverage": [
+    {
+      "run": 1,
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/coverage-1.json",
+        "sha256": "6ace26dd946895fd16504886d8761ee7ce9a00ce4246a22b870cebf144d6c317",
+        "bytes": 336399
+      },
+      "totals": {
+        "covered_lines": 4898,
+        "num_statements": 5360,
+        "percent_covered": 91.38059701492537,
+        "percent_covered_display": "91",
+        "missing_lines": 462,
+        "excluded_lines": 17,
+        "percent_statements_covered": 91.38059701492537,
+        "percent_statements_covered_display": "91"
+      },
+      "recomputed_percent": 91.38059701492537,
+      "minimum_percent": 85,
+      "passed": true
+    },
+    {
+      "run": 2,
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/coverage-2.json",
+        "sha256": "8acbd04c4c4773e4d61a74f46cd6c6c839c0f0ae3db37cf5a1836b468e684b94",
+        "bytes": 336399
+      },
+      "totals": {
+        "covered_lines": 4901,
+        "num_statements": 5360,
+        "percent_covered": 91.43656716417911,
+        "percent_covered_display": "91",
+        "missing_lines": 459,
+        "excluded_lines": 17,
+        "percent_statements_covered": 91.43656716417911,
+        "percent_statements_covered_display": "91"
+      },
+      "recomputed_percent": 91.43656716417911,
+      "minimum_percent": 85,
+      "passed": true
+    }
+  ],
+  "repeatability": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261006T024719/repeatability.json",
+      "sha256": "4f3744be2b225aa5087b2797d9804940fc2cfbaaaadbf8e182d130580d1ef00d",
+      "bytes": 211393
+    },
+    "passed": true,
+    "test_count": 815
+  },
+  "criteria": {
+    "specification": {
+      "path": "SUCCESS_CRITERIA.md",
+      "sha256": "081a4b12d36c92069431e671ba5c2f3cfb381b1da099684b19c57372ef4a09bf",
+      "bytes": 32662
+    },
+    "mapping": {
+      "path": "docs/acceptance-map.json",
+      "sha256": "ee23a141c05313dcf15f4b22fe8cb2fd774a9c097839806219db6fc9dd3de9e2",
+      "bytes": 118785
+    },
+    "must_count": 169,
+    "must_passed": 163,
+    "must_remote_pending_count": 6,
+    "must_remote_pending": {
+      "HKM-VIS-MUST-025": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      },
+      "SC-DATA-005": {
+        "passed": false,
+        "failures": [
+          "ci"
+        ]
+      },
+      "SC-KB-006": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-007": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-008": {
+        "passed": false,
+        "failures": [
+          "pages",
+          "publication_remote"
+        ]
+      },
+      "UI-INV-MUST-008": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      }
+    },
+    "must_failures_only_remote": true,
+    "all_must_passed": false,
+    "lab_must_count": 51,
+    "lab_must_all_passed": true,
+    "should_count": 4,
+    "should_results": {
+      "SC-ARCH-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BRAIN-005": {
+        "passed": false,
+        "failures": [
+          "optional_model_fallback"
+        ]
+      },
+      "SC-DEMO-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-008": {
+        "passed": true,
+        "failures": []
+      }
+    },
+    "should_nonblocking_and_separate": true,
+    "all_manifest_results_recomputed": true,
+    "all_results": {
+      "SC-ARCH-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ARCH-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ARCH-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ARCH-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BLENDER-006": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-KB-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-KB-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-KB-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-KB-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-KB-010": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DOC-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DATA-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DATA-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DATA-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DATA-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DATA-005": {
+        "passed": false,
+        "failures": [
+          "ci"
+        ]
+      },
+      "SC-STATE-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-STATE-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-STATE-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-STATE-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-OBS-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-OBS-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-REC-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-STATE-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-FAULT-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-FAULT-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-STATE-006": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-FAULT-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-IDEM-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-IDEM-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-IDEM-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-IDEM-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-PERSIST-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DEMO-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DOC-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-PERSIST-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-PERSIST-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-PERSIST-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BRAIN-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BRAIN-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BRAIN-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DEMO-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BRAIN-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-FAULT-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BRAIN-005": {
+        "passed": false,
+        "failures": [
+          "optional_model_fallback"
+        ]
+      },
+      "SC-BLENDER-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BLENDER-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BLENDER-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BLENDER-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-BLENDER-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-OBS-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-OBS-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-OBS-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-REC-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-REC-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-REC-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-REC-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-REC-007": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DEMO-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-REC-006": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-FAULT-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-LOG-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-LOG-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-METRIC-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-METRIC-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DEMO-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DEMO-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-007": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-008": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-TEST-006": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-KB-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-KB-006": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-007": {
+        "passed": false,
+        "failures": [
+          "publication_remote"
+        ]
+      },
+      "SC-KB-008": {
+        "passed": false,
+        "failures": [
+          "pages",
+          "publication_remote"
+        ]
+      },
+      "SC-KB-009": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ACC-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DOC-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DOC-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-DOC-005": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ACC-001": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ACC-002": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ACC-003": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ACC-004": {
+        "passed": true,
+        "failures": []
+      },
+      "SC-ACC-006": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-001": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-002": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-003": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-004": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-005": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-006": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-007": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-008": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-009": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-010": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-011": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-012": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-013": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-014": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-015": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-016": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-017": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-018": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-019": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-020": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-021": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-022": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-023": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-024": {
+        "passed": true,
+        "failures": []
+      },
+      "HKM-VIS-MUST-025": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      },
+      "UI-INV-MUST-001": {
+        "passed": true,
+        "failures": []
+      },
+      "UI-INV-MUST-002": {
+        "passed": true,
+        "failures": []
+      },
+      "UI-INV-MUST-003": {
+        "passed": true,
+        "failures": []
+      },
+      "UI-INV-MUST-004": {
+        "passed": true,
+        "failures": []
+      },
+      "UI-INV-MUST-005": {
+        "passed": true,
+        "failures": []
+      },
+      "UI-INV-MUST-006": {
+        "passed": true,
+        "failures": []
+      },
+      "UI-INV-MUST-007": {
+        "passed": true,
+        "failures": []
+      },
+      "UI-INV-MUST-008": {
+        "passed": false,
+        "failures": [
+          "ci",
+          "publication_remote",
+          "pages"
+        ]
+      },
+      "LAB-MUST-001": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-002": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-003": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-004": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-005": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-006": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-007": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-008": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-009": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-010": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-011": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-012": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-013": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-014": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-015": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-016": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-017": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-018": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-019": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-020": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-021": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-022": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-023": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-024": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-025": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-026": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-027": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-028": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-029": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-030": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-031": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-032": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-033": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-034": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-035": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-036": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-037": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-038": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-039": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-040": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-041": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-042": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-043": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-044": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-045": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-046": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-047": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-048": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-049": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-050": {
+        "passed": true,
+        "failures": []
+      },
+      "LAB-MUST-051": {
+        "passed": true,
+        "failures": []
+      }
+    }
+  },
+  "demos": [
+    {
+      "scenario": "happy_path",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-happy_path.json",
+        "sha256": "c1b9d4ccc935e14c20e771a94a242cd5e973260df5afb9b46c47f8ada7707222",
+        "bytes": 91138
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/happy_path/result.json",
+        "sha256": "c1b9d4ccc935e14c20e771a94a242cd5e973260df5afb9b46c47f8ada7707222",
+        "bytes": 91138
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "COMPLETED",
+      "final_state": "COMPLETED",
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "6f6417e7-e06c-4d5a-9efe-2a07829441b3",
+          "payload_hash": "d80ce7420989d82fc4983c6a5cdbdaa51496f6a435968902e2e4a69f9288ff9c",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 0
+        }
+      ],
+      "tool_showcase": [],
+      "passed": true,
+      "physical_execution": "BLENDER_RECEIPTS"
+    },
+    {
+      "scenario": "lost_ack_after_effect",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-lost_ack_after_effect.json",
+        "sha256": "32614fbf3089d03f8baa40c10506a0ae3c676e62d7eb6224329449fb39765c49",
+        "bytes": 127163
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/lost_ack_after_effect/result.json",
+        "sha256": "32614fbf3089d03f8baa40c10506a0ae3c676e62d7eb6224329449fb39765c49",
+        "bytes": 127163
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "COMPLETED",
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "8adc7ba6-f5f4-4cb6-958d-d84169cb7374",
+          "payload_hash": "d2f62977c3ff84c82099a062795d48881f3eb79f618248e25735f5b508513f56",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 1
+        }
+      ],
+      "tool_showcase": [],
+      "passed": true,
+      "physical_execution": "BLENDER_RECEIPTS"
+    },
+    {
+      "scenario": "lost_ack_before_effect",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-lost_ack_before_effect.json",
+        "sha256": "7f5768c865dc738fefcaff25db17cfd1f0bc2cc0f34f3a2ea81e7adafdeaf7be",
+        "bytes": 101009
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/lost_ack_before_effect/result.json",
+        "sha256": "7f5768c865dc738fefcaff25db17cfd1f0bc2cc0f34f3a2ea81e7adafdeaf7be",
+        "bytes": 101009
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "FAILED",
+      "command_count": 1,
+      "pick_effect_count": 0,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "71a62334-5aea-4c6d-b85f-f0121dd19967",
+          "payload_hash": "e3d4876f8eb667121c7d3d1546fd9f98f4b07ccb23e7281adeb3a133e9c27654",
+          "status": "REJECTED",
+          "reason": "PROVEN_NOT_STARTED",
+          "effect_count": 0,
+          "journal_durable": true,
+          "verdict": "VERIFIED_FAILURE",
+          "reconciliation_count": 1
+        }
+      ],
+      "tool_showcase": [],
+      "passed": true,
+      "physical_execution": "PROVEN_ZERO_EFFECT_FAULT_PATH"
+    },
+    {
+      "scenario": "ambiguous",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-ambiguous.json",
+        "sha256": "24a5186f7a05e888b51a13adbac3d1081b30309362003ed1a54a7e0a9a3dfe2f",
+        "bytes": 138643
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/ambiguous/result.json",
+        "sha256": "24a5186f7a05e888b51a13adbac3d1081b30309362003ed1a54a7e0a9a3dfe2f",
+        "bytes": 138643
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "REQUIRES_INTERVENTION",
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "4983d4d0-3311-42f7-bbf3-814d35dfe751",
+          "payload_hash": "b52fa0d69786e29ae3f40775d93098bbb3e6965215d0bfd96039225bb0c9246f",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "INCONCLUSIVE",
+          "reconciliation_count": 1
+        }
+      ],
+      "tool_showcase": [],
+      "passed": true,
+      "physical_execution": "BLENDER_RECEIPTS"
+    },
+    {
+      "scenario": "restart",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-restart.json",
+        "sha256": "949ff7e21fd44f7f9cab98584a1fa65d3eaed9f800a9751c05d7944d434a26fc",
+        "bytes": 127150
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/restart/result.json",
+        "sha256": "949ff7e21fd44f7f9cab98584a1fa65d3eaed9f800a9751c05d7944d434a26fc",
+        "bytes": 127150
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "UNKNOWN_OUTCOME",
+      "final_state": "COMPLETED",
+      "command_count": 1,
+      "pick_effect_count": 1,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "ee4070d5-a1ec-41e4-b513-9dea7df72286",
+          "payload_hash": "cc8d9c3f4fddff5458f18d30de380c5e5ea532956d58a07fe7829aa45eaeef59",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 1
+        }
+      ],
+      "tool_showcase": [],
+      "passed": true,
+      "physical_execution": "BLENDER_RECEIPTS"
+    },
+    {
+      "scenario": "logical_estop",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-logical_estop.json",
+        "sha256": "dc74d9570e5dab62bc92bcaf66ae4da708e667adf77477000ead5c74737efb17",
+        "bytes": 67372
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/logical_estop/result.json",
+        "sha256": "dc74d9570e5dab62bc92bcaf66ae4da708e667adf77477000ead5c74737efb17",
+        "bytes": 67372
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "FAILED",
+      "final_state": "FAILED",
+      "command_count": 1,
+      "pick_effect_count": 0,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "9b8e3cb4-ee43-48da-b177-2a259ddc8f46",
+          "payload_hash": "b523b74fc32a6de4829c19f8c1dcd21047ed4335bb56b33159a5cca99130268d",
+          "status": "REJECTED",
+          "reason": "CELL_NOT_READY",
+          "effect_count": 0,
+          "journal_durable": true,
+          "verdict": "VERIFIED_FAILURE",
+          "reconciliation_count": 0
+        }
+      ],
+      "tool_showcase": [],
+      "passed": true,
+      "physical_execution": "PROVEN_ZERO_EFFECT_FAULT_PATH"
+    },
+    {
+      "scenario": "cell_fault",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-cell_fault.json",
+        "sha256": "6a0930d813d1663245e25b143cc7539fec2f3357fe6b7532379f4dedb18088c2",
+        "bytes": 67351
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/cell_fault/result.json",
+        "sha256": "6a0930d813d1663245e25b143cc7539fec2f3357fe6b7532379f4dedb18088c2",
+        "bytes": 67351
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "FAILED",
+      "final_state": "FAILED",
+      "command_count": 1,
+      "pick_effect_count": 0,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "3e85ce78-c4a4-40da-b2fc-ac25d660dca4",
+          "payload_hash": "1c6c28e93c9a80869cd6ff4410780fd2b8e82b15daf2eaa9322d7f26cab3d0b8",
+          "status": "REJECTED",
+          "reason": "CELL_NOT_READY",
+          "effect_count": 0,
+          "journal_durable": true,
+          "verdict": "VERIFIED_FAILURE",
+          "reconciliation_count": 0
+        }
+      ],
+      "tool_showcase": [],
+      "passed": true,
+      "physical_execution": "PROVEN_ZERO_EFFECT_FAULT_PATH"
+    },
+    {
+      "scenario": "tool_showcase",
+      "artifact": {
+        "path": "docs/evidence/acceptance/20261006T024719/demo-tool_showcase.json",
+        "sha256": "25f852975adbc470b62e0c7a767e815f03c784752678c29655b5b16deb7520ed",
+        "bytes": 620506
+      },
+      "run_result": {
+        "path": "runs/20261006T024719/tool_showcase/result.json",
+        "sha256": "25f852975adbc470b62e0c7a767e815f03c784752678c29655b5b16deb7520ed",
+        "bytes": 620506
+      },
+      "run_result_copy_identical": true,
+      "runtime": "blender",
+      "initial_state": "COMPLETED",
+      "final_state": "COMPLETED",
+      "command_count": 6,
+      "pick_effect_count": 6,
+      "duplicate_physical_picks": 0,
+      "original_command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+      "journals": [
+        {
+          "job_id": "ea9689b8-f66b-5fa0-9a5e-ce2d10ebecac",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "run_id": "4e993de4-5be2-4ae5-aa52-1a8856fe71ca",
+          "payload_hash": "5875391ae0acc3b5dbdf52cef5a5c4f8fbf25d2fb1cf9c61ab8d70dd73d5a3d6",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 0
+        },
+        {
+          "job_id": "6870956a-0937-5ecd-ac40-78950161e0dc",
+          "command_id": "cdfacd7d-b800-52d8-854e-d25419c8b876",
+          "run_id": "4e993de4-5be2-4ae5-aa52-1a8856fe71ca",
+          "payload_hash": "f859b557f9e5f94d410eb9851c04dae967f3406de7a3a4756d4df49ce0e43b65",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 0
+        },
+        {
+          "job_id": "c208413c-c9af-5c08-9cb7-a36119a93157",
+          "command_id": "37543684-c4c5-53af-9de3-6f3839be20ca",
+          "run_id": "4e993de4-5be2-4ae5-aa52-1a8856fe71ca",
+          "payload_hash": "69cf640853d82d8ca98afc2238615a4abc5a5c35bacba95b4b2c0754626c5971",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 0
+        },
+        {
+          "job_id": "5111a936-d86b-5d5c-a137-c4c1225c956f",
+          "command_id": "eb173685-4d61-5b55-b52b-13c9c8560a4d",
+          "run_id": "4e993de4-5be2-4ae5-aa52-1a8856fe71ca",
+          "payload_hash": "dc9c1bc1d3cbd01afc5bb3585c37df3f62a9aa3d4298f0b80018d18da2f4b004",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 0
+        },
+        {
+          "job_id": "b027a888-b0df-5f20-a64e-6592b5998337",
+          "command_id": "a06e2d00-3782-5de8-9016-ce59fd8a1552",
+          "run_id": "4e993de4-5be2-4ae5-aa52-1a8856fe71ca",
+          "payload_hash": "4a9b89508d9076027a5a256c14d90268fbc2769b04e38d9be32cf0fb172f176f",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 0
+        },
+        {
+          "job_id": "23cebfd3-8405-5560-987a-4696d86534fe",
+          "command_id": "7d7e583c-fd3a-5597-907c-d13e68f3e912",
+          "run_id": "4e993de4-5be2-4ae5-aa52-1a8856fe71ca",
+          "payload_hash": "1b51433ee442dfff24ea5039d197d4eb6b8dba6f644b90930f0d0059a19b6ca2",
+          "status": "SUCCEEDED",
+          "reason": "BLENDER_PICK_APPLIED",
+          "effect_count": 1,
+          "journal_durable": true,
+          "verdict": "VERIFIED_SUCCESS",
+          "reconciliation_count": 0
+        }
+      ],
+      "tool_showcase": [
+        {
+          "sku": "SKU-A",
+          "tool_id": "EE_VAC_SINGLE",
+          "command_id": "f0f021f7-aab8-531f-afd8-b3ad17133c33",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-B",
+          "tool_id": "EE_VAC_ARRAY",
+          "command_id": "cdfacd7d-b800-52d8-854e-d25419c8b876",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-C",
+          "tool_id": "EE_ADAPTIVE_SOFT",
+          "command_id": "37543684-c4c5-53af-9de3-6f3839be20ca",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-D",
+          "tool_id": "EE_PINCH_NARROW",
+          "command_id": "eb173685-4d61-5b55-b52b-13c9c8560a4d",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-E",
+          "tool_id": "EE_PINCH_WIDE",
+          "command_id": "a06e2d00-3782-5de8-9016-ce59fd8a1552",
+          "effect_count": 1
+        },
+        {
+          "sku": "SKU-F",
+          "tool_id": "EE_SUPPORT_FORK",
+          "command_id": "7d7e583c-fd3a-5597-907c-d13e68f3e912",
+          "effect_count": 1
+        }
+      ],
+      "passed": true,
+      "physical_execution": "BLENDER_RECEIPTS"
+    }
+  ],
+  "demo_scope": "Eight CLI scenarios select Blender/local workflow. Positive effects require Blender journals/events; three fault paths prove zero effect. They do not themselves attest separate-process AMQP/OPC UA or manual UI proof.",
+  "selected_browser_scope": "Four separate-process lab cases per pass; lab happy uses Blender, lab fault cases use synthetic runtime. Additional selected browser cases explicitly use Blender. JUnit PASS is not a full saved-DOM/secret/manual audit.",
+  "findings": [],
+  "remaining_scope": [
+    "Fresh exact-source manual UI and both README CLI proofs",
+    "Saved UI/trace truth-label and secret audit; final PDF visual review",
+    "Exact final-source remote CI, remote publication and Pages verification"
+  ],
+  "goal_status": "NOT_ACHIEVED",
+  "security": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261006T024719/security-review.json",
+      "sha256": "423e1927efc9af89e50ec33e0ac41f032233eeda1ebcdf07ced01244efa3b263",
+      "bytes": 2539
+    },
+    "passed": true,
+    "lock_sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+    "bandit_exit": 1,
+    "pip_audit_exit": 0,
+    "npm_audit_exit": 0,
+    "vendor_integrity": true,
+    "findings": [
+      {
+        "path": "robotops/blender/adapter.py",
+        "scope": "import subprocess",
+        "test_id": "B404",
+        "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+        "reviewed": true,
+        "rationale": "Only fixed Blender executable invocations below; shell is never enabled. Configuration is trusted local operator input."
+      },
+      {
+        "path": "robotops/blender/adapter.py",
+        "scope": "_invoke",
+        "test_id": "B603",
+        "ast_sha256": "7c87bab88cc2b24175e08a4e7454c37d7ac5802e595d855ab5bee4cb3e2aec07",
+        "reviewed": true,
+        "rationale": "Reviewed fixed Blender invocation: Windows adds only literal --qos high before the fixed Python entry point. No shell, model-controlled arguments, external code, system-policy changes or deadline extension. Disabled autoexec, bounded process timeout and confined read-only --record-existing export remain intact."
+      },
+      {
+        "path": "robotops/blender/adapter.py",
+        "scope": "manifest",
+        "test_id": "B603",
+        "ast_sha256": "556d235eb3d3a7fab1325d6e625080f33b542fc0cf3d5071064b94f381c71a96",
+        "reviewed": true,
+        "rationale": "The sole process call remains the configured local Blender executable plus literal --version, without a shell. The added cpu_qos field records a platform-selected constant and does not execute code. Existing closure hashes and provenance remain unchanged."
+      },
+      {
+        "path": "robotops/demo.py",
+        "scope": "import subprocess",
+        "test_id": "B404",
+        "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+        "reviewed": true,
+        "rationale": "Demo restart invokes the current Python interpreter with the fixed committed module; no shell."
+      },
+      {
+        "path": "robotops/demo.py",
+        "scope": "run_demo",
+        "test_id": "B603",
+        "ast_sha256": "83b0f8d506fe0a0f6ada33703c368841e561147a2c80331c7d35d43bc7798552",
+        "reviewed": true,
+        "rationale": "Reviewed HKM tool-showcase and evidence additions; the sole subprocess call remains sys.executable -m robotops.demo --resume with argparse-controlled runtime and local directory arguments. Fixed argv, no shell, generated code or model input; outside robot command execution."
+      }
+    ],
+    "scope": "Saved security review; recorded Bandit findings may be reviewed exceptions."
+  },
+  "drift": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261006T024719/drift.json",
+      "sha256": "3810bedd2004942e1b07b119613e03a70b6c435fe4d5f32c8878f8277277b96b",
+      "bytes": 3374
+    },
+    "passed": true,
+    "errors": [],
+    "must_count": 169
+  },
+  "publication": {
+    "artifact": {
+      "path": "docs/evidence/acceptance/20261006T024719/publication-build.json",
+      "sha256": "918f11ee63ee6fb015ab846568d12fa22f5c77be90795fb8e6bdebfdc9020e06",
+      "bytes": 3586
+    },
+    "source_commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "reports": [
+      {
+        "report": "01-design",
+        "title": "Från kundorder till verifierad roboteffekt",
+        "pages": 35,
+        "words_approx": 5772,
+        "references": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S21",
+          "S22",
+          "S23",
+          "S24",
+          "S25",
+          "S26",
+          "S27",
+          "S28",
+          "S29",
+          "S30",
+          "S31"
+        ],
+        "pdf_sha256": "7b4a06d149c793edfb818ce79a252f908db101d3c3ed9705a9e22a2e20d4f6b8"
+      },
+      {
+        "report": "02-avgransning",
+        "title": "Simulatorn och den verkliga robotcellen",
+        "pages": 13,
+        "words_approx": 2500,
+        "references": [
+          "S01",
+          "S03",
+          "S04",
+          "S07",
+          "S08",
+          "S10",
+          "S11",
+          "S12",
+          "S17",
+          "S18",
+          "S19",
+          "S23",
+          "S24",
+          "S28",
+          "S29",
+          "S30"
+        ],
+        "pdf_sha256": "fadb7d9af4bde9897e099edcbece32fe551a51ffe0d1feeb5c65838e01b58751"
+      },
+      {
+        "report": "03-diskussion",
+        "title": "Teknisk dialog om RobotOps Twin",
+        "pages": 16,
+        "words_approx": 3253,
+        "references": [
+          "S01",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S10",
+          "S11",
+          "S20",
+          "S23",
+          "S25",
+          "S28",
+          "S29"
+        ],
+        "pdf_sha256": "6d03277a78cd660a193395acffd3dfbb73a628cfbf71eb909889338e63b3f21d"
+      }
+    ],
+    "combined_pdf_pages": 64,
+    "pdf_package_checks": {
+      "pages": 64,
+      "internal_links_checked": 210,
+      "destinations_preserved": true
+    },
+    "checks": [
+      "reference IDs resolved",
+      "figure placeholders resolved",
+      "SVG XML parsed",
+      "PDF text extractable",
+      "relative links and fragments validated",
+      "catalogue documentation generated from runtime source"
+    ],
+    "scope": "Saved build metadata only; no PDF rendering, visual review or remote publication claim."
+  },
+  "inputs": [
+    {
+      "path": "SUCCESS_CRITERIA.md",
+      "sha256": "081a4b12d36c92069431e671ba5c2f3cfb381b1da099684b19c57372ef4a09bf",
+      "bytes": 32662
+    },
+    {
+      "path": "artifacts/acceptance-response-sync-exit.json",
+      "sha256": "9dbc305aaf738927a5a62065c1fd11a3dea549f8b099929f82b1b260743b00b9",
+      "bytes": 192
+    },
+    {
+      "path": "docs/acceptance-map.json",
+      "sha256": "ee23a141c05313dcf15f4b22fe8cb2fd774a9c097839806219db6fc9dd3de9e2",
+      "bytes": 118785
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/blender_version.log",
+      "sha256": "40278423ab29130d0a19128e39e5ba85c9c937c8938af35e35e5247df1befccd",
+      "bytes": 1365
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/browser_setup.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/coverage-1.json",
+      "sha256": "6ace26dd946895fd16504886d8761ee7ce9a00ce4246a22b870cebf144d6c317",
+      "bytes": 336399
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/coverage-2.json",
+      "sha256": "8acbd04c4c4773e4d61a74f46cd6c6c839c0f0ae3db37cf5a1836b468e684b94",
+      "bytes": 336399
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-ambiguous.json",
+      "sha256": "24a5186f7a05e888b51a13adbac3d1081b30309362003ed1a54a7e0a9a3dfe2f",
+      "bytes": 138643
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-cell_fault.json",
+      "sha256": "6a0930d813d1663245e25b143cc7539fec2f3357fe6b7532379f4dedb18088c2",
+      "bytes": 67351
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-happy_path.json",
+      "sha256": "c1b9d4ccc935e14c20e771a94a242cd5e973260df5afb9b46c47f8ada7707222",
+      "bytes": 91138
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-logical_estop.json",
+      "sha256": "dc74d9570e5dab62bc92bcaf66ae4da708e667adf77477000ead5c74737efb17",
+      "bytes": 67372
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-lost_ack_after_effect.json",
+      "sha256": "32614fbf3089d03f8baa40c10506a0ae3c676e62d7eb6224329449fb39765c49",
+      "bytes": 127163
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-lost_ack_before_effect.json",
+      "sha256": "7f5768c865dc738fefcaff25db17cfd1f0bc2cc0f34f3a2ea81e7adafdeaf7be",
+      "bytes": 101009
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-restart.json",
+      "sha256": "949ff7e21fd44f7f9cab98584a1fa65d3eaed9f800a9751c05d7944d434a26fc",
+      "bytes": 127150
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo-tool_showcase.json",
+      "sha256": "25f852975adbc470b62e0c7a767e815f03c784752678c29655b5b16deb7520ed",
+      "bytes": 620506
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_ambiguous.log",
+      "sha256": "201f92fc99738ae69e9a60e049edda5e3597189e32949d3d22b6ef2ade48ef35",
+      "bytes": 329
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_cell_fault.log",
+      "sha256": "4e23618c6ff165c1b0ba132ae58afa021a25b15ada94295186de5faf0f893429",
+      "bytes": 307
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_happy_path.log",
+      "sha256": "7da9c85b37af6bf1be9aa21b978babbcd0112c994651bf241a29448c66998216",
+      "bytes": 313
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_logical_estop.log",
+      "sha256": "96dcb42a636573823f8162fe450f49f13873c08f2500f7e0bba11427422b6123",
+      "bytes": 313
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_lost_ack_after_effect.log",
+      "sha256": "51a405b6620ca776e8883762a74bd55c548ef634a6a010c8e35fb1094fd4d843",
+      "bytes": 341
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_lost_ack_before_effect.log",
+      "sha256": "1e9843371e2b202b0f2623540dd8d89153b59cd8cd69655113c9f917dd3b2d1a",
+      "bytes": 340
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_restart.log",
+      "sha256": "f9c53ef66cefd01fd47f77470e58225214a9d9267f22e6fc719ae358386ef936",
+      "bytes": 343
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/demo_tool_showcase.log",
+      "sha256": "a82f93b13788cbf810428096c06a0252c61464ba01a37d737574f942c906988f",
+      "bytes": 319
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/drift.json",
+      "sha256": "3810bedd2004942e1b07b119613e03a70b6c435fe4d5f32c8878f8277277b96b",
+      "bytes": 3374
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/drift.log",
+      "sha256": "3810bedd2004942e1b07b119613e03a70b6c435fe4d5f32c8878f8277277b96b",
+      "bytes": 3374
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/lint.log",
+      "sha256": "4395c9f2c447f8fde97a7a55613144f4a64fcb4486867aca64ad2ce8400e68b5",
+      "bytes": 49
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/manifest.json",
+      "sha256": "caf31b7306a13007432bf86f63eb8b92b88ef8a738a407e8ec7827cc36ce9bca",
+      "bytes": 24057
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/publication-build.json",
+      "sha256": "918f11ee63ee6fb015ab846568d12fa22f5c77be90795fb8e6bdebfdc9020e06",
+      "bytes": 3586
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/publication.log",
+      "sha256": "ef301eab4c368cb6a977b321a7ff2df4dad218f5b68bdc066575131e54522ce3",
+      "bytes": 4650
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/publication_final.log",
+      "sha256": "ef301eab4c368cb6a977b321a7ff2df4dad218f5b68bdc066575131e54522ce3",
+      "bytes": 4650
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/remote.json",
+      "sha256": "246409c1a08cceb397e4f3b3c9c55ab63f200e6730f783cfc03e27e10df50e35",
+      "bytes": 84
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/repeatability.json",
+      "sha256": "4f3744be2b225aa5087b2797d9804940fc2cfbaaaadbf8e182d130580d1ef00d",
+      "bytes": 211393
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/security-review.json",
+      "sha256": "423e1927efc9af89e50ec33e0ac41f032233eeda1ebcdf07ced01244efa3b263",
+      "bytes": 2539
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/security.log",
+      "sha256": "261252af3baa3393ea7bfe97dc79a2a1af5ac97f99921f99354dd38a41aa7418",
+      "bytes": 2899
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/setup.log",
+      "sha256": "4542e407dd1474004105de51ade7bad87354e547ca52ed0fa85ad83e01a5e48b",
+      "bytes": 61
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/tests-1.xml",
+      "sha256": "7899f43724ec15a2ec4fa7be612fd7eb95c60e690fbeb3af9dbb6ed5e073e5af",
+      "bytes": 125497
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/tests-2.xml",
+      "sha256": "51bfac934f503a91efbbe965fcb1e7d4b34bafb853c47a9a87aaf25a86d23213",
+      "bytes": 125498
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/tests_1.log",
+      "sha256": "6c61963008bcbb09032dad300e1f89d87ae5d77ddd311de8fca7b34dd507986e",
+      "bytes": 11858
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/tests_2.log",
+      "sha256": "4b9553e42cdfaa2d84194ac097afb9e0ebd20430057baa0be8c4f29997fe4b18",
+      "bytes": 11858
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/typecheck.log",
+      "sha256": "bbb056d74047c9da539a491357402c09020761ff6911e560d1fc89951f972115",
+      "bytes": 45
+    },
+    {
+      "path": "runs/20261006T024719/ambiguous/result.json",
+      "sha256": "24a5186f7a05e888b51a13adbac3d1081b30309362003ed1a54a7e0a9a3dfe2f",
+      "bytes": 138643
+    },
+    {
+      "path": "runs/20261006T024719/cell_fault/result.json",
+      "sha256": "6a0930d813d1663245e25b143cc7539fec2f3357fe6b7532379f4dedb18088c2",
+      "bytes": 67351
+    },
+    {
+      "path": "runs/20261006T024719/happy_path/result.json",
+      "sha256": "c1b9d4ccc935e14c20e771a94a242cd5e973260df5afb9b46c47f8ada7707222",
+      "bytes": 91138
+    },
+    {
+      "path": "runs/20261006T024719/logical_estop/result.json",
+      "sha256": "dc74d9570e5dab62bc92bcaf66ae4da708e667adf77477000ead5c74737efb17",
+      "bytes": 67372
+    },
+    {
+      "path": "runs/20261006T024719/lost_ack_after_effect/result.json",
+      "sha256": "32614fbf3089d03f8baa40c10506a0ae3c676e62d7eb6224329449fb39765c49",
+      "bytes": 127163
+    },
+    {
+      "path": "runs/20261006T024719/lost_ack_before_effect/result.json",
+      "sha256": "7f5768c865dc738fefcaff25db17cfd1f0bc2cc0f34f3a2ea81e7adafdeaf7be",
+      "bytes": 101009
+    },
+    {
+      "path": "runs/20261006T024719/restart/result.json",
+      "sha256": "949ff7e21fd44f7f9cab98584a1fa65d3eaed9f800a9751c05d7944d434a26fc",
+      "bytes": 127150
+    },
+    {
+      "path": "runs/20261006T024719/tool_showcase/result.json",
+      "sha256": "25f852975adbc470b62e0c7a767e815f03c784752678c29655b5b16deb7520ed",
+      "bytes": 620506
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+      "bytes": 174866
+    }
+  ],
+  "local_acceptance_passed": true
+}

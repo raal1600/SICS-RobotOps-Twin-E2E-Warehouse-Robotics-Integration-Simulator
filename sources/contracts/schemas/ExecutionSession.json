@@ -1,0 +1,488 @@
+{
+  "$defs": {
+    "ExecutionStep": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization_required": {
+          "default": false,
+          "title": "Authorization Required",
+          "type": "boolean"
+        },
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "command_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Command Id"
+        },
+        "component": {
+          "title": "Component",
+          "type": "string"
+        },
+        "correlation_id": {
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "duration_ms": {
+          "default": 0,
+          "title": "Duration Ms",
+          "type": "number"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "execution_session_id": {
+          "title": "Execution Session Id",
+          "type": "string"
+        },
+        "failure_semantics": {
+          "title": "Failure Semantics",
+          "type": "string"
+        },
+        "input": {
+          "additionalProperties": true,
+          "title": "Input",
+          "type": "object"
+        },
+        "invariant": {
+          "title": "Invariant",
+          "type": "string"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Job Id"
+        },
+        "order_id": {
+          "title": "Order Id",
+          "type": "string"
+        },
+        "output": {
+          "additionalProperties": true,
+          "title": "Output",
+          "type": "object"
+        },
+        "persistence_effect": {
+          "title": "Persistence Effect",
+          "type": "string"
+        },
+        "protocol": {
+          "title": "Protocol",
+          "type": "string"
+        },
+        "revision": {
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sequence": {
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceReference"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "integer"
+        },
+        "state_after": {
+          "title": "State After",
+          "type": "string"
+        },
+        "state_before": {
+          "title": "State Before",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "wire": {
+          "additionalProperties": true,
+          "title": "Wire",
+          "type": "object"
+        }
+      },
+      "required": [
+        "step_id",
+        "session_id",
+        "execution_session_id",
+        "order_id",
+        "job_id",
+        "command_id",
+        "correlation_id",
+        "stage",
+        "sequence",
+        "revision",
+        "title",
+        "summary",
+        "status",
+        "component",
+        "protocol",
+        "classification",
+        "state_before",
+        "state_after",
+        "persistence_effect",
+        "source",
+        "invariant",
+        "failure_semantics"
+      ],
+      "title": "ExecutionStep",
+      "type": "object"
+    },
+    "OrderLine": {
+      "additionalProperties": false,
+      "properties": {
+        "destination_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Destination Id",
+          "type": "string"
+        },
+        "order_line_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Order Line Id",
+          "type": "string"
+        },
+        "product_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "quantity": {
+          "const": 1,
+          "default": 1,
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "order_line_id",
+        "product_id",
+        "source_id",
+        "destination_id"
+      ],
+      "title": "OrderLine",
+      "type": "object"
+    },
+    "OrderRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "lines": {
+          "items": {
+            "$ref": "#/$defs/OrderLine"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Lines",
+          "type": "array"
+        },
+        "order_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Order Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "order_id",
+        "lines"
+      ],
+      "title": "OrderRequest",
+      "type": "object"
+    },
+    "PendingAuthorization": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_revision": {
+          "title": "Expected Revision",
+          "type": "integer"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "mandatory": {
+          "title": "Mandatory",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "integer"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage",
+        "title",
+        "label",
+        "expected_revision",
+        "mandatory"
+      ],
+      "title": "PendingAuthorization",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "excerpt": {
+          "title": "Excerpt",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "symbol",
+        "excerpt"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "command_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Command Id"
+    },
+    "context": {
+      "additionalProperties": true,
+      "title": "Context",
+      "type": "object"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "current_stage": {
+      "default": 1,
+      "title": "Current Stage",
+      "type": "integer"
+    },
+    "execution_session_id": {
+      "title": "Execution Session Id",
+      "type": "string"
+    },
+    "fault": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Fault"
+    },
+    "job_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Job Id"
+    },
+    "job_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Job Ids",
+      "type": "array"
+    },
+    "mode": {
+      "const": "guided",
+      "default": "guided",
+      "title": "Mode",
+      "type": "string"
+    },
+    "order_id": {
+      "title": "Order Id",
+      "type": "string"
+    },
+    "pending_authorization": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PendingAuthorization"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "profile": {
+      "default": "local",
+      "title": "Profile",
+      "type": "string"
+    },
+    "request": {
+      "$ref": "#/$defs/OrderRequest"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "revision": {
+      "default": 0,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "pattern": "^1\\.0$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "status": {
+      "default": "WAITING_AUTHORIZATION",
+      "title": "Status",
+      "type": "string"
+    },
+    "steps": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ExecutionStep"
+      },
+      "title": "Steps",
+      "type": "array"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "session_id",
+    "execution_session_id",
+    "correlation_id",
+    "request",
+    "request_id",
+    "order_id"
+  ],
+  "title": "ExecutionSession",
+  "type": "object"
+}

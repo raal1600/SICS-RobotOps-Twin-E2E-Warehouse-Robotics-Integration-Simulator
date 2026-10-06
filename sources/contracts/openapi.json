@@ -157,6 +157,48 @@
         "title": "AuditEvent",
         "type": "object"
       },
+      "AuthorizeStage": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "const": "approve",
+            "default": "approve",
+            "title": "Decision",
+            "type": "string"
+          },
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "stage": {
+            "maximum": 22.0,
+            "minimum": 1.0,
+            "title": "Stage",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "stage"
+        ],
+        "title": "AuthorizeStage",
+        "type": "object"
+      },
       "CellMode": {
         "enum": [
           "READY",
@@ -546,6 +588,50 @@
         "title": "CommandStatus",
         "type": "string"
       },
+      "CreateSession": {
+        "additionalProperties": false,
+        "properties": {
+          "fault": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fault"
+          },
+          "mode": {
+            "const": "guided",
+            "default": "guided",
+            "title": "Mode",
+            "type": "string"
+          },
+          "request": {
+            "$ref": "#/components/schemas/OrderRequest"
+          },
+          "request_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request",
+          "request_id"
+        ],
+        "title": "CreateSession",
+        "type": "object"
+      },
       "DeleteTestRequest": {
         "additionalProperties": false,
         "properties": {
@@ -718,6 +804,371 @@
         "title": "ExecutionRequest",
         "type": "object"
       },
+      "ExecutionScenario": {
+        "additionalProperties": false,
+        "description": "Recorded test configuration, not proof of an injection or physical outcome.",
+        "properties": {
+          "fault": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fault"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "session_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[\\w.:-]+$",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "source": {
+            "const": "GUIDED_SESSION",
+            "default": "GUIDED_SESSION",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "fault"
+        ],
+        "title": "ExecutionScenario",
+        "type": "object"
+      },
+      "ExecutionSession": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Command Id"
+          },
+          "context": {
+            "additionalProperties": true,
+            "title": "Context",
+            "type": "object"
+          },
+          "correlation_id": {
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_stage": {
+            "default": 1,
+            "title": "Current Stage",
+            "type": "integer"
+          },
+          "execution_session_id": {
+            "title": "Execution Session Id",
+            "type": "string"
+          },
+          "fault": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fault"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "job_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Job Ids",
+            "type": "array"
+          },
+          "mode": {
+            "const": "guided",
+            "default": "guided",
+            "title": "Mode",
+            "type": "string"
+          },
+          "order_id": {
+            "title": "Order Id",
+            "type": "string"
+          },
+          "pending_authorization": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PendingAuthorization"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "profile": {
+            "default": "local",
+            "title": "Profile",
+            "type": "string"
+          },
+          "request": {
+            "$ref": "#/components/schemas/OrderRequest"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "revision": {
+            "default": 0,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "WAITING_AUTHORIZATION",
+            "title": "Status",
+            "type": "string"
+          },
+          "steps": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ExecutionStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "execution_session_id",
+          "correlation_id",
+          "request",
+          "request_id",
+          "order_id"
+        ],
+        "title": "ExecutionSession",
+        "type": "object"
+      },
+      "ExecutionStep": {
+        "additionalProperties": false,
+        "properties": {
+          "authorization_required": {
+            "default": false,
+            "title": "Authorization Required",
+            "type": "boolean"
+          },
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "command_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Command Id"
+          },
+          "component": {
+            "title": "Component",
+            "type": "string"
+          },
+          "correlation_id": {
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "duration_ms": {
+            "default": 0,
+            "title": "Duration Ms",
+            "type": "number"
+          },
+          "evidence_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "execution_session_id": {
+            "title": "Execution Session Id",
+            "type": "string"
+          },
+          "failure_semantics": {
+            "title": "Failure Semantics",
+            "type": "string"
+          },
+          "input": {
+            "additionalProperties": true,
+            "title": "Input",
+            "type": "object"
+          },
+          "invariant": {
+            "title": "Invariant",
+            "type": "string"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "order_id": {
+            "title": "Order Id",
+            "type": "string"
+          },
+          "output": {
+            "additionalProperties": true,
+            "title": "Output",
+            "type": "object"
+          },
+          "persistence_effect": {
+            "title": "Persistence Effect",
+            "type": "string"
+          },
+          "protocol": {
+            "title": "Protocol",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sequence": {
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SourceReference"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "integer"
+          },
+          "state_after": {
+            "title": "State After",
+            "type": "string"
+          },
+          "state_before": {
+            "title": "State Before",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "step_id": {
+            "title": "Step Id",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "wire": {
+            "additionalProperties": true,
+            "title": "Wire",
+            "type": "object"
+          }
+        },
+        "required": [
+          "step_id",
+          "session_id",
+          "execution_session_id",
+          "order_id",
+          "job_id",
+          "command_id",
+          "correlation_id",
+          "stage",
+          "sequence",
+          "revision",
+          "title",
+          "summary",
+          "status",
+          "component",
+          "protocol",
+          "classification",
+          "state_before",
+          "state_after",
+          "persistence_effect",
+          "source",
+          "invariant",
+          "failure_semantics"
+        ],
+        "title": "ExecutionStep",
+        "type": "object"
+      },
       "Fault": {
         "enum": [
           "DROP_ACK_AFTER_EFFECT",
@@ -843,6 +1294,16 @@
             },
             "title": "Events",
             "type": "array"
+          },
+          "execution_scenario": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionScenario"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "job_id": {
             "maxLength": 160,
@@ -1382,6 +1843,47 @@
         "title": "OrderRequest",
         "type": "object"
       },
+      "PendingAuthorization": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "mandatory": {
+            "title": "Mandatory",
+            "type": "boolean"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage",
+          "title",
+          "label",
+          "expected_revision",
+          "mandatory"
+        ],
+        "title": "PendingAuthorization",
+        "type": "object"
+      },
       "PickJob": {
         "additionalProperties": false,
         "properties": {
@@ -1566,6 +2068,45 @@
           "position"
         ],
         "title": "Pose",
+        "type": "object"
+      },
+      "ReconcileSession": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "fault": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fault"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "request_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision"
+        ],
+        "title": "ReconcileSession",
         "type": "object"
       },
       "ReconciliationEvidence": {
@@ -2049,6 +2590,37 @@
           "cell_display_name"
         ],
         "title": "SimulationTest",
+        "type": "object"
+      },
+      "SourceReference": {
+        "additionalProperties": false,
+        "properties": {
+          "excerpt": {
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "pattern": "^1\\.0$",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "symbol",
+          "excerpt"
+        ],
+        "title": "SourceReference",
         "type": "object"
       },
       "StartTestRequest": {
@@ -3832,6 +4404,242 @@
         "summary": "Health"
       }
     },
+    "/integration/sessions": {
+      "get": {
+        "operationId": "sessions_integration_sessions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExecutionSession"
+                  },
+                  "title": "Response Sessions Integration Sessions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Sessions"
+      },
+      "post": {
+        "operationId": "create_session_integration_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Session"
+      }
+    },
+    "/integration/sessions/{session_id}": {
+      "get": {
+        "operationId": "session_integration_sessions__session_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Session"
+      }
+    },
+    "/integration/sessions/{session_id}/authorize": {
+      "post": {
+        "operationId": "authorize_integration_sessions__session_id__authorize_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorizeStage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Authorize"
+      }
+    },
+    "/integration/sessions/{session_id}/live": {
+      "get": {
+        "operationId": "live_protocol_status_integration_sessions__session_id__live_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Live Protocol Status Integration Sessions  Session Id  Live Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Live Protocol Status"
+      }
+    },
+    "/integration/sessions/{session_id}/reconcile": {
+      "post": {
+        "operationId": "reconcile_integration_sessions__session_id__reconcile_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconcileSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reconcile"
+      }
+    },
     "/jobs/{job_id}": {
       "get": {
         "operationId": "job_jobs__job_id__get",
@@ -4590,7 +5398,8 @@
               "enum": [
                 "playback.js",
                 "scene-view.js",
-                "workflow-guide.js"
+                "workflow-guide.js",
+                "integration-console.js"
               ],
               "title": "Script",
               "type": "string"
@@ -4613,6 +5422,44 @@
           }
         },
         "summary": "Playback Javascript"
+      }
+    },
+    "/v1/wms/tasks": {
+      "post": {
+        "operationId": "create_session_v1_wms_tasks_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Session"
       }
     }
   }

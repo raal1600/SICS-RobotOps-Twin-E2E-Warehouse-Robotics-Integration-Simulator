@@ -1,0 +1,55 @@
+{
+  "recorded_at_utc": "2026-10-06T01:01:05.560406+00:00",
+  "source_commit": "b9685864afb6f47e440bd051789052070456c7b2",
+  "source_sha256": "7160cbf5333d7cebace24551767402f7ce419dca489295eb45d340ab063fc264",
+  "status": "INTENTIONALLY_INTERRUPTED_AFTER_FAILED_FIRST_PASS",
+  "first_pass": {
+    "pytest_summary": "811 passed, 1 warning, 1 error in 1680.12s",
+    "junit_testcases": 811,
+    "junit_clean_testcases": 810,
+    "junit_failures": 0,
+    "junit_errors": 1,
+    "junit_skipped": 0,
+    "seconds": "1680.091",
+    "error_case": "tests.browser.test_investigation::test_run_notice_investigate_and_return[blender-compact]",
+    "error": "API server thread did not shut down within20 seconds; savedlog also records Proactor socket.shutdown WinError10054.",
+    "coverage": {
+      "covered_lines": 4893,
+      "num_statements": 5349,
+      "percent_covered": 91.47504206393718,
+      "percent_covered_display": "91",
+      "missing_lines": 456,
+      "excluded_lines": 17,
+      "percent_statements_covered": 91.47504206393718,
+      "percent_statements_covered_display": "91"
+    }
+  },
+  "second_pass": {
+    "started": true,
+    "actual_pytest_pid": 30508,
+    "fixture_basename": "robotops-acceptance-2-0kc1x2__",
+    "status": "INTERRUPTED_WITHOUT_TERMINAL_JUNIT",
+    "formal_result": null
+  },
+  "stop": {
+    "stopped_pids": [
+      31732,
+      9476,
+      32644,
+      13052,
+      14808,
+      35948,
+      30008,
+      25148,
+      14736,
+      30508
+    ],
+    "reason": "First complete suite failed teardown; prevent redundant uncorrected second pass and preserve evidence before source diagnosis.",
+    "at_utc": "2026-10-06T00:59:08.0810701Z",
+    "remaining": []
+  },
+  "watcher_stop": "artifacts/final-evidence-pack/b968586/watcher-stopped.json",
+  "terminal_acceptance_exit_record_exists": false,
+  "preservation": "Original first JUnit, coverage, logs and manifest unchanged. All four pass1 labbrowser captures retained. No full acceptance/manual completion is asserted.",
+  "next": "Diagnose and correct Windows test-server shutdown lifecycle, prove focused lifecycle/browser behavior, then run fresh full acceptance from a new clean commit."
+}

@@ -1,10 +1,10 @@
 # Current Integration Lab handoff
 
-The active objective is now [GOAL.md](GOAL.md). **Integration Lab is NOT ACHIEVED**;
-its current evidence and remaining final checks are recorded in
-[GOAL_PROGRESS.md](GOAL_PROGRESS.md) and the
-[51-item delivery checklist](docs/integration-lab-requirements.md).
-The material below records the earlier simulator revision and its scoped acceptance.
+Accepted runtime baseline A is `9e83fe7d41a52a63ba65b77730e392dafca8fffe`, fingerprint `136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd`. The original two 815-case suites, five fresh manual/CLI cases and saved audits remain source-scoped. The subsequent publication candidate includes unchanged robot runtime plus publication validator/tests, two report hrefs and reviewed evidence/status documentation. It is not a status-only revision; its full suite remains pending until independently observed. Known-broken A is not the publication candidate. After the corrected candidate is committed and authorized, verify its own full Linux acceptance, Windows native workflow and publication/Pages before refreshing its exact CI manifest. Only then may a reviewed completion successor be created; that successor also needs its own exact-source workflows. **NOT DONE / NOT ACHIEVED** remains the current status.
+
+[Accepted local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Current archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Known publication-link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Reviewed local report](docs/integration-lab-final-report.md)
+
+The [51-item checklist](docs/integration-lab-requirements.md) marks50 local obligations supported and TEST-10 pending. The following historical simulator operating contract and acceptance sections retain their original source scope.
 
 ---
 

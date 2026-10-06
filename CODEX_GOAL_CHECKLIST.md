@@ -1,10 +1,10 @@
-# Integration Lab scope
+# Current Integration Lab checklist scope
 
-The active objective is now [GOAL.md](GOAL.md). **Integration Lab is NOT ACHIEVED**;
-its current evidence and remaining final checks are recorded in
-[GOAL_PROGRESS.md](GOAL_PROGRESS.md) and the
-[51-item delivery checklist](docs/integration-lab-requirements.md).
-The material below records the earlier simulator revision and its scoped acceptance.
+Integration Lab passed local acceptance at source 9e83fe7: two clean 815-test suites, 20 local gates and five fresh manual/CLI scenarios. A subsequent documentation correction fixes two report links and rejects links outside the publication root; its five regression tests pass. Final-source Linux CI, Windows checks and GitHub Pages verification remain pending. **NOT ACHIEVED**.
+
+[Accepted local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Current archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Known publication-link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Reviewed local report](docs/integration-lab-final-report.md)
+
+The [51-item current checklist](docs/integration-lab-requirements.md) has50 locally supported items; TEST-10 / LAB-MUST-044 remains unchecked pending candidate-specific remote CI. The publication-link/validator correction, proposed P full verification, final payload and P/R attestations remain mandatory. Historical checked lists below retain their prior release scope and do not close this goal.
 
 ---
 

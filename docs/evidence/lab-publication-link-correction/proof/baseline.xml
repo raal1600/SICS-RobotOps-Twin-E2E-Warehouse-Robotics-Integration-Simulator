@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="5" time="0.400" timestamp="2026-10-06T06:37:57.571898+02:00" hostname="DESKTOP-AZDXEDL"><testcase classname="artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links" name="test_publication_rejects_existing_target_outside_site[../docs/outside.md]" time="0.039"><failure message="Failed: DID NOT RAISE ValueError">publication_links = (WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline-fixtures/test_publication_rejects_exist0/site'), &lt;function validate_links at 0x00000152D8FD1B20&gt;)
+href = '../docs/outside.md'
+
+    @pytest.mark.parametrize("href", ["../docs/outside.md", "%2e%2e/docs/outside.md"])
+    def test_publication_rejects_existing_target_outside_site(publication_links, href):
+        site, validate = publication_links
+        outside = site.parent / "docs" / "outside.md"
+        outside.parent.mkdir()
+        outside.write_text("Existing repository document outside the served root.", encoding="utf-8")
+        (site / "index.html").write_text(f'&lt;a href="{href}"&gt;Document&lt;/a&gt;', encoding="utf-8")
+    
+&gt;       with pytest.raises(ValueError, match="outside publication root"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+artifacts\final-evidence-pack\9e83fe7\publication-link-correction\baseline\tests\contract\test_publication_links.py:34: Failed</failure></testcase><testcase classname="artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links" name="test_publication_rejects_existing_target_outside_site[%2e%2e/docs/outside.md]" time="0.019"><failure message="Failed: DID NOT RAISE ValueError">publication_links = (WindowsPath('C:/Users/ramis/source/repos/robotops-twin/artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline-fixtures/test_publication_rejects_exist1/site'), &lt;function validate_links at 0x00000152DB55A520&gt;)
+href = '%2e%2e/docs/outside.md'
+
+    @pytest.mark.parametrize("href", ["../docs/outside.md", "%2e%2e/docs/outside.md"])
+    def test_publication_rejects_existing_target_outside_site(publication_links, href):
+        site, validate = publication_links
+        outside = site.parent / "docs" / "outside.md"
+        outside.parent.mkdir()
+        outside.write_text("Existing repository document outside the served root.", encoding="utf-8")
+        (site / "index.html").write_text(f'&lt;a href="{href}"&gt;Document&lt;/a&gt;', encoding="utf-8")
+    
+&gt;       with pytest.raises(ValueError, match="outside publication root"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+artifacts\final-evidence-pack\9e83fe7\publication-link-correction\baseline\tests\contract\test_publication_links.py:34: Failed</failure></testcase><testcase classname="artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links" name="test_publication_accepts_local_download_fragment_and_external_links" time="0.024" /><testcase classname="artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links" name="test_publication_retains_missing_target_and_fragment_rejection[missing.html-Broken link]" time="0.016" /><testcase classname="artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links" name="test_publication_retains_missing_target_and_fragment_rejection[page.html#missing-Missing fragment]" time="0.023" /></testsuite></testsuites>

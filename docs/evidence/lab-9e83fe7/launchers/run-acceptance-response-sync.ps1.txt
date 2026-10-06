@@ -1,0 +1,26 @@
+# Preparation only: root launches after a new clean commit and reviewed focused browser results.
+param([Parameter(Mandatory=$true)][ValidatePattern('^[0-9a-fA-F]{40}$')][string]$ExpectedCommit)
+$ErrorActionPreference = 'Stop'
+Set-Location -LiteralPath 'C:\Users\ramis\source\repos\robotops-twin'
+$taskHead = & git rev-parse HEAD
+if ($LASTEXITCODE -ne 0 -or !$taskHead) { throw 'Unable to read source commit' }
+$taskHead = $taskHead.Trim()
+if ($taskHead -ne $ExpectedCommit) { throw 'Unexpected source commit' }
+# Refuse tracked edits and every nonignored untracked file; ignored artifacts remain allowed.
+$taskStatus = @(& git status --porcelain=v1 --untracked-files=all)
+if ($LASTEXITCODE -ne 0) { throw 'Unable to verify clean source' }
+if ($taskStatus.Count -ne 0) { throw 'Acceptance requires a clean committed source, including no nonignored untracked files' }
+if (Test-Path -LiteralPath 'artifacts/acceptance-response-sync-exit.json') { throw 'Existing campaign terminal record; inspect before another run' }
+$env:ROBOTOPS_POSTGRES_DSN = 'postgresql://robotops:demo-only@127.0.0.1:5432/robotops'
+$env:ROBOTOPS_AMQP_URL = 'amqp://guest:guest@127.0.0.1:5672/%2F'
+$env:ROBOTOPS_LAB_TESTS = '1'
+$env:BLENDER_EXECUTABLE = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
+$env:WEASYPRINT_DLL_DIRECTORIES = 'C:\Users\ramis\.cache\robotops-build-tools\pdf-env\Library\bin'
+$env:PATH = $env:WEASYPRINT_DLL_DIRECTORIES + ';C:\Users\ramis\.local\bin;' + $env:PATH
+$env:PYTEST_ADDOPTS = '-o cache_dir=artifacts/pytest-cache-response-sync -o faulthandler_timeout=300'
+$env:PYTHONUNBUFFERED = '1'
+$taskStarted = [DateTime]::UtcNow.ToString('o')
+& 'C:\Users\ramis\.local\bin\uv.exe' run --locked python -u -m tools.dev acceptance --local
+$taskExit = $LASTEXITCODE
+[pscustomobject]@{source=$taskHead;started_at=$taskStarted;ended_at=[DateTime]::UtcNow.ToString('o');exit_code=$taskExit} | ConvertTo-Json | Set-Content -LiteralPath 'artifacts/acceptance-response-sync-exit.json' -Encoding UTF8
+exit $taskExit

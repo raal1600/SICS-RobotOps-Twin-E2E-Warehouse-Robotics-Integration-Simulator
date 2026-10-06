@@ -1,0 +1,537 @@
+<!doctype html><html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Från kundorder till verifierad roboteffekt | RobotOps Twin</title><meta name="author" content="Rami Halabi"><meta name="description" content="Forskningsunderlag, kravspårbarhet, arkitektur, kontrakt och en förhandsdefinierad utvärderingsplan."><link rel="stylesheet" href="style.css"></head><body><a class="skip" href="#main">Hoppa till innehållet</a><header class="site-header"><a class="brand" href="index.html">ROBOTOPS TWIN<span>FORSKNING · SYSTEMDESIGN · DIALOG</span></a><nav class="top-nav" aria-label="Huvudmeny"><a href="index.html">Översikt</a><a href="design.html" aria-current="page">Designstudie</a><a href="avgransning.html">Avgränsning</a><a href="diskussion.html">Diskussion</a><a href="kallor.html">Källor</a><a href="diagram.html">Diagram</a></nav></header><div class="shell"><aside class="sidebar"><details open><summary>Innehåll</summary><ol><li><a href="#section-1">Sammanfattning</a></li><li><a href="#section-2">1. Syfte, frågeställningar och läsanvisning</a></li><li><a href="#section-4">2. Metod och källkritik</a></li><li><a href="#section-8">3. Vad de offentliga källorna faktiskt visar</a></li><li><a href="#section-15">4. Krav och minsta meningsfulla omfattning</a></li><li><a href="#section-18">5. Föreslagen systemarkitektur</a></li><li><a href="#section-22">6. Datakontrakt och tillstånd</a></li><li><a href="#section-27">7. Kärnfallet: utfört plock, förlorad kvittens</a></li><li><a href="#section-31">8. Observation, modell och verifiering</a></li><li><a href="#section-36">9. Blender, MCP och operationella gränser</a></li><li><a href="#section-43">10. Utvärderingsprotokoll och genomförd acceptans</a></li><li><a href="#section-48">11. Genomförande, dokumentation och underhåll</a></li><li><a href="#section-52">12. Diskussion, begränsningar och slutsats</a></li><li><a href="#section-53">Implementerat undersökningsflöde (2026-10-05)</a></li><li><a href="#referenser">Referenser och källbegränsningar</a></li></ol></details><div class="side-meta">Rapport 01 / 03<br>Version 1.5 · Svenska<br>Aktuell status i rapportens revisionsruta<br><a href="downloads/01-design.pdf">Ladda ned PDF</a></div></aside><main id="main" class="document"><section class="cover"><div class="eyebrow">Rapport 01 / 03 · RobotOps Twin</div><h1>Från kundorder till verifierad roboteffekt</h1><p class="subtitle">Vetenskaplig designstudie för RobotOps Twin</p><div class="metadata">Rami Halabi<br>Version 1.5 · 5 oktober 2026<br>Oberoende tekniskt rapportpaket · Svenska</div><div class="status"><strong>Status: se aktuell revisionsruta.</strong> Aktuella resultat anges i rapportens statusruta och på governance-sidan. Acceptans gäller endast den källrevision som anges i evidensen; tidigare resultat bevaras separat. Inga fysiska robotresultat eller säkerhetsgarantier hävdas.</div><div class="buttons"><a class="button" href="downloads/01-design.pdf" download>Ladda ned PDF</a><a class="button secondary" href="sources/01-design.md" download>Markdown-källa</a></div><p class="print-label">AI-assisterad text- och publiceringsframställning.<br>Ej sakkunniggranskad. Inte framtagen av eller godkänd av SICS AI.<br>Rapporternas källor, diagram och byggskript finns i projektets repository.</p></section><nav class="print-toc" aria-label="Innehållsförteckning"><h2>Innehåll</h2><ol><li><a href="#section-1">Sammanfattning</a></li><li><a href="#section-2">1. Syfte, frågeställningar och läsanvisning</a></li><li><a href="#section-4">2. Metod och källkritik</a></li><li><a href="#section-8">3. Vad de offentliga källorna faktiskt visar</a></li><li><a href="#section-15">4. Krav och minsta meningsfulla omfattning</a></li><li><a href="#section-18">5. Föreslagen systemarkitektur</a></li><li><a href="#section-22">6. Datakontrakt och tillstånd</a></li><li><a href="#section-27">7. Kärnfallet: utfört plock, förlorad kvittens</a></li><li><a href="#section-31">8. Observation, modell och verifiering</a></li><li><a href="#section-36">9. Blender, MCP och operationella gränser</a></li><li><a href="#section-43">10. Utvärderingsprotokoll och genomförd acceptans</a></li><li><a href="#section-48">11. Genomförande, dokumentation och underhåll</a></li><li><a href="#section-52">12. Diskussion, begränsningar och slutsats</a></li><li><a href="#section-53">Implementerat undersökningsflöde (2026-10-05)</a></li><li><a href="#referenser">Referenser och källbegränsningar</a></li></ol></nav><!-- implementation-status:start -->
+<blockquote>
+<p><strong>Implementation status, 2026-10-05:</strong> Integration Lab implementation is undergoing final recovery, real-service, browser and Blender verification. Historical simulator acceptance does not prove the new GOAL.md; all 51 additional MUSTs and the mandatory final loop remain required. Status: NOT DONE.
+Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
+The research below records design rationale, not real-world robot validation.</p>
+</blockquote>
+<!-- implementation-status:end -->
+<h2 id="section-1">Sammanfattning</h2>
+<p>RobotOps Twin är en implementerad, lokal integrationssimulator för lagerrobotik. Ett förenklat ERP/WMS skapar plockuppdrag. Ett Pythonbaserat integrationslager validerar och lagrar uppdragen, hämtar observationer, begär ett handlingsförslag och skickar typade kommandon till en simulerad robotcell i Blender. En separat verifierare bedömer utfallet innan kundsystemet uppdateras. Den centrala frågan är inte hur en robotarm animeras, utan hur mjukvaran hanterar skillnaden mellan en begärd handling, en kvitterad operation och ett observerat resultat.</p>
+<p>Studien kombinerar en riktad genomgång av offentliga primärkällor med ett eget arkitekturförslag och en förhandsdefinierad utvärderingsplan. Underlaget omfattar SICS AI:s rollbeskrivning och HYPER-redovisning, Cognibotics produktionsbeskrivning, CloudGripper/AutoGrasper, R900 samt officiell dokumentation för Blender, OpenAI och integrationsprotokoll. Källorna har olika bevisvärde och hålls därför isär.</p>
+<p><strong>Forskningsdelen redovisar designunderlaget. Aktuell implementationsstatus finns ovan; simulatorresultat är inte fysisk robotvalidering.</strong> Inga prestandasiffror för projektet, säkerhetsgarantier eller resultat om generell intelligens hävdas. Bidraget är ett litet, reproducerbart testsystem där fel efter en fysiskliknande sidoeffekt kan studeras utan verklig robotutrustning.</p>
+<p><strong>Nyckelord:</strong> systemintegration, lagerrobotik, Blender, verifiering, idempotens, återhämtning, observerbarhet, digital-tvilling-inspirerad simulering.</p>
+<h2 id="section-2">1. Syfte, frågeställningar och läsanvisning</h2>
+<p>Projektet ska visa hur ett kunduppdrag kan följas genom flera system med olika ansvar och olika uppfattningar om vad som har inträffat. Den avsedda användningen är teknisk diskussion, intervjuförberedelse och ett senare portfolioprojekt. Det är inte en beställning från SICS AI och inte dokumentation av företagets interna implementation.</p>
+<p>Tre frågor styr designen:</p>
+<p><strong>F1.</strong> Hur kan ett litet system hålla isär affärsuppdrag, modellförslag, robotkommandon och verifierade effekter?</p>
+<p><strong>F2.</strong> Hur kan systemet återhämta sig när kommunikationen försvinner efter att ett objekt redan har flyttats, utan ett omotiverat nytt plock?</p>
+<p><strong>F3.</strong> Vilka relevanta integrationsproblem kan demonstreras i Blender, och vilka slutsatser kräver fysisk utrustning eller tillgång till den verkliga plattformen?</p>
+<p>Rapport 1 beskriver forskningsunderlag, arkitektur och testplan. Rapport 2 granskar överförbarheten till en verklig robotmiljö. Rapport 3 är ett samtalsunderlag för diskussion med Axel Kaliff och Per-Eric Olsson. Den som vill förstå huvudidén först kan läsa figur 1, avsnitt 7 och slutsatsen. Kontrakt och utvärderingsprotokoll är till för den tekniska fördjupningen.</p>
+<p>Den implementerade operationsvyn visar en interaktiv 3D-cell med maskin och produkter även när ett scenario inte leder till rörelse. Sparat starttillstånd och händelser förklarar stopp; inspelade Blender-poser visar utförda plock. Samma order kan spelas upp igen utan ett nytt plockkommando. Illustrationen är simulatorns facit för betraktaren; verifieraren använder fortfarande en separat WorldObservation. Se implementationens replay-dokumentation i governance-avsnittet.</p>
+<p>Den lokala 3D-vyn använder Three.js med kamerakontroller för rotation, panorering och zoom <a class="cite" href="#ref-S22" aria-label="Källa S22">[S22]</a>. Detta är ett visningsval i vår simulator, inte ett påstående om en verklig robots arkitektur.</p>
+<h3 id="section-3">1.1 Vad ordet ”Twin” betyder här</h3>
+<p>Projektets namn är RobotOps Twin. I denna studie används dock den mer precisa beskrivningen <strong>digital-tvilling-inspirerad integrationssimulator</strong>. Det finns ännu ingen ansluten fysisk tillgång som modellen hålls synkroniserad med. En synlig Blender-scen är därför inte i sig en verifierad digital tvilling av Nowastes anläggning.</p>
+<p>Vi definierar en <em>effekt</em> som en förändring i simulatorns auktoritativa världstillstånd, exempelvis att objekt O17 flyttas från källåda A till orderlåda B. Att en animation har spelats upp är inte en tillräcklig effektdefinition. Testerna måste kunna inspektera den lagrade världen och effektjournalen.</p>
+<figure id="fig-context"><img src="assets/context.svg" alt="Från kundorder till verifierad effekt. Figur 1. Egen konceptmodell. Ett plock passerar flera ansvar; kundstatus ändras först efter observerad effekt och hanterad kvittens. Pilarna visar informations- och exekveringsflöde, inte verkliga SICS-gränssnitt." width="900" height="670"><figcaption>Figur 1. Egen konceptmodell. Ett plock passerar flera ansvar; kundstatus ändras först efter observerad effekt och hanterad kvittens. Pilarna visar informations- och exekveringsflöde, inte verkliga SICS-gränssnitt.</figcaption><div class="figure-tools"><a href="assets/context.svg">Öppna stor SVG</a><a href="sources/diagrams/context.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<h2 id="section-4">2. Metod och källkritik</h2>
+<h3 id="section-5">2.1 Undersökningens karaktär</h3>
+<p>Detta är en <strong>riktad litteratur- och dokumentstudie med konstruktivt designförslag</strong>. Det är inte en uttömmande systematisk översikt. Urvalet utgår från den aktuella rollen, de namngivna forskarna och de produkter som förekommer i offentliga integrationsbeskrivningar. Sökningen har kompletterats med officiell teknisk dokumentation för föreslagna verktyg.</p>
+<p>Kontrolldatum är <strong>1 oktober 2026</strong>. Referensregistret anger organisation eller författare, titel, datum när det är känt, URL och begränsning. Källor utan säkert publiceringsdatum markeras utan datum. En relativ LinkedIn-tidsstämpel omvandlas inte till ett gissat publiceringsdatum.</p>
+<p>Arbetsgången var att identifiera relevanta påståenden, kontrollera deras ursprung, härleda ett integrationsbehov och formulera ett eget designbeslut. Författarens beslut redovisas som förslag, inte som fynd om SICS AI. Tidigare research har behandlats som ett sökunderlag och inte som en oberoende källa.</p>
+<h3 id="section-6">2.2 Fyra evidenskategorier</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Kategori</th>
+<th>Betydelse i rapportpaketet</th>
+<th>Exempel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dokumenterat</td>
+<td>En identifierbar källa innehåller den beskrivna uppgiften.</td>
+<td>En rollannons nämner Pythonintegration.</td>
+</tr>
+<tr>
+<td>Självrapporterat</td>
+<td>Företaget eller projektgruppen beskriver egna egenskaper eller resultat.</td>
+<td>HYPER-redovisning och leverantörspress.</td>
+</tr>
+<tr>
+<td>Eget designförslag</td>
+<td>Ett val för RobotOps Twin, härlett men inte kopierat från källorna.</td>
+<td>SQLite, kommandokontrakt och testfall.</td>
+</tr>
+<tr>
+<td>Ej verifierat</td>
+<td>Underlag saknas, är otillgängligt eller otillräckligt för slutsatsen.</td>
+<td>SICS interna API, säkerhetsarkitektur och modellkod.</td>
+</tr>
+</tbody>
+</table></div>
+<p>En EU-webbplats kan verifiera att ett projekt och en rapport finns. Det gör inte automatiskt deltagarens tekniska resultat oberoende reproducerade. En tillverkares högsta uppgivna plockhastighet ska inte tolkas som mätt genomströmning hos en viss kund.</p>
+<p>Axels examensarbete används med särskild försiktighet: titel och bibliografiskt sammanhang identifierades i föregående research, men fulltexten kunde inte återhämtas i denna publiceringskontroll. Därför återges inga detaljerade metod- eller resultatpåståenden från examensarbetet. Kopplingen till verifiering används som ett avgränsat diskussionstema. <a class="cite" href="#ref-S04" aria-label="Källa S04">[S04]</a></p>
+<h3 id="section-7">2.3 Publiceringsetik och reproducerbarhet</h3>
+<p>Alla figurer och arkitekturkontrakt i paketet är egna illustrationer. Inga företagslogotyper, privata e-postmeddelanden eller interna dokument återpubliceras. Referenserna är inspiration och belägg för avgränsade påståenden, inte ett påstående om samarbete eller godkännande.</p>
+<p>Text, disposition och publiceringskod har tagits fram med AI-assistans. Projektägaren ansvarar för att läsa och förstå materialet före användning. Rapportpaketet är inte sakkunniggranskat. Källfiler, diagramdefinitioner och byggskript publiceras så att text och figurer går att rätta och regenerera.</p>
+<h2 id="section-8">3. Vad de offentliga källorna faktiskt visar</h2>
+<h3 id="section-9">3.1 Rollen: integrationsansvar snarare än enbart modellutveckling</h3>
+<p>Den granskade Systemingenjör-annonsen kopplar rollen till Python, robotceller och kundernas API:er, PLC:er och WMS/ERP. Den omfattar också LLM/VLM-integration, driftsättning, felsökning, dokumentation och teknisk kunddialog. Industriella protokoll anges som meriterande. Annonsen är ett kravunderlag, inte en fullständig lista över den interna teknikstacken. <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a></p>
+<p>En närliggande annonsversion formulerar erfarenhetskraven annorlunda. Projektet ska därför inte användas för att hävda att alla formella anställningskrav är uppfyllda. Det demonstrerar valda arbetsuppgifter; det ersätter inte yrkeserfarenhet, examen eller ansvar för verkliga leveranser. <a class="cite" href="#ref-S02" aria-label="Källa S02">[S02]</a></p>
+<h3 id="section-10">3.2 SICS AI:s HYPER-beskrivning</h3>
+<p>HYPER är registrerat hos CORDIS med projekt-ID 101218436. I deltagarrapporteringen beskriver SICS AI en strukturerad världsmodell och feedbackbaserat lärande samt anger att kärnan inte är en LLM och inte använder reinforcement learning. Rapporten beskriver också robotgränssnitt med kontroll på led- och rörelsenivå. Detta är bolagets redovisning; underlaget räcker inte för att rekonstruera algoritmen. <a class="cite" href="#ref-S03" aria-label="Källa S03">[S03]</a></p>
+<p>För projektet följer ett designkrav: AI-funktionen ska vara en utbytbar komponent med ett uttryckligt in- och utkontrakt. Den ska inte ersättas med en fri textprompt som samtidigt får obegränsad rätt att ändra simulatorn.</p>
+<h3 id="section-11">3.3 Produktionsbeskrivningen från Cognibotics</h3>
+<p>Cognibotics meddelade den 5 januari 2026 att Nowaste hade <strong>beställt en andra cell</strong> efter den första piloten. Texten tillskriver den befintliga AutoStore-tillämpningen SICS AI-vision samt Juliet &amp; Romeo för rörelse, gripning och transportbandsöverlämning. Källan belägger inte att den andra installationen redan var färdig. Det är leverantörens beskrivning, inte en oberoende driftsrevision eller intern API-specifikation. <a class="cite" href="#ref-S07" aria-label="Källa S07">[S07]</a></p>
+<p>Nowastes eget pressmeddelande från den 26 januari 2024 beskriver en HKM1800 med SICS-programvara i en pilot i produktionsmiljö på Tostarp. Det ger lagerplockning som användningskontext, men ingen rätt att rekonstruera kundens exakta layout eller interna system. Även detta är COMPANY_REPORTED_CLAIM. <a class="cite" href="#ref-S25" aria-label="Källa S25">[S25]</a></p>
+<p>Tillverkaren anger 1,8 m radiell räckvidd över 360 grader, ungefär 10 m² täckning, nära 1 m vertikalt slag och 2 kg nominell respektive 7,5 kg maximal last. Uppgifterna är offentliga tillverkarpåståenden, inte testresultat från RobotOps. <a class="cite" href="#ref-S08" aria-label="Källa S08">[S08]</a> Beskrivningen av basplacerade drivningar och kombinerade serie-/parallelllänkar ger visuell inspiration; vi härleder inga verkliga ledmått eller styrparametrar. <a class="cite" href="#ref-S23" aria-label="Källa S23">[S23]</a> Verktygsväxling för varierande gods är också tillverkarbeskriven, medan våra sex verktyg och deras begränsningar är egna simulatorval. <a class="cite" href="#ref-S24" aria-label="Källa S24">[S24]</a></p>
+<p>HYPER- och produktionsbeskrivningarna behöver inte motsäga varandra. De kan avse olika nivåer, versioner eller tillämpningar. Vårt svar är att skilja mellan uppgiftsnivå och rörelsenivå i designen och be SICS förklara den verkliga ansvarsfördelningen. Två fullständiga styrimplementationer behövs inte i första versionen.</p>
+<h3 id="section-12">3.4 Axel Kaliff, AutoGrasper och R900</h3>
+<p>CloudGripper/AutoGrasper beskriver ett arbetsflöde där uppgift, återställning, felåterhämtning och datainsamling har separata roller. README-filen anger tillstånden STARTUP, ACTIVE och RESETTING och namnger metoder för normal uppgift respektive återhämtning. Det granskade README-objektets Git-blob är <code>3cb1da256bc5147ef52a56327da476f110c4e6c2</code>. Det är forskningsverktyg, inte SICS produktkod. <a class="cite" href="#ref-S05" aria-label="Källa S05">[S05]</a></p>
+<p>R900, med Axel Kaliff som medförfattare, undersöker kostnadseffektiviteten hos autonom datainsamling för robotinlärning. Den granskade arXiv-posten har en reviderad version från 17 september 2025. Studiens automatisering av försök, märkning och återställning motiverar att också vår simulator gör episoder och återhämtning till förstklassiga begrepp. Vi reproducerar inte dess dataset eller modellresultat. <a class="cite" href="#ref-S06" aria-label="Källa S06">[S06]</a></p>
+<p>Axels examensarbetstitel anknyter till verifiering av robotaktioner med en digital tvilling. Examinatorns aktuella akademiska lista anger även hans författarskap i CloudGripper-AutoGrasper. DiVA-fulltexten har fortfarande inte kunnat granskas; endast bibliografisk koppling och öppet repositoryunderlag används. RobotOps gör därför inget anspråk på att reproducera examensarbetets metod eller resultat. <a class="cite" href="#ref-S04" aria-label="Källa S04">[S04]</a><a class="cite" href="#ref-S26" aria-label="Källa S26">[S26]</a></p>
+<h3 id="section-13">3.5 GPU-resurser och deras roll</h3>
+<p>ENCCS redovisar arbete med Python/PyTorch och GPU-träning på LUMI. Aixia har offentliggjort en leverans av DGX B200 med drifttjänster till SICS AI. Dessa källor ger stöd för verkligt beräkningsarbete, men fastställer inte var varje kunds inferens körs eller vilket GPU-ansvar den aktuella rollen får. <a class="cite" href="#ref-S10" aria-label="Källa S10">[S10]</a><a class="cite" href="#ref-S11" aria-label="Källa S11">[S11]</a></p>
+<p>Simulatorn behöver ingen B200. Den ska i stället kunna beskriva modellversion, inferensgränssnitt, latens och felutfall. En eventuell framtida GPU-adapter ändrar inte vem som äger ordern eller vem som verifierar ett plock.</p>
+<h3 id="section-14">3.6 Från inspiration till eget beslut</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Källa</th>
+<th>Avgränsat fynd</th>
+<th>Eget designbeslut</th>
+<th>Inte en reproduktion av</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rollannons <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a></td>
+<td>Integration mellan flera system.</td>
+<td>Separata kund-, modell- och robotkontrakt.</td>
+<td>Företagets exakta stack.</td>
+</tr>
+<tr>
+<td>HYPER <a class="cite" href="#ref-S03" aria-label="Källa S03">[S03]</a></td>
+<td>Världsrepresentation och robotgränssnitt.</td>
+<td>Ett typat Brain-gränssnitt.</td>
+<td>Proprietär modell eller AGI.</td>
+</tr>
+<tr>
+<td>AutoGrasper <a class="cite" href="#ref-S05" aria-label="Källa S05">[S05]</a></td>
+<td>Uppgift, reset och recovery skiljs åt.</td>
+<td>Episodmodell och explicita felvägar.</td>
+<td>Deras implementation eller data.</td>
+</tr>
+<tr>
+<td>R900 <a class="cite" href="#ref-S06" aria-label="Källa S06">[S06]</a></td>
+<td>Automatiserade robotförsök.</td>
+<td>Reproducerbara scenarier och loggning.</td>
+<td>Studiens resultat.</td>
+</tr>
+<tr>
+<td>Cognibotics / Nowaste <a class="cite" href="#ref-S07" aria-label="Källa S07">[S07]</a><a class="cite" href="#ref-S25" aria-label="Källa S25">[S25]</a></td>
+<td>Rapporterad pilot och beställning av ytterligare cell.</td>
+<td>Separat cell- och robotadapter.</td>
+<td>Kundens interna API eller exakta cell.</td>
+</tr>
+<tr>
+<td>Blender <a class="cite" href="#ref-S12" aria-label="Källa S12">[S12]</a><a class="cite" href="#ref-S13" aria-label="Källa S13">[S13]</a><a class="cite" href="#ref-S14" aria-label="Källa S14">[S14]</a></td>
+<td>Scen-API, timers och MCP-verktyg.</td>
+<td>Kontrollerad runtime, separat scenförfattande.</td>
+<td>Industriell realtidsstyrning.</td>
+</tr>
+<tr>
+<td>AWS <a class="cite" href="#ref-S17" aria-label="Källa S17">[S17]</a></td>
+<td>Återförsök kräver tydlig identitet och semantik.</td>
+<td>Beständig avsikt och avstämning av okänt utfall.</td>
+<td>En allmän exactly-once-garanti.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-15">4. Krav och minsta meningsfulla omfattning</h2>
+<h3 id="section-16">4.1 Ett litet system med verkliga ansvarsskillnader</h3>
+<p>Den arkiverade första implementationen har tre syntetiska artikeltyper och ett aktivt plock åt gången. Revision 1.2 har sex produktfamiljer i sex källådor och sex utbytbara verktyg runt en HKM-inspirerad manipulator. HKM-utökningen verifierades med upprepad full acceptans, Blender-tester och publicering vid källrevision ca7798798f916c8130e1833cf16b4d4d3f10d546. Den historiska evidensen ligger under docs/evidence/test-lifecycle-baseline; ACCEPTANCE_REPORT.md redovisar aktuell revisionsstatus. En orderrad omfattar fortfarande ett exemplar; större kvantiteter kräver spårbara deluppdrag. Sparade körningar behåller sina ursprungliga produkt-, scen- och kommandoidentiteter.</p>
+<p>Livscykeln skiljer val av robotcell från fel- och observationsscenario. ”Start new test” öppnar ett cellval; endast den HKM-inspirerade cellen kan väljas för nya försök. ”Clear test and retry” behåller försökets nummer och cell men tar efter bekräftelse bort gamla kördata och återställer produkter. ”Delete selected test” tar bort försöket helt; ”Delete all tests” tar bort den bekräftade samlingen. Lediga nummer återanvänds och en tom lista börjar på Test 1. Radering eller rensning avgör inget osäkert plock och skickar inget robotkommando. Ett raderat aktivt försök ersätts inte automatiskt. ADR 0013 beskriver beständig rensningsavsikt, revisionsskydd, anonyma begärandedigester och avgränsad filhantering.</p>
+<p>Inför bekräftad datahantering pausar gränssnittet uppdateringar och väntar på pågående läsning av replay och sparad bild. Om läsningen fastnar skickas ingen ändring; användaren kan försöka igen. Serverns skydd för pågående arbete och andra läsares filåtkomst finns kvar.</p>
+<p>Systemet ska kunna köras utan externa modellkonton. Blender visar förändringen i världen, men ordern blir inte färdig bara för att animationen slutar. UI:t visar orderstatus, cellstatus, kommandostatus och verifieringsstatus var för sig.</p>
+<h3 id="section-17">4.2 Kravspårbarhet mot rollen</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Arbetsområde</th>
+<th>Planerad projektartefakt</th>
+<th>Vad som kan bedömas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>K01</td>
+<td>Pythonutveckling</td>
+<td>Modulärt backend och typade modeller.</td>
+<td>Kodstruktur, felhantering och tester.</td>
+</tr>
+<tr>
+<td>K02</td>
+<td>Kund-API/WMS</td>
+<td>Mock-ERP och adapter med kvittenser.</td>
+<td>Kontrakt och affärssemantik.</td>
+</tr>
+<tr>
+<td>K03</td>
+<td>Robotintegration</td>
+<td>RobotGateway med Blender-adapter.</td>
+<td>Ansvarsgräns och versionshantering.</td>
+</tr>
+<tr>
+<td>K04</td>
+<td>PLC/cellsignaler</td>
+<td>Logisk CellController.</td>
+<td>Interlocks och tillstånd, inte PLC-certifiering.</td>
+</tr>
+<tr>
+<td>K05</td>
+<td>LLM/VLM</td>
+<td>Valfri adapter för strukturerade förslag.</td>
+<td>Validering, tidsgränser och avvisning.</td>
+</tr>
+<tr>
+<td>K06</td>
+<td>Driftsättning</td>
+<td>Lokal installationsguide och versionsmanifest.</td>
+<td>Repeterbar start och konfiguration.</td>
+</tr>
+<tr>
+<td>K07</td>
+<td>Drift/felsökning</td>
+<td>Händelsetidslinje och felinjektion.</td>
+<td>Spårbarhet och diagnos.</td>
+</tr>
+<tr>
+<td>K08</td>
+<td>Tillförlitlighet</td>
+<td>Journal, dubblettskydd och reconciliation.</td>
+<td>Modellens definierade felantaganden.</td>
+</tr>
+<tr>
+<td>K09</td>
+<td>Prestanda</td>
+<td>Mätning per steg och kötid.</td>
+<td>Flaskhalsanalys, inte industriell kapacitet.</td>
+</tr>
+<tr>
+<td>K10</td>
+<td>Dokumentation/kunddialog</td>
+<td>Tre rapporter, kontrakt och demonstrationsmanus.</td>
+<td>Förmåga att förklara beslut.</td>
+</tr>
+<tr>
+<td>K11</td>
+<td>Industriella protokoll</td>
+<td>Integration Lab använder verklig AMQP och OPC UA mot en virtuell PLC.</td>
+<td>Protokolltrafik belägger inte verklig hårdvara eller säkerhetscertifiering.</td>
+</tr>
+<tr>
+<td>K12</td>
+<td>AI-stödd utveckling</td>
+<td>Versionshanterade ändringar och granskade tester.</td>
+<td>Eget ansvar för agentgenererad kod.</td>
+</tr>
+</tbody>
+</table></div>
+<p>K01–K10 är en forskningsbaserad kravkartläggning. Vilka simulatorfunktioner som har körts och godkänts framgår av ACCEPTANCE_REPORT.md, inte av denna tabell. K11 får inte markeras färdigt för att booleska signaler finns i JSON. Annonsens kärnuppgifter och meriterande områden är utgångspunkt för kartläggningen. <a class="cite" href="#ref-S01" aria-label="Källa S01">[S01]</a><a class="cite" href="#ref-S02" aria-label="Källa S02">[S02]</a></p>
+<h2 id="section-18">5. Föreslagen systemarkitektur</h2>
+<h3 id="section-19">5.1 Komponenter och ägarskap</h3>
+<p>Arkitekturen är en liten modulär tjänst med separata externa gränser, inte ett stort kluster av mikrotjänster. Ett separat mock-kundsystem och en separat Blenderprocess gör kommunikationsfel möjliga att studera. Modell, verifierare och cellkontroll kan inledningsvis vara moduler i samma Pythonapplikation.</p>
+<figure id="fig-architecture"><img src="assets/architecture.svg" alt="Systemgränser och ägarskap. Figure 2. SIMULATOR_DESIGN architecture; revision-specific acceptance is stated separately. The durable workflow validates observed plans and preserves original command identity. The bounded Blender runtime owns private world/tool state and controller checkpoints. ObservationModel alone converts world data into WorldObservation with explicit sensor and simulated telemetry provenance; Verifier has no direct world path. Tool preparation shares the product-transfer command and does not add a transfer effect. Replay reads versioned artifacts. The API cell registry initializes new tests; retained archives remain read-only. Confirmed deletion removes the test world and catalog entry after bounded cleanup; display numbers become reusable. Clear retains the same test identity/number/cell, replaces execution data with an empty scene and increments its revision before permitting new work. Only anonymous request digests remain after completed deletion. The UI drains its own pending replay and snapshot response bodies before confirmed management; controls and polling resume after final refresh. Backend response-lifetime and running-work guards remain enforced. Neither action dispatches a pick or assigns a verdict. Deleting the active test leaves no active world; explicitly clearing an archive activates only its restored world. Lost acknowledgement still requires original journal plus fresh sufficient observation, with no replacement pick. Investigation reads job-scoped persisted evidence independently of replay. Explicit re-observation alone invokes reconciliation; navigation and downloads do not mutate the world." width="900" height="850"><figcaption>Figure 2. SIMULATOR_DESIGN architecture; revision-specific acceptance is stated separately. The durable workflow validates observed plans and preserves original command identity. The bounded Blender runtime owns private world/tool state and controller checkpoints. ObservationModel alone converts world data into WorldObservation with explicit sensor and simulated telemetry provenance; Verifier has no direct world path. Tool preparation shares the product-transfer command and does not add a transfer effect. Replay reads versioned artifacts. The API cell registry initializes new tests; retained archives remain read-only. Confirmed deletion removes the test world and catalog entry after bounded cleanup; display numbers become reusable. Clear retains the same test identity/number/cell, replaces execution data with an empty scene and increments its revision before permitting new work. Only anonymous request digests remain after completed deletion. The UI drains its own pending replay and snapshot response bodies before confirmed management; controls and polling resume after final refresh. Backend response-lifetime and running-work guards remain enforced. Neither action dispatches a pick or assigns a verdict. Deleting the active test leaves no active world; explicitly clearing an archive activates only its restored world. Lost acknowledgement still requires original journal plus fresh sufficient observation, with no replacement pick. Investigation reads job-scoped persisted evidence independently of replay. Explicit re-observation alone invokes reconciliation; navigation and downloads do not mutate the world.</figcaption><div class="figure-tools"><a href="assets/architecture.svg">Öppna stor SVG</a><a href="sources/diagrams/architecture.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Del</th>
+<th>Äger</th>
+<th>Får inte göra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mock ERP/WMS</td>
+<td>Order, artikelregister och kundens kvittens.</td>
+<td>Skriva robotleder eller modellens interna tillstånd.</td>
+</tr>
+<tr>
+<td>Integrationslager</td>
+<td>Uppdrag, avsikt, försök och rapportering.</td>
+<td>Tolka timeout som bevis för utebliven effekt.</td>
+</tr>
+<tr>
+<td>Brain-adapter</td>
+<td>Ett handlingsförslag och modellmetadata.</td>
+<td>Exekvera kod i Blender eller godkänna sig själv.</td>
+</tr>
+<tr>
+<td>Validator</td>
+<td>Kontrakt, aktualitet och operationella gränser.</td>
+<td>Påstå att logiska kontroller är funktionell säkerhet.</td>
+</tr>
+<tr>
+<td>CellController</td>
+<td>Simulerad tillgänglighet, stopp och signaler.</td>
+<td>Återstarta rörelse automatiskt efter reset.</td>
+</tr>
+<tr>
+<td>RobotGateway</td>
+<td>Kommandostatus och adapterförmågor.</td>
+<td>Dölja skillnader mellan stödda och ostödda kommandon.</td>
+</tr>
+<tr>
+<td>Blender-runtime</td>
+<td>Simulatorns värld och effektjournal.</td>
+<td>Låta UI eller modell manipulera världen direkt.</td>
+</tr>
+<tr>
+<td>Verifierare</td>
+<td>Bedömning baserad på observationer.</td>
+<td>Anta att sänd kvittens innebär lyckad uppgift.</td>
+</tr>
+<tr>
+<td>Test-orakel</td>
+<td>Jämförelse med fullständigt simulatortillstånd.</td>
+<td>Ge den ordinarie beslutsvägen obegränsad facitåtkomst.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-20">5.2 Två arkitekturnivåer, en första implementation</h3>
+<p>Det logiska gränssnittet kan uttrycka både <code>PickIntent</code> och <code>JointTrajectory</code>, men första implementationen ska endast utföra en avgränsad <code>PICK_AND_PLACE</code>-uppgift via fördefinierade, validerade rörelsesegment. En kapabilitetsförfrågan anger vad adaptern faktiskt stöder. En ostödd ledtrajektoria ger ett tydligt fel, inte en approximativ animation som låtsas vara motsvarande styrning.</p>
+<p>Senare kan en lednivåadapter införas med lednamn, tidsatta waypoints och explicit robotmodell. Det är ett separat integrationsarbete med egna tester. Gemensamt affärskontrakt kan minska ändringar i ERP-delen, men gör inte ett hårdvarubyte plug-and-play.</p>
+<h3 id="section-21">5.3 Driftmiljö</h3>
+<p>Snabbprofilen använder webbläsare, Python, SQLite och syntetisk eller Blender-baserad runtime. Integration Lab använder PostgreSQL för applikationstillstånd, en transaktionell outbox, verklig RabbitMQ/AMQP, en separat Python-edge med beständig inbox och verklig OPC UA till en virtuell PLC. Runtime-journal, PLC-journal och värld lagras lokalt enligt den dokumenterade felmodellen. En syntetisk WMS-tjänst tar emot verifierade resultat över REST. En produktionsanslutning till ett verkligt ERP är fortfarande ett separat integrationsarbete.</p>
+<figure id="fig-integration-lab"><img src="assets/integration-lab.svg" alt="Integration Lab: explicit boundaries. Figure 13. Implemented Integration Lab topology, with acceptance tracked in the current report. The console sends explicit REST authorizations and reads a persisted WebSocket trace. PostgreSQL commits immutable command/outbox intent before RabbitMQ publication. The separate edge service commits its inbox before consumer ACK and owns real OPC UA sessions to the virtual PLC. Bounded API-to-edge REST control calls preserve guided gates. PLC acceptance alone cannot actuate the runtime: explicit physical authorization and the original durable execution claim are required. The PLC-to-runtime interface is simulated; the existing runtime is invoked by the shared bounded handler. Fresh synthetic observations and the verifier determine the outcome. WMS HTTP acknowledgement precedes committed ERP business completion. Lost replies cause original-identity reconciliation, never an automatic replacement pick. This does not claim safety certification or exactly-once physical execution." width="900" height="840"><figcaption>Figure 13. Implemented Integration Lab topology, with acceptance tracked in the current report. The console sends explicit REST authorizations and reads a persisted WebSocket trace. PostgreSQL commits immutable command/outbox intent before RabbitMQ publication. The separate edge service commits its inbox before consumer ACK and owns real OPC UA sessions to the virtual PLC. Bounded API-to-edge REST control calls preserve guided gates. PLC acceptance alone cannot actuate the runtime: explicit physical authorization and the original durable execution claim are required. The PLC-to-runtime interface is simulated; the existing runtime is invoked by the shared bounded handler. Fresh synthetic observations and the verifier determine the outcome. WMS HTTP acknowledgement precedes committed ERP business completion. Lost replies cause original-identity reconciliation, never an automatic replacement pick. This does not claim safety certification or exactly-once physical execution.</figcaption><div class="figure-tools"><a href="assets/integration-lab.svg">Öppna stor SVG</a><a href="sources/diagrams/integration-lab.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p>Guided Console sparar 22 avgränsade steg och revisionsskyddade beslut. Ingen databastransaktion väntar på användarens svar. <strong>AUTHORIZE ROBOT EXECUTION</strong> måste passeras innan simulerad rörelse får starta. WebSocket-strömmen är skrivskyddad. Källkod, protokolldata och verkligt respektive simulerat ansvar visas per steg. <a href="https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/blob/main/docs/integration-lab.md">Implementerad labbprofil och körkommandon</a> beskriver processer och återhämtning; <a href="https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/blob/main/docs/integration-lab-requirements.md">kravgranskningen</a> skiljer implementation från ännu ej styrkt slutacceptans.</p>
+<p>GitHub Pages används endast för rapporter, diagram och nedladdningar. Pages kör inte Pythonbackend eller Blender. En framtida inspelad demo ska märkas inspelad och inte presenteras som levande robottelemetri. <a class="cite" href="#ref-S19" aria-label="Källa S19">[S19]</a></p>
+<h2 id="section-22">6. Datakontrakt och tillstånd</h2>
+<h3 id="section-23">6.1 Identiteter som inte får blandas ihop</h3>
+<p><code>order_id</code> identifierar kundens order. <code>job_id</code> identifierar den affärseffekt som efterfrågas. <code>command_id</code> identifierar ett specifikt exekveringsförsök. <code>event_id</code> används för mottagardubbletter. <code>scene_epoch</code> identifierar en sammanhängande simulatorvärld och ändras vid återställning av scenen. En scenåterställning får inte radera tidigare orderhistorik eller få gamla kommandon att bli giltiga igen.</p>
+<p>Återleverans av samma orderbegäran använder samma idempotensnyckel. Samma nyckel med annat innehåll avvisas som konflikt. Ett nytt försök efter ett verkligt misslyckande får egen försöksidentitet men behåller kopplingen till samma uppdrag. Skillnaden mellan begäran och avsikt är central i designen. <a class="cite" href="#ref-S17" aria-label="Källa S17">[S17]</a></p>
+<h3 id="section-24">6.2 Implementerat kommando</h3>
+<p>Det fullständiga, versionshanterade kontraktet finns i <code>contracts/schemas/RobotCommand.json</code>. Det innehåller stabil order-, jobb-, plan-, kommando- och observationsidentitet, scenepok, cellgeneration samt <code>product_id</code>, källa, destination och en typad <code>target_pose</code> med meter, koordinatram och kalibrering. JSON är strikt data; okända fält och godtycklig kod avvisas. Det är vårt simulator-API, inte SICS AI:s API.</p>
+<p>Valideringen kontrollerar bland annat tillåten kommandotyp, ändliga tal, rätt koordinatsystem, korrekt objekt, rimliga gränser, kompatibel kalibrering och tillräckligt aktuell observation. Kvaternionen kontrolleras mot en dokumenterad normtolerans. Toleranserna är egna simulatorparametrar och får inte kallas industriellt säkra.</p>
+<h3 id="section-25">6.3 Normativa API-gränser</h3>
+<p>GOAL.md, PROJECT_PLAN.md och contracts/ beskriver implementationens gränser.
+POST /v1/wms/tasks skapar en guidad session. POST /integration/sessions/{id}/authorize
+utför ett revisionsskyddat steg; /reconcile undersöker samma ursprungliga kommando.
+GET /integration/sessions/{id}, dess /live-resurs och /stream-WebSocket är skrivskyddade.
+Order-, jobb-, tidslinje-, evidens-, /health- och /metrics-resurser finns kvar.
+De äldre POST /orders och /jobs/{id}/run finns för lokal kompatibilitet men avvisas
+i labbprofilen, där hela den guidade protokollkedjan krävs.</p>
+<p>Samma idempotensnyckel och payload återger samma order. Ändrat innehåll ger
+konflikt. Journalens frånvaro bevisar inte i sig utebliven effekt.</p>
+<h3 id="section-26">6.4 Uppdragstillstånd och celltillstånd</h3>
+<figure id="fig-state"><img src="assets/state.svg" alt="Uppdragets tillstånd och osäkra utfall. Figure 3. SIMULATOR_DESIGN. Only reconciliation evidence resolves an unknown effect. Timeout alone never proves failure. ERP exposes the verified business outcome. Explicit operator re-observation may return REQUIRES_INTERVENTION to RECONCILING using the same command and fresh evidence. It never dispatches another pick; restart leaves intervention paused (ADR 0008)." width="900" height="950"><figcaption>Figure 3. SIMULATOR_DESIGN. Only reconciliation evidence resolves an unknown effect. Timeout alone never proves failure. ERP exposes the verified business outcome. Explicit operator re-observation may return REQUIRES_INTERVENTION to RECONCILING using the same command and fresh evidence. It never dispatches another pick; restart leaves intervention paused (ADR 0008).</figcaption><div class="figure-tools"><a href="assets/state.svg">Öppna stor SVG</a><a href="sources/diagrams/state.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p>Den normativa normalvägen är RECEIVED → VALIDATED → PLANNING →
+READY_TO_EXECUTE → EXECUTING → VERIFYING → COMPLETED för plockuppdraget.
+I den guidade kedjan stannar orderns affärsstatus i RECONCILING tills samtliga
+verifierade plock har beständiga WMS-kvittenser och steg 21 sparar ERP-utfallet.
+Robotresultat, sensorverifiering, WMS-kvittens och ERP-status är separata fakta.
+Den syntetiska affärsmodellen är ingen leveransgaranti för ett verkligt kundsystem.</p>
+<p>UNKNOWN_OUTCOME kan endast lösas via RECONCILING och lagrad evidens.
+Otillräckligt eller motstridigt underlag ger REQUIRES_INTERVENTION, aldrig
+påhittad framgång. Timeout är inte bevis för FAILED.</p>
+<p>REQUIRES_INTERVENTION pausar nya plock men tillåter en uttrycklig begäran om ny
+observation för samma kommando. Via RECONCILING kan tillräcklig ny evidens lösa
+utfallet; annars pausas uppdraget igen. Varje bedömning sparas. Omstart eller
+granskning av evidens öppnar inte intervention automatiskt, och inget nytt plock
+skickas vid avstämningen. Detta är vårt simulatorval enligt ADR 0008.</p>
+<p>Cellen har READY, BUSY, FAULTED, ESTOP_LOGICAL, RESETTING och OFFLINE.
+Reset bevisar inte oförändrad värld. Osäkra uppdrag behöver ny observation och
+avstämning. Stoppet är logiskt, aldrig en säkerhetsklassad funktion.</p>
+<h2 id="section-27">7. Kärnfallet: utfört plock, förlorad kvittens</h2>
+<h3 id="section-28">7.1 Varför ett återförsök kan vara fel</h3>
+<p>Anta att robotadaptern flyttar ett objekt, men att nätverket bryts innan integrationstjänsten får svaret. Klienten ser bara en timeout. Två förlopp är då förenliga med samma observation: ingenting utfördes, eller allt utfördes men svaret försvann. Utan mer information går det inte att välja ett säkert nytt plock enbart utifrån timeouten.</p>
+<figure id="fig-ack-loss"><img src="assets/ack-loss.svg" alt="Utfört plock — förlorad kvittens. Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning. Efter otillräcklig evidens kan operatören uttryckligen upprepa steg 6–9 för samma kommando. Varje bedömning sparas; ingen ny plockeffekt begärs. Verktygsförberedelse i HKM-revisionen hör till samma kommando och ändrar inte denna avstämningsregel." width="900" height="795"><figcaption>Figur 4. Egen sekvensmodell. Effekten uppstår före kommunikationsfelet. Integrationen begär kommandostatus och observation, inte ett nytt plock. Endast tillräcklig och konsistent evidens tillåter slutförande; annars krävs fortsatt utredning. Efter otillräcklig evidens kan operatören uttryckligen upprepa steg 6–9 för samma kommando. Varje bedömning sparas; ingen ny plockeffekt begärs. Verktygsförberedelse i HKM-revisionen hör till samma kommando och ändrar inte denna avstämningsregel.</figcaption><div class="figure-tools"><a href="assets/ack-loss.svg">Öppna stor SVG</a><a href="sources/diagrams/ack-loss.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p>Lösningen kombinerar beständig avsikt, kommandoregister och observation efter handling. Den utlovar inte en universell exactly-once-egenskap. Ett databaslås och en robotrörelse är inte en gemensam atomär transaktion.</p>
+<h3 id="section-29">7.2 Föreslaget återhämtningsförlopp</h3>
+<p>Integrationslagret lagrar avsikten före sändning. Blender-adaptern lagrar kommandots ID och innehållshash före effekt. När kvittensen uteblir markeras uppdraget som osäkert. Integrationen frågar efter samma kommando och begär en färsk observation. Om journal, epok och observerat objektläge ger tillräckligt stöd kan verifieringen fortsätta utan ett nytt plock.</p>
+<p>Om journalen säger slutfört men objektet inte kan lokaliseras är det en konflikt som kräver utredning, inte tillåtelse att välja den mest bekväma uppgiften. Om journalen gått förlorad och bilden är skymd kan korrekt beteende vara att stoppa automatiseringen och visa osäkerheten.</p>
+<h3 id="section-30">7.3 Omstarter och delvis genomförda handlingar</h3>
+<p>En omstart av integrationstjänsten får inte nollställa robotens värld. Den återläser uppdrag och utgående meddelanden från beständig lagring. Vid avbrott under sändning gör den avstämning innan nya rörelseförslag tillåts.</p>
+<p>En omstart av Blender är svårare. Scenens senaste sparade fil kan ligga efter effektjournalen. Första versionen ska därför antingen bevara en konsistent scenögonblicksbild tillsammans med logiskt stegnummer eller uttryckligen markera att världen inte kan återställas säkert. Vid inkonsistens skapas en ny scene_epoch och pågående uppdrag kräver manuell granskning. Att tyst läsa en gammal .blend-fil och fortsätta skulle dölja felet.</p>
+<p>Ett uppdrag kan också avbrytas när objektet sitter i griparen. Verifieraren måste därför skilja mellan rätt destination, kvar i källan, fäst i verktyget och oklart läge. Återhämtning är inte alltid samma sak som att börja från början.</p>
+<h2 id="section-31">8. Observation, modell och verifiering</h2>
+<h3 id="section-32">8.1 Fyra representationer av världen</h3>
+<p>Simulatorn äger det verkliga tillståndet inom modellen, <code>x</code>. Sensoradaptern producerar observationen <code>y</code>. Brain-komponenten kan hålla en intern uppskattning eller ett minne, <code>b</code>. ERP-uppdraget definierar det önskade tillståndet, <code>g</code>. Dessa får inte blandas ihop.</p>
+<p>En förenklad egen modell är:</p>
+<p><code>y_t = h(x_t, calibration, occlusion, noise)</code></p>
+<p><code>proposal_t = planner(y_t, b_t, g)</code></p>
+<p><code>x_(t+1) = simulator(x_t, validated_command_t)</code></p>
+<p><code>verdict = verifier(y_before, y_after, command_journal)</code></p>
+<p>Uttrycken beskriver ansvar, inte en reproduktion av SICS lärandealgoritm. En klassisk databas med objektpositioner är inte automatiskt en inlärd världsmodell.</p>
+<figure id="fig-worlds"><img src="assets/worlds.svg" alt="Verklighet, observation, mål och förslag. Figure 5. SIMULATOR_DESIGN evidence boundary for the enhancement. ObservationModel derives configured sensor-like evidence from private WorldState; active-tool telemetry is explicitly SIMULATED_CELL_TELEMETRY, not computer vision. Noise, freshness, uncertainty and coverage affect the observation contract. Verifier receives observation and original command, never raw world or rendered pixels. The test oracle alone may compare hidden truth with a verdict. Public presentation cameras and replay do not prove business success." width="900" height="790"><figcaption>Figure 5. SIMULATOR_DESIGN evidence boundary for the enhancement. ObservationModel derives configured sensor-like evidence from private WorldState; active-tool telemetry is explicitly SIMULATED_CELL_TELEMETRY, not computer vision. Noise, freshness, uncertainty and coverage affect the observation contract. Verifier receives observation and original command, never raw world or rendered pixels. The test oracle alone may compare hidden truth with a verdict. Public presentation cameras and replay do not prove business success.</figcaption><div class="figure-tools"><a href="assets/worlds.svg">Öppna stor SVG</a><a href="sources/diagrams/worlds.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<h3 id="section-33">8.2 Test-orakel respektive ordinarie verifierare</h3>
+<p>Test-oraklet får läsa fullständig simulatorinformation för att avgöra om systemets bedömning var rätt. Den ordinarie verifieraren får bara de sensorliknande uppgifter som scenarioinställningen medger. Annars blir testet cirkulärt: samma funktion flyttar objektet och intygar sedan att den själv gjorde rätt.</p>
+<p>Även dessa två vägar delar simulatorns antaganden. Separationen minskar en viss typ av logiskt fel, men gör inte verifieringen oberoende av simuleringsmodellen. Korrekta metadata är inte ett bevis för korrekt synsystem i en verklig lagercell.</p>
+<h3 id="section-34">8.3 Koordinater och tid</h3>
+<p>Alla positioner uttrycks i meter, vinklar i radianer och orienteringar i en angiven konvention. En enkel koordinattransformation skrivs <code>p_cell = R × p_camera + t</code>. Räkneexempel: utan rotation ger kamerakoordinaten <code>(0,10; 0,20; 0,30)</code> och förskjutningen <code>(0,40; 0; 0,80)</code> cellkoordinaten <code>(0,50; 0,20; 1,10)</code> meter. Detta är ett pedagogiskt exempel, inte robotkalibrering.</p>
+<p>Varje observation har fångsttid, mottagningstid och scensteg. Väggklocka används för mänskligt läsbara loggar; monotona tidsmått används för lokala tidsgränser. Simuleringstid hålls separat från verklig elapsed time. Ett bildresultat från en tidigare scene_epoch avvisas även om objektets namn råkar vara oförändrat.</p>
+<h3 id="section-35">8.4 Deterministisk baslinje och valfri modell</h3>
+<p>Baslinjen gör ett reproducerbart val bland tillåtna objekt och rörelsesegment. Den tränar ingen modell. En valfri LLM/VLM-adapter kan ge ett strukturerat förslag, men schemakorrekthet garanterar inte semantisk korrekthet. OpenAI dokumenterar strukturerade utdata och särskild hantering av exempelvis avvisade svar. <a class="cite" href="#ref-S16" aria-label="Källa S16">[S16]</a></p>
+<p>Implementerade felvägar är timeout, okänd objektidentitet, felaktig destination och otillräcklig observation. Avvisat externt modellsvar hör till den valfria modelladaptern som inte är implementerad. Dessa ger ett synligt avbrott eller en dokumenterad alternativ policy. Ett självrapporterat confidence-värde ska inte behandlas som kalibrerad sannolikhet för ett lyckat grepp.</p>
+<h2 id="section-36">9. Blender, MCP och operationella gränser</h2>
+<h3 id="section-37">9.1 Scen och rörelse</h3>
+<p>Den arkiverade baslinjen använder en stiliserad kartesisk maskin, två lådor och tre produktkuber. Nya världar i revision 1.2 använder en originalbyggd HKM-inspirerad hybridmanipulator och en rikare lagercell: sex källådor, varierande produktgeometri, sex verktygsdockor, transportband, inhägnad och tre kameror. Baslinjens gamla scener och inspelningar behåller sin ursprungliga form; en ny standardprofil ändrar inte sparad historik.</p>
+<figure id="fig-hkm-cell"><img src="assets/hkm-cell.svg" alt="HKM-inspired warehouse cell. Figure 8. SIMULATOR_DESIGN implemented cell; final acceptance status is stated separately. Six source families and interchangeable tools surround one original TCP-driven hybrid-inspired manipulator. The procedural enclosure, conveyor and logical interlocks illustrate context, not validated industrial safety. Public manufacturer reach metadata is separate from the smaller enforced synthetic workspace. Operator overview is presentation only; overhead/side observation metadata does not imply pixel-based computer vision." width="900" height="760"><figcaption>Figure 8. SIMULATOR_DESIGN implemented cell; final acceptance status is stated separately. Six source families and interchangeable tools surround one original TCP-driven hybrid-inspired manipulator. The procedural enclosure, conveyor and logical interlocks illustrate context, not validated industrial safety. Public manufacturer reach metadata is separate from the smaller enforced synthetic workspace. Operator overview is presentation only; overhead/side observation metadata does not imply pixel-based computer vision.</figcaption><div class="figure-tools"><a href="assets/hkm-cell.svg">Öppna stor SVG</a><a href="sources/diagrams/hkm-cell.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p><code>HKM_INSPIRED_VISUAL_KINEMATICS_V1</code> är vårt namn på en deterministisk avbildning från TCP-pose till sammankopplade visuella länkar. Matematiken finns i <code>robotops/hkm_geometry.py</code>; den gör inga anspråk på verklig HKM-IK. Version-2-inspelningar innehåller utvärderad position, quaternion, skala, fas, synlighet och verktygs-/objektanknytning. Blender- och webbläsarvyn använder samma semantiska objektidentiteter. Replay är läsning av inspelad evidens, aldrig en väg tillbaka till robotkommandon.</p>
+<p>Blenders Python-API stöder programmatisk åtkomst till objekt, scen och animation, vilket passar denna avgränsade syntetiska värld. <a class="cite" href="#ref-S27" aria-label="Källa S27">[S27]</a> Kontaktkrafter, deformation och riktiga sugkoppskrafter simuleras inte. PyBullet dokumenterar fysik, ledkroppar, IK och kollisionsfunktioner; Isaac Sim dokumenterar robotrörelse och sensormodeller. De är relevanta jämförelser om sådan validering senare blir ett krav, men införs inte som nya beroenden här. <a class="cite" href="#ref-S28" aria-label="Källa S28">[S28]</a><a class="cite" href="#ref-S29" aria-label="Källa S29">[S29]</a><a class="cite" href="#ref-S30" aria-label="Källa S30">[S30]</a></p>
+<h3 id="section-38">9.1.1 Verktygsval och synlig förberedelse</h3>
+<p>Den kanoniska katalogen <code>robotops/robotics/catalogue-v1.json</code> beskriver våra sex produktfamiljer, massa/geometri och sex gripverktyg. Tabellen nedan genereras direkt från samma data. P/C är kandidater; separat kontroll av produktens konservativa maximala fixturmassa, geometri och tillgänglighet kan ändå utesluta ett verktyg. Poäng, avvisningsskäl och stabil rangordning sparas i planen och visas under ”Why this tool?”. Integrerad köracceptans redovisas separat från att katalogen existerar.</p>
+<figure id="fig-product-tool-compatibility"><img src="assets/product-tool-compatibility.svg" alt="Synthetic product-tool compatibility. Figure 11. SIMULATOR_DESIGN compatibility matrix generated from robotops/robotics/catalogue-v1.json. P/C eligibility remains subject to actual fixture mass, geometry and tool availability. These are not manufacturer gripper specifications. The selected tool and candidate rejection reasons must be persisted separately as execution evidence." width="900" height="690"><figcaption>Figure 11. SIMULATOR_DESIGN compatibility matrix generated from robotops/robotics/catalogue-v1.json. P/C eligibility remains subject to actual fixture mass, geometry and tool availability. These are not manufacturer gripper specifications. The selected tool and candidate rejection reasons must be persisted separately as execution evidence.</figcaption><div class="figure-tools"><a href="assets/product-tool-compatibility.svg">Öppna stor SVG</a><a href="sources/diagrams/product-tool-compatibility.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p>Verktygsväxling är en förberedelse inom det ursprungliga PICK_AND_PLACE-kommandot. Rackplats, monterat verktyg och kontrollsteg sparas beständigt. Ett verktygsbyte ökar inte antalet produktförflyttningar. Saknat begärt verktyg stoppar före produktens effekt; redan korrekt verktyg ger ett explicit no-change-beslut. <code>tool_showcase</code> kör alla sex produktfamiljer med deras föredragna verktyg och verifierar varje jobb innan nästa börjar.</p>
+<figure id="fig-tool-preparation"><img src="assets/tool-preparation.svg" alt="Tool preparation under the original command. Figure 9. SIMULATOR_DESIGN implemented execution sequence; final acceptance status is stated separately. A valid original PICK_AND_PLACE intent is durable before cell preparation. Selection and availability checks can reject before any transfer. If the active tool is correct, TOOL_CHANGE_NOT_REQUIRED is recorded and the preparation branch is bypassed. Otherwise dock, release/empty-flange, engagement/tool-ID and retreat events share the original command identity. Restart never treats a missing reply as permission for another pick." width="900" height="1050"><figcaption>Figure 9. SIMULATOR_DESIGN implemented execution sequence; final acceptance status is stated separately. A valid original PICK_AND_PLACE intent is durable before cell preparation. Selection and availability checks can reject before any transfer. If the active tool is correct, TOOL_CHANGE_NOT_REQUIRED is recorded and the preparation branch is bypassed. Otherwise dock, release/empty-flange, engagement/tool-ID and retreat events share the original command identity. Restart never treats a missing reply as permission for another pick.</figcaption><div class="figure-tools"><a href="assets/tool-preparation.svg">Öppna stor SVG</a><a href="sources/diagrams/tool-preparation.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<h3 id="section-39">9.1.2 Trajektoria, arbetsområde och ramar</h3>
+<p>Planeringen innehåller förberedelse, lodrät ansats, grepp/kvittens, lyft, hög syntetisk överföringsnivå, placering, lossning/kvittens och reträtt. Deterministisk smoothstep ger läsbar acceleration utan att imitera tillverkarens cykeltid. Simuleringstid och presentationshastighet hålls skilda från faktisk pipeline-latens och UTC-händelser.</p>
+<p>Den egna konservativa geometrikontrollen samplar arbetsområdet och testar segment mot expanderade hindergränser, provar ett ändligt antal alternativa vägar och avvisar om ingen väg fungerar. Synliga statiska objekt och hindergränser kommer från samma geometri; även observerade produkter, last och parkerade verktyg kontrolleras. Endast registrerad lodrät dockning till rätt verktyg får undantag för avsiktlig kontakt. Rotationsrörelser får en konservativ svept volym. Kontrollen validerar inte verklig robotkollision, länkarnas kontaktfysik eller säkerhet. Runtime kontrollerar oberoende identitet, scenepok, källa, verktyg, kalibrering och begränsad trajektoria före effekt. Sensorramar och celltelemetri märks uttryckligen; en renderad kamerabild bevisar inte att datorseende har körts.</p>
+<figure id="fig-frames"><img src="assets/frames.svg" alt="Explicit coordinate frames. Figure 10. SIMULATOR_DESIGN frame tree. Tool TCP transforms and camera/source/destination poses are explicit, versioned values. Parent frame labels do not assert calibrated correspondence to a real robot. Observation captures add UTC timestamps and model/sensor provenance. Browser camera selection is presentation only." width="900" height="820"><figcaption>Figure 10. SIMULATOR_DESIGN frame tree. Tool TCP transforms and camera/source/destination poses are explicit, versioned values. Parent frame labels do not assert calibrated correspondence to a real robot. Observation captures add UTC timestamps and model/sensor provenance. Browser camera selection is presentation only.</figcaption><div class="figure-tools"><a href="assets/frames.svg">Öppna stor SVG</a><a href="sources/diagrams/frames.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<h3 id="section-40">9.2 Blender-runtime och trådar</h3>
+<p>Blenders dokumentation varnar för osäker användning av Pythontrådar. Scenändringar ska inte göras godtyckligt från en långlivad bakgrundstråd. Timers ger ett API för schemalagda anrop. <a class="cite" href="#ref-S13" aria-label="Källa S13">[S13]</a><a class="cite" href="#ref-S14" aria-label="Källa S14">[S14]</a></p>
+<p>Den implementerade adaptern använder i stället en tidsbegränsad Blender-batchprocess med ett fast Python-skript och typade JSON-filer. Scenändringar sker på Blenders huvudtråd. RUNNING journalförs före start; scenfilens hash och svarets identitet kontrolleras innan checkpointen godkänns. Saknat eller korrupt svar leder till osäkerhet utan omkörning. Blender-version och skripthash finns i runtime-manifestet. ADR 0001 dokumenterar valet; ingen långlivad nätverksbrygga krävs. CPU-versionen är Blender 5.2.1 LTS. <a class="cite" href="#ref-S21" aria-label="Källa S21">[S21]</a></p>
+<p>På Windows startar den avgränsade processen med Blenders dokumenterade <code>--qos high</code> för att använda prestandakärnor på hybridprocessorer. <a class="cite" href="#ref-S31" aria-label="Källa S31">[S31]</a> Detta är ett processlokalt simulatorval; det ändrar inte Windows-policy, renderkvalitet, inspelningsfrekvens eller den befintliga tidsgränsen. Runtime-manifestet anger <code>cpu_qos</code>. Upprepade oförändrade synlighetsvärden skrivs inte om under animering, men verkliga synlighetsändringar behålls i sparade keyframes. Lokala prestandatester är inte validering av robotens fysiska genomströmning.</p>
+<h3 id="section-41">9.3 MCP hör till utvecklingsmiljön</h3>
+<p>Blender Lab beskriver en MCP-server med ett separat tillägg och varnar för att LLM-genererad kod kan köras utan dataskyddsräcken. Den kontrollerade sidan anger Blender 5.1 eller senare för just denna integration. <a class="cite" href="#ref-S12" aria-label="Källa S12">[S12]</a></p>
+<p>Codex kan ansluta till MCP-servrar. Det kan användas för kodarbete, scenförfattande och granskning; den aktuella runtime-adaptern använder det inte, inte som en säkerhetsklassad regulator. <a class="cite" href="#ref-S15" aria-label="Källa S15">[S15]</a></p>
+<figure id="fig-trust"><img src="assets/trust.svg" alt="Skilj scenförfattande från robotkörning. Figur 6. Egen behörighetsmodell. Codex och MCP kan hjälpa till med scenförfattande i en isolerad utvecklingsmiljö. Granskade och versionshanterade artefakter förs sedan till körmiljön. RobotGateway accepterar enbart det avgränsade runtime-kontraktet." width="900" height="755"><figcaption>Figur 6. Egen behörighetsmodell. Codex och MCP kan hjälpa till med scenförfattande i en isolerad utvecklingsmiljö. Granskade och versionshanterade artefakter förs sedan till körmiljön. RobotGateway accepterar enbart det avgränsade runtime-kontraktet.</figcaption><div class="figure-tools"><a href="assets/trust.svg">Öppna stor SVG</a><a href="sources/diagrams/trust.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<p>Under utveckling kan en agent föreslå Blenderkod i en isolerad miljö. Under körning accepterar robotadaptern endast det definierade kommandoschemat. Runtime erbjuder ingen <code>exec</code>, ingen godtycklig filåtkomst och inga modellvalda externa adresser. API-nycklar ligger utanför repot och aldrig i den publicerade webbsidan.</p>
+<h3 id="section-42">9.4 PLC och stopp</h3>
+<p>Cellmodellen har READY, BUSY, FAULTED, ESTOP_LOGICAL, RESETTING och OFFLINE samt generationsnummer. Runtime kontrollerar källobjekt och destination mot det typade kommandot. Före start måste definierade förvillkor vara uppfyllda. Signalerna behöver aktualitetskontroll; ett gammalt READY räcker inte.</p>
+<p>Integration Lab implementerar OPC UA-klient/server-trafik med anslutning, browse, prenumeration och metoder för SubmitJob, ursprunglig status och resultatkvittens. Informationsmodell och återstartssemantik dokumenteras i labbguiden. Ett REST-svar från edge är inte i sig bevis för OPC UA; spåret innehåller de underliggande metodsvaren och datanotifikationerna. PLC-till-runtime-länken märks <strong>simulated controller interface</strong>. OPC Foundations åtskillnad mellan informationsmodell och kommunikationstjänster är relevant för denna gräns. <a class="cite" href="#ref-S18" aria-label="Källa S18">[S18]</a></p>
+<p>Stoppknappen i demonstrationen är <strong>en simulerad operationell spärr</strong>, inte ett nödstopp med verifierad säkerhetsfunktion. Projektet ska inte anslutas till fysisk robotutrustning med denna logik som skyddssystem.</p>
+<h2 id="section-43">10. Utvärderingsprotokoll och genomförd acceptans</h2>
+<p>Den ursprungliga forskningsplanen nedan innehåller även framtida experiment. Den normativa obligatoriska sviten definieras av SUCCESS_CRITERIA.md. ACCEPTANCE_REPORT.md kopplar varje MUST till aktuella kommandon, tester och artefakter. T07 (extern ERP-outbox), kontinuerligt stopp mitt i rörelse i T10, partiellt grepp i T12 och jämförande fröexperiment är uttryckligen tillägg; de har inte körts som sådana. Batch-runtime simulerar ingen säker realtidsavbrytning.</p>
+<h3 id="section-44">10.1 Hypoteser och jämförelse</h3>
+<p><strong>H1:</strong> Under det definierade kvittensbortfallsfallet ska journal plus avstämning undvika ett extra plockförsök som saknar stöd i observerat tillstånd.</p>
+<p><strong>H2:</strong> En verifierare med begränsad observation ska ibland lämna utfallet oavgjort, i stället för att felaktigt markera uppdraget slutfört.</p>
+<p><strong>H3:</strong> En tjänsteomstart ska inte orsaka att en redan verifierad affärseffekt utförs igen när endast ERP-kvittensen återstår.</p>
+<p>Hypoteserna är prövbara inom simulatorns felmodell. De är inte testresultat. En medvetet naiv återförsöksstrategi kan användas som jämförelse i en isolerad testvariant. Båda varianterna ska då möta samma scener och felinjektioner. Baslinjen får inte köras mot fysisk utrustning.</p>
+<h3 id="section-45">10.2 Scenarier och godkännandekriterier</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Injicerat eller kontrollerat fall</th>
+<th>Förväntad egenskap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T01</td>
+<td>Normalt plock</td>
+<td>Ett objekt i rätt destination; korrekt ERP-kvittens.</td>
+</tr>
+<tr>
+<td>T02</td>
+<td>Samma order skickas två gånger</td>
+<td>Samma uppdrag återfås; ingen extra effekt.</td>
+</tr>
+<tr>
+<td>T03</td>
+<td>Samma nyckel, ändrat innehåll</td>
+<td>Konflikt avvisas före rörelse.</td>
+</tr>
+<tr>
+<td>T04</td>
+<td>Kvittens tappas efter effekt</td>
+<td>Okänt utfall synliggörs; avstämning utan blint nytt plock.</td>
+</tr>
+<tr>
+<td>T05</td>
+<td>Kommando avvisas före start</td>
+<td>Ingen effekt; tydlig orsak och kontrollerat nytt försök.</td>
+</tr>
+<tr>
+<td>T06</td>
+<td>Integrationstjänsten startas om</td>
+<td>Beständig historik återläses och pågående avsikt stäms av.</td>
+</tr>
+<tr>
+<td>T07</td>
+<td>ERP otillgängligt efter verifiering</td>
+<td>Kundsynk återförsöks, inte robotplocket.</td>
+</tr>
+<tr>
+<td>T08</td>
+<td>Objektet skymt efter rörelse</td>
+<td>Ingen falsk slutsats från att objektet inte syns.</td>
+</tr>
+<tr>
+<td>T09</td>
+<td>För gammal observation eller fel epok</td>
+<td>Planen avvisas.</td>
+</tr>
+<tr>
+<td>T10</td>
+<td>Stopp under rörelse</td>
+<td>Ingen automatisk fortsättning efter reset.</td>
+</tr>
+<tr>
+<td>T11</td>
+<td>Felaktigt modellförslag</td>
+<td>Validatorn hindrar exekvering och loggar orsaken.</td>
+</tr>
+<tr>
+<td>T12</td>
+<td>Delvis plock, objekt i griparen</td>
+<td>Delutfallet registreras; återstart sker inte från fel antagande.</td>
+</tr>
+<tr>
+<td>T13</td>
+<td>Motstridiga journal- och sensoruppgifter</td>
+<td>Ärendet eskaleras som konflikt.</td>
+</tr>
+<tr>
+<td>T14</td>
+<td>Andra exekveraren försöker ta samma cell</td>
+<td>Ensam exekveringsrätt upprätthålls eller starten avvisas.</td>
+</tr>
+<tr>
+<td>T15</td>
+<td>Blender omstart med inkonsistent snapshot</td>
+<td>Ny epok och granskning; inget tyst återspel.</td>
+</tr>
+<tr>
+<td>T16</td>
+<td>Observation med fel koordinatenhet</td>
+<td>Kontraktsfel upptäcks före exekvering.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ett valfritt framtida experiment föreslås använda tio namngivna scenfrön per scenario, med dokumenterade objektplaceringar och felpunkter. Antalet är en praktisk startpunkt, inte en statistisk styrkeberäkning. Deterministiska fall ska också testas vid flera gränser i tillståndsövergången, inte bara med flera slumpfrön.</p>
+<h3 id="section-46">10.3 Mått och invarianta villkor</h3>
+<p><strong>Duplicerad effekt:</strong> antal uppdrag där fler effekter än beställt har inträffat, dividerat med antal uppdrag.</p>
+<p><strong>Falskt slutförande:</strong> antal uppdrag märkta slutförda trots att test-oraklet visar fel slutläge, dividerat med antalet slutförda uppdrag. Om nämnaren är noll redovisas måttet som ej tillämpligt.</p>
+<p><strong>Oavgjorda utfall:</strong> antal uppdrag där verifieraren saknar tillräckligt underlag. Ett lägre värde är inte automatiskt bättre om det köps genom fler felaktiga godkännanden.</p>
+<p><strong>Återhämtningstid:</strong> tid från upptäckt fel till verifierad lösning eller eskalering. Rapportera både simulerade steg och verklig elapsed time, med maskin- och versionsuppgifter.</p>
+<p>Invarianta villkor är bland annat att gamla scene_epoch-kommandon inte körs, att endast en aktör ändrar roboten åt gången och att färdig kundorder bygger på en lagrad verifieringspost. Noll observerade fel i ett litet prov ska inte tolkas som noll verklig felrisk.</p>
+<h3 id="section-47">10.4 Reproduktionspaket</h3>
+<p>Varje körning ska kunna exportera Git-commit, konfiguration, scene_hash, seed, schema- och modellversion, inskickade kommandon, händelseföljd, observationer, orakelutfall och mätvärden. Modellkörningar redovisas separat från den deterministiska baslinjen. Nätverkskostnader och externa anrop ska vara synliga och begränsade.</p>
+<p>Ett misslyckat experiment sparas lika noggrant som ett lyckat. Presentationen får inte välja endast vackra videosekvenser och dölja resten av testpopulationen.</p>
+<h2 id="section-48">11. Genomförande, dokumentation och underhåll</h2>
+<h3 id="section-49">11.1 Ursprunglig byggordning och aktuell status</h3>
+<p>Etapperna nedan beskriver den ursprungliga forskningsplanen. P0–P5 i PROJECT_PLAN.md är implementerade; P6 är valfri och ej implementerad. P7 omfattar slutlig acceptans och publicering. Fullständig aktuell status står i rapportens statusruta. Utökade experiment i avsnitt 10 är inte automatiskt genomförda genom att kärnan finns.</p>
+<p><strong>Etapp A: kontrakt och testbar kärna.</strong> Skapa modeller, beständig uppdragslogg, kundmock och en robotstub utan grafik. Godkänn T01–T07 innan scenarbete blir huvudfokus.</p>
+<p><strong>Etapp B: Blender som värld.</strong> Inför scenmetadata, begränsad runtime, observation och verifiering. Demonstrera ett normalt plock och ett kvittensbortfall med samma orderflöde.</p>
+<p><strong>Etapp C: svåra fel.</strong> Lägg till stopp, stale observation, delutfall, epoker och restart-konflikter. Dokumentera vilka fall som ännu inte kan lösas automatiskt.</p>
+<p><strong>Etapp D: tillägg.</strong> Lägg till valfri bildmodell eller ett verkligt lokalt OPC UA-gränssnitt först när baslinjen är stabil. Fotorealism, komplex fysik och flera robotar prioriteras sist.</p>
+<h3 id="section-50">11.2 Implementationens struktur</h3>
+<p>Den aktuella målstrukturen finns i PROJECT_PLAN.md: apps/, robotops/domain/,
+robotops/workflow/, robotops/brain/, robotops/robot_gateway/, robotops/cell/,
+robotops/blender/, robotops/observation/, robotops/verification/, contracts/ och
+tests/{unit,contract,integration,e2e}/. GOAL_PROGRESS.md redovisar vad som finns
+nu och ACCEPTANCE_REPORT.md redovisar verifierad evidens. Dokumentationsbygget
+hålls separat från runtime. Se ADR 0001 för den begränsade processadaptern.</p>
+<h3 id="section-51">11.3 Definition av färdig demonstration</h3>
+<p>Demonstrationen är färdig först när en annan person kan följa startinstruktionen, skapa en order, se en verklig scenändring, följa dess ID genom tidslinjen och återköra kvittensbortfallsfallet. Ett statusmanifest ska ange genomförda tester och kända begränsningar. Skärminspelning är en reservväg, inte en ersättning för testbarhet.</p>
+<h2 id="section-52">12. Diskussion, begränsningar och slutsats</h2>
+<p>Det mest överförbara i projektet är gränssnitten och resonemanget om osäkerhet: affärsavsikt, exekveringsförsök och effekt behöver olika identiteter och bevis. Den minst överförbara delen är den förenklade världen. Fästning av ett objekt i en gripare kan inte belägga robust gripning, och en kontroll i SQLite kan inte belägga säker robotrörelse.</p>
+<p>Det finns risk för gemensamma modellfel mellan simulator och verifierare. Scenarierna är få, produkter förenklade och hårdvarans dynamik saknas. En framtida verklig integration kräver nya adapterspecifikationer, riskbedömning, fysisk kalibrering, driftsättningsprov och verksamhetsförankring. Rapport 2 utvecklar dessa gränser.</p>
+<p><strong>Slutsatsen är att projektet är motiverat som ett avgränsat integrations- och återhämtningstest, inte som en kopia av SICS AI:s robotbrain.</strong> En liten demo med ärlig osäkerhet, spårbara beslut och reproducerbara fel är vetenskapligt mer användbar än en större animation som ger sken av verifierad fysisk förmåga.</p>
+<p>Den fortsatta diskussionen bör pröva designens antaganden: var den verkliga plattformens gränser går, vilka fel som är vanligast och vilken evidens som krävs för att ett plock ska räknas som lyckat. Den aktuella publikationsrevisionen länkar verifierad simulator-evidens via ACCEPTANCE_REPORT.md. Den redovisar inga experimentella resultat för fysisk robotprestanda eller generell intelligens.</p>
+<h2 id="section-53">Implementerat undersökningsflöde (2026-10-05)</h2>
+<p>Arbetsytan prioriterar körning, synligt resultat och en uttrycklig undersökning.
+En kort scenariobeskrivning säger vad operatören ska titta efter. Avvikande resultat
+markeras utan att automatiskt täcka cellen. Panelen skiljer symptom, innehållet i
+sparade bevis och möjliga förklaringar. Den bedömda observationen väljs med dess ID;
+animationen och den aktuella felväljaren får inte ersätta evidens. Tidslinjen är
+sekundär och höjdbegränsad. API-anrop, JSON-export och riktiga kod-/loggsökvägar
+stöder fortsatt teknisk undersökning. Återgång bevarar uppspelningens sammanhang.
+Detta är egen SIMULATOR_DESIGN, inte ett nytt påstående om SICS AI:s produkt.</p>
+<figure id="fig-investigation"><img src="assets/investigation.svg" alt="Run, notice and investigate. Figure 12. The operator runs a scenario and follows the recorded result into a bounded investigation panel. Symptoms, record findings and possible explanations stay distinct. Evidence and manual inspection use the same test/job identity; the timeline is secondary. Return preserves replay context. Only explicit re-observation invokes existing original-command reconciliation; replay, tabs and downloads issue no pick. Browser automation checks function, not first-time usability." width="900" height="660"><figcaption>Figure 12. The operator runs a scenario and follows the recorded result into a bounded investigation panel. Symptoms, record findings and possible explanations stay distinct. Evidence and manual inspection use the same test/job identity; the timeline is secondary. Return preserves replay context. Only explicit re-observation invokes existing original-command reconciliation; replay, tabs and downloads issue no pick. Browser automation checks function, not first-time usability.</figcaption><div class="figure-tools"><a href="assets/investigation.svg">Öppna stor SVG</a><a href="sources/diagrams/investigation.mmd" download>Mermaid-källa</a><a href="sources/diagrams.json" download>Redigera layout (JSON)</a></div></figure>
+<section class="references" aria-label="Referenser"><h2 id="referenser">Referenser och källbegränsningar</h2><p>Referenserna avser avgränsade sakuppgifter. Diagram, kontrakt och testfall är simulatorns egna designval. Basgranskning: 1 oktober 2026; komplettering för HKM-revisionen: 4 oktober 2026. Varje post anger sitt kontrolldatum.</p><section class="reference" id="ref-S01"><h3>[S01] Systemingenjör — annons 4464336388</h3><span class="ref-kind">Arbetsgivarens rollbeskrivning · COMPANY_REPORTED_CLAIM</span><p>Superintelligence Computing Systems. Utan säkert publiceringsdatum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4464336388">https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4464336388</a></p><p>Offentligt sökindexerad annons kontrollerad. Används som kravunderlag; inte som bevis för intern teknikstack. Direktsidan kunde inte återläsas konsekvent.</p></section><section class="reference" id="ref-S02"><h3>[S02] Systemingenjör — alternativ annonsversion 4465300388</h3><span class="ref-kind">Arbetsgivarens rollbeskrivning · COMPANY_REPORTED_CLAIM</span><p>Superintelligence Computing Systems. Utan säkert publiceringsdatum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4465300388">https://se.linkedin.com/jobs/view/systemingenj%C3%B6r-at-superintelligence-computing-systems-4465300388</a></p><p>Offentligt sökindexerad annons med delvis annan formulering av erfarenhetskrav. Versionerna ska inte behandlas som ett enda exakt avtal.</p></section><section class="reference" id="ref-S03"><h3>[S03] Foundation AGI model for Industrial Robots — HYPER: reporting</h3><span class="ref-kind">Självrapporterat projektarbete · COMPANY_REPORTED_CLAIM</span><p>SICS AI, deltagarrapport hos Europeiska kommissionen/CORDIS. Uppdaterad 1 juni 2026. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://cordis.europa.eu/project/id/101218436/reporting">https://cordis.europa.eu/project/id/101218436/reporting</a></p><p>Project ID 101218436, coordinator reporting period 2025-07-01 to 2026-03-31. Structured world model and control of joint angles, trajectories, speed, acceleration and grip force are SICS/coordinator-reported claims hosted by CORDIS, not EC validation of performance. No proprietary model or AGI implementation is inferred. Project DOI: 10.3030/101218436.</p></section><section class="reference" id="ref-S04"><h3>[S04] Simulation In The Loop: Real-Time Robot Action Success Verification with a Digital Twin</h3><span class="ref-kind">Examensarbete — bibliografisk uppgift · VERIFIED_PUBLIC_FACT</span><p>Axel Kaliff, KTH. 2025. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A1988006">https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A1988006</a></p><p>Title/author/academic relationship is corroborated by examiner Florian Pokorny&#x27;s public research listing (the previous KTH homepage redirects there). DiVA full text was not retrieved during the enhancement review; no detailed thesis method, algorithm or experimental result is reproduced.</p><p class="ref-url">Kompletterande primärkälla: <a href="https://florianpokorny.com/">https://florianpokorny.com/</a></p></section><section class="reference" id="ref-S05"><h3>[S05] Project Autograsper: Custom Grasper Development Guide</h3><span class="ref-kind">Öppen primärdokumentation · VERIFIED_PUBLIC_FACT</span><p>CloudGripper-projektet. Löpande repositorydokumentation. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://github.com/cloudgripper/autograsper/blob/main/README.md">https://github.com/cloudgripper/autograsper/blob/main/README.md</a></p><p>Primary research-software README separates STARTUP, ACTIVE and RESETTING and perform_task, reset_task and recover_after_fail. The earlier review pinned Git blob 3cb1da256bc5147ef52a56327da476f110c4e6c2; the 2026-10-04 review re-read the current README but does not relabel that historical blob as a new commit. Conceptual inspiration only; no remote robot execution or proprietary SICS code.</p></section><section class="reference" id="ref-S06"><h3>[S06] R900: Understanding the Cost-Effectiveness of Random Exploration from 900 Hours of Robotic Data Collection</h3><span class="ref-kind">Forskningspreprint · VERIFIED_PUBLIC_FACT</span><p>Shutong Jin, Axel Kaliff, Ruiyu Wang, Muhammad Zahid och Florian T. Pokorny. arXiv v2, 17 september 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://arxiv.org/abs/2503.23571">https://arxiv.org/abs/2503.23571</a></p><p>DOI: 10.48550/arXiv.2503.23571. Används för datainsamling, episodhantering och återställning som designinspiration. Projektet reproducerar inte experimenten eller resultaten.</p></section><section class="reference" id="ref-S07"><h3>[S07] Nowaste Logistics Advances Automation with Cognibotics Robot Picking Cell</h3><span class="ref-kind">Manufacturer-reported second-cell order and first-cell production context · COMPANY_REPORTED_CLAIM</span><p>Cognibotics. 5 januari 2026. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/articles/nowaste-logistics-advances-automation-with-cognibotics-robot-picking-cell">https://www.cognibotics.com/en/articles/nowaste-logistics-advances-automation-with-cognibotics-robot-picking-cell</a></p><p>The 5 January 2026 release reports an ORDER for a second cell following the first pilot; it does not establish that the second cell was already installed. AutoStore, SICS AI vision and Juliet &amp; Romeo roles are manufacturer descriptions, not an independently audited installation or proprietary interface specification.</p></section><section class="reference" id="ref-S08"><h3>[S08] HKM1800 — robot for intralogistics and warehouse automation</h3><span class="ref-kind">Tillverkardokumentation · COMPANY_REPORTED_CLAIM</span><p>Cognibotics. Utan datum. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/products/hkm">https://www.cognibotics.com/en/products/hkm</a></p><p>Manufacturer-published reference envelope: 1.8 m radial reach over 360 degrees, approximately 10 square meters, close to 1 m Z stroke, tool rotation/change, 2 kg nominal and 7.5 kg maximum payload. These are attributed claims, not independent performance validation or simulator acceptance targets. No linked STEP/CAD model is downloaded or reused; synthetic envelope, six tools and geometry are independent design.</p></section><section class="reference" id="ref-S10"><h3>[S10] SICS AI: HPC Access to LUMI Supercomputer for AI and Robotics</h3><span class="ref-kind">Teknisk samarbetsbeskrivning · COMPANY_REPORTED_CLAIM</span><p>ENCCS. 12 september 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://enccs.se/2025/09/news/sics-hpc-access-lumi-supercomputer-ai-robotics-3/">https://enccs.se/2025/09/news/sics-hpc-access-lumi-supercomputer-ai-robotics-3/</a></p><p>Dokumenterar arbete med beräkningsmiljö och GPU-träning. Fastställer inte kundernas aktuella inferensarkitektur.</p></section><section class="reference" id="ref-S11"><h3>[S11] SICS AI investerar i NVIDIA DGX B200 från Aixia</h3><span class="ref-kind">Leverantörens pressmeddelande · COMPANY_REPORTED_CLAIM</span><p>Aixia Group AB. 17 juni 2025. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://news.cision.com/se/aixia-group-ab--publ-/r/sics-ai-investerar-i-nvidia-dgx-b200-fran-aixia---accelererar-utvecklingen-av-ai-hjarna-for-nasta-ge%2Cc4165473">https://news.cision.com/se/aixia-group-ab--publ-/r/sics-ai-investerar-i-nvidia-dgx-b200-fran-aixia---accelererar-utvecklingen-av-ai-hjarna-for-nasta-ge%2Cc4165473</a></p><p>Bekräftar offentliggjord DGX B200-affär med drifttjänster. Inte ett test av modeller eller belägg för var dagens maskin är placerad.</p></section><section class="reference" id="ref-S12"><h3>[S12] MCP Server</h3><span class="ref-kind">Officiell verktygsdokumentation · VERIFIED_PUBLIC_FACT</span><p>Blender Lab / Blender Foundation. Löpande dokumentation. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://www.blender.org/lab/mcp-server/">https://www.blender.org/lab/mcp-server/</a></p><p>Official authoring-tool documentation warns that the integration can execute model-generated code and documents Blender 5.1+ support. Enhancement refresh used the official search-indexed page; direct retrieval failed. The mandatory runtime does not use MCP or require this authoring integration; its security/compatibility is not attested here.</p></section><section class="reference" id="ref-S13"><h3>[S13] Blender Python API: Python Threads are Not Supported</h3><span class="ref-kind">Officiell API-dokumentation · VERIFIED_PUBLIC_FACT</span><p>Blender Foundation. Dokumentationsversion 5.0. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://docs.blender.org/api/5.0/info_gotchas_threading.html">https://docs.blender.org/api/5.0/info_gotchas_threading.html</a></p><p>Används för tråd- och processgränsen i den föreslagna runtime-designen. Vald körversion ska låsas och testas separat.</p></section><section class="reference" id="ref-S14"><h3>[S14] Blender Python API: Application Timers (bpy.app.timers)</h3><span class="ref-kind">Officiell API-dokumentation · VERIFIED_PUBLIC_FACT</span><p>Blender Foundation. Dokumentationsversion 3.6. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://docs.blender.org/api/3.6/bpy.app.timers.html">https://docs.blender.org/api/3.6/bpy.app.timers.html</a></p><p>Beskriver callback-baserad schemaläggning och huvudtrådsexekvering. Dokumentationsreferensen är inte ett krav att köra Blender 3.6.</p></section><section class="reference" id="ref-S15"><h3>[S15] Codex: Model Context Protocol</h3><span class="ref-kind">Officiell produktdokumentation · VERIFIED_PUBLIC_FACT</span><p>OpenAI. Löpande dokumentation. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://developers.openai.com/codex/mcp">https://developers.openai.com/codex/mcp</a></p><p>Beskriver Codex anslutning till MCP-servrar. Motiverar utvecklingsverktyg, inte användning som säkerhetsklassad robotcontroller.</p></section><section class="reference" id="ref-S16"><h3>[S16] Structured outputs</h3><span class="ref-kind">Officiell API-dokumentation · VERIFIED_PUBLIC_FACT</span><p>OpenAI. Löpande API-dokumentation. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://developers.openai.com/api/docs/guides/structured-outputs">https://developers.openai.com/api/docs/guides/structured-outputs</a></p><p>Schemaformat, avvisade svar och begränsningar. Ett giltigt schema är inte bevis för ett korrekt eller säkert handlingsförslag.</p></section><section class="reference" id="ref-S17"><h3>[S17] Making retries safe with idempotent APIs</h3><span class="ref-kind">Primär teknisk designbeskrivning · GENERAL_PRACTICE</span><p>Amazon Web Services, Builders&#x27; Library. Utan datum. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/">https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/</a></p><p>Stabila begärandeidentiteter och idempotent semantik. Projektets slutsatser om fysiska effekter är egen designanalys, inte en utlovad AWS-garanti för robotar.</p></section><section class="reference" id="ref-S18"><h3>[S18] OPC Unified Architecture</h3><span class="ref-kind">Protokollägarens dokumentation · VERIFIED_PUBLIC_FACT</span><p>OPC Foundation. Löpande dokumentation. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://opcfoundation.org/about/opc-technologies/opc-ua/">https://opcfoundation.org/about/opc-technologies/opc-ua/</a></p><p>Informationsmodell och kommunikationstjänster. En lokal signalmodell eller REST-route innebär inte implementerat OPC UA-stöd.</p></section><section class="reference" id="ref-S19"><h3>[S19] Creating a GitHub Pages site; configuring a publishing source</h3><span class="ref-kind">Officiell publiceringsdokumentation · VERIFIED_PUBLIC_FACT</span><p>GitHub Docs. Löpande dokumentation. Kontrollerad 2026-10-01.</p><p class="ref-url"><a href="https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site">https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site</a></p><p>Pages används för statiska rapporter och nedladdningar, inte för Python eller Blender-runtime.</p><p class="ref-url">Kompletterande primärkälla: <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site</a></p></section><section class="reference" id="ref-S21"><h3>[S21] Blender 5.2.1 release checksums</h3><span class="ref-kind">Official release provenance · VERIFIED_PUBLIC_FACT</span><p>Blender Foundation. Checked 2 October 2026. Kontrollerad 2026-10-02.</p><p class="ref-url"><a href="https://download.blender.org/release/Blender5.2/blender-5.2.1.sha256">https://download.blender.org/release/Blender5.2/blender-5.2.1.sha256</a></p><p>Linux x64 SHA-256 a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9. Version selection is SIMULATOR_DESIGN; release metadata is not physical robot validation.</p></section><section class="reference" id="ref-S22"><h3>[S22] OrbitControls and Three.js r180 license</h3><span class="ref-kind">Official technical documentation · VERIFIED_PUBLIC_FACT</span><p>Three.js authors. Checked 3 October 2026. Kontrollerad 2026-10-03.</p><p class="ref-url"><a href="https://threejs.org/docs/pages/OrbitControls.html">https://threejs.org/docs/pages/OrbitControls.html</a></p><p>Camera orbit, zoom and pan controls. Version 0.180.0 and the local software fallback are SIMULATOR_DESIGN, not evidence of robot dynamics. MIT notice retained with vendored files.</p><p class="ref-url">Kompletterande primärkälla: <a href="https://raw.githubusercontent.com/mrdoob/three.js/r180/LICENSE">https://raw.githubusercontent.com/mrdoob/three.js/r180/LICENSE</a></p></section><section class="reference" id="ref-S23"><h3>[S23] Hybrid Kinematic Machine (HKM)</h3><span class="ref-kind">Manufacturer mechanism overview · COMPANY_REPORTED_CLAIM</span><p>Cognibotics. Undated. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/articles/hybrid-kinematic-machine">https://www.cognibotics.com/en/articles/hybrid-kinematic-machine</a></p><p>Describes base-located drives and combined serial/parallel rod members. Used only for general visual inspiration. RobotOps uses original TCP-driven illustrative links, not reverse-engineered lengths, joint equations or controller parameters.</p></section><section class="reference" id="ref-S24"><h3>[S24] The fastest robot meets the fastest tool changer in new partnership</h3><span class="ref-kind">Manufacturer tool-change capability announcement · COMPANY_REPORTED_CLAIM</span><p>Cognibotics / Smartshift Robotics. Undated. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://www.cognibotics.com/en/articles/the-fastest-robot-meets-the-fastest-tool-changer-in-new-partnership">https://www.cognibotics.com/en/articles/the-fastest-robot-meets-the-fastest-tool-changer-in-new-partnership</a></p><p>Supports tool changing as a use-case concept for varied items. The six RobotOps end-effectors, rack state machine, constraints and timings are independent SIMULATOR_DESIGN, not a claim that the supplier offers this exact tool set.</p></section><section class="reference" id="ref-S25"><h3>[S25] Revolutionerande AI-teknik testas hos Nowaste Logistics</h3><span class="ref-kind">Customer/company press release · COMPANY_REPORTED_CLAIM</span><p>Nowaste Logistics. 2024-01-26. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://press.nowaste.se/posts/pressreleases/revolutionerande-ai-teknik-testas-hos-nowaste">https://press.nowaste.se/posts/pressreleases/revolutionerande-ai-teknik-testas-hos-nowaste</a></p><p>Reports an HKM1800/SICS software production-environment pilot in Tostarp. Supports warehouse-picking use-case context only; no proprietary layout, throughput result, autonomy/AGI claim or internal architecture is imported into our design.</p></section><section class="reference" id="ref-S26"><h3>[S26] Research homepage: Axel Kaliff thesis and CloudGripper-AutoGrasper publications</h3><span class="ref-kind">Academic bibliographic provenance · VERIFIED_PUBLIC_FACT</span><p>Florian T. Pokorny, KTH professor. Ongoing academic listing. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://florianpokorny.com/">https://florianpokorny.com/</a></p><p>Lists Axel Kaliff and the simulation-in-the-loop thesis title, and first authorship of the CloudGripper-AutoGrasper IROS workshop work. This supports bibliographic provenance only. The thesis full text remains unreviewed; RobotOps does not reproduce its algorithm.</p></section><section class="reference" id="ref-S27"><h3>[S27] Blender Python API: Quickstart and Object transforms</h3><span class="ref-kind">Official platform API documentation · VERIFIED_PUBLIC_FACT</span><p>Blender Foundation. Current/main API documentation. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://docs.blender.org/api/main/info_quickstart.html">https://docs.blender.org/api/main/info_quickstart.html</a></p><p>Scripted objects, animation and scene data justify a fixed deterministic programmatic runtime. Primary quickstart was verified through the official search index; direct fetch failed. API capability is not robot-dynamics validation. Local runtime remains pinned/tested separately.</p><p class="ref-url">Kompletterande primärkälla: <a href="https://docs.blender.org/api/current/bpy.types.Object.html">https://docs.blender.org/api/current/bpy.types.Object.html</a></p></section><section class="reference" id="ref-S28"><h3>[S28] PyBullet Quickstart Guide</h3><span class="ref-kind">Primary physics/robotics library documentation · VERIFIED_PUBLIC_FACT</span><p>Bullet Physics maintainers. Current repository documentation. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://github.com/bulletphysics/bullet3/blob/master/docs/pybullet_quickstart_guide/PyBulletQuickstartGuide.md.html">https://github.com/bulletphysics/bullet3/blob/master/docs/pybullet_quickstart_guide/PyBulletQuickstartGuide.md.html</a></p><p>Documents articulated-body simulation, inverse kinematics and collision facilities. Scope comparison only: richer physics/IK might motivate another adapter later. PyBullet is not a RobotOps dependency and these capabilities do not validate the current Blender abstraction.</p></section><section class="reference" id="ref-S29"><h3>[S29] Isaac Sim Motion Generation (Experimental)</h3><span class="ref-kind">Official robotics simulation documentation · VERIFIED_PUBLIC_FACT</span><p>NVIDIA. Current documentation, reviewed 2026-10-04. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://docs.isaacsim.omniverse.nvidia.com/latest/motion_generation/index.html">https://docs.isaacsim.omniverse.nvidia.com/latest/motion_generation/index.html</a></p><p>The current API documents robotics motion-generation facilities and marks this interface experimental. Used to distinguish model-based robotics planning from RobotOps conservative synthetic preflight, not to imply an installed dependency or real-world safety guarantee.</p></section><section class="reference" id="ref-S30"><h3>[S30] Isaac Sim Sensors</h3><span class="ref-kind">Official sensor-simulation documentation · VERIFIED_PUBLIC_FACT</span><p>NVIDIA. Documentation version 6.0.0. Kontrollerad 2026-10-04.</p><p class="ref-url"><a href="https://docs.isaacsim.omniverse.nvidia.com/6.0.0/sensors/index.html">https://docs.isaacsim.omniverse.nvidia.com/6.0.0/sensors/index.html</a></p><p>Robotics-oriented sensor simulation is a scope comparison. RobotOps observations come from an explicitly synthetic deterministic ObservationModel; rendering cameras does not implement computer vision.</p></section><section class="reference" id="ref-S31"><h3>[S31] Blender 5.2 command-line arguments: CPU scheduling and threads</h3><span class="ref-kind">Official platform command-line documentation · VERIFIED_PUBLIC_FACT</span><p>Blender Foundation. Blender 5.2 LTS manual. Kontrollerad 2026-10-05.</p><p class="ref-url"><a href="https://docs.blender.org/manual/sv/5.2/advanced/command_line/arguments.html">https://docs.blender.org/manual/sv/5.2/advanced/command_line/arguments.html</a></p><p>Documents --qos for Windows hybrid CPUs and the rendering/operation thread option. The pinned Blender 5.2.1 executable&#x27;s --help independently confirms these options. Selecting high QoS for the bounded child process is SIMULATOR_DESIGN, supported by local browser tests; it is not a real-time deadline or robot-performance guarantee.</p></section></section></main></div><footer class="site-footer">Rami Halabi · Version 1.5 · 5 oktober 2026.<br>Oberoende, AI-assisterad simulator och forskningsunderlag. Inte SICS AI:s dokumentation eller validerad fysisk robotprestanda. <a href="https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator">Källfiler på GitHub</a> · <a href="downloads/robotops-twin-samlat.pdf">Samtliga rapporter som PDF</a></footer></body></html>

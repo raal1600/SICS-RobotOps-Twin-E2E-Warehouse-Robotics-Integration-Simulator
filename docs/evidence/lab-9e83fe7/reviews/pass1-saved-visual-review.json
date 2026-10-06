@@ -1,0 +1,736 @@
+{
+  "reviewed_at_utc": "2026-10-06T03:14:41.297292+00:00",
+  "reviewer": "/root/final_audit",
+  "scope": "Independent bounded saved-image review; eight PNGs, four case metadata sets and one small motion JSON only.",
+  "source": {
+    "commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "dirty": false,
+    "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+  },
+  "campaign": "docs/evidence/acceptance/20261006T024719",
+  "acceptance_pass": 1,
+  "source_attribution_limit": "Exact frozen source is reported by current watcher discovery and saved source maps. Source-map file bytes are hashed here, but whole-tree fingerprint and35 source hashes are not independently recomputed in this visual task. Mutable watcher records only locate saved artifacts and retain observed formal status; they are not final input bindings.",
+  "verdict": "NO_ACTIONABLE_VISUAL_FINDING_IN_EIGHT_REVIEWED_SCREENSHOTS",
+  "formal_test_pass_claimed": false,
+  "whole_acceptance_pass_claimed": false,
+  "manual_walkthrough_claimed": false,
+  "counts": {
+    "cases": 4,
+    "actually_viewed_pngs": 8,
+    "hashed_saved_inputs": 25
+  },
+  "cases": [
+    {
+      "case": "happy",
+      "artifact_directory": "artifacts/lab-browser/20261006T030829531907/happy",
+      "discovery_only": {
+        "path": "artifacts/final-evidence-pack/9e83fe7/pass-1/happy.json",
+        "captured_at_utc": "2026-10-06T03:10:16.142319+00:00",
+        "capture_complete": true,
+        "formal_test_status_at_discovery": "PENDING_JUNIT",
+        "mutable": true,
+        "bound_as_final_input": false
+      },
+      "runtime": "blender",
+      "fixture_directory": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-to2atak6\\fixtures\\test_full_lab_browser_authoriz0\\process-stack",
+      "recorded_stack_truth": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+      "session_metadata": {
+        "session_id": "cf8834c5-a5c4-59ef-a4be-35d308dd1575",
+        "correlation_id": "1cbcb675-cc2b-5e34-bc9f-97757618dff6",
+        "order_id": "order-061d9e1d-61af-44f5-812b-3507b7388e51",
+        "job_id": "70090125-8cc2-58ab-9dd7-5a22128ee923",
+        "command_id": "c8806eb8-d12a-59a1-bfb1-7acef07216ec",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "fault": null,
+        "updated_at": "2026-10-06T03:09:17.021392Z"
+      },
+      "saved_browser_metadata": {
+        "errors": [],
+        "console_errors": [],
+        "request_count": 494,
+        "request_bodies_audited": false,
+        "limits": "Recorded listener errors only; no claim about unseen traffic or request headers."
+      },
+      "source_hash_entries": 35,
+      "source_hashes_recomputed": false,
+      "metadata_refs": [
+        "artifacts/lab-browser/20261006T030829531907/happy/session.json",
+        "artifacts/lab-browser/20261006T030829531907/happy/browser.json",
+        "artifacts/lab-browser/20261006T030829531907/happy/source-hashes.json",
+        "artifacts/lab-browser/20261006T030829531907/happy/stack.json"
+      ],
+      "images_viewed": [
+        {
+          "path": "artifacts/lab-browser/20261006T030829531907/happy/physical-gate.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "WAITING_AUTHORIZATION",
+          "revision": 28,
+          "current_phase": "OPC UA / PLC",
+          "selected_step": "14. PLC operational preconditions",
+          "reviewed_regions": [
+            "workspace/profile header",
+            "test and session selectors",
+            "phase map",
+            "physical authorization card",
+            "visible trace rows and What inspector",
+            "scenario selector/brief",
+            "static scene and playback controls",
+            "simulation footer"
+          ],
+          "observed": [
+            "Explicit READY FOR PHYSICAL EXECUTION card with AUTHORIZE ROBOT EXECUTION.",
+            "Card says this permits original command to change synthetic world; lost response must use original journal, never a fresh pick; not a safety function.",
+            "Step14 shows OPC UA / REAL PROTOCOL and the original command ID.",
+            "Static scene view; physical execution not authorized; playback disabled and saved motion hidden wording. Playback buttons appear dimmed.",
+            "Scenario selector shows Happy path and the normal-pick brief; product SKU-A at source."
+          ],
+          "not_proven": [
+            "PNG appearance does not independently establish DOM disabled properties, no earlier autoplay or effect zero."
+          ]
+        },
+        {
+          "path": "artifacts/lab-browser/20261006T030829531907/happy/blender-motion.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "WAITING_AUTHORIZATION",
+          "revision": 32,
+          "current_phase": "Robot",
+          "selected_step": "16. Physical execution",
+          "reviewed_regions": [
+            "workspace/profile header",
+            "test/session state",
+            "Controller result pending card",
+            "physical execution What inspector",
+            "simulated/read-only live evidence",
+            "saved caption and full scene",
+            "motion readout and controls"
+          ],
+          "observed": [
+            "Controller result is the pending stage; step16 shows SUCCEEDED / SIMULATED ROBOT for the original command.",
+            "Live panel says SIMULATED ROBOT / READ-ONLY REPLAY and includes original command OPC UA READY/EXECUTING/HOME notifications.",
+            "Saved caption Execution: Happy path (no injected scenario); Recorded 3D scenario.",
+            "Machine and product follow evaluated Blender poses; visible PRE_GRASP / Blender frame 6/133 / 0.2s simulated.",
+            "Recorded simulator poses are separate from the business outcome displayed above."
+          ],
+          "not_proven": [
+            "A still screenshot is not continuous-motion proof. The separately read saved motion JSON records changed evaluated/rendered coordinates. Screenshot and JSON samples need not represent one instant."
+          ]
+        },
+        {
+          "path": "artifacts/lab-browser/20261006T030829531907/happy/completed.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "COMPLETED",
+          "revision": 44,
+          "current_phase": "Business",
+          "saved_caption": "Execution: Happy path (no injected scenario)",
+          "future_selector": "Brain timeout",
+          "reviewed_regions": [
+            "workspace/profile/test selectors",
+            "completed console and What inspector",
+            "completion banner",
+            "live evidence",
+            "future selector/brief",
+            "saved caption/scene/motion readout",
+            "simulation/footer and collapsed technical details"
+          ],
+          "observed": [
+            "Pending authorization card is absent.",
+            "Session selector, console and job show COMPLETED; Business is current phase.",
+            "Neutral text: Execution session completed. Review the recorded controller result, verification and business reconciliation.",
+            "SIMULATED ROBOT / READ-ONLY REPLAY and live OPC UA original-command evidence are visible.",
+            "Future selector shows Brain timeout and its planner-deadline brief while the saved job caption remains its original scenario.",
+            "Future product SKU-B at source is distinct from completed SKU-A job.",
+            "Blender recording retains Recorded 3D scenario and evaluated-pose labeling. The saved replay is at PRE_GRASP frame6/133 while business status is completed; the text expressly separates recorded pose from business outcome."
+          ]
+        }
+      ]
+    },
+    {
+      "case": "drop_ack_after_effect",
+      "artifact_directory": "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT",
+      "discovery_only": {
+        "path": "artifacts/final-evidence-pack/9e83fe7/pass-1/drop_ack_after_effect.json",
+        "captured_at_utc": "2026-10-06T03:10:16.232611+00:00",
+        "capture_complete": true,
+        "formal_test_status_at_discovery": "PENDING_JUNIT",
+        "mutable": true,
+        "bound_as_final_input": false
+      },
+      "runtime": "synthetic",
+      "fixture_directory": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-to2atak6\\fixtures\\test_full_lab_browser_authoriz1\\process-stack",
+      "recorded_stack_truth": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+      "session_metadata": {
+        "session_id": "1588a929-2e52-544b-b5e7-b63a70f62298",
+        "correlation_id": "8e215052-a230-5788-816f-98dce27f3aff",
+        "order_id": "order-1bdf9409-f5a2-45cc-8028-670e0881b4ae",
+        "job_id": "6f89c6b3-2e51-524d-9e7a-acaa24341714",
+        "command_id": "8963d437-b345-5af5-8db7-d2477d76a0b9",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "fault": "DROP_ACK_AFTER_EFFECT",
+        "updated_at": "2026-10-06T03:09:59.396561Z"
+      },
+      "saved_browser_metadata": {
+        "errors": [],
+        "console_errors": [],
+        "request_count": 380,
+        "request_bodies_audited": false,
+        "limits": "Recorded listener errors only; no claim about unseen traffic or request headers."
+      },
+      "source_hash_entries": 35,
+      "source_hashes_recomputed": false,
+      "metadata_refs": [
+        "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/session.json",
+        "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/browser.json",
+        "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/source-hashes.json",
+        "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/stack.json"
+      ],
+      "images_viewed": [
+        {
+          "path": "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/unknown-outcome.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "UNKNOWN_OUTCOME",
+          "revision": 38,
+          "current_phase": "Business",
+          "selected_step": "19. Verification",
+          "saved_caption": "Execution: Lose acknowledgement after effect",
+          "future_selector": "Happy path",
+          "reviewed_regions": [
+            "workspace/profile/test/session labels",
+            "phase map and uncertainty card",
+            "verification What inspector",
+            "uncertainty banner",
+            "blocked next-pick controls",
+            "live original-command evidence",
+            "saved caption/scene/event-replay labels"
+          ],
+          "observed": [
+            "Test/session/console/job state labels agree on UNKNOWN_OUTCOME.",
+            "Outcome unproven / reconciliation required says reconcile original command journal plus fresh observation, does not issue new pick, business remains blocked pending verification and WMS.",
+            "Awaiting reconciliation appears disabled; Reconcile original command is explicit.",
+            "Uncertain SKU-A banner and Next pick paused - reconcile first block are visible.",
+            "Saved lost-ack caption stays distinct from future Happy path selector and normal-pick brief.",
+            "SIMULATED ROBOT / READ-ONLY REPLAY with original command OPC UA evidence.",
+            "Scenario events - stationary scene, no motion recording, headless runtime has no Blender recording, and stationary view is not proof of no effect are explicit."
+          ],
+          "not_proven": [
+            "Only the intermediate UNKNOWN revision38 screenshot was viewed for this case. Later saved session.json is COMPLETED revision46; this review did not witness live reconciliation or inspect that completed PNG."
+          ]
+        }
+      ]
+    },
+    {
+      "case": "duplicate_delivery",
+      "artifact_directory": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY",
+      "discovery_only": {
+        "path": "artifacts/final-evidence-pack/9e83fe7/pass-1/duplicate_delivery.json",
+        "captured_at_utc": "2026-10-06T03:11:16.333898+00:00",
+        "capture_complete": true,
+        "formal_test_status_at_discovery": "PENDING_JUNIT",
+        "mutable": true,
+        "bound_as_final_input": false
+      },
+      "runtime": "synthetic",
+      "fixture_directory": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-to2atak6\\fixtures\\test_full_lab_browser_authoriz2\\process-stack",
+      "recorded_stack_truth": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+      "session_metadata": {
+        "session_id": "a12d5c5c-3745-5290-8511-be0444df071a",
+        "correlation_id": "2f207603-9bca-57a2-80ca-9e13051b6873",
+        "order_id": "order-3e311fe0-418f-4e44-8573-286a3dae0b2d",
+        "job_id": "d3092a0b-a13b-5be2-9784-af244b26cba6",
+        "command_id": "678aadd3-5d02-53c5-bf1e-548080d5ec38",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "fault": "DUPLICATE_DELIVERY",
+        "updated_at": "2026-10-06T03:10:36.833246Z"
+      },
+      "saved_browser_metadata": {
+        "errors": [],
+        "console_errors": [],
+        "request_count": 351,
+        "request_bodies_audited": false,
+        "limits": "Recorded listener errors only; no claim about unseen traffic or request headers."
+      },
+      "source_hash_entries": 35,
+      "source_hashes_recomputed": false,
+      "metadata_refs": [
+        "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/session.json",
+        "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/browser.json",
+        "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/source-hashes.json",
+        "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/stack.json"
+      ],
+      "images_viewed": [
+        {
+          "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/physical-gate.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "WAITING_AUTHORIZATION",
+          "revision": 28,
+          "current_phase": "OPC UA / PLC",
+          "selected_step": "14. PLC operational preconditions",
+          "reviewed_regions": [
+            "workspace/profile header",
+            "test and session selectors",
+            "phase map",
+            "physical authorization card",
+            "visible trace rows and What inspector",
+            "scenario selector/brief",
+            "static scene and playback controls",
+            "simulation footer"
+          ],
+          "observed": [
+            "Explicit READY FOR PHYSICAL EXECUTION card with AUTHORIZE ROBOT EXECUTION.",
+            "Card says this permits original command to change synthetic world; lost response must use original journal, never a fresh pick; not a safety function.",
+            "Step14 shows OPC UA / REAL PROTOCOL and the original command ID.",
+            "Static scene view; physical execution not authorized; playback disabled and saved motion hidden wording. Playback buttons appear dimmed.",
+            "Scenario selector shows Happy path and the normal-pick brief; product SKU-A at source."
+          ],
+          "not_proven": [
+            "PNG appearance does not independently establish DOM disabled properties, no earlier autoplay or effect zero."
+          ]
+        },
+        {
+          "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/completed.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "COMPLETED",
+          "revision": 44,
+          "current_phase": "Business",
+          "saved_caption": "Execution: Duplicate command delivery",
+          "future_selector": "Brain timeout",
+          "reviewed_regions": [
+            "workspace/profile/test/session labels",
+            "completed console",
+            "completion banner",
+            "live original-command evidence",
+            "future selector/brief",
+            "saved caption/scene/event controls"
+          ],
+          "observed": [
+            "Pending authorization card is absent.",
+            "Session selector, console and job show COMPLETED; Business is current phase.",
+            "Neutral text: Execution session completed. Review the recorded controller result, verification and business reconciliation.",
+            "SIMULATED ROBOT / READ-ONLY REPLAY and live OPC UA original-command evidence are visible.",
+            "Future selector shows Brain timeout and its planner-deadline brief while the saved job caption remains its original scenario.",
+            "Future product SKU-B at source is distinct from completed SKU-A job.",
+            "Saved caption correctly names Duplicate command delivery.",
+            "Scenario events - stationary scene and no Blender recording are explicit; stationary view is not proof of no effect."
+          ],
+          "not_proven": [
+            "Neither viewed gate nor completed PNG shows the duplicate-delivery-specific brief: the future selector is Happy path at gate and Brain timeout at completion. Its supported brief is not visually attested here."
+          ]
+        }
+      ]
+    },
+    {
+      "case": "wms_unavailable",
+      "artifact_directory": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE",
+      "discovery_only": {
+        "path": "artifacts/final-evidence-pack/9e83fe7/pass-1/wms_unavailable.json",
+        "captured_at_utc": "2026-10-06T03:12:16.458444+00:00",
+        "capture_complete": true,
+        "formal_test_status_at_discovery": "PENDING_JUNIT",
+        "mutable": true,
+        "bound_as_final_input": false
+      },
+      "runtime": "synthetic",
+      "fixture_directory": "C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-to2atak6\\fixtures\\test_full_lab_browser_authoriz3\\process-stack",
+      "recorded_stack_truth": "real PostgreSQL/AMQP/OPC UA/REST; simulated WMS/PLC/robot/sensors",
+      "session_metadata": {
+        "session_id": "6c827f1f-9fbe-599b-8d44-c4e142ff6c8f",
+        "correlation_id": "e0414fe9-d59b-50dc-93fb-294ccf36cfc7",
+        "order_id": "order-31ac4f5e-602c-42f3-991c-2d5ab7e532f4",
+        "job_id": "c08def21-421e-5fcd-8591-6c73498199ad",
+        "command_id": "4548efe1-467c-5e5c-a644-79fb4faed2cb",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "fault": "WMS_UNAVAILABLE",
+        "updated_at": "2026-10-06T03:11:15.804201Z"
+      },
+      "saved_browser_metadata": {
+        "errors": [],
+        "console_errors": [],
+        "request_count": 376,
+        "request_bodies_audited": false,
+        "limits": "Recorded listener errors only; no claim about unseen traffic or request headers."
+      },
+      "source_hash_entries": 35,
+      "source_hashes_recomputed": false,
+      "metadata_refs": [
+        "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/session.json",
+        "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/browser.json",
+        "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/source-hashes.json",
+        "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/stack.json"
+      ],
+      "images_viewed": [
+        {
+          "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/physical-gate.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "WAITING_AUTHORIZATION",
+          "revision": 28,
+          "current_phase": "OPC UA / PLC",
+          "selected_step": "14. PLC operational preconditions",
+          "reviewed_regions": [
+            "workspace/profile header",
+            "test and session selectors",
+            "phase map",
+            "physical authorization card",
+            "visible trace rows and What inspector",
+            "scenario selector/brief",
+            "static scene and playback controls",
+            "simulation footer"
+          ],
+          "observed": [
+            "Explicit READY FOR PHYSICAL EXECUTION card with AUTHORIZE ROBOT EXECUTION.",
+            "Card says this permits original command to change synthetic world; lost response must use original journal, never a fresh pick; not a safety function.",
+            "Step14 shows OPC UA / REAL PROTOCOL and the original command ID.",
+            "Static scene view; physical execution not authorized; playback disabled and saved motion hidden wording. Playback buttons appear dimmed.",
+            "Scenario selector shows Happy path and the normal-pick brief; product SKU-A at source."
+          ],
+          "not_proven": [
+            "PNG appearance does not independently establish DOM disabled properties, no earlier autoplay or effect zero."
+          ]
+        },
+        {
+          "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/completed.png",
+          "visual_inspection": "performed",
+          "detail": "original",
+          "state": "COMPLETED",
+          "revision": 46,
+          "current_phase": "Business",
+          "saved_caption": "Execution: WMS unavailable after verified pick",
+          "future_selector": "Brain timeout",
+          "reviewed_regions": [
+            "workspace/profile/test/session labels",
+            "completed console",
+            "completion banner",
+            "live original-command evidence",
+            "future selector/brief",
+            "saved caption/scene/event controls"
+          ],
+          "observed": [
+            "Pending authorization card is absent.",
+            "Session selector, console and job show COMPLETED; Business is current phase.",
+            "Neutral text: Execution session completed. Review the recorded controller result, verification and business reconciliation.",
+            "SIMULATED ROBOT / READ-ONLY REPLAY and live OPC UA original-command evidence are visible.",
+            "Future selector shows Brain timeout and its planner-deadline brief while the saved job caption remains its original scenario.",
+            "Future product SKU-B at source is distinct from completed SKU-A job.",
+            "Saved caption correctly names WMS unavailable after verified pick.",
+            "Scenario events - stationary scene and no Blender recording are explicit; stationary view is not proof of no effect."
+          ],
+          "not_proven": [
+            "Neither viewed gate nor completed PNG shows the WMS-unavailable-specific brief or intermediate retry state: the future selector is Happy path at gate and Brain timeout at completion. Those states are not visually attested here."
+          ]
+        }
+      ]
+    }
+  ],
+  "motion": {
+    "path": "artifacts/lab-browser/20261006T030829531907/happy/blender-motion.json",
+    "recording": {
+      "source": "BLENDER_EVALUATED_SCENE",
+      "complete": true,
+      "command_id": "c8806eb8-d12a-59a1-bfb1-7acef07216ec",
+      "frames": 133,
+      "total_frames": 133,
+      "motion_steps": 133,
+      "robot_poses": 118,
+      "product_name": "Products/product-SKU-A-01",
+      "product_start": [
+        1.0800000429153442,
+        -0.6800000071525574,
+        0.20249998569488525
+      ],
+      "product_finish": [
+        -0.3799999952316284,
+        0.9399999976158142,
+        0.20249998569488525
+      ],
+      "moving_cursor": 85
+    },
+    "before": {
+      "cursor": 85,
+      "pose": {
+        "position": [
+          0,
+          -0.6000000238418579,
+          1.1579999923706055
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1.000000238418579,
+          1.000000238418579,
+          1
+        ],
+        "visible": true
+      },
+      "rendered": [
+        0,
+        -0.6000000238418579,
+        1.1579999923706055
+      ]
+    },
+    "after": {
+      "cursor": 86.60080000000002,
+      "playing": true,
+      "pose": {
+        "position": [
+          0.03172502338588315,
+          -0.6023499943733216,
+          1.1579999923706055
+        ],
+        "quaternion_xyzw": [
+          0,
+          0,
+          -3.7178392746637646e-10,
+          1
+        ],
+        "scale": [
+          1.0000000475883484,
+          1.0000000475883484,
+          1
+        ],
+        "visible": true
+      },
+      "rendered": [
+        0.01707321762144451,
+        -0.6012646847724914,
+        1.1579999923706055
+      ]
+    },
+    "derived": {
+      "cursor_delta": 1.6008000000000209,
+      "evaluated_position_delta_euclidean": 0.031811939116212024,
+      "rendered_position_delta_euclidean": 0.017119992033253813,
+      "product_start_to_finish_distance": 2.1808255608458658
+    },
+    "interpretation": "Saved current happy-command observations contain133 frames/118 poses and nonzero evaluated and rendered position changes while playing; not newly sampled live by this reviewer."
+  },
+  "overall_observations": [
+    "All viewed pages distinguish Integration lab PostgreSQL/real AMQP/OPC UA from simulated systems.",
+    "All reviewed post-execution live panels label simulated robot/read-only replay and show the corresponding original command ID.",
+    "Explicit authorization wording is visible in all three viewed gate images; static preview and playback-disabled text precede authorization.",
+    "Neutral completed-session review guidance and absent terminal pending card are visible for happy, duplicate and WMS completion.",
+    "Lost UNKNOWN screenshot describes original-command reconciliation and blocks another pick.",
+    "Saved per-job scenario captions remain distinct from future order controls; synthetic fault cases do not falsely claim Blender recording.",
+    "No obvious unintended clipping or overlapping content was observed in the reviewed full-page PNGs."
+  ],
+  "limitations": [
+    "Current formal JUnit was pending in discovery observations; root owns later formal/semantic164-check review.",
+    "No browser, live workflow, tests, runtime, network, DB, PDF, ZIP scan or full DOM decode performed.",
+    "Screenshots are existing automated-browser artifacts, not a fresh manual final-loop demonstration.",
+    "Visible consent/read-only/disabled wording does not prove no POST, unchanged revision, no earlier effect or every transient frame.",
+    "No journal/effect/idempotency proof is independently derived by this visual receipt.",
+    "Scenario-specific duplicate and WMS briefs are not visible in these PNGs; no claim that they were visually reviewed.",
+    "Six inspector tab labels are visible, but all tab contents, closed details and all viewports were not inspected.",
+    "No credential audit or all-public-archive review performed."
+  ],
+  "inputs": [
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/session.json",
+      "sha256": "28b34981a28dcb7225e6fb9193f9d9274fdd7d4985b2477314582d382b1e8719",
+      "bytes": 190627,
+      "mtime_utc": "2026-10-06T03:09:18.851614+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/browser.json",
+      "sha256": "af2a1eaa017c93abb8217b20855bf21c5dbfc8e1ece6d3f577f92994c9aca360",
+      "bytes": 67504,
+      "mtime_utc": "2026-10-06T03:09:19.202030+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/source-hashes.json",
+      "sha256": "fe19fabc78146a622987f6c0b4c86fb0869cb530ffa4767eaac4bd36ff99f535",
+      "bytes": 3607,
+      "mtime_utc": "2026-10-06T03:08:29.535862+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/stack.json",
+      "sha256": "07a770cd088eebf28acc7f062f4f1c0363b7b8da3b13ae870cd36b044c752d08",
+      "bytes": 717,
+      "mtime_utc": "2026-10-06T03:08:31.413887+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/physical-gate.png",
+      "sha256": "e28cb2ca4a86241f560efe9ec2ef2906eb1f0a51faacb0c9808a677a780497c5",
+      "bytes": 372103,
+      "mtime_utc": "2026-10-06T03:08:48.007276+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 2338
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/blender-motion.png",
+      "sha256": "58a7068e0cfa294026a3341f68891d1f13819ae2d94b2d79e2ba8a1bd095b38c",
+      "bytes": 416802,
+      "mtime_utc": "2026-10-06T03:09:06.700221+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 2918
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/completed.png",
+      "sha256": "d96ece604d79132389f42183d6c6a02f3ae9dbb05bdc8a9b551543cc2e3526ac",
+      "bytes": 419442,
+      "mtime_utc": "2026-10-06T03:09:19.000830+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 3022
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/session.json",
+      "sha256": "433520a90f364f7232daa88e46b873bc8a90eb356441519b677f7e95634a8643",
+      "bytes": 216425,
+      "mtime_utc": "2026-10-06T03:10:00.697873+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/browser.json",
+      "sha256": "374cfac0094153a2894f2575b3d88cd533556dbc49ab9fb44ecb0d82a86a39f0",
+      "bytes": 52572,
+      "mtime_utc": "2026-10-06T03:10:01.047333+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/source-hashes.json",
+      "sha256": "fe19fabc78146a622987f6c0b4c86fb0869cb530ffa4767eaac4bd36ff99f535",
+      "bytes": 3607,
+      "mtime_utc": "2026-10-06T03:09:23.995904+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/stack.json",
+      "sha256": "15384d8150dab9242a86e853a0f011aaadf762459147b778d09bc5272170212e",
+      "bytes": 718,
+      "mtime_utc": "2026-10-06T03:09:25.847980+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030923991193/DROP_ACK_AFTER_EFFECT/unknown-outcome.png",
+      "sha256": "23ef5a049328a12085fc87731222154f7974ef1b39c784153aefac2805f3f88b",
+      "bytes": 438302,
+      "mtime_utc": "2026-10-06T03:09:51.166965+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 3054
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/session.json",
+      "sha256": "5738553acbb62e996ecfe042564444bf8e9230b75f5f72ea28167977801c7a1a",
+      "bytes": 192305,
+      "mtime_utc": "2026-10-06T03:10:38.108153+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/browser.json",
+      "sha256": "bd5ae68a508d7fba2fb685efb982002b5d4011207dc8d8bf63d1869e873b87a4",
+      "bytes": 48817,
+      "mtime_utc": "2026-10-06T03:10:38.445626+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/source-hashes.json",
+      "sha256": "fe19fabc78146a622987f6c0b4c86fb0869cb530ffa4767eaac4bd36ff99f535",
+      "bytes": 3607,
+      "mtime_utc": "2026-10-06T03:10:04.923563+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/stack.json",
+      "sha256": "fcf95641a14aea021a8e5b01dc1076971ed613143c897bedbbfc46d7ed770ded",
+      "bytes": 718,
+      "mtime_utc": "2026-10-06T03:10:06.774378+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/physical-gate.png",
+      "sha256": "be4818e8932dd226dd418225b1b5aa21bd5d58f0018f07e49bdcaae75906a2cd",
+      "bytes": 372034,
+      "mtime_utc": "2026-10-06T03:10:22.881853+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 2338
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031004919796/DUPLICATE_DELIVERY/completed.png",
+      "sha256": "f67361a59c7f4addfa398e07fbf0810e9e0ecfebced07eb1c01449e758287d04",
+      "bytes": 412803,
+      "mtime_utc": "2026-10-06T03:10:38.247594+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 2916
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/session.json",
+      "sha256": "52d045580ce19b6c51222f262495b01a7a7c78d79fa7ca213ba7fd0da976539d",
+      "bytes": 193202,
+      "mtime_utc": "2026-10-06T03:11:16.827849+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/browser.json",
+      "sha256": "9c1f453f49800ee22abb4d0d42181515505b7aa4068f50a5d3fab05b8a3b2b1a",
+      "bytes": 52018,
+      "mtime_utc": "2026-10-06T03:11:17.315043+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/source-hashes.json",
+      "sha256": "fe19fabc78146a622987f6c0b4c86fb0869cb530ffa4767eaac4bd36ff99f535",
+      "bytes": 3607,
+      "mtime_utc": "2026-10-06T03:10:41.776577+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/stack.json",
+      "sha256": "33f94cbf671a1010899a9e12250e83a201cee293e189d40a6d74541e2791e9b9",
+      "bytes": 718,
+      "mtime_utc": "2026-10-06T03:10:43.223591+00:00",
+      "purpose": "Read small saved case metadata; no DB or trace inspection"
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/physical-gate.png",
+      "sha256": "f56448f4c767e9d883695abb968860a5c8663b272ca32482efb951ef4b68f48f",
+      "bytes": 372019,
+      "mtime_utc": "2026-10-06T03:11:00.344368+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 2338
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T031041773163/WMS_UNAVAILABLE/completed.png",
+      "sha256": "83f5a944ae9711f02a01b4a242805dcfbd10f6911473bd657c56fb415642e9f8",
+      "bytes": 413039,
+      "mtime_utc": "2026-10-06T03:11:16.985380+00:00",
+      "purpose": "Actually viewed saved PNG at original detail with view_image",
+      "width": 1440,
+      "height": 2916
+    },
+    {
+      "path": "artifacts/lab-browser/20261006T030829531907/happy/blender-motion.json",
+      "sha256": "cc6001ae151907f18209a05d442d940375a417d6fa01b0c8390d56aa8f4bddf0",
+      "bytes": 1562,
+      "mtime_utc": "2026-10-06T03:09:06.504113+00:00",
+      "purpose": "Read saved small before/after Blender motion metrics"
+    }
+  ],
+  "input_binding": "All saved JSON facts parsed and SHA256 bound to the same first-read bytes; all25 saved input bytes rechecked unchanged before this receipt was written."
+}

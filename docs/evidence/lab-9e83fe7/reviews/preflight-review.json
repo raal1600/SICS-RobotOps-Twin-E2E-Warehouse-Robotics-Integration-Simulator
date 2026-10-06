@@ -1,0 +1,547 @@
+{
+  "reviewed_at_utc": "2026-10-06T02:51:59.269932+00:00",
+  "verdict": "COMPLETED_PREFLIGHT_RECEIPTS_MATCH_CONFIGURED_POLICY",
+  "goal_status": "NOT_ACHIEVED",
+  "full_acceptance_status": "PENDING; no full-suite/coverage/repeatability/demo/publication/manual/remote result inferred",
+  "scope": "Independent bounded read-only review of saved current setup/browser/Blender/configured-security receipts, exact five LOW policy AST scopes, selected committed source bindings and four vendor hashes. Existing npm output snapshotted with mutable-origin timing limit. No tests, runtime, scanner, network, browser or database actions.",
+  "source": {
+    "manifest_path": "docs/evidence/acceptance/20261006T024719/manifest.json",
+    "manifest_snapshot": "artifacts/final-evidence-pack/9e83fe7/preflight/manifest.json",
+    "manifest_started_at": "2026-10-06T02:47:20.134216+00:00",
+    "recorded_identity": {
+      "commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+      "dirty": false,
+      "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+    },
+    "observed_HEAD": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "lock_sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+    "fingerprint_scope": "Full fingerprint/clean start recorded by manifest. Bounded review independently checked HEAD and 16 relevant committed files; did not recompute the full repository fingerprint."
+  },
+  "completed_gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\.local\\bin\\uv.EXE",
+        "sync",
+        "--locked",
+        "--all-groups"
+      ],
+      "seconds": 0.04331219999585301,
+      "log": "docs/evidence/acceptance/20261006T024719/setup.log"
+    },
+    "browser_setup": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "playwright",
+        "install",
+        "chromium",
+        "--only-shell"
+      ],
+      "seconds": 0.3898464999801945,
+      "log": "docs/evidence/acceptance/20261006T024719/browser_setup.log"
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+        "--version"
+      ],
+      "seconds": 0.22596929999417625,
+      "log": "docs/evidence/acceptance/20261006T024719/blender_version.log"
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "security"
+      ],
+      "seconds": 19.600753200007603,
+      "log": "docs/evidence/acceptance/20261006T024719/security.log"
+    }
+  },
+  "setup": {
+    "resolved_packages": 95,
+    "checked_packages": 93,
+    "command": [
+      "C:\\Users\\ramis\\.local\\bin\\uv.EXE",
+      "sync",
+      "--locked",
+      "--all-groups"
+    ]
+  },
+  "browser_setup": {
+    "command": [
+      "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+      "-m",
+      "playwright",
+      "install",
+      "chromium",
+      "--only-shell"
+    ],
+    "saved_log_bytes": 0,
+    "playwright_version_recorded": "1.63.0",
+    "meaning": "Successful headless-shell installation command; no journey or browser binary identity inferred."
+  },
+  "blender_preflight": {
+    "version": "5.2.1 LTS",
+    "build_hash": "9e2066aef7ef",
+    "build_date": "2026-08-25",
+    "platform": "Windows",
+    "meaning": "Saved configured executable --version output only; no motion/render/signature verification."
+  },
+  "security": {
+    "configured_passed": true,
+    "bandit_exit": 1,
+    "raw_bandit_findings": 5,
+    "all_raw_findings_LOW": true,
+    "bandit_errors": [],
+    "bandit_generated_at": "2026-10-06T02:47:22Z",
+    "findings": [
+      {
+        "path": "robotops/blender/adapter.py",
+        "scope": "import subprocess",
+        "test_id": "B404",
+        "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+        "reviewed": true,
+        "rationale": "Only fixed Blender executable invocations below; shell is never enabled. Configuration is trusted local operator input.",
+        "line": 5,
+        "raw_severity": "LOW",
+        "raw_confidence": "HIGH",
+        "matched_exception_count": 1,
+        "subprocess_run_calls": 0,
+        "no_shell_enabled_in_scope": true,
+        "argv_expressions": []
+      },
+      {
+        "path": "robotops/blender/adapter.py",
+        "scope": "_invoke",
+        "test_id": "B603",
+        "ast_sha256": "7c87bab88cc2b24175e08a4e7454c37d7ac5802e595d855ab5bee4cb3e2aec07",
+        "reviewed": true,
+        "rationale": "Reviewed fixed Blender invocation: Windows adds only literal --qos high before the fixed Python entry point. No shell, model-controlled arguments, external code, system-policy changes or deadline extension. Disabled autoexec, bounded process timeout and confined read-only --record-existing export remain intact.",
+        "line": 89,
+        "raw_severity": "LOW",
+        "raw_confidence": "HIGH",
+        "matched_exception_count": 1,
+        "subprocess_run_calls": 1,
+        "no_shell_enabled_in_scope": true,
+        "argv_expressions": [
+          "args"
+        ]
+      },
+      {
+        "path": "robotops/blender/adapter.py",
+        "scope": "manifest",
+        "test_id": "B603",
+        "ast_sha256": "556d235eb3d3a7fab1325d6e625080f33b542fc0cf3d5071064b94f381c71a96",
+        "reviewed": true,
+        "rationale": "The sole process call remains the configured local Blender executable plus literal --version, without a shell. The added cpu_qos field records a platform-selected constant and does not execute code. Existing closure hashes and provenance remain unchanged.",
+        "line": 362,
+        "raw_severity": "LOW",
+        "raw_confidence": "HIGH",
+        "matched_exception_count": 1,
+        "subprocess_run_calls": 1,
+        "no_shell_enabled_in_scope": true,
+        "argv_expressions": [
+          "[self.executable, '--version']"
+        ]
+      },
+      {
+        "path": "robotops/demo.py",
+        "scope": "import subprocess",
+        "test_id": "B404",
+        "ast_sha256": "9d97d469cf8d66465563e1e22c6dab3b6107819aba2d9956c7080016c1ab9c1b",
+        "reviewed": true,
+        "rationale": "Demo restart invokes the current Python interpreter with the fixed committed module; no shell.",
+        "line": 5,
+        "raw_severity": "LOW",
+        "raw_confidence": "HIGH",
+        "matched_exception_count": 1,
+        "subprocess_run_calls": 0,
+        "no_shell_enabled_in_scope": true,
+        "argv_expressions": []
+      },
+      {
+        "path": "robotops/demo.py",
+        "scope": "run_demo",
+        "test_id": "B603",
+        "ast_sha256": "83b0f8d506fe0a0f6ada33703c368841e561147a2c80331c7d35d43bc7798552",
+        "reviewed": true,
+        "rationale": "Reviewed HKM tool-showcase and evidence additions; the sole subprocess call remains sys.executable -m robotops.demo --resume with argparse-controlled runtime and local directory arguments. Fixed argv, no shell, generated code or model input; outside robot command execution.",
+        "line": 87,
+        "raw_severity": "LOW",
+        "raw_confidence": "HIGH",
+        "matched_exception_count": 1,
+        "subprocess_run_calls": 1,
+        "no_shell_enabled_in_scope": true,
+        "argv_expressions": [
+          "[sys.executable, '-m', 'robotops.demo', '--resume', '--directory', str(directory), '--runtime', runtime_mode]"
+        ]
+      }
+    ],
+    "independent_review_matches_campaign_receipt": true,
+    "pip": {
+      "exit_recorded": 0,
+      "dependencies": 93,
+      "vulnerability_count": 0,
+      "fixes": []
+    },
+    "npm": {
+      "exit_recorded": 0,
+      "audit_report_version": 2,
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies_metadata": {
+        "prod": 2,
+        "dev": 0,
+        "optional": 0,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 1
+      },
+      "snapshot": "artifacts/final-evidence-pack/9e83fe7/preflight/npm-audit.json",
+      "origin_mtime_utc": "2026-10-06T02:47:40.623919+00:00",
+      "origin_limit": "The raw npm file is shared and carries no embedded run ID. Its mtime is within this campaign and precedes the completed campaign security receipt; shared bandit/pip/security bytes match canonical campaign bytes. This is a point-in-time retained snapshot supported by timing and receipts, not independent proof of original process ownership."
+    },
+    "vendor": {
+      "package": "three",
+      "version": "0.180.0",
+      "checks": [
+        {
+          "file": "apps/erp_ui/vendor/three.module.min.js",
+          "recorded_sha256": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+          "actual_sha256": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+          "matches": true
+        },
+        {
+          "file": "apps/erp_ui/vendor/three.core.min.js",
+          "recorded_sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+          "actual_sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+          "matches": true
+        },
+        {
+          "file": "apps/erp_ui/vendor/OrbitControls.js",
+          "recorded_sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c",
+          "actual_sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c",
+          "matches": true
+        },
+        {
+          "file": "apps/erp_ui/vendor/LICENSE",
+          "recorded_sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+          "actual_sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+          "matches": true
+        }
+      ]
+    }
+  },
+  "selected_committed_input_bindings": [
+    {
+      "path": "tools/security_check.py",
+      "working_sha256": "7b47c939f092b74adc31d80b9d74df9a91849a60c8971d43055c71e9775afc08",
+      "commit_blob_content_sha256": "7b47c939f092b74adc31d80b9d74df9a91849a60c8971d43055c71e9775afc08",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "tools/acceptance.py",
+      "working_sha256": "acd6c7f59d5544af4e46f10ff01639c7cf397ac87e1bf9eee8d36f170dbeb8ec",
+      "commit_blob_content_sha256": "87d54fef35bc61f94b6c1668208a2a38f54f5da83584d8794bcf3d8d4b96f67c",
+      "exact_bytes_match": false,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "tools/dev.py",
+      "working_sha256": "f4001be432bc3b6f0cf7ce31f45ca28102e4bb077c549eab3d8ca365cdc757a7",
+      "commit_blob_content_sha256": "f4001be432bc3b6f0cf7ce31f45ca28102e4bb077c549eab3d8ca365cdc757a7",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "docs/security-exceptions.json",
+      "working_sha256": "441a7a47e4ef6c5530847c5cd4bb72ed817fb2c44d0f1cc7275ab5b20c96bd66",
+      "commit_blob_content_sha256": "7762860610895949f5ac1c95b4f904150ae399a7b90b9a101ff19b2393f32f54",
+      "exact_bytes_match": false,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "pyproject.toml",
+      "working_sha256": "b9cd1ea5a6c68d68c1ef0dc265eb8e67a4407912f2b6f629b3049d52df395bae",
+      "commit_blob_content_sha256": "b9cd1ea5a6c68d68c1ef0dc265eb8e67a4407912f2b6f629b3049d52df395bae",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "uv.lock",
+      "working_sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+      "commit_blob_content_sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "working_sha256": "c1cfa650069e8390c56a479f7a3e8ac01d7fbc0d15ed24942bf64f79ead71588",
+      "commit_blob_content_sha256": "c1cfa650069e8390c56a479f7a3e8ac01d7fbc0d15ed24942bf64f79ead71588",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "robotops/demo.py",
+      "working_sha256": "8a5b15eb944d68c66d519f5797a8457bd6da0c2161ba59117b24ef7cc0cac8a3",
+      "commit_blob_content_sha256": "8a5b15eb944d68c66d519f5797a8457bd6da0c2161ba59117b24ef7cc0cac8a3",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "robotops/http_server.py",
+      "working_sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "commit_blob_content_sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "apps/erp_ui/vendor/manifest.json",
+      "working_sha256": "a1efbffa7f70bd6ad6465a75f86d622e4afc8bf0d185c051407edd3d44e0b365",
+      "commit_blob_content_sha256": "a1efbffa7f70bd6ad6465a75f86d622e4afc8bf0d185c051407edd3d44e0b365",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "apps/erp_ui/vendor/package.json",
+      "working_sha256": "a2055cca0ea571227a9bf043c728c1ecaeb7ccf7d1e56d8615fe70ea4106396d",
+      "commit_blob_content_sha256": "a2055cca0ea571227a9bf043c728c1ecaeb7ccf7d1e56d8615fe70ea4106396d",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "apps/erp_ui/vendor/package-lock.json",
+      "working_sha256": "03774a2cb5efbe116c1d55b1a02637dc68716b533a8e4f851e95e6367b3e3953",
+      "commit_blob_content_sha256": "03774a2cb5efbe116c1d55b1a02637dc68716b533a8e4f851e95e6367b3e3953",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "apps/erp_ui/vendor/three.module.min.js",
+      "working_sha256": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+      "commit_blob_content_sha256": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "apps/erp_ui/vendor/three.core.min.js",
+      "working_sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+      "commit_blob_content_sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "apps/erp_ui/vendor/OrbitControls.js",
+      "working_sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c",
+      "commit_blob_content_sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    },
+    {
+      "path": "apps/erp_ui/vendor/LICENSE",
+      "working_sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "commit_blob_content_sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "exact_bytes_match": true,
+      "git_text_normalization_match": true
+    }
+  ],
+  "snapshot_receipt": {
+    "path": "artifacts/final-evidence-pack/9e83fe7/preflight/snapshot-receipt.json",
+    "sha256": "a5273fe0748c016a1b4228d588203bbe8977132f90bd81b5a204026670a7ab06"
+  },
+  "input_files": [
+    {
+      "path": "apps/erp_ui/vendor/LICENSE",
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "bytes": 1081,
+      "mtime_utc": "2026-10-02T23:36:04.566987+00:00"
+    },
+    {
+      "path": "apps/erp_ui/vendor/OrbitControls.js",
+      "sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c",
+      "bytes": 38703,
+      "mtime_utc": "2026-10-02T23:36:04.564988+00:00"
+    },
+    {
+      "path": "apps/erp_ui/vendor/manifest.json",
+      "sha256": "a1efbffa7f70bd6ad6465a75f86d622e4afc8bf0d185c051407edd3d44e0b365",
+      "bytes": 632,
+      "mtime_utc": "2026-10-03T11:46:44.897144+00:00"
+    },
+    {
+      "path": "apps/erp_ui/vendor/package-lock.json",
+      "sha256": "03774a2cb5efbe116c1d55b1a02637dc68716b533a8e4f851e95e6367b3e3953",
+      "bytes": 545,
+      "mtime_utc": "2026-10-02T23:47:53.818713+00:00"
+    },
+    {
+      "path": "apps/erp_ui/vendor/package.json",
+      "sha256": "a2055cca0ea571227a9bf043c728c1ecaeb7ccf7d1e56d8615fe70ea4106396d",
+      "bytes": 102,
+      "mtime_utc": "2026-10-03T11:46:44.902648+00:00"
+    },
+    {
+      "path": "apps/erp_ui/vendor/three.core.min.js",
+      "sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+      "bytes": 381124,
+      "mtime_utc": "2026-10-02T23:36:04.534288+00:00"
+    },
+    {
+      "path": "apps/erp_ui/vendor/three.module.min.js",
+      "sha256": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+      "bytes": 338908,
+      "mtime_utc": "2026-10-02T23:36:04.490147+00:00"
+    },
+    {
+      "path": "artifacts/bandit.json",
+      "sha256": "3d540eb8428f7cfa13951f3339a6870142ee83a31ddc856d2c9f63ae2abbe34d",
+      "bytes": 29428,
+      "mtime_utc": "2026-10-06T02:47:22.027520+00:00"
+    },
+    {
+      "path": "artifacts/npm-audit.json",
+      "sha256": "846fc260eb0bf70e6b21419d4cab9fcc61c224c7362324d4cbc8aebf8355f9bd",
+      "bytes": 358,
+      "mtime_utc": "2026-10-06T02:47:40.623919+00:00"
+    },
+    {
+      "path": "artifacts/pip-audit.json",
+      "sha256": "08d5662858017d72624b0ac5e3461d7218778330e18e816ecf6b071e21aa028d",
+      "bytes": 5326,
+      "mtime_utc": "2026-10-06T02:47:28.132252+00:00"
+    },
+    {
+      "path": "artifacts/security-review.json",
+      "sha256": "423e1927efc9af89e50ec33e0ac41f032233eeda1ebcdf07ced01244efa3b263",
+      "bytes": 2539,
+      "mtime_utc": "2026-10-06T02:47:40.639372+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/bandit.json",
+      "sha256": "3d540eb8428f7cfa13951f3339a6870142ee83a31ddc856d2c9f63ae2abbe34d",
+      "bytes": 29428,
+      "mtime_utc": "2026-10-06T02:47:40.659961+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/blender_version.log",
+      "sha256": "40278423ab29130d0a19128e39e5ba85c9c937c8938af35e35e5247df1befccd",
+      "bytes": 1365,
+      "mtime_utc": "2026-10-06T02:47:21.041148+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/browser_setup.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mtime_utc": "2026-10-06T02:47:20.803145+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/manifest.json",
+      "sha256": "c5fb5f1aa70de0080b22ff68c6c82f07fdd892dbe28eeb874e290fbf90baa95b",
+      "bytes": 2197,
+      "mtime_utc": "2026-10-06T02:47:40.654745+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/pip-audit.json",
+      "sha256": "08d5662858017d72624b0ac5e3461d7218778330e18e816ecf6b071e21aa028d",
+      "bytes": 5326,
+      "mtime_utc": "2026-10-06T02:47:40.661961+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/security-review.json",
+      "sha256": "423e1927efc9af89e50ec33e0ac41f032233eeda1ebcdf07ced01244efa3b263",
+      "bytes": 2539,
+      "mtime_utc": "2026-10-06T02:47:40.662961+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/security.log",
+      "sha256": "261252af3baa3393ea7bfe97dc79a2a1af5ac97f99921f99354dd38a41aa7418",
+      "bytes": 2899,
+      "mtime_utc": "2026-10-06T02:47:40.654745+00:00"
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T024719/setup.log",
+      "sha256": "4542e407dd1474004105de51ade7bad87354e547ca52ed0fa85ad83e01a5e48b",
+      "bytes": 61,
+      "mtime_utc": "2026-10-06T02:47:20.404701+00:00"
+    },
+    {
+      "path": "docs/security-exceptions.json",
+      "sha256": "441a7a47e4ef6c5530847c5cd4bb72ed817fb2c44d0f1cc7275ab5b20c96bd66",
+      "bytes": 2274,
+      "mtime_utc": "2026-10-05T14:00:57.830206+00:00"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "b9cd1ea5a6c68d68c1ef0dc265eb8e67a4407912f2b6f629b3049d52df395bae",
+      "bytes": 1412,
+      "mtime_utc": "2026-10-05T18:11:19.679331+00:00"
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "sha256": "c1cfa650069e8390c56a479f7a3e8ac01d7fbc0d15ed24942bf64f79ead71588",
+      "bytes": 20492,
+      "mtime_utc": "2026-10-05T13:58:29.804409+00:00"
+    },
+    {
+      "path": "robotops/demo.py",
+      "sha256": "8a5b15eb944d68c66d519f5797a8457bd6da0c2161ba59117b24ef7cc0cac8a3",
+      "bytes": 7550,
+      "mtime_utc": "2026-10-04T09:45:10.065560+00:00"
+    },
+    {
+      "path": "robotops/http_server.py",
+      "sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "bytes": 712,
+      "mtime_utc": "2026-10-06T01:05:11.096260+00:00"
+    },
+    {
+      "path": "tools/acceptance.py",
+      "sha256": "acd6c7f59d5544af4e46f10ff01639c7cf397ac87e1bf9eee8d36f170dbeb8ec",
+      "bytes": 34259,
+      "mtime_utc": "2026-10-05T18:55:37.894102+00:00"
+    },
+    {
+      "path": "tools/dev.py",
+      "sha256": "f4001be432bc3b6f0cf7ce31f45ca28102e4bb077c549eab3d8ca365cdc757a7",
+      "bytes": 1225,
+      "mtime_utc": "2026-10-02T17:11:45.304194+00:00"
+    },
+    {
+      "path": "tools/security_check.py",
+      "sha256": "7b47c939f092b74adc31d80b9d74df9a91849a60c8971d43055c71e9775afc08",
+      "bytes": 4213,
+      "mtime_utc": "2026-10-02T23:53:23.461888+00:00"
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+      "bytes": 174866,
+      "mtime_utc": "2026-10-05T18:11:19.697918+00:00"
+    }
+  ],
+  "blocking_findings": [],
+  "limits": [
+    "Configured security policy passed with five reviewed LOW findings, not zero raw findings or comprehensive security certification.",
+    "Recorded scanner exit codes are taken from current canonical manifest/security receipts; no scanner was rerun.",
+    "Saved dependency vulnerability reports are point-in-time results. Shared npm report has no embedded campaign/run ID; its exact bytes/mtime are retained with matching sibling receipts.",
+    "Manifest snapshot is immutable; the live manifest may legitimately grow.",
+    "No current full acceptance, manual/CLI, saved-trace/secret, PDF visual or remote PASS is claimed."
+  ]
+}

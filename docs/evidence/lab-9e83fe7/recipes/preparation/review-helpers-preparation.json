@@ -1,0 +1,120 @@
+{
+  "prepared_at_utc": "2026-10-06T02:50:07.953847+00:00",
+  "status": "PREPARED_SYNTAX_ONLY_NOT_EXECUTED",
+  "source": {
+    "commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "dirty": false,
+    "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd"
+  },
+  "campaign": "docs/evidence/acceptance/20261006T024719",
+  "manifest_started_at": "2026-10-06T02:47:20.134216+00:00",
+  "terminal_record": "artifacts/acceptance-response-sync-exit.json",
+  "manifest_observation": {
+    "live_path": "docs/evidence/acceptance/20261006T024719/manifest.json",
+    "immutable_preparation_copy": {
+      "path": "artifacts/final-evidence-pack/9e83fe7/review-helper-preparation-manifest.json",
+      "sha256": "c5fb5f1aa70de0080b22ff68c6c82f07fdd892dbe28eeb874e290fbf90baa95b",
+      "bytes": 2197
+    },
+    "live_manifest_mutable": true,
+    "observed_gate_names": [
+      "setup",
+      "browser_setup",
+      "blender_version",
+      "security"
+    ]
+  },
+  "programs": [
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/prepare-terminal-review.py",
+      "sha256": "802c643d2ba81a34028ab5971964b8c660f03b6eca405bb50f2cc6485fe72511",
+      "bytes": 28487
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/case_review.py",
+      "sha256": "d4976ea729f76ff6c7f894a81d8a2a6beaa1358b52122069bcf7b96286883f56",
+      "bytes": 30797
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/prepare-pass1-case-review.py",
+      "sha256": "d9ca3e23d24a064263a1a450d581215d1ae085c55d17e97c1caf84eee76e7562",
+      "bytes": 151
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/prepare-pass2-case-review.py",
+      "sha256": "342037d9daf807a66a1f7fd9adf35280240b8cb7e30b985519cd007ded62c17d",
+      "bytes": 151
+    }
+  ],
+  "documentation": [
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/case-review-usage.md",
+      "sha256": "dd1cf80e3d7737545ae25032fde7b6f435626a5de08751f39b97ccef721bb214",
+      "bytes": 5218
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/terminal-review-usage.md",
+      "sha256": "213adc8538f2d6887e684be0271de37ab5e3c658d12f607fdd3b54fdcfa9608e",
+      "bytes": 5074
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/case-review-adaptation.diff.txt",
+      "sha256": "d92972a8412ed296de3ab3b0e45c6b4f4b249ef79db92918a000505ed841cc22",
+      "bytes": 22672
+    }
+  ],
+  "provenance": [
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/prepare-terminal-review.py",
+      "sha256": "183ff8f01a3af9f58b83e4e51df37a60282270c19add58679130943014e6f466",
+      "bytes": 28488
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/prepare-pass2-case-review.py",
+      "sha256": "e6e96ed1f23c7a9298c6870aef7977d28e4c789f65c7ef4b05d57eb408afd1e1",
+      "bytes": 30046
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-review-preparation-resolution.json",
+      "sha256": "f6e3706c1943a1afb53751e729a82466fba3136a9edafc5bac9b1a7c01f10526",
+      "bytes": 3926
+    }
+  ],
+  "changes": [
+    "Exact commit/fingerprint/campaign/start/terminal binding changed to current source; no historical fallback.",
+    "Prior hardened pass2 logic extracted into shared case_review.py with explicit pass1/pass2 entrypoints.",
+    "Exact independently observed fixture basename must be supplied and cross-checked; future suffix is not invented.",
+    "Pass1 requires its own terminal clean JUnit; pass2 retains both terminal clean JUnits and equality guard.",
+    "Source A exact-byte parse binding and first-read coverage binding retained."
+  ],
+  "validation": {
+    "ast_parse": true,
+    "builtin_compile": true,
+    "module_imported": false,
+    "review_executed": false,
+    "tests_or_services_started": false,
+    "database_or_zip_opened": false,
+    "tracked_writes": false
+  },
+  "pending": [
+    "Current acceptance terminal success not yet reviewed",
+    "Fresh formal cases and exact observed fixture arguments",
+    "Independent static follow-up review",
+    "Fresh manual/CLI, saved-UI/trace, publication visual and remote proof remain separate"
+  ],
+  "expected_outputs": [
+    "pass1-finalized-snapshots/",
+    "pass2-finalized-snapshots/",
+    "pass1-case-review-final.json",
+    "pass2-case-review-final.json",
+    "local-acceptance-review.json"
+  ],
+  "output_existence_at_preparation": {
+    "pass1-finalized-snapshots": false,
+    "pass2-finalized-snapshots": false,
+    "pass1-case-review-final.json": false,
+    "pass2-case-review-final.json": false,
+    "local-acceptance-review.json": false
+  },
+  "no_current_pass_assertion": true
+}

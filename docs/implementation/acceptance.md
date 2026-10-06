@@ -1,5 +1,13 @@
 # Acceptance and evidence
 
+## Current Integration Lab local evidence and next candidate
+
+Accepted runtime baseline A is `9e83fe7d41a52a63ba65b77730e392dafca8fffe`, fingerprint `136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd`. The original two 815-case suites, five fresh manual/CLI cases and saved audits remain source-scoped. The subsequent publication candidate includes unchanged robot runtime plus publication validator/tests, two report hrefs and reviewed evidence/status documentation. It is not a status-only revision; its full suite remains pending until independently observed. Known-broken A is not the publication candidate. After the corrected candidate is committed and authorized, verify its own full Linux acceptance, Windows native workflow and publication/Pages before refreshing its exact CI manifest. Only then may a reviewed completion successor be created; that successor also needs its own exact-source workflows. **NOT DONE / NOT ACHIEVED** remains the current status.
+
+[Local A campaign](../evidence/acceptance/20261006T024719/manifest.json), [archive readiness](../evidence/lab-9e83fe7/readiness.json) and [publication-link defect](../evidence/lab-9e83fe7/publication-link-disposition.json) distinguish two815 clean suites from proposed P checks. A passed all20 configured local gates, but its publication validator accepted repository files outside _site; local gate PASS does not erase the two broken public hrefs. The proposed guard/tests/hrefs need targeted checks and P's own full CI/publication evidence. Exact P CI manifest, not A's local manifest, is the later remote-refresh input. Separate Windows native workflow is explicitly inspected; it is not one of the three coded remote gate keys.
+
+The acceptance procedure and historical releases below retain their original scope.
+
 `uv run --locked python -m tools.dev acceptance` runs setup, the full mandatory
 suite twice with separate temporary fixture roots, coverage (minimum 85%), lint,
 strict types, security, eight deterministic Blender scenarios, documentation drift

@@ -1,0 +1,88 @@
+"""Supplement full A/history scan with percent-decoded URL query/userinfo checks."""
+import datetime as dt
+import hashlib
+import importlib.util
+import json
+import re
+import subprocess
+from pathlib import Path
+from urllib.parse import parse_qsl, unquote, urlsplit
+
+P = Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location("payload_a_scan", P / "scan_public_payload_A.py")
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+inventory_path = P / "public-payload-A-inventory.json"
+history_path = P / "public-payload-A-history-inventory.json"
+inventory = json.loads(inventory_path.read_bytes())
+history = json.loads(history_path.read_bytes())
+original_scan_text = m.scan_text
+m.PATTERNS = []
+url_count = 0
+parse_errors = []
+began = dt.datetime.now(dt.UTC).isoformat()
+url_regex = re.compile(r"\b(?:https?|amqps?|postgres(?:ql)?|mongodb(?:\+srv)?)://[^\s\"'<>]+", re.I)
+
+
+def supplement(text, location, pointer="", structured=True):
+    global url_count
+    for match in url_regex.finditer(text):
+        url_count += 1
+        try:
+            parsed = urlsplit(match.group())
+            if parsed.password is not None:
+                m.candidate("uri_decoded_userinfo", unquote(parsed.username or "") + ":" + unquote(parsed.password), location, pointer + "/url-char:" + str(match.start()))
+            for key, value in parse_qsl(parsed.query, keep_blank_values=True):
+                normalized = re.sub(r"[^a-z0-9]", "", key.lower())
+                if normalized in m.SENSITIVE or normalized in {"accesskey", "credential", "credentials"}:
+                    m.candidate("uri_query:" + normalized, value, location, pointer + "/url-char:" + str(match.start()))
+        except ValueError as exc:
+            parse_errors.append({"location": location, "pointer": pointer + "/url-char:" + str(match.start()), "error": str(exc)})
+    original_scan_text(text, location, pointer, structured)
+
+
+m.scan_text = supplement
+scans = {}
+for entry in inventory["files"]:
+    scans[entry["git_oid"]] = entry["scan"]
+for entry in history["new_blobs"]:
+    scans[entry["git_oid"]] = entry["scan"]
+batch = subprocess.Popen(["git", "cat-file", "--batch"], cwd=m.ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+try:
+    for i, (oid, proof) in enumerate(scans.items()):
+        batch.stdin.write((oid + "\n").encode())
+        batch.stdin.flush()
+        header = batch.stdout.readline().decode().split()
+        if header[:2] != [oid, "blob"]:
+            raise RuntimeError("Unexpected object header")
+        data = batch.stdout.read(int(header[2]))
+        if batch.stdout.read(1) != b"\n" or len(data) != proof["bytes"] or m.sha(data) != proof["sha256"]:
+            raise RuntimeError("Exact first scan blob binding mismatch")
+        m.inspect_bytes(data, proof["scan_location"], oid)
+        if i % 500 == 0:
+            print(json.dumps({"uri_supplement_blobs": i + 1, "total": len(scans)}), flush=True)
+finally:
+    batch.stdin.close()
+    batch.stdout.close()
+    batch.wait(timeout=20)
+output = {
+    "status": "FULL_URI_SUPPLEMENT_COMPLETE_CONTEXT_REVIEW_PENDING",
+    "source_A": m.A, "baseline": m.BASE, "started_utc": began,
+    "finished_utc": dt.datetime.now(dt.UTC).isoformat(),
+    "scanner_sha256": m.sha(Path(__file__).read_bytes()),
+    "imported_full_extractor_sha256": m.sha((P / "scan_public_payload_A.py").read_bytes()),
+    "inputs": [{"path": str(x.relative_to(m.ROOT)).replace("\\", "/"), "sha256": m.sha(x.read_bytes())} for x in [inventory_path, history_path]],
+    "method": "Independently re-read all bound unique blobs, recurse through every ZIP member, immutable DB typed values and all PDF pages using the first scanner's extractors. Match complete URLs and percent-decode userinfo and query pairs; inspect normalized credential query keys. Existing structured-key/header parser runs too; no prefix sampling.",
+    "unique_blobs_reread_and_sha256_verified": len(scans),
+    "url_occurrences_parsed": url_count,
+    "candidates": list(m.candidate_groups.values()),
+    "counts": dict(m.counts),
+    "json_parse_errors": m.json_errors,
+    "url_parse_errors": parse_errors,
+    "limit": "URI-like documentation templates and already-redacted URLs may be invalid URI syntax; such occurrences are recorded for contextual disposition. No arbitrary layered encodings or image OCR proof.",
+}
+path = P / "public-payload-A-uri-supplement.json"
+if path.exists():
+    raise RuntimeError("Refuse overwrite")
+path.write_text(json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+print(json.dumps({"output": str(path), "sha256": m.sha(path.read_bytes()), "candidate_groups": len(m.candidate_groups), "url_parse_errors": len(parse_errors)}))

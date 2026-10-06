@@ -1,0 +1,73 @@
+"""Execute actual saved validator/report-builder ASTs; no full build or runtime."""
+import ast,datetime,difflib,hashlib,html,json,re,shutil
+from pathlib import Path
+from typing import Any
+from markdown_it import MarkdownIt
+ROOT=Path.cwd();P=ROOT/'artifacts/final-evidence-pack/9e83fe7/publication-link-correction';PROPOSED=ROOT/'artifacts/proposed-status-9e83fe7';SITE=ROOT/'_site';ARCHIVE=ROOT/'docs/evidence/lab-9e83fe7/publication/site'
+assert not (P/'saved-site-checks.json').exists()
+cache={}
+def raw(p):
+ p=Path(p).resolve()
+ if p not in cache:cache[p]=p.read_bytes()
+ return cache[p]
+def ref(p):
+ p=Path(p).resolve();r=raw(p);return {'path':p.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(r).hexdigest(),'bytes':len(r)}
+def parse(p):return ast.parse(raw(p).decode('utf-8'),filename=str(p))
+old=ROOT/'tools/build_publication.py';new=PROPOSED/'tools/build_publication.py';report=PROPOSED/'reports/01-design.md'
+assert ref(old)['sha256']=='330e97e031e2f94596597ad863c851caf43b2b62157a9499d83628acbf3ce910'
+assert ref(new)['sha256']=='1ba01db9c5032030be165df16b08249a93ffdf8e45d7cdb68eade5b3716c85fe'
+assert ref(report)['sha256']=='4fad6d222dc2b5f3976db3bf2f01efac620d8e2a5655f0232fbb1f67c104cd09'
+def validator(source,out):
+ node=next(n for n in parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='validate_links')
+ ns={'OUT':out,'html':html,'re':re}
+ exec(compile(ast.Module(body=[node],type_ignores=[]),str(source),'exec'),ns)
+ return ns['validate_links']
+def outcome(function):
+ try:function();return {'accepted':True,'error':None}
+ except ValueError as exc:return {'accepted':False,'error':str(exc)}
+original_site_inputs=[ref(p) for p in sorted(SITE.glob('*.html'))];assert len(original_site_inputs)==7
+original=outcome(validator(old,SITE));assert original['accepted']
+corrected=outcome(validator(new,SITE));assert not corrected['accepted'] and '../docs/integration-lab.md' in corrected['error'] and 'outside publication root' in corrected['error']
+candidate=P/'candidate-exact-links';assert not candidate.exists();shutil.copytree(ARCHIVE,candidate)
+for p in candidate.glob('*.html'):assert p.read_bytes()==raw(SITE/p.name)
+hrefs={'../docs/integration-lab.md':'https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/blob/main/docs/integration-lab.md','../docs/integration-lab-requirements.md':'https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/blob/main/docs/integration-lab-requirements.md'}
+design=candidate/'design.html';base=design.read_bytes();changed=base;stages=[]
+for index,(before,after) in enumerate(hrefs.items(),1):
+ needle=('href="'+before+'"').encode();replacement=('href="'+after+'"').encode();assert changed.count(needle)==1
+ changed=changed.replace(needle,replacement);design.write_bytes(changed)
+ result=outcome(validator(new,candidate));stages.append({'after_href_corrections':index,**result})
+ (P/f'exact-links-stage{index}-design.html.txt').write_bytes(changed)
+assert not stages[0]['accepted'] and '../docs/integration-lab-requirements.md' in stages[0]['error']
+assert stages[1]['accepted']
+(P/'exact-two-href.diff.txt').write_text(''.join(difflib.unified_diff(base.decode().splitlines(True),changed.decode().splitlines(True),fromfile='frozen-A/design.html',tofile='candidate/design.html')),encoding='utf-8')
+# Compile actual helper AST plus its constant assignments: no reimplementation of Markdown rendering.
+names={'figure','reference_html','header','page','build_report'}
+constants={'BASE_SOURCE_DATE','DISPLAY_VERSION','DISPLAY_DATE','REPO','REPO_URL','REPORTS','E'}
+nodes=[]
+for n in parse(new).body:
+ if isinstance(n,ast.FunctionDef) and n.name in names:nodes.append(n)
+ elif isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in constants for t in n.targets):nodes.append(n)
+ns={'html':html,'re':re,'Any':Any,'MarkdownIt':MarkdownIt,'ROOT':ROOT}
+exec(compile(ast.Module(body=nodes,type_ignores=[]),str(new),'exec'),ns)
+refs_path=ROOT/'publication/references.json';diagrams_path=ROOT/'publication/diagrams.json'
+refs={r['id']:r for r in json.loads(raw(refs_path))};diagrams=json.loads(raw(diagrams_path))
+raw(ROOT/'reports/01-design.md')
+rendered_A,_,_=ns['build_report'](ns['REPORTS'][0],refs,diagrams)
+assert rendered_A==raw(SITE/'design.html').decode('utf-8').replace('\r\n','\n'),'Actual A render must match frozen generated page'
+ns['ROOT']=PROPOSED
+rendered,used,words=ns['build_report'](ns['REPORTS'][0],refs,diagrams)
+for before,after in hrefs.items():
+ assert 'href="'+before+'"' not in rendered
+ assert rendered.count('href="'+after+'"')==1
+render_candidate=P/'candidate-rendered-report';assert not render_candidate.exists();shutil.copytree(candidate,render_candidate)
+(render_candidate/'design.html').write_text(rendered,encoding='utf-8')
+(render_candidate/'sources/01-design.md').write_bytes(raw(report))
+render_check=outcome(validator(new,render_candidate));assert render_check['accepted']
+unchanged=[]
+for p,r in cache.items():
+ assert p.read_bytes()==r,'Input changed '+str(p)
+ unchanged.append(ref(p))
+result={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Actual validate_links and build_report AST execution only; no build main(), PDF/render/browser/runtime/network action. Temporary candidate copies confined to this ignored proof directory.','original_A':{'validator':ref(old),'seven_HTML_inputs':original_site_inputs,'validator_result':original,'known_bug':'Existing repository files outside served root accepted.'},'proposed':{'validator':ref(new),'Markdown_report':ref(report),'actual_frozen_site_validation':corrected,'guard_rejects_both_current_links_progressively':stages,'exact_two_href_candidate':{'path':candidate.relative_to(ROOT).as_posix(),'files':len([p for p in candidate.rglob('*') if p.is_file()]),'all7HTMLs_validated':True,'changes':'Exactly two href attribute values; no other original HTML bytes changed.'},'actual_Markdown_builder_candidate':{'path':render_candidate.relative_to(ROOT).as_posix(),'all7HTMLs_validated':render_check['accepted'],'validator_result':render_check,'original_A_report_render_matches_frozen_A_HTML':True,'used_reference_count':len(used),'word_count':words,'rendered_design_sha256':hashlib.sha256((render_candidate/'design.html').read_bytes()).hexdigest()}},'inputs':unchanged,'all_source_frozen_site_inputs_unchanged':True,'limitations':['No live HTTP404 request or remote GitHub URL verification was performed.','External URLs pass local-link validation by existing scheme rule; remote reachability is a separate gate.','Only proposed design report was rendered through actual Markdown builder; this is not a full new site/PDF build or a full acceptance run.','New5tests belong to a future candidate; original A remains815 tests and its evidence is not relabeled.','Original frozen archive and _site remain unchanged; no correction evidence appended to archive yet.']}
+(P/'saved-site-checks.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'result':str((P/'saved-site-checks.json').relative_to(ROOT)),'sha256':hashlib.sha256((P/'saved-site-checks.json').read_bytes()).hexdigest(),'original_accepts':original['accepted'],'new_rejects_original_site':not corrected['accepted'],'both_href_failures':stages,'corrected7HTMLs':render_check['accepted'],'inputs':len(unchanged)}))
+

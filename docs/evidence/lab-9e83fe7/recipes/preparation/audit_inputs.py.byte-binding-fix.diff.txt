@@ -1,0 +1,27 @@
+--- initial-preparation/audit_inputs.py
++++ byte-bound-preparation/audit_inputs.py
+@@ -57,10 +57,13 @@
+     require(args.run_saved_audit, "Execution opt-in absent; preparation is not authorization")
+     output_names = {"complete-text-scan": "final-trace-audit-result.json", "grouped-saved-dom-review": "final-trace-dom-review.json", "finalize-saved-review": "final-saved-audit-review.json"}
+     require(operation not in output_names or not (out / output_names[operation]).exists(), "Existing audit output refused; preserve original proof")
+-    preparation = json.loads((out / "audit-programs-preparation.json").read_text(encoding="utf-8-sig"))
++    preparation_path = out / "audit-programs-preparation.json"
++    preparation_raw = preparation_path.read_bytes()
++    preparation = json.loads(preparation_raw.decode("utf-8-sig"))
+     inventory_path = resolve(args.inventory)
+     require(inventory_path.parent == out, "Inventory belongs to a different output pack")
+-    inventory = json.loads(inventory_path.read_text(encoding="utf-8-sig"))
++    inventory_raw = inventory_path.read_bytes()
++    inventory = json.loads(inventory_raw.decode("utf-8-sig"))
+     require(inventory.get("status") == "READY_FOR_FINAL_SAVED_AUDIT", "Fresh inventory is not marked ready")
+     expected = preparation["source"]
+     require(subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip() == expected["commit"], "Current HEAD differs; a successor source requires separate review")
+@@ -215,5 +218,7 @@
+     require(discovered.issubset(bound), "Manual directory has unlisted saved text/image inputs; refresh after it settles")
+     require(set(inventory.get("expected_lab_stage_classification", {})) == {str(i) for i in range(1, 23)}, "Stage truth expectations missing")
+     require(set(inventory.get("presentation_expectations", {})) == CASES, "Current-case presentation expectations missing")
+-    inventory["_audit_binding"] = {"inventory_path": args.inventory, "inventory_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest(), "operation": operation, "guard": "exact source/campaign;20 terminal local gates;2 clean equal 815-case JUnits;8 immutable formal case bindings;5 complete fresh manual/CLI cases and explicit stopped record"}
++    require(inventory_path.read_bytes() == inventory_raw, "Inventory changed while its fields were being checked")
++    require(preparation_path.read_bytes() == preparation_raw, "Preparation changed while its guards were being checked")
++    inventory["_audit_binding"] = {"inventory_path": args.inventory, "inventory_sha256": hashlib.sha256(inventory_raw).hexdigest(), "preparation_path": preparation_path.relative_to(ROOT).as_posix(), "preparation_sha256": hashlib.sha256(preparation_raw).hexdigest(), "operation": operation, "guard": "exact source/campaign;20 terminal local gates;2 clean equal 815-case JUnits;8 immutable formal case bindings;5 complete fresh manual/CLI cases and explicit stopped record"}
+     return inventory

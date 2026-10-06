@@ -1,3 +1,19 @@
+# Current Integration Lab evidence (2026-10-06)
+
+Integration Lab passed local acceptance at source 9e83fe7: two clean 815-test suites, 20 local gates and five fresh manual/CLI scenarios. A subsequent documentation correction fixes two report links and rejects links outside the publication root; its five regression tests pass. Final-source Linux CI, Windows checks and GitHub Pages verification remain pending.
+
+Accepted runtime baseline A is `9e83fe7d41a52a63ba65b77730e392dafca8fffe`, fingerprint `136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd`. The original two 815-case suites, five fresh manual/CLI cases and saved audits remain source-scoped. The subsequent publication candidate includes unchanged robot runtime plus publication validator/tests, two report hrefs and reviewed evidence/status documentation. It is not a status-only revision; its full suite remains pending until independently observed. Known-broken A is not the publication candidate. After the corrected candidate is committed and authorized, verify its own full Linux acceptance, Windows native workflow and publication/Pages before refreshing its exact CI manifest. Only then may a reviewed completion successor be created; that successor also needs its own exact-source workflows. **NOT DONE / NOT ACHIEVED** remains the current status.
+
+[Accepted local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Current archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Known publication-link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Reviewed local report](docs/integration-lab-final-report.md)
+
+Local checklist: 50 of 51 GOAL items have substantive local support; CI item TEST-10 / LAB-MUST-044 remains pending. Final-loop steps12/13 retain the publication correction and candidate checks; step14 is a local evidence report, not final completion. Public-payload review covers A and the frozen new evidence extension separately; final proposed P-tree binding remains required.
+
+## Preserved historical implementation log
+
+The following original entries retain their wording and status at their recorded source/date. Pending statements below are historical and do not override the current summary above.
+
+---
+
 # Goal Progress - Integration Lab
 
 Current objective: root [GOAL.md](GOAL.md), introduced at `814979d`.

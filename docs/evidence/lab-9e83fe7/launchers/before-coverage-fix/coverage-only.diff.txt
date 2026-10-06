@@ -1,0 +1,14 @@
+--- artifacts/final-evidence-pack/9e83fe7/prep-before-coverage-fix-20261006T035307/run-manual-lab-9e83fe7.ps1.txt
++++ artifacts/run-manual-lab-9e83fe7.ps1
+@@ -49,7 +49,10 @@
+     if (@($taskIdentities | Select-Object -Unique).Count -ne $taskIdentities.Count) { throw 'JUnit contains duplicate testcase identities.' }
+     $taskPassIdentities[$taskPass] = $taskIdentities
+     $taskCoveragePath = 'docs/evidence/acceptance/20261006T024719/coverage-' + $taskPass + '.json'
+-    $taskCoverage = Get-Content -LiteralPath $taskCoveragePath -Raw | ConvertFrom-Json
++    # Python accepts coverage.py's empty context-name key; PowerShell receives only the finite scalar total.
++    $taskCoverageJson = & '.venv\Scripts\python.exe' -c "import json, math, sys; from pathlib import Path; value = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8-sig'))['totals']['percent_covered']; assert type(value) in (int, float) and math.isfinite(value), 'Coverage total must be finite and numeric'; print(json.dumps({'totals': {'percent_covered': value}}, allow_nan=False))" $taskCoveragePath
++    if ($LASTEXITCODE -ne 0 -or !$taskCoverageJson) { throw ('Unable to extract finite coverage total: pass ' + $taskPass) }
++    $taskCoverage = $taskCoverageJson | ConvertFrom-Json
+     if ($null -eq $taskCoverage.totals.percent_covered -or [double]$taskCoverage.totals.percent_covered -lt 85) { throw ('Coverage is below 85 percent: pass ' + $taskPass) }
+ }
+ if (@(Compare-Object -ReferenceObject $taskPassIdentities[1] -DifferenceObject $taskPassIdentities[2]).Count -ne 0) { throw 'The two passing JUnits cover different testcase identities.' }

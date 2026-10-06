@@ -1,0 +1,111 @@
+import json,hashlib,datetime,collections
+from pathlib import Path
+from html.parser import HTMLParser
+from urllib.parse import urlsplit,unquote
+ROOT=Path.cwd();P=ROOT/'artifacts/final-evidence-pack/9e83fe7';D=ROOT/'docs/evidence/lab-9e83fe7';M=ROOT/'artifacts/final-manual-9e83fe7';C=ROOT/'docs/evidence/acceptance/20261006T024719';PUB=ROOT/'artifacts/publication-review-9e83fe7-20261006T041750Z'
+A='9e83fe7d41a52a63ba65b77730e392dafca8fffe';F='136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd'
+assert not D.exists(),'Refusing existing archive'
+cache={};copies={};canonical={};aliases=[]
+def read(path):
+ p=Path(path);p=(p if p.is_absolute() else ROOT/p).resolve();assert p.is_relative_to(ROOT) and p.is_file(),str(p)
+ if p not in cache:
+  r=p.read_bytes();cache[p]={'raw':r,'path':p.relative_to(ROOT).as_posix(),'absolute_path':str(p),'sha256':hashlib.sha256(r).hexdigest(),'bytes':len(r)}
+ return cache[p]
+def obj(p):return json.loads(read(p)['raw'].decode('utf-8-sig'))
+def add(src,dst,kind,expected=None):
+ r=read(src)
+ if expected:assert r['sha256']==expected,r['path']
+ assert dst not in copies or copies[dst]['source']==r['path'],dst
+ copies[dst]={'source':r['path'],'source_absolute':r['absolute_path'],'archive_relative':dst,'archive_path':(D/dst).relative_to(ROOT).as_posix(),'sha256':r['sha256'],'bytes':r['bytes'],'kind':kind}
+def cref(src,kind='canonical_acceptance'):
+ r=read(src);canonical[r['path']]={k:r[k] for k in ['path','absolute_path','sha256','bytes']};canonical[r['path']]['kind']=kind
+inv=obj(P/'final-trace-audit-inventory.json');assert inv['source_commit']==A and inv['source_sha256']==F
+bound={r['path']:r['sha256'] for r in inv['scan_entries']}
+local=obj(P/'local-acceptance-review.json');audit=obj(P/'final-saved-audit-review.json')
+assert local['local_acceptance_passed'] and local['local_gate_count']==20 and audit['findings']==[]
+for p in sorted(C.iterdir()):
+ if p.is_file():cref(p)
+add(C/'manifest.json','acceptance-local/manifest.json','immutable_local_manifest_before_remote_refresh','caf31b7306a13007432bf86f63eb8b92b88ef8a738a407e8ec7827cc36ce9bca')
+add('ACCEPTANCE_REPORT.md','acceptance-local/ACCEPTANCE_REPORT.md','immutable_local_generated_report_before_remote_refresh')
+for name in ['GOAL.md','SUCCESS_CRITERIA.md','docs/acceptance-map.json','uv.lock']:cref(name,'source_commit_repository_file')
+for number in (1,2):
+ review=obj(P/f'pass{number}-case-review-final.json')
+ for p in sorted((P/f'pass{number}-finalized-snapshots').iterdir()):
+  if p.is_file():add(p,f'cases/pass-{number}/snapshots/{p.name}','immutable_case_binding',bound.get(p.relative_to(ROOT).as_posix()))
+ for name,case in review['cases'].items():
+  snap=obj(case['snapshot']['path'])
+  for r in snap['input_files']:add(r['path'],f'cases/pass-{number}/{name}/'+Path(r['path']).name,'raw_case_json',r['sha256'])
+  for filename in ['trace.zip']+(['blender-motion.json'] if name=='happy' else []):
+   src=snap['artifact_directory']+'/'+filename;add(src,f'cases/pass-{number}/{name}/{filename}','audited_current_trace_zip' if filename.endswith('.zip') else 'blender_motion',bound[src])
+ visual=obj(P/f'pass{number}-saved-visual-review.json');pngs=[r for r in visual['inputs'] if r['path'].endswith('.png')];assert len(pngs)==8
+ for r in pngs:
+  q=Path(r['path']);add(q,f'cases/pass-{number}/{q.parent.name.lower()}/{q.name}','reviewed_acceptance_png',r['sha256'])
+ for r in review['source_checks']:
+  assert read(r['path'])['sha256']==r['review_sha256'];cref(r['path'],'source_commit_repository_file')
+manual=sorted(p for p in M.rglob('*') if p.is_file());assert len(manual)==470
+for p in manual:add(p,'manual/'+p.relative_to(M).as_posix(),'settled_manual_raw',bound[p.relative_to(ROOT).as_posix()])
+add('artifacts/lab-final-9e83fe7.json','manual/lab-report.json','original_lab_report',bound['artifacts/lab-final-9e83fe7.json'])
+reviews=['local-acceptance-review.json','local-acceptance-independent-review.json','local-acceptance-root-bindings.json','pass1-case-review-final.json','pass2-case-review-final.json','pass1-output-verification-attribution.json','pass2-attributed-output-verification.json','pass1-root-review.json','pass1-bindings-root-review.json','pass2-root-review.json','pass2-fixture-binding-root.json','pass2-visual-bindings-root-review.json','pass1-saved-visual-review.json','pass2-saved-visual-review.json','happy-manual-saved-review.json','happy-manual-saved-review-initial-comparison.json','lost-manual-saved-review.json','duplicate-manual-saved-review.json','cli-manual-saved-review.json','browser-manual-root-bindings.json','manual-visual-root-review.json','preflight-review.json','preflight-root-review.json','coverage-extraction-fix-independent-review.json','coverage-extraction-fix-receipt.json','coverage-extraction-fix-validation.json','current-manual-launcher-preparation.json','final-cli-preparation-independent-review.json','cli-preparation-root-review.json','audit-pdf-preparation-independent.json','review-helpers-adaptation-independent.json','preparation-root-review.json','cli-and-scan-root-bindings.json']
+for n in reviews:add(P/n,'reviews/'+n,'attributed_review',bound.get((P/n).relative_to(ROOT).as_posix()))
+for n in ['final-trace-audit-inventory.json','final-trace-audit-result.json','final-trace-dom-review.json','final-saved-audit-review.json','final-saved-audit-execution-receipt.json','final-trace-inventory-preflight.json']:add(P/n,'audit/'+n,'executed_audit')
+for prefix in ['trace-scan-execution','trace-dom-execution','trace-finalize-execution']:
+ for suffix in ['-exit.json','.stdout.log','.stderr.log']:add(P/(prefix+suffix),'audit/'+prefix+suffix,'audit_execution_record')
+for n in ['audit_inputs.py','scan_saved_traces.py','review_trace_dom.py','finalize_saved_audit.py','case_review.py','prepare-pass1-case-review.py','prepare-pass2-case-review.py','prepare-terminal-review.py','review_publication.py']:add(P/n,'recipes/'+n+'.txt','inert_executed_recipe')
+for n in ['audit-programs-preparation.json','audit-programs-usage.md','byte-binding-fix-preparation.json','audit_inputs.py.byte-binding-fix.diff.txt','review-helpers-preparation.json','review-helper-preparation-manifest.json','case-review-usage.md','terminal-review-usage.md','publication-review-preparation.json','publication-review-usage.md','review_publication.py.byte-binding-fix.diff.txt']:add(P/n,'recipes/preparation/'+n,'recipe_preparation')
+for folder,dst,kind in [('preparation-before-byte-binding-fix','recipes/before-byte-binding-fix','superseded_preparation'),('preflight','preflight','preflight_snapshot'),('prep-before-coverage-fix-20261006T035307','launchers/before-coverage-fix','original_launcher_before_fix'),('initial-report-preparation','preparation/reports/initial','preserved_report_preparation')]:
+ for p in sorted((P/folder).iterdir()):
+  if p.is_file():add(p,dst+'/'+p.name,kind)
+for n in ['status.json','watcher-owner.json','watcher.stdout.log','watcher.stderr.log','lifecycle-pass1-observation.json','lifecycle-pass2-observation.json']:add(P/n,'watcher/'+n,'watcher_record')
+for n in ['run-manual-lab-9e83fe7.ps1','run-final-cli-9e83fe7.ps1','run-acceptance-response-sync.ps1']:add('artifacts/'+n,'launchers/'+n+'.txt','inert_launcher')
+for n in ['manual-9e83fe7-runbook.md','manual-9e83fe7-coverage-amendment.md','manual-9e83fe7-preparation.json','final-cli-9e83fe7-preparation.json','lab-final-9e83fe7-owner.json','acceptance-response-sync-owner.json','acceptance-response-sync-exit.json','acceptance-response-sync.stdout.log','acceptance-response-sync.stderr.log']:add('artifacts/'+n,'launchers/'+n,'launcher_record_or_preparation')
+for prefix in ['lab-final-9e83fe7-launch-env-failure','lab-final-9e83fe7-coverage-guard-failure']:
+ for suffix in (['.json','.stdout.log','.stderr.log'] if 'env' in prefix else ['-owner.json','.stdout.log','.stderr.log']):add('artifacts/'+prefix+suffix,'launchers/startup-failures/'+prefix+suffix,'pre_service_failure')
+for n in ['final-report-9e83fe7-preparation.md','final-report-9e83fe7-preparation-review.json','final-report-9e83fe7-local-preparation.md','final-report-9e83fe7-local-preparation-review.json']:add('artifacts/'+n,'preparation/reports/'+n,'historical_report_preparation')
+for n in ['report-manual-preparation-independent.json','report-draft-review-pass1.json','report-draft-review-local.json','report-draft-pass1-root-bindings.json']:add(P/n,'preparation/reports/'+n,'historical_report_preparation_review')
+for p in sorted(C.glob('demo-*.json')):
+ src=ROOT/'runs/20261006T024719'/p.stem.removeprefix('demo-')/'result.json';r,t=read(src),read(p);assert r['raw']==t['raw'];aliases.append({'original_path':r['path'],'original_absolute':r['absolute_path'],'canonical_path':t['path'],'sha256':r['sha256'],'bytes':r['bytes'],'basis':'Actual byte equality to canonical acceptance copy.'})
+# Publication extension authorized once frozen. Exact PDFs/HTML/build plus linked local assets and source downloads.
+struct=obj(PUB/'structural-review.json');visual=obj(PUB/'visual-review.json')
+assert read(PUB/'visual-review.json')['sha256']=='a76eed27937a85b80d5ffc942ffac515979edbf1c8786958bf7d1862f546c683'
+for p in sorted(PUB.rglob('*')):
+ if p.is_file():add(p,'publication/review/'+p.relative_to(PUB).as_posix(),'publication_review_raw')
+site=ROOT/'_site';site_paths=set()
+for path,expected in struct['inputs'].items():
+ assert read(path)['sha256']==expected
+ if path.startswith('_site/'):site_paths.add((ROOT/path).resolve())
+class Links(HTMLParser):
+ def __init__(self):super().__init__();self.values=[]
+ def handle_starttag(self,tag,attrs):
+  self.values.extend(v for k,v in attrs if k in ('href','src') and v)
+unarchived_publication_links=[]
+for p in list(site_paths):
+ if p.suffix=='.html':
+  parser=Links();parser.feed(read(p)['raw'].decode('utf-8'))
+  for href in parser.values:
+   u=urlsplit(href)
+   if u.scheme or u.netloc or not u.path:continue
+   target=(p.parent/unquote(u.path)).resolve()
+   if target.is_relative_to(site.resolve()) and target.is_file():site_paths.add(target)
+   else:unarchived_publication_links.append({'html':p.relative_to(ROOT).as_posix(),'href':href,'reason':'Not an existing local file inside generated-site root'})
+for p in sorted((site/'assets').glob('*')):
+ if p.is_file():site_paths.add(p.resolve())
+site_paths.add((site/'style.css').resolve())
+for p in sorted(site_paths):add(p,'publication/site/'+p.relative_to(site).as_posix(),'publication_generated_snapshot',struct['inputs'].get(p.relative_to(ROOT).as_posix()))
+recipe=P/'assemble-current-archive.py';add(recipe,'assembly-recipe.py.txt','inert_archive_recipe')
+# All planned sources are present/hash-checked before any archive directory is created.
+D.mkdir(parents=True)
+for dst,r in sorted(copies.items()):
+ p=D/dst;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(read(r['source'])['raw']);assert hashlib.sha256(p.read_bytes()).hexdigest()==r['sha256']
+created=datetime.datetime.now(datetime.timezone.utc).isoformat();generated=[]
+def gen(name,value,text=False):
+ raw=value.encode() if text else (json.dumps(value,indent=2,ensure_ascii=True)+'\n').encode();p=D/name;p.write_bytes(raw);generated.append({'path':p.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)})
+summary={'schema_version':'1.0','assembled_at_utc':created,'source':{'commit':A,'source_sha256':F},'status':'CURRENT_LOCAL_EVIDENCE_ARCHIVED_ROOT_REVIEW_PENDING','goal_status':'NOT_ACHIEVED_REMOTE_ATTESTATION_AND_PUBLIC_PAYLOAD_REVIEW_PENDING','canonical_acceptance_directory':C.relative_to(ROOT).as_posix(),'local_acceptance':{'local_gates_passed':20,'both_suites_unique_cases':815,'both_suites_failures_errors_skips':0,'equal_case_sets':True,'JUnit_seconds':[1649.757,1675.043],'coverage_percent':[91.38059701492537,91.43656716417911],'formal_lab_cases':8},'criteria':{'MUST':169,'passed_locally':163,'remote_dependent_pending':6,'remote_gates_pending':['ci','publication_remote','pages'],'SHOULD':4,'SHOULD_passed':3,'optional_model_fallback_unmet_nonblocking':1},'manual':{'complete_original_cases':5,'raw_files':470,'saved_stop':obj(M/'stopped-processes.json')['at'],'remaining':[],'forced_shutdown_no_launcher_exit0_asserted':True,'CLI_exact_README_scenarios':['happy_path','lost_ack_after_effect']},'audit':{'status':audit['status'],'findings':[],'inventory_files':540,'trace_ZIPs':8,'ZIP_members':2588,'ZIP_uncompressed_bytes':276018990,'DOM_snapshots':5436,'DOM_relevant_snapshots':5428,'DOM_groups':441,'credential_candidates':0,'limits':'Eight current lab traces and explicit manual/log inputs; binary images accounted without OCR. No global/historical publication payload claim.'},'visual_evidence':{'acceptance_reviewed_PNGs':16,'manual_root_reviewed_PNGs':13,'publication_root_reviewed_PDF_pages':64,'publication_HTML_scope':'Entire index/governance and design top/integration diagram, four actual root-viewed screenshots; structural checks on seven HTML pages.','publication_review':'publication/review/visual-review.json','publication_four_PDFs_archived':True,'publication_unknown_local_links':unarchived_publication_links},'startup_history':{'environment_attempt':'Start-Process failed before owner creation due duplicate Path/PATH process environment. Failure metadata and empty logs preserved.','coverage_guard_attempt':'Owner36916 failed before services/report/data because PS5.1 ConvertFrom-Json rejected coverage empty-context key. Original launcher and error preserved; only ignored coverage extraction changed to Python with exit/finite/85-percent guards.','successful_manual_owner':31548,'production_source_unchanged':True},'copy_counts':{'files':len(copies),'bytes':sum(x['bytes'] for x in copies.values()),'zero_byte_observed_files':sum(x['bytes']==0 for x in copies.values()),'by_kind':dict(collections.Counter(x['kind'] for x in copies.values()))},'limits':['No publication, commit, runtime/test/browser/DB action or source/status modification during assembly. Historical campaign archives remain untouched.','Copied bytes preserve original absolute/temporary paths; inputs.json maps their exact archived counterparts. A temporary DB or expired fixture path in a receipt is not claimed present.','Current canonical acceptance raw reports and source files remain in repository and are separately hash-listed, not duplicated.','Preparation and original failed attempts remain labeled historical. Inert .py.txt/.ps1.txt files preserve recipe provenance, not additional executed proof.','Publication snapshot includes structural-bound inputs, current assets and direct existing local HTML links; it does not duplicate all historical _site/sources trees. No broader public-payload scan claim.','The final report and public-payload scan are later separately reviewed extensions.']}
+gen('summary.json',summary)
+gen('canonical-references.json',{'source_commit':A,'references':list(canonical.values()),'byte_identical_demo_aliases':aliases,'scope':'Actual existing repository references, hashed; canonical reports deliberately not duplicated.'})
+index='# Current 9e83fe7 evidence archive\n\nLocal acceptance and fresh stopped manual proof are archived; the overall goal remains NOT ACHIEVED pending remote attestation and the separate public-payload review.\n\n- [Summary](summary.json) and [exact byte inventory](inputs.json).\n- [Canonical acceptance](../acceptance/20261006T024719/manifest.json) and [hashed canonical references](canonical-references.json).\n- [Terminal review](reviews/local-acceptance-review.json) and [independent local review](reviews/local-acceptance-independent-review.json).\n- [Happy](reviews/happy-manual-saved-review.json), [lost ACK](reviews/lost-manual-saved-review.json), [duplicate delivery](reviews/duplicate-manual-saved-review.json), [CLI and stop](reviews/cli-manual-saved-review.json).\n- [Saved audit](audit/final-saved-audit-review.json), [text scan](audit/final-trace-audit-result.json), [DOM review](audit/final-trace-dom-review.json), [execution receipt](audit/final-saved-audit-execution-receipt.json).\n- [Publication visual review](publication/review/visual-review.json), [structural review](publication/review/structural-review.json), [captured HTML](publication/site/index.html), [combined PDF](publication/site/downloads/robotops-twin-samlat.pdf).\n\nCases contain eight original audited traces and sixteen reviewed PNGs. Manual contains all470 settled raw files plus original lab report. Original pre-service failures and coverage-only launcher correction are preserved under launchers/. Recipes are inert provenance text. Earlier report preparations are under preparation/reports/ and are not the final report.\n\nEvery copy is mapped to its original path/hash/size in inputs.json. Raw receipts are unchanged; temporary paths do not imply live databases or expired fixture directories are present. Historical public payloads remain a separate audit scope.\n'
+gen('index.md',index,True)
+manifest={'schema_version':'1.0','source_commit':A,'source_sha256':F,'created_at':created,'archive_root':D.relative_to(ROOT).as_posix(),'copied':list(sorted(copies.values(),key=lambda x:x['archive_path'])),'canonical_references':list(canonical.values()),'canonical_byte_identical_aliases':aliases,'generated':generated,'self_hash':'Bound externally by assembly-receipt.json to avoid a recursive hash.','verification':'Every copied output rehashed and matched to exact first-read original bytes; no missing planned inputs tolerated.'}
+gen('inputs.json',manifest)
+receipt={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'archive_root':D.relative_to(ROOT).as_posix(),'source_commit':A,'source_sha256':F,'copied_files':len(copies),'copied_bytes':sum(x['bytes'] for x in copies.values()),'canonical_refs':len(canonical),'byte_identical_demo_aliases':len(aliases),'generated':generated,'all_copied_bytes_verified':True,'status':'ROOT_REVIEW_PENDING','public_payload_review_required':True,'publication_included':True}
+q=P/'current-archive-assembly-receipt.json';assert not q.exists();q.write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8');(D/'assembly-receipt.json').write_bytes(q.read_bytes())
+print(json.dumps({'receipt':q.relative_to(ROOT).as_posix(),'receipt_sha256':hashlib.sha256(q.read_bytes()).hexdigest(),'copies':len(copies),'bytes':receipt['copied_bytes'],'canonical_refs':len(canonical),'inputs_sha256':hashlib.sha256((D/'inputs.json').read_bytes()).hexdigest(),'summary_sha256':hashlib.sha256((D/'summary.json').read_bytes()).hexdigest(),'publication_local_links_not_archived':unarchived_publication_links}))

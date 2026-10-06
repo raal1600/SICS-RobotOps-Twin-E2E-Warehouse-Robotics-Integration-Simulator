@@ -1,0 +1,110 @@
+{
+    "reviewer":  "/root/final_audit",
+    "kind":  "independent ignored-launcher coverage parsing correction review",
+    "source_commit":  "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+    "outcome":  "NO_BLOCKING_FINDING",
+    "issues":  [
+
+               ],
+    "static_diff":  {
+                        "original_sha256":  "a3116840fda22f7ea6506852db92cb3f34010bc80c4c98a5a5735e2616c7bc59",
+                        "corrected_sha256":  "81b20e45df77e48a80239e376722415d5e741c0c731c4392b0fac44989f12e42",
+                        "same_prefix":  true,
+                        "same_suffix_including85threshold":  true,
+                        "only_change_old_lines":  1,
+                        "only_change_new_lines":  4,
+                        "replacement_at_same_line":  true,
+                        "cli_sha256":  "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150",
+                        "old_stderr":  "ConvertFrom-Json : Cannot process argument because the value of argument \"name\" is not valid. Change the value of the \n\"name\" argument and run the operation again.\nAt C:\\Users\\ramis\\source\\repos\\robotops-twin\\artifacts\\run-manual-lab-9e83fe7.ps1:52 char:71\n+ ...  = Get-Content -LiteralPath $taskCoveragePath -Raw | ConvertFrom-Json\n+                                                          ~~~~~~~~~~~~~~~~\n    + CategoryInfo          : InvalidArgument: (:) [ConvertFrom-Json], PSArgumentException\n    + FullyQualifiedErrorId : Argument,Microsoft.PowerShell.Commands.ConvertFromJsonCommand\n \n"
+                    },
+    "actual_fragment_validation":  {
+                                       "powershell_version":  "5.1.26100.9444",
+                                       "launcher_sha256":  "81b20e45df77e48a80239e376722415d5e741c0c731c4392b0fac44989f12e42",
+                                       "fragment_only":  true,
+                                       "results":  [
+                                                       {
+                                                           "pass":  1,
+                                                           "path":  "docs/evidence/acceptance/20261006T024719/coverage-1.json",
+                                                           "python_exit_code":  0,
+                                                           "percent_covered":  91.38059701492537,
+                                                           "sha256":  "6ace26dd946895fd16504886d8761ee7ce9a00ce4246a22b870cebf144d6c317",
+                                                           "unchanged":  true
+                                                       },
+                                                       {
+                                                           "pass":  2,
+                                                           "path":  "docs/evidence/acceptance/20261006T024719/coverage-2.json",
+                                                           "python_exit_code":  0,
+                                                           "percent_covered":  91.43656716417911,
+                                                           "sha256":  "8acbd04c4c4773e4d61a74f46cd6c6c839c0f0ae3db37cf5a1836b468e684b94",
+                                                           "unchanged":  true
+                                                       }
+                                                   ],
+                                       "launcher_executed":  false,
+                                       "services_started":  false
+                                   },
+    "full_launcher_parse_errors":  0,
+    "retained_guards":  [
+                            "Explicit -RunManual opt-in",
+                            "Exact HEAD and current source fingerprint; tracked diff exception only ACCEPTANCE_REPORT.md",
+                            "Exact clean source/campaign identity and terminal exit0/timestamps",
+                            "All20 local gates passed and no nonzero exit",
+                            "Two nonempty unique clean JUnit identity sets with equal testcase identities",
+                            "Coverage numeric, finite, successful native extraction and unchanged \u003e=85 threshold",
+                            "Refusal of existing report/data/exit/final-manual evidence",
+                            "Unchanged --fresh --runtime blender service invocation and terminal recording"
+                        ],
+    "review_execution_note":  "Only the four-line extraction/threshold fragment was executed, first in a child scriptblock scope (values were not retained in the caller), then in the current scope to capture actual percentages. Both runs exited0; the first null capture was a review harness scoping limitation, not a launcher/parser result. No launcher, services, browser or tests executed.",
+    "limitations":  [
+                        "This verifies saved actual coverage parsing on Windows PowerShell5.1 and statically preserved guards. It is not a new acceptance run or manual scenario proof.",
+                        "Original source/product/tests and failed-launch evidence were not edited; initial PATH-environment and guard failures remain historical records.",
+                        "Finite validation uses Python assertions plus json.dumps allow_nan=False; the actual accepted inputs are numeric finite values. No intentionally malformed input probes were added."
+                    ],
+    "reviewed_at_utc":  "2026-10-06T03:55:48.1812291Z",
+    "inputs":  [
+                   {
+                       "path":  "artifacts/run-manual-lab-9e83fe7.ps1",
+                       "sha256":  "81b20e45df77e48a80239e376722415d5e741c0c731c4392b0fac44989f12e42",
+                       "bytes":  7415
+                   },
+                   {
+                       "path":  "artifacts/run-final-cli-9e83fe7.ps1",
+                       "sha256":  "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150",
+                       "bytes":  11306
+                   },
+                   {
+                       "path":  "artifacts/final-evidence-pack/9e83fe7/coverage-extraction-fix-validation.json",
+                       "sha256":  "efadb7b66eac440377f1311dfacfd628a23a8085dc966ca708e942cd96644f94",
+                       "bytes":  3083
+                   },
+                   {
+                       "path":  "artifacts/final-evidence-pack/9e83fe7/prep-before-coverage-fix-20261006T035307/run-manual-lab-9e83fe7.ps1.txt",
+                       "sha256":  "a3116840fda22f7ea6506852db92cb3f34010bc80c4c98a5a5735e2616c7bc59",
+                       "bytes":  6804
+                   },
+                   {
+                       "path":  "artifacts/final-evidence-pack/9e83fe7/prep-before-coverage-fix-20261006T035307/run-final-cli-9e83fe7.ps1.txt",
+                       "sha256":  "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150",
+                       "bytes":  11306
+                   },
+                   {
+                       "path":  "artifacts/final-evidence-pack/9e83fe7/prep-before-coverage-fix-20261006T035307/coverage-only.diff.txt",
+                       "sha256":  "e8c3bc4be391a9f170d5f8256e397baf832248b9d6bcb216c46549751165124c",
+                       "bytes":  1628
+                   },
+                   {
+                       "path":  "artifacts/final-evidence-pack/9e83fe7/prep-before-coverage-fix-20261006T035307/lab-final-9e83fe7.stderr.log",
+                       "sha256":  "5707fbd7a4804e0e15738706f618edcd85c612dec9b520a8cc7923a1f047f1d1",
+                       "bytes":  602
+                   },
+                   {
+                       "path":  "docs/evidence/acceptance/20261006T024719/coverage-1.json",
+                       "sha256":  "6ace26dd946895fd16504886d8761ee7ce9a00ce4246a22b870cebf144d6c317",
+                       "bytes":  336399
+                   },
+                   {
+                       "path":  "docs/evidence/acceptance/20261006T024719/coverage-2.json",
+                       "sha256":  "8acbd04c4c4773e4d61a74f46cd6c6c839c0f0ae3db37cf5a1836b468e684b94",
+                       "bytes":  336399
+                   }
+               ]
+}

@@ -281,6 +281,8 @@ def validate_links() -> None:
             if parsed.scheme or parsed.netloc:
                 continue
             target=(file.parent/unquote(parsed.path)).resolve() if parsed.path else file
+            if not target.is_relative_to(OUT.resolve()):
+                raise ValueError(f'Link outside publication root in {file.name}: {link}')
             if not target.exists():
                 raise ValueError(f'Broken link in {file.name}: {link}')
             if parsed.fragment and target.suffix=='.html':

@@ -1,0 +1,88 @@
+{
+  "prepared_at_utc": "2026-10-06T03:02:54.769271+00:00",
+  "status": "PREPARATION_ONLY_NOT_EXECUTED",
+  "role": "author_static_preparation",
+  "source_commit": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+  "source_sha256": "136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd",
+  "launcher": {
+    "path": "artifacts\\run-final-cli-9e83fe7.ps1",
+    "sha256": "509598a236dcf240af76f61e6e0bb55427273dd7991a033fc8fe6acf92f76150",
+    "bytes": 11306
+  },
+  "inputs": [
+    {
+      "path": "artifacts/run-final-cli-4774af5.ps1",
+      "sha256": "5946de2f6aa573e3df9cd69c1216b80ae7f7065fd5a560aee0f88b2542c791ac",
+      "bytes": 1476
+    },
+    {
+      "path": "artifacts/run-manual-lab-9e83fe7.ps1",
+      "sha256": "a3116840fda22f7ea6506852db92cb3f34010bc80c4c98a5a5735e2616c7bc59",
+      "bytes": 6804
+    },
+    {
+      "path": "README.md",
+      "sha256": "3c3c72ea5aa6835f7d8c78d0c27923359f0bf631f5ff34053e1de660bc2c8b57",
+      "bytes": 19835
+    },
+    {
+      "path": "tools/integration_demo.py",
+      "sha256": "3dbef1a582e0a97a18c5825e8a5df2164c8aaa72c26914d4580899e8dc046252",
+      "bytes": 6471
+    },
+    {
+      "path": "tools/lab_stack.py",
+      "sha256": "e5eab0ed7fabdcda4b0c093f23734231df9eea31f8333a091ffb8aaa34462eea",
+      "bytes": 11073
+    },
+    {
+      "path": "robotops/lab/api.py",
+      "sha256": "2677fb5058476eeb0fde6491d10f76cdab77488991a6d06dee83e2199bf7f15b",
+      "bytes": 3057
+    }
+  ],
+  "static_checks": {
+    "powershell_parse_errors": 0,
+    "new_runtime_or_health_calls": 0,
+    "future_evidence_directory_exists": false,
+    "single_native_cli_invocation": true,
+    "validateset": [
+      "happy_path",
+      "lost_ack_after_effect"
+    ],
+    "explicit_run_switch": "RunScenario",
+    "exact_readme_commands": [
+      "uv run --locked python -m tools.integration_demo --scenario happy_path --authorize-robot",
+      "uv run --locked python -m tools.integration_demo --scenario lost_ack_after_effect --authorize-robot"
+    ],
+    "preexisting_attempt_start_stdout_stderr_exit_refused_before_external_commands": true,
+    "durable_exclusive_attempt_and_start_before_mutation": true,
+    "file_reservation_mechanism": "FileMode.CreateNew; UTF8; FileStream.Flush(true); attempt remains after failure/interruption",
+    "source_fingerprint_and_terminal_acceptance20gate_guards": true,
+    "current_manual_report_owner_data_schema_queue_api_pid_and_lab_blender_health_guards": true,
+    "api_must_match_readme_default": "http://127.0.0.1:8000",
+    "no_url_output_or_session_override": true,
+    "stdout_and_stderr_captured": true,
+    "nonzero_or_uncertain_exit_stops_no_retry": true,
+    "tracked_differences_observed": []
+  },
+  "planned_invocations": [
+    "powershell.exe -NoProfile -ExecutionPolicy Bypass -File artifacts/run-final-cli-9e83fe7.ps1 -Scenario happy_path -RunScenario",
+    "powershell.exe -NoProfile -ExecutionPolicy Bypass -File artifacts/run-final-cli-9e83fe7.ps1 -Scenario lost_ack_after_effect -RunScenario"
+  ],
+  "review_sequence": "Root invokes happy_path once only after accepted current manual lab. Review saved stdout/exit/full session and original effect evidence; separately decide to invoke lost_ack_after_effect once. No automatic next scenario.",
+  "evidence_paths": [
+    "artifacts/final-manual-9e83fe7/cli-<Scenario>-attempt.json",
+    "artifacts/final-manual-9e83fe7/cli-<Scenario>-start.json",
+    "artifacts/final-manual-9e83fe7/cli-<Scenario>.stdout.log",
+    "artifacts/final-manual-9e83fe7/cli-<Scenario>.stderr.log",
+    "artifacts/final-manual-9e83fe7/cli-<Scenario>-exit.json"
+  ],
+  "limits": [
+    "Not run; no health/server/process probes executed by preparation",
+    "Root must inspect terminal result and persisted original session/effect; exit0 alone is not final scenario proof",
+    "A reserved or interrupted attempt is not permission to retry; preserve evidence and inspect original session",
+    "Durable attempted-command marker prevents launcher reuse, not a hardware exactly-once guarantee",
+    "The future final-manual directory is not created during preparation"
+  ]
+}

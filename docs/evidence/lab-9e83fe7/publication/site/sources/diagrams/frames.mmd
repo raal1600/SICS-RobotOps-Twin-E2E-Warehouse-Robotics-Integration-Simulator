@@ -1,0 +1,14 @@
+flowchart TD
+  world["cell_world<br/>Synthetic common frame"]
+  base["robot_base<br/>Original robot profile"]
+  camera["camera_overhead / side<br/>Sensor calibration / camera model"]
+  locations["source_box_A-F<br/>And destination_tote"]
+  wrist["robot_wrist<br/>TCP-derived visual pose"]
+  flange["tool_flange<br/>Tool changer coupling"]
+  tcp["active_tool_tcp<br/>Tool-specific transform"]
+  world --> base
+  world --> camera
+  world --> locations
+  base --> wrist
+  wrist --> flange
+  flange --> tcp

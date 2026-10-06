@@ -1,0 +1,257 @@
+{
+  "schema_version": "1.0",
+  "at": "2026-10-06T04:41:19.918490+00:00",
+  "status": "FOCUSED_PROPOSED_PUBLICATION_CORRECTION_PASS",
+  "source_A": "9e83fe7d41a52a63ba65b77730e392dafca8fffe",
+  "proposed_label": "P (previous preparation label B); uncommitted, no new source SHA invented",
+  "owned_paths": [
+    "artifacts/proposed-status-9e83fe7/tools/build_publication.py",
+    "artifacts/proposed-status-9e83fe7/tests/contract/test_publication_links.py"
+  ],
+  "change": "Two guard lines inserted before target.exists: the resolved, decoded target must stay within OUT.resolve(); five focused actual-function AST regression cases added.",
+  "only_guard_inserted": true,
+  "tracked_builder_unchanged": true,
+  "test_method": "Compile and execute exact validate_links FunctionDef AST from each real source file, not a mirror implementation; test source root derives from __file__.parents[2], so it targets the proposal when staged and repository after application. Same test bytes run separately with --noconftest, no cache plugin and distinct fixture roots under this ignored directory.",
+  "suites": [
+    {
+      "label": "baseline",
+      "testcases": 5,
+      "passed": 3,
+      "failures": 2,
+      "errors": 0,
+      "skips": 0,
+      "JUnit_seconds": 0.4,
+      "failed_names": [
+        "test_publication_rejects_existing_target_outside_site[../docs/outside.md]",
+        "test_publication_rejects_existing_target_outside_site[%2e%2e/docs/outside.md]"
+      ],
+      "cases": [
+        {
+          "classname": "artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links",
+          "name": "test_publication_rejects_existing_target_outside_site[../docs/outside.md]"
+        },
+        {
+          "classname": "artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links",
+          "name": "test_publication_rejects_existing_target_outside_site[%2e%2e/docs/outside.md]"
+        },
+        {
+          "classname": "artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links",
+          "name": "test_publication_accepts_local_download_fragment_and_external_links"
+        },
+        {
+          "classname": "artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links",
+          "name": "test_publication_retains_missing_target_and_fragment_rejection[missing.html-Broken link]"
+        },
+        {
+          "classname": "artifacts.final-evidence-pack.9e83fe7.publication-link-correction.baseline.tests.contract.test_publication_links",
+          "name": "test_publication_retains_missing_target_and_fragment_rejection[page.html#missing-Missing fragment]"
+        }
+      ],
+      "exit": {
+        "started_at": "2026-10-06T04:37:57.1858306Z",
+        "ended_at": "2026-10-06T04:37:58.0398172Z",
+        "exit_code": 1,
+        "scope": "Same five proposed test bytes against exact original A validator"
+      }
+    },
+    {
+      "label": "proposed",
+      "testcases": 5,
+      "passed": 5,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "JUnit_seconds": 0.252,
+      "failed_names": [],
+      "cases": [
+        {
+          "classname": "artifacts.proposed-status-9e83fe7.tests.contract.test_publication_links",
+          "name": "test_publication_rejects_existing_target_outside_site[../docs/outside.md]"
+        },
+        {
+          "classname": "artifacts.proposed-status-9e83fe7.tests.contract.test_publication_links",
+          "name": "test_publication_rejects_existing_target_outside_site[%2e%2e/docs/outside.md]"
+        },
+        {
+          "classname": "artifacts.proposed-status-9e83fe7.tests.contract.test_publication_links",
+          "name": "test_publication_accepts_local_download_fragment_and_external_links"
+        },
+        {
+          "classname": "artifacts.proposed-status-9e83fe7.tests.contract.test_publication_links",
+          "name": "test_publication_retains_missing_target_and_fragment_rejection[missing.html-Broken link]"
+        },
+        {
+          "classname": "artifacts.proposed-status-9e83fe7.tests.contract.test_publication_links",
+          "name": "test_publication_retains_missing_target_and_fragment_rejection[page.html#missing-Missing fragment]"
+        }
+      ],
+      "exit": {
+        "started_at": "2026-10-06T04:37:59.0256393Z",
+        "ended_at": "2026-10-06T04:37:59.7171805Z",
+        "exit_code": 0,
+        "scope": "Actual five proposed tests against staged publication-root guard"
+      }
+    }
+  ],
+  "same5test_names_and_bytes": true,
+  "JUnit_classname_note": "Classnames differ because pytest includes distinct baseline/proposed artifact paths; names/parameters and test bytes are identical. No claim of identical full classname strings.",
+  "ruff": {
+    "started_at": "2026-10-06T04:37:30.3717821Z",
+    "ended_at": "2026-10-06T04:37:30.5861263Z",
+    "ruff_check_exit": 0,
+    "ruff_format_exit": 0
+  },
+  "review_process_notes": [
+    "Initial format-check requested only a wrapped test-function signature; final check/format both pass before the two pytest runs.",
+    "Initial receipt assembly attempted full classname equality and stopped before writing because artifact path prefixes differ. Corrected comparison uses identical names/parameters and byte-identical tests; raw JUnits unchanged."
+  ],
+  "saved_site": {
+    "receipt": {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/saved-site-checks.json",
+      "sha256": "e52703b8b31c7210b5eee7919ffbc5463764a5171ef2ec521852dc140e6ef949",
+      "bytes": 6456
+    },
+    "original_A_validator_accepts_current7HTMLs": true,
+    "proposed_validator_rejects_original_site": true,
+    "first_link_corrected_then_second_rejected": true,
+    "exactly2href_corrected_candidate7HTMLs_pass": true,
+    "actual_build_report_AST_A_render_equals_frozen_design": true,
+    "actual_build_report_AST_proposed_report_candidate7HTMLs_pass": true
+  },
+  "future_count_scope": "Five proposed cases would make future full acceptance820; frozen A815 and its formal/manual proof remain unchanged.",
+  "limitations": [
+    "No live HTTP404 request or remote GitHub URL verification was performed.",
+    "External URLs pass local-link validation by existing scheme rule; remote reachability is a separate gate.",
+    "Only proposed design report was rendered through actual Markdown builder; this is not a full new site/PDF build or a full acceptance run.",
+    "New5tests belong to a future candidate; original A remains815 tests and its evidence is not relabeled.",
+    "Original frozen archive and _site remain unchanged; no correction evidence appended to archive yet."
+  ],
+  "archive": "No correction evidence appended to the frozen900-file archive; root/independent review and separate extension pending.",
+  "inputs": [
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline.xml",
+      "sha256": "839df3967f4c05e992aaeb9b08edbac8bca322d966151e2b998f00a769c9ca24",
+      "bytes": 3854
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline-exit.json",
+      "sha256": "d0ba34fe6616598f751e30ce3b3cea6a35374eb1628536ce3ccf87149d1d46b2",
+      "bytes": 215
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline.stdout.log",
+      "sha256": "15cc89e03688c6d602a98a39573f69a03524e8368b5a58c6e93500785de51c99",
+      "bytes": 6146
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/proposed.xml",
+      "sha256": "a94a9098b8c1d820fd226eb1d805f196dc9bd738c2e67e64000bf7c6794d6f32",
+      "bytes": 1239
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/proposed-exit.json",
+      "sha256": "b9616d20d52fb969d0768825fd4dbdcad3318181f550fc7aeb1f5ec0525e42e6",
+      "bytes": 215
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/proposed.stdout.log",
+      "sha256": "0c41dedcdb906a51ae38362437921e67fbf9780efd6f150237e692e4901f464b",
+      "bytes": 202
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/proposed.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/ruff-result.json",
+      "sha256": "ff4ee7ccbe803b29703dedaeae3d406395959cd92e33fa08beff0c6779ee07ba",
+      "bytes": 167
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/ruff-check.stdout.log",
+      "sha256": "af352a86840ad0af3d37ea0d9197f868363a6dac6b1c2ef5d2722f6b41d2d9af",
+      "bytes": 42
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/ruff-check.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/ruff-format.stdout.log",
+      "sha256": "3f995abf7569b1e556471e7aee144e03d32b2c7c8b1f30c5fbde8d22fdee2088",
+      "bytes": 54
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/ruff-format.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/initial-ruff-observation.json",
+      "sha256": "ca739e36bb91de1c073ceaf81c8cf983eb2c2a54bdd8f1a87512d47c0938c225",
+      "bytes": 881
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/build-publication.diff.txt",
+      "sha256": "70486c7fa8707d2d45dd906f06552c658ce6dfdcfa2e4917739a7c7191393038",
+      "bytes": 597
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/original-build_publication.py.txt",
+      "sha256": "330e97e031e2f94596597ad863c851caf43b2b62157a9499d83628acbf3ce910",
+      "bytes": 26872
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/verify_saved_site.py",
+      "sha256": "81ba3154cf87dd60e1c282a1008b5374214eafdb1161bb3c12f17c8b20705e8e",
+      "bytes": 7352
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/exact-two-href.diff.txt",
+      "sha256": "6ce7aebb6739ddd0d1445e82e79e8cd413b9ba010af3e7c55b8f2175fbe32a40",
+      "bytes": 4890
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/saved-site-checks.json",
+      "sha256": "e52703b8b31c7210b5eee7919ffbc5463764a5171ef2ec521852dc140e6ef949",
+      "bytes": 6456
+    },
+    {
+      "path": "tools/build_publication.py",
+      "sha256": "330e97e031e2f94596597ad863c851caf43b2b62157a9499d83628acbf3ce910",
+      "bytes": 26872
+    },
+    {
+      "path": "artifacts/proposed-status-9e83fe7/tools/build_publication.py",
+      "sha256": "1ba01db9c5032030be165df16b08249a93ffdf8e45d7cdb68eade5b3716c85fe",
+      "bytes": 27021
+    },
+    {
+      "path": "artifacts/proposed-status-9e83fe7/tests/contract/test_publication_links.py",
+      "sha256": "c4a984d3f5f32771623071a4e103137b54e7d0a4638d6c987afc0b1fa6792433",
+      "bytes": 2506
+    },
+    {
+      "path": "artifacts/proposed-status-9e83fe7/reports/01-design.md",
+      "sha256": "fc86a92fbd947df586cc1370d83d79b60910cec82c0c240bbfb68dc475dc88db",
+      "bytes": 47671
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline/tools/build_publication.py",
+      "sha256": "330e97e031e2f94596597ad863c851caf43b2b62157a9499d83628acbf3ce910",
+      "bytes": 26872
+    },
+    {
+      "path": "artifacts/final-evidence-pack/9e83fe7/publication-link-correction/baseline/tests/contract/test_publication_links.py",
+      "sha256": "c4a984d3f5f32771623071a4e103137b54e7d0a4638d6c987afc0b1fa6792433",
+      "bytes": 2506
+    }
+  ]
+}

@@ -4,15 +4,13 @@ Detta repository innehåller en **deterministisk simulator, ett rapportpaket och
 
 ## Innehåll och redigering
 
-### Integration Lab revision (2026-10-05; acceptance pending)
+### Integration Lab revision (2026-10-06; local runtime verified, publication correction and remote pending)
 
-Version 1.5 adds the guided 22-stage integration console, PostgreSQL, RabbitMQ,
-the separate edge/OPC UA service, virtual PLC journal and WMS/ERP reconciliation.
-Figure 13 and the design/boundary reports describe these implemented boundaries.
-The mandatory final loop and 51 additional LAB-MUST criteria remain tracked in
-[the requirements audit](docs/integration-lab-requirements.md). Earlier accepted
-simulator revisions below do not attest this implementation. Publication remains
-generated exclusively by the existing build tool and workflow.
+Accepted runtime baseline A is `9e83fe7d41a52a63ba65b77730e392dafca8fffe`, fingerprint `136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd`. The original two 815-case suites, five fresh manual/CLI cases and saved audits remain source-scoped. The subsequent publication candidate includes unchanged robot runtime plus publication validator/tests, two report hrefs and reviewed evidence/status documentation. It is not a status-only revision; its full suite remains pending until independently observed. Known-broken A is not the publication candidate. After the corrected candidate is committed and authorized, verify its own full Linux acceptance, Windows native workflow and publication/Pages before refreshing its exact CI manifest. Only then may a reviewed completion successor be created; that successor also needs its own exact-source workflows. **NOT DONE / NOT ACHIEVED** remains the current status.
+
+[Accepted local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Current archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Known publication-link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Reviewed local report](docs/integration-lab-final-report.md)
+
+The source A PDFs have35/13/16 pages,64 combined; root reviewed all pages and selected HTML without visual defects. Archive review separately found two generated design-page links escaping the site root. Candidate P replaces those two Markdown hrefs with absolute GitHub source links and confines validate_links to the publication output root, with five contract regressions. Original A outputs remain unchanged. Targeted candidate checks and the new exact-source build are recorded separately; a local visual PASS is not functional publication or remote deployment proof.
 
 ### Final lifecycle/runtime verification (2026-10-05)
 

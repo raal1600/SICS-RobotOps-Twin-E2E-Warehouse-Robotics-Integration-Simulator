@@ -1,0 +1,38 @@
+import datetime,hashlib,json,pathlib,subprocess
+root=pathlib.Path(__file__).resolve().parents[4]
+out=pathlib.Path(__file__).resolve().parent
+base=out/'extracted'
+expected='76e6abef95155b09484da9a226612d774ceb493d'
+checks=[]
+def check(name,passed,**detail):
+ checks.append(dict(name=name,passed=bool(passed),**detail))
+ assert passed,name
+def read(p): return json.loads(p.read_text(encoding='utf-8-sig'))
+def digest(data):return hashlib.sha256(data).hexdigest()
+bpath=base/'desktop/RobotOps Twin/windows-build.json'
+build=read(bpath)
+smokes=list(base.glob('desktop-smoke/*/evidence.json'))
+check('one smoke record',len(smokes)==1)
+smoke=read(smokes[0])
+check('clean exact-source build',build['source_commit']==expected and build['source_dirty'] is False)
+check('clean exact-source smoke',smoke['source_commit']==expected and smoke['source_dirty'] is False)
+check('headless native window smoke passed',smoke['passed'] is True and smoke['runtime']=='headless',checks=smoke['checks'])
+for name,sha in build['files'].items():check('artifact byte binding '+name,digest((bpath.parent/name).read_bytes())==sha,sha256=sha)
+for name,sha in {**build['source_sha256'],'tools/test-desktop.ps1':smoke['test_script_sha256']}.items():
+ blob=subprocess.check_output(['git','show',expected+':'+name],cwd=root)
+ lf=blob.replace(b'\r\n',b'\n')
+ forms={'git_blob':digest(blob),'windows_crlf_checkout':digest(lf.replace(b'\n',b'\r\n'))}
+ check('exact-source checkout binding '+name,sha in forms.values(),sha256=sha,matching_forms=[k for k,v in forms.items() if v==sha])
+sessions=sorted((smokes[0].parent/'sessions').iterdir())
+check('three distinct owned launches',len(sessions)==3)
+for i,s in enumerate(sessions):
+ launcher,ready,window=map(lambda n:read(s/n),['launcher.json','ready.json','window-ready.json'])
+ check('session identity '+s.name,launcher['session_id']==ready['session_id']==window['session_id'] and ready['origin']==window['origin'] and ready['runtime']=='headless')
+ if i!=1:
+  stopped,launcher_stopped=read(s/'stopped.json'),read(s/'launcher-stopped.json')
+  check('normal close '+s.name,stopped['server_exited'] and stopped['pid']==ready['pid'] and launcher_stopped['backend_exited'] and launcher_stopped['forced'] is False)
+check('six lifecycle/command checks',len(smoke['checks'])==6)
+result={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_commit':expected,'run_id':37524578604,'job_id':112478213715,'artifact_id':11442255852,'artifact_sha256':digest((out/'windows-desktop-evidence-C.zip').read_bytes()),'passed':all(c['passed'] for c in checks),'checks':checks,'limitations':['Native Windows/WebView2 ownership and lifecycle with deterministic headless runtime. Does not attest native Blender playback.','Actual CI assertions establish one-effect recovery; artifact retains smoke/session records, not full runtime database.']}
+(out/'review.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'passed':result['passed'],'checks':len(checks),'receipt':str(out/'review.json')}))
+

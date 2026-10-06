@@ -3,7 +3,7 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Current delivery status:** Integration Lab passed local acceptance at source 9e83fe7: two clean 815-test suites, 20 local gates and five fresh manual/CLI scenarios. A subsequent documentation correction fixes two report links and rejects links outside the publication root; its five regression tests pass. Final-source Linux CI, Windows checks and GitHub Pages verification remain pending. **NOT DONE**.
+**Current delivery status:** Integration Lab is verified at audited source 76e6abe: two clean 831-case Linux suites, all 169 MUST criteria, Windows native checks and exact-source publication/Pages verification. Five fresh Blender/manual scenarios remain attributed to unchanged runtime source 9e83fe7. This evidence/status revision requires its own exact-SHA CI, Windows and deployed-build attestation under ADR 0002. **DONE at audited C**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -52,7 +52,7 @@ an application interlock, not safety certification. No API key, model service,
 GPU, real PLC or industrial hardware is required.
 
 
-## Integration Lab (local runtime verified; publication and remote completion pending)
+## Integration Lab (audited C verified; successor attestation required)
 
 Create and run order now opens a persisted guided session. Each REST authorization
 advances one bounded stage. Reloading the browser reads the saved stage; it cannot
@@ -78,9 +78,11 @@ synthetic. A controller result is distinct from verification and business comple
 [Native Windows service setup](docs/integration-lab-native.md) ·
 [Mandatory delivery and final-loop checklist](docs/integration-lab-requirements.md)
 
-Accepted runtime baseline A is `9e83fe7d41a52a63ba65b77730e392dafca8fffe`, fingerprint `136641a25c5fbd7d45c016582ec2c5c5197362f44f0a894ee95a69c652e3eafd`. The original two 815-case suites, five fresh manual/CLI cases and saved audits remain source-scoped. The subsequent publication candidate includes unchanged robot runtime plus publication validator/tests, two report hrefs and reviewed evidence/status documentation. It is not a status-only revision; its full suite remains pending until independently observed. Known-broken A is not the publication candidate. After the corrected candidate is committed and authorized, verify its own full Linux acceptance, Windows native workflow and publication/Pages before refreshing its exact CI manifest. Only then may a reviewed completion successor be created; that successor also needs its own exact-source workflows. **NOT DONE / NOT ACHIEVED** remains the current status.
+Audited candidate C is `76e6abef95155b09484da9a226612d774ceb493d`. The complete Linux, Windows native and publication/Pages results linked here attest C. Original manual/Blender evidence remains source A `9e83fe7d41a52a63ba65b77730e392dafca8fffe`; source P's Windows checkout failure and C's isolated checkout correction remain preserved. This status/evidence successor R must pass its own complete workflows before the final goal declaration. Its independent CI artifact and deployed build.json supply R's identity without a self-hash commit loop. No result is relabeled as R execution.
 
-[Accepted local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Current archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Known publication-link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Reviewed local report](docs/integration-lab-final-report.md)
+[Exact C acceptance](docs/evidence/acceptance/20261006T201300/manifest.json) | [CI review](docs/evidence/lab-76e6abe/ci/review/linux-artifact-review.json) | [Windows review](docs/evidence/lab-76e6abe/windows/review.json) | [Publication review](docs/evidence/lab-76e6abe/publication/review.json) | [Runtime identity](docs/evidence/lab-76e6abe/source-relation.json) | [Payload review](docs/evidence/lab-76e6abe/payload-review.json)
+
+[Source-A local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Source-A archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Preserved source-A link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Source-bound completion report](docs/integration-lab-final-report.md)
 
 After starting either API profile, run the same staged workflow automatically:
 

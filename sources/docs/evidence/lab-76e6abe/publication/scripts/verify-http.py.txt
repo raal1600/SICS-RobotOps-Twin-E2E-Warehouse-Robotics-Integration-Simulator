@@ -1,0 +1,131 @@
+"""Read-only exact-run publication/Pages byte comparison; no Git or runtime mutations."""
+import argparse
+import hashlib
+import json
+import re
+import urllib.parse
+import urllib.request
+import zipfile
+from datetime import UTC, datetime
+from html.parser import HTMLParser
+from io import BytesIO
+from pathlib import Path, PurePosixPath
+
+from pypdf import PdfReader
+
+P = "76e6abef95155b09484da9a226612d774ceb493d"
+RUN = 37524940689
+BASE = "https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/"
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+sha = lambda b: hashlib.sha256(b).hexdigest()
+
+class HTML(HTMLParser):
+    def __init__(self, data):
+        super().__init__(); self.links=[]; self.ids=set(); self.feed(data.decode("utf-8"))
+    def handle_starttag(self, tag, attrs):
+        d=dict(attrs)
+        if d.get("id"): self.ids.add(d["id"])
+        if tag in {"a","link","img","script"}:
+            href=d.get("src") if tag in {"img","script"} else d.get("href")
+            if href: self.links.append({"tag":tag,"href":href})
+
+def main():
+    ap=argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--publication-zip",type=Path,required=True)
+    ap.add_argument("--http-check-zip",type=Path,required=True)
+    ap.add_argument("--run-metadata",type=Path,required=True)
+    ap.add_argument("--jobs-metadata",type=Path,required=True)
+    ap.add_argument("--artifacts-metadata",type=Path,required=True)
+    ap.add_argument("--output",type=Path,required=True)
+    args=ap.parse_args(); out=args.output.resolve()
+    assert out.parent==HERE and not out.exists()
+    inputs=[]
+    def load(p):
+        raw=p.read_bytes();inputs.append({"path":str(p.resolve()),"bytes":len(raw),"sha256":sha(raw)})
+        return json.loads(raw)
+    run=load(args.run_metadata); jobs=load(args.jobs_metadata); artifacts=load(args.artifacts_metadata)
+    assert run["id"]==RUN and run["head_sha"]==P and run["head_branch"]=="main"
+    assert run["path"]==".github/workflows/publish-reports.yml" and run["status"]=="completed" and run["conclusion"]=="success"
+    assert {j["name"] for j in jobs["jobs"]}=={"build","deploy"}
+    assert all(j["head_sha"]==P and j["run_id"]==RUN and j["status"]=="completed" and j["conclusion"]=="success" for j in jobs["jobs"])
+    assert all(s["conclusion"] in {"success","skipped"} for j in jobs["jobs"] for s in j["steps"])
+    archives={}
+    for name,path in [("robotops-publication",args.publication_zip),("publication-http-checks",args.http_check_zip)]:
+        metadata=[a for a in artifacts["artifacts"] if a["name"]==name]
+        assert len(metadata)==1 and not metadata[0]["expired"]
+        m=metadata[0]; assert m["workflow_run"]["id"]==RUN and m["workflow_run"]["head_sha"]==P
+        raw=path.read_bytes(); digest=sha(raw)
+        assert m["digest"]=="sha256:"+digest
+        inputs.append({"path":str(path.resolve()),"bytes":len(raw),"sha256":digest,"artifact_id":m["id"],"artifact_name":name})
+        z=zipfile.ZipFile(BytesIO(raw)); names=z.namelist()
+        assert len(names)==len(set(names))
+        assert all(not PurePosixPath(n).is_absolute() and ".." not in PurePosixPath(n).parts and "\\" not in n for n in names)
+        archives[name]=z
+    z=archives["robotops-publication"]
+    build_raw=z.read("build.json"); build=json.loads(build_raw); assert build["source_commit"]==P
+    smoke=json.loads(archives["publication-http-checks"].read("publication-http-checks.json"))
+    assert smoke["source_commit"]==P and smoke["page_url"].rstrip("/")+"/"==BASE
+    assert all(c["status"]==200 for c in smoke["checks"])
+    out.mkdir(); (out/"artifact-selected").mkdir(); (out/"http").mkdir()
+    requests=[]; cache={}; links=[]; findings=[]
+    def get(name,save_name=None):
+        assert not name.startswith("/") and ".." not in PurePosixPath(name).parts
+        url=BASE+urllib.parse.quote(name,safe="/")+"?verify="+P
+        request=urllib.request.Request(url,headers={"User-Agent":"RobotOps-Exact-Source-ReadOnly-Review","Cache-Control":"no-cache"})
+        with urllib.request.urlopen(request,timeout=40) as r:
+            assert r.status==200 and r.url.startswith(BASE)
+            raw=r.read(); typ=r.headers.get_content_type()
+            record={"path":name,"url":url,"final_url":r.url,"status":r.status,"content_type":typ,"bytes":len(raw),"sha256":sha(raw),"at_utc":datetime.now(UTC).isoformat()}
+        p=out/"http"/(save_name or name); p.parent.mkdir(parents=True,exist_ok=True)
+        with p.open("xb") as f:f.write(raw)
+        requests.append(record); (out/"http-progress.json").write_text(json.dumps(requests,indent=2)+"\n")
+        return raw,typ
+    remote_build,_=get("build.json","build-before.json");assert remote_build==build_raw
+    pages=["index","design","avgransning","diskussion","kallor","diagram","governance"]
+    selected={"build.json":build_raw}
+    for name in pages:
+        path=name+".html";raw,typ=get(path);assert typ=="text/html" and raw==z.read(path)
+        cache[path]=(raw,typ);selected[path]=z.read(path)
+    corrected=["https://github.com/raal1600/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/blob/main/docs/"+n for n in ["integration-lab.md","integration-lab-requirements.md"]]
+    design=HTML(cache["design.html"][0]); assert all(sum(x["href"]==u for x in design.links)==1 for u in corrected)
+    for name in pages:
+        parser=HTML(cache[name+".html"][0])
+        for item in parser.links:
+            url=urllib.parse.urljoin(BASE+name+".html",item["href"]); parts=urllib.parse.urlsplit(url)
+            if parts.netloc!=urllib.parse.urlsplit(BASE).netloc: continue
+            prefix=urllib.parse.urlsplit(BASE).path
+            decoded=urllib.parse.unquote(parts.path)
+            assert decoded.startswith(prefix),("Outside published project root",url)
+            path=decoded[len(prefix):] or "index.html"
+            assert ".." not in PurePosixPath(path).parts
+            if path not in cache: cache[path]=get(path)
+            raw,typ=cache[path]
+            assert path in z.namelist() and raw==z.read(path), ("HTTP differs from same-run artifact",path)
+            if parts.fragment and typ=="text/html":assert urllib.parse.unquote(parts.fragment) in HTML(raw).ids,(path,parts.fragment)
+            links.append({"page":name,"href":item["href"],"target":path,"fragment":parts.fragment,"same_run_bytes":True})
+    pdfs=[]; concat=[]; local=ROOT/"artifacts/publication-candidate-review-b38fb0f-20261006T050730Z/site/downloads"
+    for name in [r["report"] for r in build["reports"]]+["robotops-twin-samlat"]:
+        path="downloads/"+name+".pdf"
+        raw,typ=cache.get(path) or get(path);cache[path]=(raw,typ)
+        original=z.read(path);assert raw==original and raw.startswith(b"%PDF-")
+        selected[path]=original
+        reader=PdfReader(BytesIO(raw)); texts=[p.extract_text() or "" for p in reader.pages]
+        expected=next((r for r in build["reports"] if r["report"]==name),None)
+        if expected: assert sha(raw)==expected["pdf_sha256"] and len(texts)==expected["pages"];concat.extend(texts)
+        else:assert texts==concat and len(texts)==build["combined_pdf_pages"]
+        local_raw=(local/(name+".pdf")).read_bytes(); local_reader=PdfReader(BytesIO(local_raw));local_texts=[p.extract_text() or "" for p in local_reader.pages]
+        normalize=lambda t:re.sub(r"\s+"," ",t).strip()
+        same_text=[normalize(t) for t in texts]==[normalize(t) for t in local_texts]
+        record={"path":path,"bytes":len(raw),"sha256":sha(raw),"pages":len(texts),"http_equals_same_run_artifact":True,"declared_part_hash_matches":bool(expected),"local_P_pdf_sha256":sha(local_raw),"local_P_pages":len(local_texts),"same_normalized_page_text_as_local_P":same_text,"same_mediaboxes_as_local_P":[list(p.mediabox) for p in reader.pages]==[list(p.mediabox) for p in local_reader.pages]}
+        pdfs.append(record)
+        if not same_text:findings.append({"kind":"remote_local_page_text_difference_requires_review","path":path})
+    after,_=get("build.json","build-after.json");assert after==build_raw==remote_build
+    for name,raw in selected.items():
+        p=out/"artifact-selected"/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw)
+    for item in inputs:assert sha(Path(item["path"]).read_bytes())==item["sha256"]
+    receipt={"at_utc":datetime.now(UTC).isoformat(),"status":"EXACT_RUN_ARTIFACT_HTTP_BYTES_PASS_VISUAL_REVIEW_PENDING","source_commit":P,"run_id":RUN,"workflow_url":run["html_url"],"page_url":BASE,"workflow_build_deploy_passed":True,"build_before_after_same_exact_run_bytes":True,"reports":pdfs,"html_pages":pages,"local_link_occurrences_checked":len(links),"local_links":links,"corrected_absolute_hrefs":corrected,"corrected_remote_document_targets_not_fetched_by_this_script":True,"requests":requests,"inputs":inputs,"findings":findings,"runtime_scope":"Documentation only; no robot runtime executed. P runtime/source relation and local64-page visual review are separate existing evidence.","visual_review":"Pending selected live HTML and remote PDF comparison; local review is not silently relabeled remote."}
+    (out/"http-and-artifact-review.json").write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf-8")
+    print(json.dumps({"receipt":str(out/"http-and-artifact-review.json"),"pages":len(pages),"pdfs":len(pdfs),"local_link_checks":len(links),"findings":findings}))
+
+if __name__=="__main__":main()

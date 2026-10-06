@@ -1,10 +1,12 @@
 # Current Integration Lab checklist scope
 
-Integration Lab passed local acceptance at source 9e83fe7: two clean 815-test suites, 20 local gates and five fresh manual/CLI scenarios. A subsequent documentation correction fixes two report links and rejects links outside the publication root; its five regression tests pass. Final-source Linux CI, Windows checks and GitHub Pages verification remain pending. **NOT ACHIEVED**.
+Integration Lab is verified at audited source 76e6abe: two clean 831-case Linux suites, all 169 MUST criteria, Windows native checks and exact-source publication/Pages verification. Five fresh Blender/manual scenarios remain attributed to unchanged runtime source 9e83fe7. This evidence/status revision requires its own exact-SHA CI, Windows and deployed-build attestation under ADR 0002.
 
-[Accepted local campaign](docs/evidence/acceptance/20261006T024719/manifest.json) | [Current archive readiness](docs/evidence/lab-9e83fe7/readiness.json) | [Known publication-link defect](docs/evidence/lab-9e83fe7/publication-link-disposition.json) | [Reviewed local report](docs/integration-lab-final-report.md)
+Audited candidate C is `76e6abef95155b09484da9a226612d774ceb493d`. The complete Linux, Windows native and publication/Pages results linked here attest C. Original manual/Blender evidence remains source A `9e83fe7d41a52a63ba65b77730e392dafca8fffe`; source P's Windows checkout failure and C's isolated checkout correction remain preserved. This status/evidence successor R must pass its own complete workflows before the final goal declaration. Its independent CI artifact and deployed build.json supply R's identity without a self-hash commit loop. No result is relabeled as R execution.
 
-The [51-item current checklist](docs/integration-lab-requirements.md) has50 locally supported items; TEST-10 / LAB-MUST-044 remains unchecked pending candidate-specific remote CI. The publication-link/validator correction, proposed P full verification, final payload and P/R attestations remain mandatory. Historical checked lists below retain their prior release scope and do not close this goal.
+[Exact C acceptance](docs/evidence/acceptance/20261006T201300/manifest.json) | [CI review](docs/evidence/lab-76e6abe/ci/review/linux-artifact-review.json) | [Windows review](docs/evidence/lab-76e6abe/windows/review.json) | [Publication review](docs/evidence/lab-76e6abe/publication/review.json) | [Runtime identity](docs/evidence/lab-76e6abe/source-relation.json) | [Payload review](docs/evidence/lab-76e6abe/payload-review.json)
+
+All 51 GOAL items now have source-bound evidence, including exact-C CI for TEST-10 / LAB-MUST-044. All 169 MUSTs pass for C. The final report and 14-action ledger retain the independent final-R attestation requirement. Earlier entries below retain their original source/date and do not override this audited-C status.
 
 ---
 

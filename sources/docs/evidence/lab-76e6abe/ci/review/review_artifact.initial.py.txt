@@ -1,0 +1,299 @@
+"""Read-only exact-source GitHub CI artifact audit; no imports from product code."""
+import argparse
+from collections import Counter
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path, PurePosixPath
+import re
+import subprocess
+import xml.etree.ElementTree as ET
+import zipfile
+
+COMMIT = "76e6abef95155b09484da9a226612d774ceb493d"
+RUN_ID = 37524578727
+LOCAL = {"setup", "browser_setup", "blender_version", "security", "tests_1", "tests_2", "repeatability", "lint", "typecheck", "drift", "publication", "publication_final"}
+REMOTE = {"ci", "publication_remote", "pages"}
+REMOTE_MUST = {
+    "SC-DATA-005": {"ci"}, "SC-KB-006": {"publication_remote"},
+    "SC-KB-007": {"publication_remote"}, "SC-KB-008": {"pages", "publication_remote"},
+    "HKM-VIS-MUST-025": REMOTE, "UI-INV-MUST-008": REMOTE,
+}
+DEMOS = {
+    "happy_path": ("COMPLETED", "COMPLETED", 1, 1, "VERIFIED_SUCCESS"),
+    "lost_ack_after_effect": ("UNKNOWN_OUTCOME", "COMPLETED", 1, 1, "VERIFIED_SUCCESS"),
+    "lost_ack_before_effect": ("UNKNOWN_OUTCOME", "FAILED", 0, 1, "VERIFIED_FAILURE"),
+    "ambiguous": ("UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION", 1, 1, "INCONCLUSIVE"),
+    "restart": ("UNKNOWN_OUTCOME", "COMPLETED", 1, 1, "VERIFIED_SUCCESS"),
+    "logical_estop": ("FAILED", "FAILED", 0, 1, "VERIFIED_FAILURE"),
+    "cell_fault": ("FAILED", "FAILED", 0, 1, "VERIFIED_FAILURE"),
+    "tool_showcase": ("COMPLETED", "COMPLETED", 6, 6, "VERIFIED_SUCCESS"),
+}
+LOCAL |= {"demo_" + name for name in DEMOS}
+ISSUES, CHECKS, INPUTS = [], [], {}
+OUTPUT_PATH = None
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def date(value):
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("Unbound naive timestamp: " + value)
+    return parsed
+
+
+def check(value, label):
+    CHECKS.append({"check": label, "passed": bool(value)})
+    if not value:
+        ISSUES.append(label)
+    return bool(value)
+
+
+def git(repo, *args):
+    return subprocess.check_output(["git", *args], cwd=repo)
+
+
+def source_blobs(repo):
+    rows = git(repo, "ls-tree", "-rz", "--full-tree", COMMIT).split(b"\0")
+    paths = {}
+    for row in filter(None, rows):
+        metadata, name = row.split(b"\t", 1)
+        mode, kind, oid = metadata.split()
+        name = name.decode()
+        if kind == b"blob" and not name.startswith("docs/evidence/") and name != "ACCEPTANCE_REPORT.md":
+            paths[name] = oid
+    names = sorted(paths)
+    data = subprocess.run(["git", "cat-file", "--batch"], cwd=repo, input=b"\n".join(paths[n] for n in names) + b"\n", stdout=subprocess.PIPE, check=True).stdout
+    pos, blobs = 0, {}
+    for name in names:
+        end = data.index(b"\n", pos)
+        size = int(data[pos:end].split()[2])
+        blobs[name] = data[end + 1:end + 1 + size]
+        pos = end + 2 + size
+    fingerprint = hashlib.sha256()
+    for name, raw in blobs.items():
+        fingerprint.update(name.encode() + b"\0" + raw)
+    return blobs, fingerprint.hexdigest()
+
+
+def main():
+    global OUTPUT_PATH
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--zip", required=True, type=Path)
+    parser.add_argument("--run", required=True, type=Path)
+    parser.add_argument("--artifact", required=True, type=Path)
+    parser.add_argument("--repo", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    args = parser.parse_args()
+    script_raw = Path(__file__).read_bytes()
+    if args.output.exists():
+        raise ValueError("Refusing to overwrite a previous review receipt")
+    OUTPUT_PATH = args.output
+    run_raw, artifact_raw = args.run.read_bytes(), args.artifact.read_bytes()
+    run, artifact = json.loads(run_raw), json.loads(artifact_raw)
+    check(run["id"] == RUN_ID and run["head_sha"] == COMMIT and run["event"] == "push" and run["head_branch"] == "main", "exact C main push run")
+    check(run["status"] == "completed" and run["conclusion"] == "success", "terminal successful Linux workflow")
+    check(artifact["name"] == "deterministic-evidence" and artifact["workflow_run"]["id"] == RUN_ID and artifact["workflow_run"]["head_sha"] == COMMIT and not artifact["expired"], "artifact exact run/source identity")
+    with args.zip.open("rb") as stream:
+        archive_hash = hashlib.file_digest(stream, "sha256").hexdigest()
+    check(artifact.get("digest") == "sha256:" + archive_hash, "downloaded ZIP matches GitHub artifact SHA256")
+    blobs, fingerprint = source_blobs(args.repo)
+    output = {"reviewed_at": datetime.now(timezone.utc).isoformat(), "commit": COMMIT, "run_id": RUN_ID, "run_url": run["html_url"], "script_sha256": sha(script_raw), "archive_sha256": archive_hash, "archive_bytes": args.zip.stat().st_size, "run_json_sha256": sha(run_raw), "artifact_json_sha256": sha(artifact_raw), "expected_test_count": 831, "git_blob_source_sha256": fingerprint, "limitations": ["Saved CI evidence audit; no test or runtime rerun.", "No full trace ZIP, visual/PDF, Windows or remote Pages audit in this receipt.", "Git blob fingerprint compares Linux checkout source bytes, excluding generated acceptance/evidence as implementation does."]}
+    with zipfile.ZipFile(args.zip) as z:
+        names = z.namelist()
+        check(len(names) == len(set(names)), "no duplicate ZIP member names")
+        check(all(not PurePosixPath(n).is_absolute() and ".." not in PurePosixPath(n).parts and "\\" not in n for n in names), "archive paths are relative and confined")
+
+        def read(name):
+            raw = z.read(name)
+            INPUTS[name] = {"sha256": sha(raw), "bytes": len(raw)}
+            return raw
+
+        def js(name):
+            return json.loads(read(name))
+
+        candidates = []
+        for name in names:
+            if re.fullmatch(r"docs/evidence/acceptance/[^/]+/manifest\.json", name):
+                value = json.loads(z.read(name))
+                if value.get("source", {}).get("commit") == COMMIT:
+                    candidates.append(name)
+        if not check(len(candidates) == 1, "exactly one fresh exact C campaign manifest"):
+            raise ValueError("ambiguous/missing exact-source campaign")
+        manifest_name = candidates[0]
+        manifest = js(manifest_name)
+        base = manifest_name.rsplit("/", 1)[0]
+        output.update(campaign=base, source=manifest["source"], environment=manifest["environment"])
+        check(manifest["source"] == {"commit": COMMIT, "dirty": False, "source_sha256": fingerprint}, "manifest source equals clean committed Linux source")
+        begin, end = date(manifest["started_at"]), date(run["updated_at"])
+        check(date(run["created_at"]) <= begin <= end, "campaign starts within current workflow lifetime")
+        check(manifest["environment"]["platform"].startswith("Linux"), "actual Linux environment")
+        check(manifest["environment"]["lock_sha256"] == sha(blobs["uv.lock"]), "manifest lock hash matches exact commit")
+        gates = manifest["gates"]
+        check(set(gates) == LOCAL | REMOTE and len(LOCAL) == 20, "complete expected 20 local/3 remote gate set")
+        for name in sorted(LOCAL):
+            gate = gates.get(name, {})
+            check(gate.get("passed") is True and gate.get("exit_code", 0) == 0, "local gate passed: " + name)
+            if gate.get("log"):
+                read(gate["log"])
+        check(all(gates.get(n, {}).get("passed") is False for n in REMOTE), "local CI manifest accurately leaves external remote refresh pending")
+        output["gates"] = gates
+        suites, summaries, fixture_names = [], [], []
+        for i in (1, 2):
+            command = gates[f"tests_{i}"]["command"]
+            check(len(command) == 10 and command[1:4] == ["-m", "tools.dev", "test"] and command[6:8] == ["--cov=robotops", "--cov=apps"] and command[-1] == "--cov-report=term", f"suite {i} full unfiltered invocation")
+            fixture = next(x.split("=", 1)[1] for x in command if x.startswith("--basetemp="))
+            fixture_names.append(PurePosixPath(fixture).parent.name)
+            check(fixture_names[-1].startswith(f"robotops-acceptance-{i}-") and fixture.endswith("/fixtures"), f"suite {i} isolated fixture identity")
+            doc = ET.fromstring(read(f"{base}/tests-{i}.xml"))
+            cases, counts = {}, Counter()
+            for case in doc.iter("testcase"):
+                identity = case.attrib["classname"].replace(".", "/") + ".py::" + case.attrib["name"]
+                outcome = next((key for key in ("failure", "error", "skipped") if case.find(key) is not None), "passed")
+                check(identity not in cases, f"suite {i} unique testcase: {identity}")
+                cases[identity] = outcome == "passed"
+                counts[outcome] += 1
+            check(len(cases) == 831 and counts == {"passed": 831}, f"suite {i} actual 831 clean cases")
+            declarations = [dict(s.attrib) for s in doc.iter("testsuite")]
+            check(sum(int(s["tests"]) for s in declarations) == len(cases) and all(int(s[k]) == 0 for s in declarations for k in ("failures", "errors", "skipped")), f"suite {i} declarations agree with actual clean outcomes")
+            check(all(begin <= date(s["timestamp"]) <= end for s in declarations), f"suite {i} actual start timestamps within current campaign")
+            coverage = js(f"{base}/coverage-{i}.json")
+            totals = coverage["totals"]
+            percent = totals["covered_lines"] * 100 / totals["num_statements"]
+            check(abs(percent - totals["percent_covered"]) < 1e-8 and percent >= 85 and totals["missing_lines"] + totals["covered_lines"] == totals["num_statements"], f"suite {i} independently recomputed coverage >=85")
+            suites.append(cases)
+            summaries.append({"pass": i, "counts": dict(counts), "unique_cases": len(cases), "declared_suites": declarations, "coverage": totals, "recomputed_coverage": percent, "fixture_basename": fixture_names[-1], "testcase_outcome_sha256": sha(json.dumps(cases, sort_keys=True).encode())})
+        check(suites[0] == suites[1] and all(suites[0].values()), "two identical complete clean testcase/outcome sets")
+        repeat = js(f"{base}/repeatability.json")
+        check(repeat == {"passed": True, "test_count": len(suites[0]), "tests": suites}, "recorded repeatability equals independently parsed JUnits")
+        output["suites"] = summaries
+        lab_cases = []
+        for name in names:
+            if not re.fullmatch(r"artifacts/lab-browser/[^/]+/[^/]+/stack\.json", name):
+                continue
+            stack = json.loads(z.read(name))
+            matches = [i for i, fixture in enumerate(fixture_names, 1) if fixture in stack.get("data_directory", "")]
+            if not matches:
+                continue
+            check(len(matches) == 1, "lab saved case unambiguous suite fixture")
+            read(name)
+            folder = name.rsplit("/", 1)[0]
+            scenario = folder.rsplit("/", 1)[1]
+            session = js(folder + "/session.json")
+            browser = js(folder + "/browser.json")
+            hashes = js(folder + "/source-hashes.json")
+            check(len(hashes) >= 25 and all(path.replace("\\", "/") in blobs and sha(blobs[path.replace("\\", "/")]) == value for path, value in hashes.items()), folder + " recorded source hashes match exact C blobs")
+            check(session["status"] == "COMPLETED" and session["current_stage"] == 22 and session["profile"] == "lab", folder + " completed guided lab session")
+            check(begin <= date(session["created_at"]) <= date(session["updated_at"]) <= end, folder + " current campaign session timestamps")
+            check(session["context"]["physical_authorized"] is True and session["context"]["wms_ack"] is True, folder + " authorization and business acknowledgement")
+            receipt = session["context"]["receipt"]
+            check(receipt["command_id"] == session["command_id"] and receipt["job_id"] == session["job_id"] and receipt["effect_count"] == 1 and receipt["journal_durable"], folder + " original durable single-effect receipt")
+            check(set(range(1, 23)) <= {s["stage"] for s in session["steps"]}, folder + " all 22 actual stages saved")
+            check(all(s["classification"] == "REAL PROTOCOL" for s in session["steps"] if s["stage"] in {10, 11, 12, 13, 14, 17, 20}), folder + " real-protocol stage classification")
+            check(browser["errors"] == [] and browser["console_errors"] == [], folder + " no browser/page errors")
+            posts = [r for r in browser["requests"] if r["method"] == "POST"]
+            auth = [r for r in posts if r["url"].endswith("/authorize")]
+            check(sum(r["body"].get("stage") == 16 for r in auth) == 1 and sum(r["body"].get("stage") == 15 for r in auth) == 1, folder + " physical gate and execution each authorized once")
+            check(not any(r["url"].endswith("/run") for r in posts), folder + " no monolithic run request")
+            motion = None
+            if scenario == "happy":
+                motion = js(folder + "/blender-motion.json")
+                recording = motion["recording"]
+                check(stack["runtime"] == "blender" and recording["source"] == "BLENDER_EVALUATED_SCENE" and recording["complete"] and recording["command_id"] == session["command_id"] and recording["frames"] > 1 and recording["robot_poses"] > 1, folder + " actual complete Blender recording")
+                check(motion["before"]["pose"]["position"] != motion["after"]["pose"]["position"] and motion["before"]["rendered"] != motion["after"]["rendered"], folder + " evaluated and rendered robot positions change")
+            identity = "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[" + ("" if scenario == "happy" else scenario) + "]"
+            check(suites[matches[0] - 1].get(identity) is True, folder + " exact saved case has formal clean JUnit outcome")
+            lab_cases.append({"pass": matches[0], "scenario": scenario, "folder": folder, "session_id": session["session_id"], "command_id": session["command_id"], "job_id": session["job_id"], "revision": session["revision"], "effect_count": receipt["effect_count"], "runtime": stack["runtime"], "source_hash_count": len(hashes), "motion_recording": motion["recording"] if motion else None, "formal_test_id": identity})
+        expected_pairs = {(i, s) for i in (1, 2) for s in ("happy", "DROP_ACK_AFTER_EFFECT", "DUPLICATE_DELIVERY", "WMS_UNAVAILABLE")}
+        check(len(lab_cases) == 8 and {(c["pass"], c["scenario"]) for c in lab_cases} == expected_pairs, "all eight saved formal full-lab case identities")
+        output["lab_browser_cases"] = lab_cases
+        mapping = json.loads(blobs["docs/acceptance-map.json"])
+        criterion_results = {}
+        for identity, item in mapping.items():
+            failures = [n for n in item["gates"] if gates.get(n, {}).get("passed") is not True]
+            for test in item["tests"]:
+                for i, suite in enumerate(suites, 1):
+                    matched = [value for name, value in suite.items() if name.split("::")[-1].split("[")[0] == test]
+                    if not matched or not all(matched):
+                        failures.append(f"run {i}: {test} missing/failed/skipped")
+            criterion_results[identity] = {"passed": not failures, "failures": failures}
+        check(criterion_results == manifest["criteria"], "all criterion results independently recomputed")
+        must = re.findall(r"\*\*((?:SC-[A-Z]+-\d{3}|HKM-VIS-MUST-\d{3}|UI-INV-MUST-\d{3}|LAB-MUST-\d{3})) MUST\*\*", blobs["SUCCESS_CRITERIA.md"].decode())
+        pending = {k: criterion_results[k] for k in must if not criterion_results[k]["passed"]}
+        check(len(must) == len(set(must)) == 169 and len(pending) == 6 and all(set(v["failures"]) <= REMOTE and v["failures"] for v in pending.values()), "169 MUST: 163 locally satisfied; exactly six only remote-dependent")
+        check({k: set(v["failures"]) for k, v in pending.items()} == REMOTE_MUST, "exact six expected remote criterion dependency sets")
+        lab = [k for k in must if k.startswith("LAB-MUST-")]
+        check(len(lab) == 51 and all(criterion_results[k]["passed"] for k in lab), "all51 mapped LAB criteria locally proven by gates/tests")
+        output["criteria"] = {"must_count": len(must), "local_passed": len(must) - len(pending), "pending": pending}
+        demo_results = []
+        for scenario, expected in DEMOS.items():
+            d = js(f"{base}/demo-{scenario}.json")
+            check(d["scenario"] == scenario and d["runtime"] == "blender", scenario + " actual Blender scenario")
+            check((d["initial_state"], d["final_state"], d["pick_effect_count"], d["command_count"]) == expected[:4], scenario + " expected outcomes/counts")
+            check(d["duplicate_physical_picks"] == 0 and d["no_replacement_commands"] is True, scenario + " no duplicate effects/replacement commands")
+            evidence = d["evidence"]
+            commands = [e["command"]["command_id"] for e in evidence]
+            check(len(evidence) == expected[3] and len(set(commands)) == len(commands) and d["command_id"] == d["original_command_id"] == commands[0], scenario + " original unique identities")
+            check(d["order"]["status"] == expected[1] and set(d["order"]["job_ids"]) == {e["job"]["job_id"] for e in evidence}, scenario + " order and original jobs")
+            applied = [e for e in d["controller_events"] if e["event_type"] == "PICK_EFFECT"]
+            check(len(applied) == expected[2] and all(v == 1 for v in Counter(e["command_id"] for e in applied).values()), scenario + " independent effect events")
+            created = [e for e in d["controller_events"] if e["event_type"] == "COMMAND_CREATED"]
+            check(Counter(e["command_id"] for e in created) == Counter(commands), scenario + " exactly original durable command creation events")
+            check(all(begin <= date(e["timestamp"]) <= end for e in d["controller_events"]), scenario + " current campaign event timestamps")
+            receipts = []
+            for e in evidence:
+                cmd, job, journal = e["command"], e["job"], e["journal"]
+                cid = cmd["command_id"]
+                check(cid == job["command_id"] == journal["command_id"] and cmd["job_id"] == job["job_id"] == journal["job_id"], scenario + " command/job/journal identity")
+                check(job["state"] == expected[1] and cmd["run_id"] == job["run_id"] == journal["run_id"] and cmd["order_id"] == job["order_id"] == d["order"]["order_id"], scenario + " correlated run/order and final job state")
+                check(journal["journal_durable"] is True and journal["effect_count"] in (0, 1) and journal["effect_count"] == sum(x["command_id"] == cid for x in applied), scenario + " durable per-command effect receipt")
+                if journal["effect_count"]:
+                    check(journal["status"] == "SUCCEEDED" and journal["reason"] == "BLENDER_PICK_APPLIED", scenario + " actual positive Blender effect")
+                    dispatched = [e for e in d["controller_events"] if e["event_type"] == "COMMAND_DISPATCHED" and e["command_id"] == cid]
+                    check(len(dispatched) == 1 and dispatched[0]["reason"] == "BOUNDED_PROCESS", scenario + " single bounded Blender dispatch")
+                else:
+                    reason = "PROVEN_NOT_STARTED" if scenario == "lost_ack_before_effect" else "CELL_NOT_READY"
+                    check(journal["status"] == "REJECTED" and journal["reason"] == reason, scenario + " specific proven zero-effect fault receipt")
+                check(bool(e["verifications"]) and all(v["command_id"] == cid and v["verdict"] == expected[4] for v in e["verifications"]), scenario + " original-command verification")
+                recovering = scenario in {"lost_ack_after_effect", "lost_ack_before_effect", "ambiguous", "restart"}
+                check(len(e["reconciliations"]) == int(recovering), scenario + " expected original-command reconciliation count")
+                check(all(r["command"]["command_id"] == r["receipt"]["command_id"] == cid for r in e["reconciliations"]), scenario + " reconciliation preserves original command")
+                receipts.append({"command_id": cid, "effect_count": journal["effect_count"], "reason": journal["reason"], "payload_hash": journal["payload_hash"], "verdict": expected[4]})
+            check(sum(x["effect_count"] for x in receipts) == expected[2], scenario + " summed journal effects")
+            if scenario == "tool_showcase":
+                showcase = d["tool_showcase"]
+                check(len(showcase) == 6 and len({e["sku"] for e in showcase}) == len({e["tool_id"] for e in showcase}) == 6 and {e["command_id"] for e in showcase} == set(commands) and all(e["effect_count"] == 1 for e in showcase), "six-tool six-product showcase evidence")
+            demo_results.append({"scenario": scenario, "initial_state": d["initial_state"], "final_state": d["final_state"], "receipts": receipts})
+        output["demos"] = demo_results
+        security = js(f"{base}/security-review.json")
+        check(security["passed"] and security["pip_audit_exit"] == security["npm_audit_exit"] == 0 and security["vendor_integrity"] and all(f["reviewed"] for f in security["findings"]), "configured security checks and reviewed findings")
+        check(security["lock_sha256"] == manifest["environment"]["lock_sha256"], "security review exact lock binding")
+        drift = js(f"{base}/drift.json")
+        check(drift["passed"] and drift["errors"] == [] and drift["must_count"] == 169, "saved drift criteria/integrity checks")
+        publication = js(f"{base}/publication-build.json")
+        check(publication["source_commit"] == COMMIT and len(publication["reports"]) == 3 and publication["combined_pdf_pages"] == sum(r["pages"] for r in publication["reports"]), "current-source publication metadata")
+        check(js("_site/build.json") == publication, "artifact final build agrees with campaign copy")
+        output["publication_metadata"] = publication
+    with args.zip.open("rb") as stream:
+        check(hashlib.file_digest(stream, "sha256").hexdigest() == archive_hash, "ZIP unchanged through saved-file audit")
+    check(args.run.read_bytes() == run_raw and args.artifact.read_bytes() == artifact_raw, "bound metadata unchanged through audit")
+    check(Path(__file__).read_bytes() == script_raw, "executed auditor bytes unchanged through audit")
+    output.update(status="PASS_SCOPED_C_LINUX_ARTIFACT_AUDIT" if not ISSUES else "FINDINGS", checks=CHECKS, check_count=len(CHECKS), issues=ISSUES, inputs=INPUTS, input_count=len(INPUTS))
+    args.output.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"status": output["status"], "checks": len(CHECKS), "issues": ISSUES, "output": str(args.output)}))
+    return bool(ISSUES)
+
+
+if __name__ == "__main__":
+    try:
+        result = main()
+    except Exception as exc:
+        result = 1
+        diagnostic = {"status": "REVIEW_INCOMPLETE", "commit": COMMIT, "run_id": RUN_ID, "error": type(exc).__name__ + ": " + str(exc), "issues": ISSUES, "checks": CHECKS, "inputs": INPUTS, "limitation": "Review aborted; this diagnostic is not a complete artifact or acceptance result."}
+        if OUTPUT_PATH is not None and not OUTPUT_PATH.exists():
+            OUTPUT_PATH.write_text(json.dumps(diagnostic, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"status": diagnostic["status"], "error": diagnostic["error"]}))
+    raise SystemExit(result)

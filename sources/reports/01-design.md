@@ -1,5 +1,5 @@
 <!-- implementation-status:start -->
-> **Implementation status, 2026-10-06:** Integration Lab passed local acceptance at source 9e83fe7: two clean 815-test suites, 20 local gates and five fresh manual/CLI scenarios. A subsequent documentation correction fixes two report links and rejects links outside the publication root; its five regression tests pass. Final-source Linux CI, Windows checks and GitHub Pages verification remain pending. Status: NOT DONE.
+> **Implementation status, 2026-10-06:** Integration Lab is verified at audited source 76e6abe: two clean 831-case Linux suites, all 169 MUST criteria, Windows native checks and exact-source publication/Pages verification. Five fresh Blender/manual scenarios remain attributed to unchanged runtime source 9e83fe7. This evidence/status revision requires its own exact-SHA CI, Windows and deployed-build attestation under ADR 0002. Status: DONE at audited C.
 > Evidence: GOAL_PROGRESS.md and ACCEPTANCE_REPORT.md in the governance section.
 > The research below records design rationale, not real-world robot validation.
 <!-- implementation-status:end -->

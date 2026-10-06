@@ -1,0 +1,124 @@
+{
+  "reviewed_at": "2026-10-06T20:57:02.270499+00:00",
+  "status": "RESOLVED_REVIEWER_PATH_SCHEMA_ASSUMPTION",
+  "initial_review": {
+    "path": "artifacts/remote-verification/76e6abe/linux-independent/linux-artifact-review-initial.json",
+    "sha256": "32393e8746974029dc30200bfaedbc9e845f1451d030e796322883b074152e0d",
+    "bytes": 409046
+  },
+  "initial_checker": {
+    "path": "artifacts/remote-verification/76e6abe/linux-independent/review_artifact.initial.py.txt",
+    "sha256": "a2988f61f97f2a4a32aa2df0e9f17865b8e5f11e57af178213ea60ceae68854c",
+    "bytes": 23586
+  },
+  "final_review": {
+    "path": "artifacts/remote-verification/76e6abe/linux-independent/linux-artifact-review.json",
+    "sha256": "e5fceecdc25ccc6942435363b23d1d8e813737eb51d0481466bfa16758a378b6",
+    "bytes": 459798
+  },
+  "final_checker": {
+    "path": "artifacts/remote-verification/76e6abe/linux-independent/review_artifact.py",
+    "sha256": "727773b2e3b29d98afec664270acfc9999aeb08bf5490007497eb182780c41a5",
+    "bytes": 24908
+  },
+  "correction_diff": {
+    "path": "artifacts/remote-verification/76e6abe/linux-independent/source-path-checker.diff.txt",
+    "sha256": "83ca184df3ea7546a26e65303e47a5aab4381e88b0149ffaffef066475f97ef9",
+    "bytes": 5953
+  },
+  "finding": "Each saved lab source-hash map includes the executing test file as an absolute CI runner path. Initial checker accepted only relative keys; the other34 hashes percase already matched.",
+  "resolution": "Derive the exact checkout root from each recorded absolute JUnit command and its exact artifact member. Require both suite roots equal. Strip only that verified root for absolute source keys, reject escaped/duplicate canonical paths, then compare all35 bytes hashes to exact C Git blobs.",
+  "source_path_normalizations": [
+    {
+      "pass": 1,
+      "scenario": "happy",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    },
+    {
+      "pass": 1,
+      "scenario": "DROP_ACK_AFTER_EFFECT",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    },
+    {
+      "pass": 1,
+      "scenario": "DUPLICATE_DELIVERY",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    },
+    {
+      "pass": 1,
+      "scenario": "WMS_UNAVAILABLE",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    },
+    {
+      "pass": 2,
+      "scenario": "happy",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    },
+    {
+      "pass": 2,
+      "scenario": "DROP_ACK_AFTER_EFFECT",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    },
+    {
+      "pass": 2,
+      "scenario": "DUPLICATE_DELIVERY",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    },
+    {
+      "pass": 2,
+      "scenario": "WMS_UNAVAILABLE",
+      "mappings": [
+        {
+          "recorded": "/home/runner/work/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/tests/lab/test_browser_lab.py",
+          "repository_relative": "tests/lab/test_browser_lab.py",
+          "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06"
+        }
+      ]
+    }
+  ],
+  "product_or_test_changes": false,
+  "all280_saved_source_hash_bindings_match_C": true,
+  "initial_diagnostic_preserved": true
+}

@@ -1,0 +1,5187 @@
+{
+  "schema_version": "1.0",
+  "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+  "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+  "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+  "request": {
+    "schema_version": "1.0",
+    "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+    "lines": [
+      {
+        "schema_version": "1.0",
+        "order_line_id": "line-1",
+        "product_id": "product-SKU-A-01",
+        "source_id": "SRC_A",
+        "destination_id": "DESTINATION",
+        "quantity": 1
+      }
+    ]
+  },
+  "request_id": "186eb600-36f2-4072-a862-70a14925db76",
+  "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+  "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+  "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+  "job_ids": [
+    "fe2e36c8-223b-5976-aac1-ca6e57fa98dd"
+  ],
+  "revision": 46,
+  "status": "COMPLETED",
+  "current_stage": 22,
+  "mode": "guided",
+  "profile": "lab",
+  "fault": "WMS_UNAVAILABLE",
+  "steps": [
+    {
+      "schema_version": "1.0",
+      "step_id": "a7b162af-1532-5a9c-9ca3-aecccb9f5728",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": null,
+      "command_id": null,
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 1,
+      "sequence": 1,
+      "revision": 1,
+      "title": "ERP demand created",
+      "summary": "DEMAND_CREATED",
+      "status": "COMPLETED",
+      "component": "erp",
+      "protocol": "SQL",
+      "classification": "SIMULATED SYSTEM",
+      "input": {
+        "stage": 1,
+        "request_id": "e6ea28de-48ad-4a0d-910b-3f9f1fe0e87e",
+        "command_id": null
+      },
+      "output": {
+        "demand_id": "506d4312-b775-5919-bbf0-fc182c4bd67c",
+        "lines": [
+          {
+            "destination_id": "DESTINATION",
+            "order_line_id": "line-1",
+            "product_id": "product-SKU-A-01",
+            "quantity": 1,
+            "schema_version": "1.0",
+            "source_id": "SRC_A"
+          }
+        ],
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "status": "DEMAND_CREATED",
+        "system": "synthetic ERP"
+      },
+      "state_before": "NOT_INTAKEN",
+      "state_after": "NOT_INTAKEN",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "demand_id": "506d4312-b775-5919-bbf0-fc182c4bd67c",
+        "lines": [
+          {
+            "destination_id": "DESTINATION",
+            "order_line_id": "line-1",
+            "product_id": "product-SKU-A-01",
+            "quantity": 1,
+            "schema_version": "1.0",
+            "source_id": "SRC_A"
+          }
+        ],
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "status": "DEMAND_CREATED",
+        "system": "synthetic ERP"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/integration/engine.py",
+        "symbol": "GuidedEngine._execute",
+        "excerpt": "        if stage == 1:\n            return self.store.effect(\n                ident,\n                \"ERP_DEMAND\",\n                {\n                    \"order_id\": session.order_id,\n                    \"demand_id\": ident,\n                    \"lines\": [x.model_dump(mode=\"json\") for x in session.request.lines],"
+      },
+      "invariant": "Business intent does not authorize a robot.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:08.787680Z",
+      "duration_ms": 17.09228200002144,
+      "evidence_ids": [
+        "506d4312-b775-5919-bbf0-fc182c4bd67c",
+        "5950e97c-cf1d-562c-b311-5eba6bca511c"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "57018311-c117-55e0-a21a-68a9e07de773",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": null,
+      "command_id": null,
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 2,
+      "sequence": 2,
+      "revision": 3,
+      "title": "WMS task created",
+      "summary": "TASK_CREATED",
+      "status": "COMPLETED",
+      "component": "wms",
+      "protocol": "SQL",
+      "classification": "SIMULATED SYSTEM",
+      "input": {
+        "stage": 2,
+        "request_id": "6e13eb90-ceaf-421a-a282-c928073a4e42",
+        "command_id": null
+      },
+      "output": {
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "request": {
+          "lines": [
+            {
+              "destination_id": "DESTINATION",
+              "order_line_id": "line-1",
+              "product_id": "product-SKU-A-01",
+              "quantity": 1,
+              "schema_version": "1.0",
+              "source_id": "SRC_A"
+            }
+          ],
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "schema_version": "1.0"
+        },
+        "status": "TASK_CREATED",
+        "system": "synthetic WMS",
+        "task_id": "a239f094-d756-56e3-96dd-368c9e98d076"
+      },
+      "state_before": "NOT_INTAKEN",
+      "state_after": "NOT_INTAKEN",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "request": {
+          "lines": [
+            {
+              "destination_id": "DESTINATION",
+              "order_line_id": "line-1",
+              "product_id": "product-SKU-A-01",
+              "quantity": 1,
+              "schema_version": "1.0",
+              "source_id": "SRC_A"
+            }
+          ],
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "schema_version": "1.0"
+        },
+        "status": "TASK_CREATED",
+        "system": "synthetic WMS",
+        "task_id": "a239f094-d756-56e3-96dd-368c9e98d076"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/integration/engine.py",
+        "symbol": "GuidedEngine._execute",
+        "excerpt": "        if stage == 2:\n            return self.store.effect(\n                ident,\n                \"WMS_TASK\",\n                {\n                    \"task_id\": ident,\n                    \"order_id\": session.order_id,\n                    \"request\": session.request.model_dump(mode=\"json\"),"
+      },
+      "invariant": "SKU/source/destination must identify one material flow.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:09.134294Z",
+      "duration_ms": 14.175175999980638,
+      "evidence_ids": [
+        "a239f094-d756-56e3-96dd-368c9e98d076",
+        "d02e7440-08ef-50b9-a7c8-b3f41de7290e"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "3bdc171c-2da3-50e4-9755-e9e40506b2b0",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": null,
+      "command_id": null,
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 3,
+      "sequence": 3,
+      "revision": 5,
+      "title": "API intake",
+      "summary": "API intake",
+      "status": "COMPLETED",
+      "component": "api",
+      "protocol": "REST",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 3,
+        "request_id": "c6170fcd-1024-4e65-a965-ee8ba973bc04",
+        "command_id": null
+      },
+      "output": {
+        "accepted": true,
+        "idempotency_key": "186eb600-36f2-4072-a862-70a14925db76",
+        "method": "POST",
+        "path": "/v1/wms/tasks",
+        "payload_hash": "2dda72d20bcf0d40202bc3d39e0d0dfdd6c84098749cebba3d7077739492df79",
+        "schema_version": "1.0"
+      },
+      "state_before": "NOT_INTAKEN",
+      "state_after": "NOT_INTAKEN",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "accepted": true,
+        "idempotency_key": "186eb600-36f2-4072-a862-70a14925db76",
+        "method": "POST",
+        "path": "/v1/wms/tasks",
+        "payload_hash": "2dda72d20bcf0d40202bc3d39e0d0dfdd6c84098749cebba3d7077739492df79",
+        "schema_version": "1.0"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/integration/engine.py",
+        "symbol": "GuidedEngine._validate",
+        "excerpt": "    def _validate(self, request: OrderRequest) -> None:\n        OrderRequest.model_validate(request.model_dump())\n        products = {p.product_id for p in self.workflow.settings.products}\n        for line in request.lines:\n            if line.product_id not in products:\n                raise ValueError(\"PRODUCT_NOT_IN_FIXTURE\")\n            if line.source_id != self.workflow.settings.source_for(line.product_id):\n                raise ValueError(\"PRODUCT_SOURCE_MISMATCH\")"
+      },
+      "invariant": "Versioned Pydantic input and idempotency precede durable intake.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:09.469184Z",
+      "duration_ms": 15.628191000132574,
+      "evidence_ids": [
+        "7589400d-74cc-5827-863e-fcfdf2e8dacf"
+      ],
+      "authorization_required": true
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "17594e7e-adf6-565f-81fc-3082055ef9f1",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": null,
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 4,
+      "sequence": 4,
+      "revision": 7,
+      "title": "Durable intake",
+      "summary": "Durable intake",
+      "status": "COMPLETED",
+      "component": "database",
+      "protocol": "SQL",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 4,
+        "request_id": "4299d1fb-234d-4e52-a320-c9eea5fad576",
+        "command_id": null
+      },
+      "output": {
+        "order": {
+          "schema_version": "1.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "4c152a73-f430-42d1-88a9-1444033765ff",
+          "timestamp": "2026-10-06T20:29:09.866522Z",
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-SKU-A-01",
+              "source_id": "SRC_A",
+              "destination_id": "DESTINATION",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "fe2e36c8-223b-5976-aac1-ca6e57fa98dd"
+          ],
+          "status": "RECEIVED"
+        },
+        "job": {
+          "schema_version": "1.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "30991030-901b-43ed-a561-49968274211f",
+          "timestamp": "2026-10-06T20:29:09.897531Z",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "line": {
+            "schema_version": "1.0",
+            "order_line_id": "line-1",
+            "product_id": "product-SKU-A-01",
+            "source_id": "SRC_A",
+            "destination_id": "DESTINATION",
+            "quantity": 1
+          },
+          "state": "VALIDATED",
+          "revision": 1,
+          "command_id": null,
+          "action_plan_id": null
+        },
+        "database": "PostgreSQL",
+        "transaction_committed": true
+      },
+      "state_before": "NOT_INTAKEN",
+      "state_after": "VALIDATED",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "order": {
+          "schema_version": "1.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "4c152a73-f430-42d1-88a9-1444033765ff",
+          "timestamp": "2026-10-06T20:29:09.866522Z",
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "lines": [
+            {
+              "schema_version": "1.0",
+              "order_line_id": "line-1",
+              "product_id": "product-SKU-A-01",
+              "source_id": "SRC_A",
+              "destination_id": "DESTINATION",
+              "quantity": 1
+            }
+          ],
+          "job_ids": [
+            "fe2e36c8-223b-5976-aac1-ca6e57fa98dd"
+          ],
+          "status": "RECEIVED"
+        },
+        "job": {
+          "schema_version": "1.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "30991030-901b-43ed-a561-49968274211f",
+          "timestamp": "2026-10-06T20:29:09.897531Z",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "line": {
+            "schema_version": "1.0",
+            "order_line_id": "line-1",
+            "product_id": "product-SKU-A-01",
+            "source_id": "SRC_A",
+            "destination_id": "DESTINATION",
+            "quantity": 1
+          },
+          "state": "VALIDATED",
+          "revision": 1,
+          "command_id": null,
+          "action_plan_id": null
+        },
+        "database": "PostgreSQL",
+        "transaction_committed": true
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/workflow/store.py",
+        "symbol": "Store.intake",
+        "excerpt": "    def intake(\n        self,\n        request: OrderRequest,\n        key: str,\n        *,\n        validate: Callable[[OrderRequest], None] | None = None,\n    ) -> Order:\n        if not key or len(key) > 160:"
+      },
+      "invariant": "Database commit is not physical execution.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:09.921661Z",
+      "duration_ms": 81.64924599986989,
+      "evidence_ids": [
+        "388c0abe-6061-5f47-813c-96021b999c05"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "5c2400ac-2507-5119-aa28-eca019c924f2",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": null,
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 5,
+      "sequence": 5,
+      "revision": 9,
+      "title": "Fresh observation",
+      "summary": "Fresh observation",
+      "status": "COMPLETED",
+      "component": "sensor",
+      "protocol": "sensor",
+      "classification": "SYNTHETIC SENSOR",
+      "input": {
+        "stage": 5,
+        "request_id": "85068a86-3409-4b94-ae20-c0f707c9101e",
+        "command_id": null
+      },
+      "output": {
+        "schema_version": "2.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "timestamp": "2026-10-06T20:29:10.422014Z",
+        "observation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "step": 0,
+        "captured_at": "2026-10-06T20:29:10.422014Z",
+        "model_version": "synthetic-observer-2",
+        "calibration_version": "hkm-cal-1",
+        "objects": [
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-A-01",
+            "location_id": "SRC_A",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.08,
+                -0.68,
+                0.20249999999999999
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-B-01",
+            "location_id": "SRC_B",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.1,
+                -1.24,
+                0.22999999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-C-01",
+            "location_id": "SRC_C",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.85,
+                -0.92,
+                0.21999999999999997
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-D-01",
+            "location_id": "SRC_D",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.26,
+                -0.08,
+                0.295
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-E-01",
+            "location_id": "SRC_E",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.15,
+                0.75,
+                0.24
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-F-01",
+            "location_id": "SRC_F",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.14,
+                0.75,
+                0.25
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          }
+        ],
+        "covered_locations": [
+          "SRC_A",
+          "SRC_B",
+          "SRC_C",
+          "SRC_D",
+          "SRC_E",
+          "SRC_F",
+          "DESTINATION"
+        ],
+        "cell_generation": 0,
+        "robot_profile_version": "hkm_inspired_v1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "sensors": [
+          {
+            "schema_version": "2.0",
+            "sensor_id": "overhead-observation",
+            "frame_id": "camera_overhead",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                0.0,
+                2.6
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          },
+          {
+            "schema_version": "2.0",
+            "sensor_id": "side-inspection",
+            "frame_id": "camera_side",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.85,
+                -0.65,
+                1.25
+              ],
+              "quaternion_xyzw": [
+                0.4164435022802413,
+                -0.295082221134753,
+                -0.4971755075060524,
+                0.7016536231751722
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          }
+        ],
+        "machine_telemetry": {
+          "schema_version": "2.0",
+          "source": "SIMULATED_CELL_TELEMETRY",
+          "tool_state": {
+            "schema_version": "2.0",
+            "active_tool_id": "EE_VAC_SINGLE",
+            "changer_state": "READY",
+            "rack_tool_ids": [
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ],
+            "tool_state_version": "synthetic-tool-state-1"
+          },
+          "tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              0.0,
+              -0.6,
+              1.02
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "captured_at": "2026-10-06T20:29:10.422014Z",
+          "cell_generation": 0
+        }
+      },
+      "state_before": "VALIDATED",
+      "state_after": "PLANNING",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "schema_version": "2.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "timestamp": "2026-10-06T20:29:10.422014Z",
+        "observation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "step": 0,
+        "captured_at": "2026-10-06T20:29:10.422014Z",
+        "model_version": "synthetic-observer-2",
+        "calibration_version": "hkm-cal-1",
+        "objects": [
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-A-01",
+            "location_id": "SRC_A",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.08,
+                -0.68,
+                0.20249999999999999
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-B-01",
+            "location_id": "SRC_B",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.1,
+                -1.24,
+                0.22999999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-C-01",
+            "location_id": "SRC_C",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.85,
+                -0.92,
+                0.21999999999999997
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-D-01",
+            "location_id": "SRC_D",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.26,
+                -0.08,
+                0.295
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-E-01",
+            "location_id": "SRC_E",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.15,
+                0.75,
+                0.24
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-F-01",
+            "location_id": "SRC_F",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.14,
+                0.75,
+                0.25
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          }
+        ],
+        "covered_locations": [
+          "SRC_A",
+          "SRC_B",
+          "SRC_C",
+          "SRC_D",
+          "SRC_E",
+          "SRC_F",
+          "DESTINATION"
+        ],
+        "cell_generation": 0,
+        "robot_profile_version": "hkm_inspired_v1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "sensors": [
+          {
+            "schema_version": "2.0",
+            "sensor_id": "overhead-observation",
+            "frame_id": "camera_overhead",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                0.0,
+                2.6
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          },
+          {
+            "schema_version": "2.0",
+            "sensor_id": "side-inspection",
+            "frame_id": "camera_side",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.85,
+                -0.65,
+                1.25
+              ],
+              "quaternion_xyzw": [
+                0.4164435022802413,
+                -0.295082221134753,
+                -0.4971755075060524,
+                0.7016536231751722
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          }
+        ],
+        "machine_telemetry": {
+          "schema_version": "2.0",
+          "source": "SIMULATED_CELL_TELEMETRY",
+          "tool_state": {
+            "schema_version": "2.0",
+            "active_tool_id": "EE_VAC_SINGLE",
+            "changer_state": "READY",
+            "rack_tool_ids": [
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ],
+            "tool_state_version": "synthetic-tool-state-1"
+          },
+          "tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              0.0,
+              -0.6,
+              1.02
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "captured_at": "2026-10-06T20:29:10.422014Z",
+          "cell_generation": 0
+        }
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/workflow/engine.py",
+        "symbol": "Engine.stage_observe",
+        "excerpt": "    def stage_observe(self, job: PickJob, claim: Claim) -> WorldObservation:\n        if job.state == JobState.VALIDATED:\n            job = self.store.transition(\n                job.job_id, JobState.PLANNING, \"BRAIN_REQUESTED\", claim=claim\n            )\n        return self._observe(job)"
+      },
+      "invariant": "WorldObservation is measured evidence, distinct from WorldState.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:10.449590Z",
+      "duration_ms": 57.06144300006599,
+      "evidence_ids": [
+        "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "f77656e6-aad1-5a0c-8233-591d068e465b"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "fa69ee47-341b-51a3-949a-d3c7713b6668",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": null,
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 6,
+      "sequence": 6,
+      "revision": 11,
+      "title": "Planning",
+      "summary": "Planning",
+      "status": "COMPLETED",
+      "component": "planner",
+      "protocol": "Python",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 6,
+        "request_id": "5c517a78-b040-41e0-b44d-cce69b5d73ad",
+        "command_id": null
+      },
+      "output": {
+        "schema_version": "2.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "timestamp": "2026-10-06T20:29:10.422014Z",
+        "action_plan_id": "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+        "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "order_line_id": "line-1",
+        "kind": "PICK_AND_PLACE",
+        "product_id": "product-SKU-A-01",
+        "source_id": "SRC_A",
+        "destination_id": "DESTINATION",
+        "target_pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.38,
+            0.9400000000000002,
+            0.20249999999999999
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "observation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "cell_generation": 0,
+        "brain_version": "deterministic-hkm-1",
+        "selected_tool_id": "EE_VAC_SINGLE",
+        "grasp_pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.08,
+            -0.68,
+            0.22499999999999998
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "trajectory": {
+          "schema_version": "2.0",
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "profile": "SAFE_PICK_PLACE_V1",
+          "required_tool_id": "EE_VAC_SINGLE",
+          "grasp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              1.08,
+              -0.68,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "target_tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.38,
+              0.9400000000000002,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "product_attachment_offset_m": [
+            0.0,
+            0.0,
+            -0.022499999999999992
+          ],
+          "waypoints": [
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.0,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "TOOL_CHANGE_NOT_REQUIRED",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.05,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.65,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "APPROACH",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.25,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.45,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "LIFT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 2.05,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "SAFE_TRANSFER",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.65,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.15,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.3,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.4,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RETRACT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.9,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 5.5,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            }
+          ],
+          "estimated_sim_duration_s": 5.5,
+          "route_index": 0,
+          "trajectory_planner_version": "synthetic-trajectory-1",
+          "collision_check_version": "synthetic-aabb-preflight-1",
+          "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+          "calibration_version": "hkm-cal-1",
+          "frame_tree_version": "hkm-frame-tree-1"
+        },
+        "tool_selection": {
+          "schema_version": "2.0",
+          "product_id": "product-SKU-A-01",
+          "sku": "SKU-A",
+          "selected_tool_id": "EE_VAC_SINGLE",
+          "candidate_tools": [
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_SINGLE",
+              "compatibility": "P",
+              "compatible": true,
+              "eligible": true,
+              "score": 135,
+              "reasons": [
+                "PREFERRED_FOR_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "ALREADY_MOUNTED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_ARRAY",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_NARROW",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_WIDE",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_ADAPTIVE_SOFT",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_SUPPORT_FORK",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            }
+          ],
+          "assessed_mass_kg": 0.4,
+          "tool_change_required": false,
+          "selection_version": "deterministic-tool-selector-1",
+          "product_catalog_version": "synthetic-products-1",
+          "tool_spec_version": "synthetic-tools-1"
+        },
+        "robot_profile_version": "hkm_inspired_v1",
+        "product_catalog_version": "synthetic-products-1",
+        "tool_spec_version": "synthetic-tools-1",
+        "frame_tree_version": "hkm-frame-tree-1"
+      },
+      "state_before": "PLANNING",
+      "state_after": "PLANNING",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "schema_version": "2.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "timestamp": "2026-10-06T20:29:10.422014Z",
+        "action_plan_id": "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+        "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "order_line_id": "line-1",
+        "kind": "PICK_AND_PLACE",
+        "product_id": "product-SKU-A-01",
+        "source_id": "SRC_A",
+        "destination_id": "DESTINATION",
+        "target_pose": {
+          "schema_version": "1.0",
+          "position": [
+            -0.38,
+            0.9400000000000002,
+            0.20249999999999999
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "observation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "cell_generation": 0,
+        "brain_version": "deterministic-hkm-1",
+        "selected_tool_id": "EE_VAC_SINGLE",
+        "grasp_pose": {
+          "schema_version": "1.0",
+          "position": [
+            1.08,
+            -0.68,
+            0.22499999999999998
+          ],
+          "quaternion_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "unit": "m",
+          "frame_id": "cell_world",
+          "calibration_version": "hkm-cal-1"
+        },
+        "trajectory": {
+          "schema_version": "2.0",
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "profile": "SAFE_PICK_PLACE_V1",
+          "required_tool_id": "EE_VAC_SINGLE",
+          "grasp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              1.08,
+              -0.68,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "target_tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.38,
+              0.9400000000000002,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "product_attachment_offset_m": [
+            0.0,
+            0.0,
+            -0.022499999999999992
+          ],
+          "waypoints": [
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.0,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "TOOL_CHANGE_NOT_REQUIRED",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.05,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 0.65,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "APPROACH",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.25,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.45,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "GRASP_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 1.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "LIFT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  1.08,
+                  -0.68,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 2.05,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "SAFE_TRANSFER",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.55,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PRE_PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 3.65,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "PLACE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.15,
+              "attached": true,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.3,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RELEASE_CONFIRM",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  0.22499999999999998
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.4,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "RETRACT",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  -0.38,
+                  0.9400000000000002,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 4.9,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            },
+            {
+              "schema_version": "2.0",
+              "phase": "HOME",
+              "pose": {
+                "schema_version": "1.0",
+                "position": [
+                  0.0,
+                  -0.6,
+                  1.02
+                ],
+                "quaternion_xyzw": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "unit": "m",
+                "frame_id": "cell_world",
+                "calibration_version": "hkm-cal-1"
+              },
+              "sim_time_s": 5.5,
+              "attached": false,
+              "active_tool_id": "EE_VAC_SINGLE"
+            }
+          ],
+          "estimated_sim_duration_s": 5.5,
+          "route_index": 0,
+          "trajectory_planner_version": "synthetic-trajectory-1",
+          "collision_check_version": "synthetic-aabb-preflight-1",
+          "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+          "calibration_version": "hkm-cal-1",
+          "frame_tree_version": "hkm-frame-tree-1"
+        },
+        "tool_selection": {
+          "schema_version": "2.0",
+          "product_id": "product-SKU-A-01",
+          "sku": "SKU-A",
+          "selected_tool_id": "EE_VAC_SINGLE",
+          "candidate_tools": [
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_SINGLE",
+              "compatibility": "P",
+              "compatible": true,
+              "eligible": true,
+              "score": 135,
+              "reasons": [
+                "PREFERRED_FOR_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "ALREADY_MOUNTED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_VAC_ARRAY",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_NARROW",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_PINCH_WIDE",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_ADAPTIVE_SOFT",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            },
+            {
+              "schema_version": "2.0",
+              "tool_id": "EE_SUPPORT_FORK",
+              "compatibility": "C",
+              "compatible": true,
+              "eligible": true,
+              "score": 80,
+              "reasons": [
+                "COMPATIBLE_PRODUCT_FAMILY",
+                "MASS_WITHIN_SIMULATED_LIMIT",
+                "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                "TOOL_CHANGE_REQUIRED"
+              ]
+            }
+          ],
+          "assessed_mass_kg": 0.4,
+          "tool_change_required": false,
+          "selection_version": "deterministic-tool-selector-1",
+          "product_catalog_version": "synthetic-products-1",
+          "tool_spec_version": "synthetic-tools-1"
+        },
+        "robot_profile_version": "hkm_inspired_v1",
+        "product_catalog_version": "synthetic-products-1",
+        "tool_spec_version": "synthetic-tools-1",
+        "frame_tree_version": "hkm-frame-tree-1"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/workflow/engine.py",
+        "symbol": "Engine.stage_plan",
+        "excerpt": "    def stage_plan(\n        self, job: PickJob, observation: WorldObservation, fault: Fault | None = None\n    ) -> ActionPlan:\n        destination = next(\n            loc for loc in self.settings.locations if loc.location_id == job.line.destination_id\n        )\n        if fault == Fault.BRAIN_TIMEOUT:\n            raise TimeoutError(\"BRAIN_TIMEOUT\")"
+      },
+      "invariant": "Planner has no actuator capability.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:11.075651Z",
+      "duration_ms": 54.99447900001542,
+      "evidence_ids": [
+        "0de35c16-0e95-4624-8844-44acfa8dbd59",
+        "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+        "82d5dff2-2c88-5298-bec0-cf08afadf2df"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "c00fe0fa-3492-5fb7-8d49-c7c71b947432",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": null,
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 7,
+      "sequence": 7,
+      "revision": 13,
+      "title": "Plan validation",
+      "summary": "Plan validation",
+      "status": "COMPLETED",
+      "component": "validator",
+      "protocol": "Python",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 7,
+        "request_id": "36444ca3-87f0-46d8-ac2e-bd5c3d55f297",
+        "command_id": null
+      },
+      "output": {
+        "action_plan_id": "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+        "valid": true
+      },
+      "state_before": "PLANNING",
+      "state_after": "PLANNING",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "action_plan_id": "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+        "valid": true
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/workflow/engine.py",
+        "symbol": "Engine.stage_validate",
+        "excerpt": "    def stage_validate(\n        self, job: PickJob, observation: WorldObservation, plan: ActionPlan\n    ) -> ActionPlan:\n        destination = next(\n            loc for loc in self.settings.locations if loc.location_id == job.line.destination_id\n        )\n        plan = self.validator.validate(\n            plan, job, observation, self.runtime.world().cell, destination"
+      },
+      "invariant": "Planner output is not trusted without semantic validation.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:11.490917Z",
+      "duration_ms": 54.512972999873455,
+      "evidence_ids": [
+        "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+        "b99d09de-4153-53a4-945f-4df2622623a0"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "12f76c26-622c-50a8-ad92-21e3bef2d920",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 8,
+      "sequence": 8,
+      "revision": 15,
+      "title": "Immutable RobotCommand persisted",
+      "summary": "Immutable RobotCommand persisted",
+      "status": "COMPLETED",
+      "component": "database",
+      "protocol": "SQL",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 8,
+        "request_id": "3ac4bb2a-834f-4b1a-b348-799e7e98178d",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command": {
+          "schema_version": "2.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+          "timestamp": "2026-10-06T20:29:10.422014Z",
+          "action_plan_id": "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "order_line_id": "line-1",
+          "kind": "PICK_AND_PLACE",
+          "product_id": "product-SKU-A-01",
+          "source_id": "SRC_A",
+          "destination_id": "DESTINATION",
+          "target_pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.38,
+              0.9400000000000002,
+              0.20249999999999999
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+          "observation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+          "cell_generation": 0,
+          "brain_version": "deterministic-hkm-1",
+          "selected_tool_id": "EE_VAC_SINGLE",
+          "grasp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              1.08,
+              -0.68,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "trajectory": {
+            "schema_version": "2.0",
+            "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+            "profile": "SAFE_PICK_PLACE_V1",
+            "required_tool_id": "EE_VAC_SINGLE",
+            "grasp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.08,
+                -0.68,
+                0.22499999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "target_tcp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.38,
+                0.9400000000000002,
+                0.22499999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "product_attachment_offset_m": [
+              0.0,
+              0.0,
+              -0.022499999999999992
+            ],
+            "waypoints": [
+              {
+                "schema_version": "2.0",
+                "phase": "HOME",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    -0.6,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 0.0,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "TOOL_CHANGE_NOT_REQUIRED",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    -0.6,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 0.05,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "PRE_GRASP",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 0.65,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "APPROACH",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 1.25,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "GRASP",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 1.45,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "GRASP_CONFIRM",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 1.55,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "LIFT",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 2.05,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "SAFE_TRANSFER",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 3.55,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "PRE_PLACE",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 3.65,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "PLACE",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.15,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "RELEASE",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.3,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "RELEASE_CONFIRM",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.4,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "RETRACT",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.9,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "HOME",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    -0.6,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 5.5,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              }
+            ],
+            "estimated_sim_duration_s": 5.5,
+            "route_index": 0,
+            "trajectory_planner_version": "synthetic-trajectory-1",
+            "collision_check_version": "synthetic-aabb-preflight-1",
+            "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+            "calibration_version": "hkm-cal-1",
+            "frame_tree_version": "hkm-frame-tree-1"
+          },
+          "tool_selection": {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-A-01",
+            "sku": "SKU-A",
+            "selected_tool_id": "EE_VAC_SINGLE",
+            "candidate_tools": [
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_VAC_SINGLE",
+                "compatibility": "P",
+                "compatible": true,
+                "eligible": true,
+                "score": 135,
+                "reasons": [
+                  "PREFERRED_FOR_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "ALREADY_MOUNTED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_VAC_ARRAY",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_PINCH_NARROW",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_PINCH_WIDE",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_ADAPTIVE_SOFT",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_SUPPORT_FORK",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              }
+            ],
+            "assessed_mass_kg": 0.4,
+            "tool_change_required": false,
+            "selection_version": "deterministic-tool-selector-1",
+            "product_catalog_version": "synthetic-products-1",
+            "tool_spec_version": "synthetic-tools-1"
+          },
+          "robot_profile_version": "hkm_inspired_v1",
+          "product_catalog_version": "synthetic-products-1",
+          "tool_spec_version": "synthetic-tools-1",
+          "frame_tree_version": "hkm-frame-tree-1",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "required_tool_id": "EE_VAC_SINGLE"
+        },
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "outbox_atomic_with_command": true,
+        "recovered_existing_command": false
+      },
+      "state_before": "PLANNING",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command": {
+          "schema_version": "2.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+          "timestamp": "2026-10-06T20:29:10.422014Z",
+          "action_plan_id": "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+          "order_line_id": "line-1",
+          "kind": "PICK_AND_PLACE",
+          "product_id": "product-SKU-A-01",
+          "source_id": "SRC_A",
+          "destination_id": "DESTINATION",
+          "target_pose": {
+            "schema_version": "1.0",
+            "position": [
+              -0.38,
+              0.9400000000000002,
+              0.20249999999999999
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+          "observation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+          "cell_generation": 0,
+          "brain_version": "deterministic-hkm-1",
+          "selected_tool_id": "EE_VAC_SINGLE",
+          "grasp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              1.08,
+              -0.68,
+              0.22499999999999998
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "trajectory": {
+            "schema_version": "2.0",
+            "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+            "profile": "SAFE_PICK_PLACE_V1",
+            "required_tool_id": "EE_VAC_SINGLE",
+            "grasp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.08,
+                -0.68,
+                0.22499999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "target_tcp_pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.38,
+                0.9400000000000002,
+                0.22499999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "product_attachment_offset_m": [
+              0.0,
+              0.0,
+              -0.022499999999999992
+            ],
+            "waypoints": [
+              {
+                "schema_version": "2.0",
+                "phase": "HOME",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    -0.6,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 0.0,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "TOOL_CHANGE_NOT_REQUIRED",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    -0.6,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 0.05,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "PRE_GRASP",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 0.65,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "APPROACH",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 1.25,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "GRASP",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 1.45,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "GRASP_CONFIRM",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 1.55,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "LIFT",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    1.08,
+                    -0.68,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 2.05,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "SAFE_TRANSFER",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 3.55,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "PRE_PLACE",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 3.65,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "PLACE",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.15,
+                "attached": true,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "RELEASE",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.3,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "RELEASE_CONFIRM",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    0.22499999999999998
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.4,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "RETRACT",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    -0.38,
+                    0.9400000000000002,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 4.9,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              },
+              {
+                "schema_version": "2.0",
+                "phase": "HOME",
+                "pose": {
+                  "schema_version": "1.0",
+                  "position": [
+                    0.0,
+                    -0.6,
+                    1.02
+                  ],
+                  "quaternion_xyzw": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "unit": "m",
+                  "frame_id": "cell_world",
+                  "calibration_version": "hkm-cal-1"
+                },
+                "sim_time_s": 5.5,
+                "attached": false,
+                "active_tool_id": "EE_VAC_SINGLE"
+              }
+            ],
+            "estimated_sim_duration_s": 5.5,
+            "route_index": 0,
+            "trajectory_planner_version": "synthetic-trajectory-1",
+            "collision_check_version": "synthetic-aabb-preflight-1",
+            "timing_classification": "SIMULATOR_PRESENTATION_TIMING",
+            "calibration_version": "hkm-cal-1",
+            "frame_tree_version": "hkm-frame-tree-1"
+          },
+          "tool_selection": {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-A-01",
+            "sku": "SKU-A",
+            "selected_tool_id": "EE_VAC_SINGLE",
+            "candidate_tools": [
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_VAC_SINGLE",
+                "compatibility": "P",
+                "compatible": true,
+                "eligible": true,
+                "score": 135,
+                "reasons": [
+                  "PREFERRED_FOR_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "ALREADY_MOUNTED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_VAC_ARRAY",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_PINCH_NARROW",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_PINCH_WIDE",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_ADAPTIVE_SOFT",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              },
+              {
+                "schema_version": "2.0",
+                "tool_id": "EE_SUPPORT_FORK",
+                "compatibility": "C",
+                "compatible": true,
+                "eligible": true,
+                "score": 80,
+                "reasons": [
+                  "COMPATIBLE_PRODUCT_FAMILY",
+                  "MASS_WITHIN_SIMULATED_LIMIT",
+                  "SYNTHETIC_GEOMETRY_COMPATIBLE",
+                  "TOOL_CHANGE_REQUIRED"
+                ]
+              }
+            ],
+            "assessed_mass_kg": 0.4,
+            "tool_change_required": false,
+            "selection_version": "deterministic-tool-selector-1",
+            "product_catalog_version": "synthetic-products-1",
+            "tool_spec_version": "synthetic-tools-1"
+          },
+          "robot_profile_version": "hkm_inspired_v1",
+          "product_catalog_version": "synthetic-products-1",
+          "tool_spec_version": "synthetic-tools-1",
+          "frame_tree_version": "hkm-frame-tree-1",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "required_tool_id": "EE_VAC_SINGLE"
+        },
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "outbox_atomic_with_command": true,
+        "recovered_existing_command": false
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/workflow/store.py",
+        "symbol": "Store.prepare",
+        "excerpt": "    def prepare(self, claim: Claim, plan: ActionPlan, command: RobotCommand) -> PickJob:\n        with self.transaction() as db:\n            self._owned(db, claim, utc_now())\n            job = self._job(db, claim.job_id)\n            if (\n                job.state != JobState.PLANNING\n                or plan.job_id != job.job_id\n                or command.job_id != job.job_id"
+      },
+      "invariant": "Stable command identity and payload hash precede dispatch.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:11.936104Z",
+      "duration_ms": 82.338714999878,
+      "evidence_ids": [
+        "346aa5fc-eb3f-5eb1-b2bd-e950adaba9aa"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "de6bf99e-c1df-52da-ad17-d5f3daa70165",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 9,
+      "sequence": 9,
+      "revision": 17,
+      "title": "Transactional outbox",
+      "summary": "Transactional outbox",
+      "status": "COMPLETED",
+      "component": "database",
+      "protocol": "SQL",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 9,
+        "request_id": "b9d1964f-4ebf-48ea-ba12-5c7aeeec7385",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "message_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "state": "PENDING",
+        "network_side_effect": false,
+        "lab_outbox": {
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "state": "PENDING",
+          "protocol": "SQL",
+          "classification": "REAL PROTOCOL",
+          "persistence": "PostgreSQL transactional outbox committed",
+          "network_effect": false
+        }
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "message_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "state": "PENDING",
+        "network_side_effect": false,
+        "lab_outbox": {
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "state": "PENDING",
+          "protocol": "SQL",
+          "classification": "REAL PROTOCOL",
+          "persistence": "PostgreSQL transactional outbox committed",
+          "network_effect": false
+        }
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/integration/store.py",
+        "symbol": "IntegrationStore.enqueue",
+        "excerpt": "    def enqueue(self, command: dict[str, Any]) -> dict[str, Any]:\n        body = json.dumps(command, sort_keys=True, separators=(\",\", \":\"))\n        hashed = hashlib.sha256(body.encode()).hexdigest()\n        with self.store.transaction() as db:\n            row = db.execute(\n                \"SELECT payload_hash FROM integration_outbox WHERE id=?\", (command[\"command_id\"],)\n            ).fetchone()\n            if row and row[0] != hashed:"
+      },
+      "invariant": "Command and outbox commit atomically before network side effects.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:12.459535Z",
+      "duration_ms": 40.88986500005376,
+      "evidence_ids": [
+        "50f8b343-331f-5628-af3e-f88c70047cc6"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "1065cae2-d02e-50e9-b169-d4d9f17fd775",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 10,
+      "sequence": 10,
+      "revision": 19,
+      "title": "Dispatch publication",
+      "summary": "Dispatch publication",
+      "status": "COMPLETED",
+      "component": "broker",
+      "protocol": "AMQP",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 10,
+        "request_id": "239c505a-d5d7-4a7e-93d1-2f3d82c55015",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "message_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "exchange": "robotops.commands",
+        "routing_key": "test.5624f4939a774a83871ebd695af23b39",
+        "publisher_confirm": true,
+        "consumer_ack": "separate edge stage",
+        "protocol": "AMQP 0-9-1",
+        "classification": "REAL PROTOCOL",
+        "delivery_mode": 2,
+        "mandatory": true
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "message_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "exchange": "robotops.commands",
+        "routing_key": "test.5624f4939a774a83871ebd695af23b39",
+        "publisher_confirm": true,
+        "consumer_ack": "separate edge stage",
+        "protocol": "AMQP 0-9-1",
+        "classification": "REAL PROTOCOL",
+        "delivery_mode": 2,
+        "mandatory": true
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.publish",
+        "excerpt": "    def publish(self, command_id: str) -> dict[str, Any]:\n        row = self.store.outbox(command_id)\n        try:\n            connection = broker(self.config)\n        except pika.exceptions.AMQPError:\n            raise OSError(\"BROKER_UNAVAILABLE_OUTBOX_RETAINED\") from None\n        try:\n            channel = connection.channel()"
+      },
+      "invariant": "Publisher confirmation is distinct from consumer acknowledgement.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:13.908072Z",
+      "duration_ms": 49.209256000040114,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "3c1626bd-a3c7-54e1-be4b-659e50ed60f9"
+      ],
+      "authorization_required": true
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "ab1c3d0e-cae9-5156-bf75-d241ae1951b5",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 11,
+      "sequence": 11,
+      "revision": 21,
+      "title": "Edge delivery",
+      "summary": "Edge delivery",
+      "status": "COMPLETED",
+      "component": "edge",
+      "protocol": "AMQP",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 11,
+        "request_id": "893d2170-7f45-40a9-8c7d-ef1f9c7b81e3",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "deliveries": 1,
+        "redelivered": false,
+        "consumer_ack_sent": true,
+        "durable_inbox_committed": true,
+        "ack_policy": "manual ACK after PostgreSQL inbox commit",
+        "protocol": "AMQP 0-9-1",
+        "classification": "REAL PROTOCOL"
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "deliveries": 1,
+        "redelivered": false,
+        "consumer_ack_sent": true,
+        "durable_inbox_committed": true,
+        "ack_policy": "manual ACK after PostgreSQL inbox commit",
+        "protocol": "AMQP 0-9-1",
+        "classification": "REAL PROTOCOL"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.edge_deliver",
+        "excerpt": "    def edge_deliver(self, command_id: str, minimum_deliveries: int = 1) -> dict[str, Any]:\n        deadline = time.monotonic() + self.config.timeout\n        while time.monotonic() < deadline:\n            row = self.store.inbox(command_id)\n            if row and row[\"ack_sent\"] and row[\"deliveries\"] >= minimum_deliveries:\n                return {\n                    \"command_id\": command_id,\n                    \"payload_hash\": row[\"payload_hash\"],"
+      },
+      "invariant": "Persist inbox identity before acknowledging delivery.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:14.320165Z",
+      "duration_ms": 31.25045299998419,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "57b8774c-921b-52cc-82d0-903cecc1a942"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "9904d8da-02de-56db-81c8-8c580ff82d9b",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 12,
+      "sequence": 12,
+      "revision": 23,
+      "title": "Controller session",
+      "summary": "Controller session",
+      "status": "COMPLETED",
+      "component": "opcua",
+      "protocol": "OPC UA",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 12,
+        "request_id": "2e9d0e0a-d254-4323-815c-b414a144f87c",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "state": "IDLE",
+        "server_process_id": 32163,
+        "protocol": "OPC UA",
+        "classification": "REAL PROTOCOL",
+        "system": "SIMULATED SYSTEM",
+        "method": "Browse/Subscribe",
+        "namespace": "urn:robotops:integration-lab:cell-1",
+        "browsed_children": 10,
+        "subscription_created": true,
+        "subscription_notifications": [
+          "IDLE"
+        ],
+        "security_mode": "None (isolated development lab)",
+        "opcua_client_component": "edge-adapter",
+        "edge_process_id": 32164,
+        "edge_control_protocol": "REST/JSON"
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "state": "IDLE",
+        "server_process_id": 32163,
+        "protocol": "OPC UA",
+        "classification": "REAL PROTOCOL",
+        "system": "SIMULATED SYSTEM",
+        "method": "Browse/Subscribe",
+        "namespace": "urn:robotops:integration-lab:cell-1",
+        "browsed_children": 10,
+        "subscription_created": true,
+        "subscription_notifications": [
+          "IDLE"
+        ],
+        "security_mode": "None (isolated development lab)",
+        "opcua_client_component": "edge-adapter",
+        "edge_process_id": 32164,
+        "edge_control_protocol": "REST/JSON"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.opc_connect",
+        "excerpt": "    def opc_connect(self) -> dict[str, Any]:\n        return self.opc.call()"
+      },
+      "invariant": "Establishing a controller session does not accept or execute a command.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:14.795158Z",
+      "duration_ms": 74.22837700005402,
+      "evidence_ids": [
+        "8222764f-ff28-576b-a5db-4f9c1cda8d92"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "5f274489-b558-5414-9fc3-ee91beb599fc",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 13,
+      "sequence": 13,
+      "revision": 25,
+      "title": "PLC SubmitJob",
+      "summary": "PLC SubmitJob",
+      "status": "COMPLETED",
+      "component": "plc",
+      "protocol": "OPC UA",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 13,
+        "request_id": "0f9675b4-aca9-411a-b889-6d0c079f1204",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "state": "ACCEPTED",
+        "result_sequence": 0,
+        "result": null,
+        "acknowledged": false,
+        "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "validated_boot_id": null,
+        "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "duplicate": false,
+        "effect_permitted": false,
+        "protocol": "OPC UA",
+        "classification": "REAL PROTOCOL",
+        "system": "SIMULATED SYSTEM",
+        "method": "SubmitJob",
+        "namespace": "urn:robotops:integration-lab:cell-1",
+        "browsed_children": 10,
+        "subscription_created": true,
+        "subscription_notifications": [
+          "IDLE"
+        ],
+        "security_mode": "None (isolated development lab)",
+        "opcua_client_component": "edge-adapter",
+        "edge_process_id": 32164,
+        "edge_control_protocol": "REST/JSON"
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "state": "ACCEPTED",
+        "result_sequence": 0,
+        "result": null,
+        "acknowledged": false,
+        "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "validated_boot_id": null,
+        "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "duplicate": false,
+        "effect_permitted": false,
+        "protocol": "OPC UA",
+        "classification": "REAL PROTOCOL",
+        "system": "SIMULATED SYSTEM",
+        "method": "SubmitJob",
+        "namespace": "urn:robotops:integration-lab:cell-1",
+        "browsed_children": 10,
+        "subscription_created": true,
+        "subscription_notifications": [
+          "IDLE"
+        ],
+        "security_mode": "None (isolated development lab)",
+        "opcua_client_component": "edge-adapter",
+        "edge_process_id": 32164,
+        "edge_control_protocol": "REST/JSON"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.submit",
+        "excerpt": "    def submit(self, payload: dict[str, Any]) -> dict[str, Any]:\n        command = RobotCommand.model_validate(payload)\n        inbox = self.store.inbox(command.command_id)\n        if inbox is None or inbox[\"payload_hash\"] != digest(command):\n            raise Conflict(\"DURABLE_EDGE_IDENTITY_REQUIRED\")\n        return self.opc.call(\"SubmitJob\", command.model_dump_json())"
+      },
+      "invariant": "Acceptance is not execution; command identity is immutable.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:15.229226Z",
+      "duration_ms": 101.27826699999787,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "0ce1a2e2-a80d-5ac7-9afe-edbe9c52cc8d"
+      ],
+      "authorization_required": true
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "c01d00ec-a1dc-5c02-95a0-09c57cbf2d1e",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 14,
+      "sequence": 14,
+      "revision": 27,
+      "title": "PLC operational preconditions",
+      "summary": "PLC operational preconditions",
+      "status": "COMPLETED",
+      "component": "plc",
+      "protocol": "OPC UA",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 14,
+        "request_id": "65230294-8a3f-41a5-8894-e2b879096f1e",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "state": "READY",
+        "result_sequence": 0,
+        "result": null,
+        "acknowledged": false,
+        "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "validated_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "identity_retained": true,
+        "ordinary_operational_checks": true,
+        "safety_rated": false,
+        "cell_generation": 0,
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "active_tool_id": "EE_VAC_SINGLE",
+        "checks": [
+          "scene_epoch",
+          "cell_generation",
+          "cell_ready",
+          "source",
+          "tool",
+          "trajectory",
+          "payload_hash",
+          "controller_boot"
+        ],
+        "rechecked_by_runtime_at_effect": true,
+        "protocol": "OPC UA",
+        "classification": "REAL PROTOCOL",
+        "system": "SIMULATED SYSTEM",
+        "method": "CheckPreconditions",
+        "namespace": "urn:robotops:integration-lab:cell-1",
+        "browsed_children": 10,
+        "subscription_created": true,
+        "subscription_notifications": [
+          "ACCEPTED"
+        ],
+        "security_mode": "None (isolated development lab)",
+        "opcua_client_component": "edge-adapter",
+        "edge_process_id": 32164,
+        "edge_control_protocol": "REST/JSON"
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "state": "READY",
+        "result_sequence": 0,
+        "result": null,
+        "acknowledged": false,
+        "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "validated_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+        "identity_retained": true,
+        "ordinary_operational_checks": true,
+        "safety_rated": false,
+        "cell_generation": 0,
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "active_tool_id": "EE_VAC_SINGLE",
+        "checks": [
+          "scene_epoch",
+          "cell_generation",
+          "cell_ready",
+          "source",
+          "tool",
+          "trajectory",
+          "payload_hash",
+          "controller_boot"
+        ],
+        "rechecked_by_runtime_at_effect": true,
+        "protocol": "OPC UA",
+        "classification": "REAL PROTOCOL",
+        "system": "SIMULATED SYSTEM",
+        "method": "CheckPreconditions",
+        "namespace": "urn:robotops:integration-lab:cell-1",
+        "browsed_children": 10,
+        "subscription_created": true,
+        "subscription_notifications": [
+          "ACCEPTED"
+        ],
+        "security_mode": "None (isolated development lab)",
+        "opcua_client_component": "edge-adapter",
+        "edge_process_id": 32164,
+        "edge_control_protocol": "REST/JSON"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.preconditions",
+        "excerpt": "    def preconditions(self, command_id: str) -> dict[str, Any]:\n        if self.runtime is None:\n            raise Conflict(\"LAB_RUNTIME_REQUIRED_FOR_OPERATIONAL_PRECONDITIONS\")\n        return self.opc.call(\n            \"CheckPreconditions\", command_id, self.runtime.world().model_dump_json()\n        )"
+      },
+      "invariant": "Operational checks are not safety-rated functions.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:15.784641Z",
+      "duration_ms": 79.73111500018604,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "6bcdf89f-4b57-547c-9d6b-359a34b99b68"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "9250190a-661c-5ff6-960e-9c4170281ecf",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 15,
+      "sequence": 15,
+      "revision": 29,
+      "title": "READY FOR PHYSICAL EXECUTION",
+      "summary": "READY FOR PHYSICAL EXECUTION",
+      "status": "COMPLETED",
+      "component": "operator",
+      "protocol": "REST",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 15,
+        "request_id": "a872efac-d5cb-46ca-9e26-e5a7a14c4b69",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "authorized": true,
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "meaning": "Permission for irreversible simulated robot effect; not certified safety.",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "safety_function": false
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "READY_TO_EXECUTE",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "authorized": true,
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "meaning": "Permission for irreversible simulated robot effect; not certified safety.",
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "safety_function": false
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/integration/engine.py",
+        "symbol": "GuidedEngine._execute",
+        "excerpt": "        if stage == 15:\n            context[\"physical_authorized\"] = True\n            return self.store.effect(\n                ident,\n                \"PHYSICAL_AUTHORIZATION\",\n                {\n                    \"command_id\": command.command_id,\n                    \"payload_hash\": digest(command),"
+      },
+      "invariant": "Explicit authorization must precede irreversible simulated physical effect.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:16.352915Z",
+      "duration_ms": 45.80050399999891,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "1d9f21f6-781f-5fff-880b-0ae5a93a7043"
+      ],
+      "authorization_required": true
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "197c38a2-afca-5fa8-a340-5dd8a5ba2cb3",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 16,
+      "sequence": 16,
+      "revision": 31,
+      "title": "Physical execution",
+      "summary": "SUCCEEDED",
+      "status": "COMPLETED",
+      "component": "robot",
+      "protocol": "controller",
+      "classification": "SIMULATED ROBOT",
+      "input": {
+        "stage": 16,
+        "request_id": "4f4fa306-9869-42b5-b74b-86e742b98ded",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "receipt": {
+          "schema_version": "2.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "timestamp": "2026-10-06T20:29:16.878122Z",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+          "status": "SUCCEEDED",
+          "reason": "PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "journal_durable": true,
+          "active_tool_id": "EE_VAC_SINGLE",
+          "tool_change_performed": false,
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "runtime_profile_version": "hkm_inspired_v1"
+        },
+        "status": "SUCCEEDED",
+        "interface": "simulated controller interface",
+        "playback_url": "/jobs/fe2e36c8-223b-5976-aac1-ca6e57fa98dd/playback"
+      },
+      "state_before": "READY_TO_EXECUTE",
+      "state_after": "EXECUTING",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "receipt": {
+          "schema_version": "2.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "timestamp": "2026-10-06T20:29:16.878122Z",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+          "status": "SUCCEEDED",
+          "reason": "PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "journal_durable": true,
+          "active_tool_id": "EE_VAC_SINGLE",
+          "tool_change_performed": false,
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "runtime_profile_version": "hkm_inspired_v1"
+        },
+        "status": "SUCCEEDED",
+        "interface": "simulated controller interface",
+        "playback_url": "/jobs/fe2e36c8-223b-5976-aac1-ca6e57fa98dd/playback"
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/workflow/engine.py",
+        "symbol": "Engine.stage_dispatch",
+        "excerpt": "    def stage_dispatch(\n        self,\n        job: PickJob,\n        claim: Claim,\n        fault: Fault | None = None,\n        sender: Callable[[RobotCommand, Fault | None], CommandReceipt] | None = None,\n    ) -> CommandReceipt | None:\n        if job.command_id is None:"
+      },
+      "invariant": "Lost acknowledgement never permits a blind physical retry.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:17.109630Z",
+      "duration_ms": 506.1350680000487,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "f448b451-e565-58c5-a35c-740befcf3a10"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "1da0a5ba-e052-5e4c-b1b3-89b1b6ae5c5f",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 17,
+      "sequence": 17,
+      "revision": 33,
+      "title": "Controller result",
+      "summary": "Controller result",
+      "status": "COMPLETED",
+      "component": "controller",
+      "protocol": "OPC UA",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 17,
+        "request_id": "571a3450-8550-4cee-bc33-8b980e2ac5c7",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "receipt": {
+          "schema_version": "2.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "timestamp": "2026-10-06T20:29:16.878122Z",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+          "status": "SUCCEEDED",
+          "reason": "PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "journal_durable": true,
+          "active_tool_id": "EE_VAC_SINGLE",
+          "tool_change_performed": false,
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "runtime_profile_version": "hkm_inspired_v1"
+        },
+        "journal_query_only": true,
+        "wire": {
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "state": "SUCCEEDED",
+          "result_sequence": 1,
+          "result": {
+            "active_tool_id": "EE_VAC_SINGLE",
+            "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+            "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+            "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+            "effect_count": 1,
+            "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+            "journal_durable": true,
+            "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+            "reason": "PICK_APPLIED",
+            "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+            "runtime_profile_version": "hkm_inspired_v1",
+            "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+            "schema_version": "2.0",
+            "status": "SUCCEEDED",
+            "timestamp": "2026-10-06T20:29:16.878122Z",
+            "tool_change_performed": false,
+            "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7"
+          },
+          "acknowledged": false,
+          "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+          "validated_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+          "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+          "protocol": "OPC UA",
+          "classification": "REAL PROTOCOL",
+          "system": "SIMULATED SYSTEM",
+          "method": "GetJobStatus",
+          "namespace": "urn:robotops:integration-lab:cell-1",
+          "browsed_children": 10,
+          "subscription_created": true,
+          "subscription_notifications": [
+            "SUCCEEDED"
+          ],
+          "security_mode": "None (isolated development lab)",
+          "opcua_client_component": "edge-adapter",
+          "edge_process_id": 32164,
+          "edge_control_protocol": "REST/JSON"
+        },
+        "restart": null
+      },
+      "state_before": "EXECUTING",
+      "state_after": "VERIFYING",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "receipt": {
+          "schema_version": "2.0",
+          "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+          "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+          "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "timestamp": "2026-10-06T20:29:16.878122Z",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+          "status": "SUCCEEDED",
+          "reason": "PICK_APPLIED",
+          "effect_count": 1,
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "journal_durable": true,
+          "active_tool_id": "EE_VAC_SINGLE",
+          "tool_change_performed": false,
+          "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+          "runtime_profile_version": "hkm_inspired_v1"
+        },
+        "journal_query_only": true,
+        "wire": {
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+          "state": "SUCCEEDED",
+          "result_sequence": 1,
+          "result": {
+            "active_tool_id": "EE_VAC_SINGLE",
+            "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+            "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+            "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+            "effect_count": 1,
+            "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+            "journal_durable": true,
+            "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+            "reason": "PICK_APPLIED",
+            "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+            "runtime_profile_version": "hkm_inspired_v1",
+            "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+            "schema_version": "2.0",
+            "status": "SUCCEEDED",
+            "timestamp": "2026-10-06T20:29:16.878122Z",
+            "tool_change_performed": false,
+            "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7"
+          },
+          "acknowledged": false,
+          "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+          "validated_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+          "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+          "protocol": "OPC UA",
+          "classification": "REAL PROTOCOL",
+          "system": "SIMULATED SYSTEM",
+          "method": "GetJobStatus",
+          "namespace": "urn:robotops:integration-lab:cell-1",
+          "browsed_children": 10,
+          "subscription_created": true,
+          "subscription_notifications": [
+            "SUCCEEDED"
+          ],
+          "security_mode": "None (isolated development lab)",
+          "opcua_client_component": "edge-adapter",
+          "edge_process_id": 32164,
+          "edge_control_protocol": "REST/JSON"
+        },
+        "restart": null
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.status",
+        "excerpt": "    def status(self, command_id: str) -> dict[str, Any]:\n        return self.opc.call(\"GetJobStatus\", command_id)"
+      },
+      "invariant": "Controller success is not sensor verification or WMS acknowledgement.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:17.950858Z",
+      "duration_ms": 308.5373999999774,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "d0a79be9-0387-5461-90be-9cf53e710bab"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "1409bf39-3273-5afb-a4f1-2cd4d982634d",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 18,
+      "sequence": 18,
+      "revision": 35,
+      "title": "Fresh post-execution observation",
+      "summary": "Fresh post-execution observation",
+      "status": "COMPLETED",
+      "component": "sensor",
+      "protocol": "sensor",
+      "classification": "SYNTHETIC SENSOR",
+      "input": {
+        "stage": 18,
+        "request_id": "d3aef0b8-eaf4-4d8f-8817-d7d4a02bea68",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "schema_version": "2.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "timestamp": "2026-10-06T20:29:18.290346Z",
+        "observation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "step": 1,
+        "captured_at": "2026-10-06T20:29:18.290346Z",
+        "model_version": "synthetic-observer-2",
+        "calibration_version": "hkm-cal-1",
+        "objects": [
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-A-01",
+            "location_id": "DESTINATION",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.38,
+                0.9400000000000002,
+                0.20249999999999999
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-B-01",
+            "location_id": "SRC_B",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.1,
+                -1.24,
+                0.22999999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-C-01",
+            "location_id": "SRC_C",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.85,
+                -0.92,
+                0.21999999999999997
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-D-01",
+            "location_id": "SRC_D",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.26,
+                -0.08,
+                0.295
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-E-01",
+            "location_id": "SRC_E",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.15,
+                0.75,
+                0.24
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-F-01",
+            "location_id": "SRC_F",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.14,
+                0.75,
+                0.25
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          }
+        ],
+        "covered_locations": [
+          "SRC_A",
+          "SRC_B",
+          "SRC_C",
+          "SRC_D",
+          "SRC_E",
+          "SRC_F",
+          "DESTINATION"
+        ],
+        "cell_generation": 0,
+        "robot_profile_version": "hkm_inspired_v1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "sensors": [
+          {
+            "schema_version": "2.0",
+            "sensor_id": "overhead-observation",
+            "frame_id": "camera_overhead",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                0.0,
+                2.6
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          },
+          {
+            "schema_version": "2.0",
+            "sensor_id": "side-inspection",
+            "frame_id": "camera_side",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.85,
+                -0.65,
+                1.25
+              ],
+              "quaternion_xyzw": [
+                0.4164435022802413,
+                -0.295082221134753,
+                -0.4971755075060524,
+                0.7016536231751722
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          }
+        ],
+        "machine_telemetry": {
+          "schema_version": "2.0",
+          "source": "SIMULATED_CELL_TELEMETRY",
+          "tool_state": {
+            "schema_version": "2.0",
+            "active_tool_id": "EE_VAC_SINGLE",
+            "changer_state": "READY",
+            "rack_tool_ids": [
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ],
+            "tool_state_version": "synthetic-tool-state-1"
+          },
+          "tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              0.0,
+              -0.6,
+              1.02
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "captured_at": "2026-10-06T20:29:18.290346Z",
+          "cell_generation": 0
+        }
+      },
+      "state_before": "VERIFYING",
+      "state_after": "VERIFYING",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "schema_version": "2.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "timestamp": "2026-10-06T20:29:18.290346Z",
+        "observation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "step": 1,
+        "captured_at": "2026-10-06T20:29:18.290346Z",
+        "model_version": "synthetic-observer-2",
+        "calibration_version": "hkm-cal-1",
+        "objects": [
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-A-01",
+            "location_id": "DESTINATION",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.38,
+                0.9400000000000002,
+                0.20249999999999999
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-B-01",
+            "location_id": "SRC_B",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.1,
+                -1.24,
+                0.22999999999999998
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-C-01",
+            "location_id": "SRC_C",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -0.85,
+                -0.92,
+                0.21999999999999997
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-D-01",
+            "location_id": "SRC_D",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.26,
+                -0.08,
+                0.295
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-E-01",
+            "location_id": "SRC_E",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.15,
+                0.75,
+                0.24
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          },
+          {
+            "schema_version": "2.0",
+            "product_id": "product-SKU-F-01",
+            "location_id": "SRC_F",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                1.14,
+                0.75,
+                0.25
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "confidence": 1.0,
+            "uncertainty_m": 0.0,
+            "sensor_id": "overhead-observation",
+            "evidence_source": "SYNTHETIC_OBSERVATION_MODEL"
+          }
+        ],
+        "covered_locations": [
+          "SRC_A",
+          "SRC_B",
+          "SRC_C",
+          "SRC_D",
+          "SRC_E",
+          "SRC_F",
+          "DESTINATION"
+        ],
+        "cell_generation": 0,
+        "robot_profile_version": "hkm_inspired_v1",
+        "frame_tree_version": "hkm-frame-tree-1",
+        "sensors": [
+          {
+            "schema_version": "2.0",
+            "sensor_id": "overhead-observation",
+            "frame_id": "camera_overhead",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                0.0,
+                0.0,
+                2.6
+              ],
+              "quaternion_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          },
+          {
+            "schema_version": "2.0",
+            "sensor_id": "side-inspection",
+            "frame_id": "camera_side",
+            "calibration_version": "hkm-cal-1",
+            "camera_model_version": "synthetic-orthographic-1",
+            "pose": {
+              "schema_version": "1.0",
+              "position": [
+                -1.85,
+                -0.65,
+                1.25
+              ],
+              "quaternion_xyzw": [
+                0.4164435022802413,
+                -0.295082221134753,
+                -0.4971755075060524,
+                0.7016536231751722
+              ],
+              "unit": "m",
+              "frame_id": "cell_world",
+              "calibration_version": "hkm-cal-1"
+            },
+            "presentation_only": false
+          }
+        ],
+        "machine_telemetry": {
+          "schema_version": "2.0",
+          "source": "SIMULATED_CELL_TELEMETRY",
+          "tool_state": {
+            "schema_version": "2.0",
+            "active_tool_id": "EE_VAC_SINGLE",
+            "changer_state": "READY",
+            "rack_tool_ids": [
+              "EE_VAC_ARRAY",
+              "EE_PINCH_NARROW",
+              "EE_PINCH_WIDE",
+              "EE_ADAPTIVE_SOFT",
+              "EE_SUPPORT_FORK"
+            ],
+            "tool_state_version": "synthetic-tool-state-1"
+          },
+          "tcp_pose": {
+            "schema_version": "1.0",
+            "position": [
+              0.0,
+              -0.6,
+              1.02
+            ],
+            "quaternion_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "unit": "m",
+            "frame_id": "cell_world",
+            "calibration_version": "hkm-cal-1"
+          },
+          "captured_at": "2026-10-06T20:29:18.290346Z",
+          "cell_generation": 0
+        }
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/workflow/engine.py",
+        "symbol": "Engine._observe",
+        "excerpt": "    def _observe(self, job: PickJob, fault: Fault | None = None) -> WorldObservation:\n        observation = self.observer.observe(self.runtime.world(), fault)\n        # Correlate sensor evidence to the request without changing its capture data.\n        observation = observation.model_copy(\n            update={\n                \"run_id\": job.run_id,\n                \"correlation_id\": job.correlation_id,\n                \"causation_id\": job.command_id or job.job_id,"
+      },
+      "invariant": "Verification uses fresh evidence, not the presentation replay.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:18.319692Z",
+      "duration_ms": 47.650502000124106,
+      "evidence_ids": [
+        "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "638521f3-1043-5740-876c-27cac0bd7cbb"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "8f61d175-e2b7-5109-b26c-637c70b10202",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 19,
+      "sequence": 19,
+      "revision": 37,
+      "title": "Verification",
+      "summary": "Verification",
+      "status": "COMPLETED",
+      "component": "verifier",
+      "protocol": "Python",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 19,
+        "request_id": "f1d3d933-9f45-4020-a202-83ac8220955d",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "schema_version": "1.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "timestamp": "2026-10-06T20:29:18.696672Z",
+        "verification_id": "4cd5e8ae-d440-4122-8bb2-c0f05ef7446f",
+        "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "observation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "verdict": "VERIFIED_SUCCESS",
+        "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+        "workflow_state": "COMPLETED",
+        "reconciliation_required": false,
+        "recovered_verification": false
+      },
+      "state_before": "VERIFYING",
+      "state_after": "COMPLETED",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "schema_version": "1.0",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "causation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "timestamp": "2026-10-06T20:29:18.696672Z",
+        "verification_id": "4cd5e8ae-d440-4122-8bb2-c0f05ef7446f",
+        "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "observation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "verdict": "VERIFIED_SUCCESS",
+        "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE",
+        "workflow_state": "COMPLETED",
+        "reconciliation_required": false,
+        "recovered_verification": false
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/verification/verifier.py",
+        "symbol": "Verifier.verify",
+        "excerpt": "    def verify(\n        self,\n        command: RobotCommand,\n        observation: WorldObservation,\n        receipt: CommandReceipt | None,\n        *,\n        now: datetime | None = None,\n    ) -> VerificationResult:"
+      },
+      "invariant": "Inconclusive evidence must never produce business success.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:18.735919Z",
+      "duration_ms": 77.91446500004895,
+      "evidence_ids": [
+        "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+        "4cd5e8ae-d440-4122-8bb2-c0f05ef7446f",
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "661a8249-d3ae-50d3-afde-0522a7f8c20d"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "239630be-9bcf-5f4d-be91-7b4847a0091b",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 20,
+      "sequence": 20,
+      "revision": 39,
+      "title": "WMS reconciliation",
+      "summary": "WMS_HTTP_503_RETRY_BUSINESS_ACK_ONLY",
+      "status": "FAILED",
+      "component": "wms",
+      "protocol": "REST",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 20,
+        "request_id": "4904633a-a37e-4323-bb35-630ef44625d2",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "error": "WMS_HTTP_503_RETRY_BUSINESS_ACK_ONLY",
+        "retry_permitted": true,
+        "protocol_evidence_confirmed": true,
+        "network_attempted": true,
+        "http_response": {
+          "method": "POST",
+          "path": "/v1/wms/acknowledgements",
+          "status_code": 503
+        },
+        "wms_acknowledged": false,
+        "physical_retry": false
+      },
+      "state_before": "COMPLETED",
+      "state_after": "COMPLETED",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "error": "WMS_HTTP_503_RETRY_BUSINESS_ACK_ONLY",
+        "retry_permitted": true,
+        "protocol_evidence_confirmed": true,
+        "network_attempted": true,
+        "http_response": {
+          "method": "POST",
+          "path": "/v1/wms/acknowledgements",
+          "status_code": 503
+        },
+        "wms_acknowledged": false,
+        "physical_retry": false
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.reconcile_business",
+        "excerpt": "    def reconcile_business(\n        self, payload: dict[str, Any], fail_once: bool = False\n    ) -> dict[str, Any]:\n        try:\n            response = httpx.post(\n                self.config.wms_url + \"/v1/wms/acknowledgements\",\n                json={\"outcome\": payload, \"fail_once\": fail_once},\n                timeout=self.config.timeout,"
+      },
+      "invariant": "WMS retries never execute robot motion.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:19.110076Z",
+      "duration_ms": 54.40439399990282,
+      "evidence_ids": [
+        "bd8fcb60-341f-5ca4-84d3-cf18ba7c288a"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "ab988b40-24e3-5093-84bf-6462743c893d",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 20,
+      "sequence": 21,
+      "revision": 41,
+      "title": "WMS reconciliation",
+      "summary": "WMS reconciliation",
+      "status": "COMPLETED",
+      "component": "wms",
+      "protocol": "REST",
+      "classification": "REAL PROTOCOL",
+      "input": {
+        "stage": 20,
+        "request_id": "0760a429-0f5a-4f06-9425-50fe6a25c2ec",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "physical_retry": false,
+        "verified_outcome": "COMPLETED",
+        "wire": {
+          "acknowledgement_id": "wms:62920078-f365-5193-8cca-01d38c66249b",
+          "attempts": 2,
+          "classification": "REAL PROTOCOL",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "http_status": 200,
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "payload_hash": "f55f0765695d1b29b051e97f75e73e16783cdbb175356f49912924ef43c4c421",
+          "physical_retry": false,
+          "protocol": "REST/JSON",
+          "schema_version": "1.0",
+          "system": "SIMULATED WMS",
+          "verified_outcome": "COMPLETED",
+          "wms_acknowledged": true
+        },
+        "wms_acknowledged": true
+      },
+      "state_before": "COMPLETED",
+      "state_after": "COMPLETED",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "physical_retry": false,
+        "verified_outcome": "COMPLETED",
+        "wire": {
+          "acknowledgement_id": "wms:62920078-f365-5193-8cca-01d38c66249b",
+          "attempts": 2,
+          "classification": "REAL PROTOCOL",
+          "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+          "http_status": 200,
+          "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+          "payload_hash": "f55f0765695d1b29b051e97f75e73e16783cdbb175356f49912924ef43c4c421",
+          "physical_retry": false,
+          "protocol": "REST/JSON",
+          "schema_version": "1.0",
+          "system": "SIMULATED WMS",
+          "verified_outcome": "COMPLETED",
+          "wms_acknowledged": true
+        },
+        "wms_acknowledged": true
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/lab/transport.py",
+        "symbol": "LabBridge.reconcile_business",
+        "excerpt": "    def reconcile_business(\n        self, payload: dict[str, Any], fail_once: bool = False\n    ) -> dict[str, Any]:\n        try:\n            response = httpx.post(\n                self.config.wms_url + \"/v1/wms/acknowledgements\",\n                json={\"outcome\": payload, \"fail_once\": fail_once},\n                timeout=self.config.timeout,"
+      },
+      "invariant": "WMS retries never execute robot motion.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:19.528391Z",
+      "duration_ms": 88.97296399982224,
+      "evidence_ids": [
+        "62920078-f365-5193-8cca-01d38c66249b",
+        "1fa392f4-86d5-58be-95ba-19f54f047633"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "5f8d88a5-2991-5219-895a-6a655830f3ad",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 21,
+      "sequence": 22,
+      "revision": 43,
+      "title": "ERP business completion",
+      "summary": "ERP business completion",
+      "status": "COMPLETED",
+      "component": "erp",
+      "protocol": "SQL",
+      "classification": "SIMULATED SYSTEM",
+      "input": {
+        "stage": 21,
+        "request_id": "fbec1234-f820-4ab4-97d2-27dc88f24977",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "business_status": "COMPLETED",
+        "wms_acknowledged": true,
+        "wms_acknowledgement_ids": [
+          "b9d6a286-00ce-560a-9863-361bc29ae081"
+        ]
+      },
+      "state_before": "RECONCILING",
+      "state_after": "COMPLETED",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "business_status": "COMPLETED",
+        "wms_acknowledged": true,
+        "wms_acknowledgement_ids": [
+          "b9d6a286-00ce-560a-9863-361bc29ae081"
+        ]
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/integration/store.py",
+        "symbol": "IntegrationStore.complete_business",
+        "excerpt": "    def complete_business(self, session: ExecutionSession, ident: str) -> dict[str, Any]:\n        \"\"\"Commit ERP outcome only after each verified job has its durable WMS ACK.\"\"\"\n        with self.store.transaction() as db:\n            jobs = [self.store._job(db, job_id) for job_id in session.job_ids]\n            if not jobs or any(\n                job.state not in {JobState.COMPLETED, JobState.FAILED} for job in jobs\n            ):\n                raise Conflict(\"VERIFIED_ORDER_OUTCOMES_REQUIRED\")"
+      },
+      "invariant": "Business completion requires acknowledgement of verified outcome.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:19.883889Z",
+      "duration_ms": 43.843709999919156,
+      "evidence_ids": [
+        "b0b369cc-f3a6-5d7e-8258-b4c811b86a32"
+      ],
+      "authorization_required": false
+    },
+    {
+      "schema_version": "1.0",
+      "step_id": "1d734d4b-b0ed-5d07-aa31-e443973c2477",
+      "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "execution_session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+      "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "stage": 22,
+      "sequence": 23,
+      "revision": 45,
+      "title": "Final correlated trace",
+      "summary": "Final correlated trace",
+      "status": "COMPLETED",
+      "component": "trace",
+      "protocol": "SQL",
+      "classification": "REAL CODE",
+      "input": {
+        "stage": 22,
+        "request_id": "69277d59-9e21-4a0d-87b5-45916eebaf3e",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b"
+      },
+      "output": {
+        "acknowledgement_semantics": "HTTP accepted != DB commit != publisher confirm != consumer ACK != PLC acceptance != controller success != verification != WMS ACK != ERP completion",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "event_count": 57,
+        "job_ids": [
+          "fe2e36c8-223b-5976-aac1-ca6e57fa98dd"
+        ],
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+        "stage_count": 23
+      },
+      "state_before": "COMPLETED",
+      "state_after": "COMPLETED",
+      "persistence_effect": "Authorization and bounded operation evidence committed; no transaction held while waiting.",
+      "wire": {
+        "acknowledgement_semantics": "HTTP accepted != DB commit != publisher confirm != consumer ACK != PLC acceptance != controller success != verification != WMS ACK != ERP completion",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "event_count": 57,
+        "job_ids": [
+          "fe2e36c8-223b-5976-aac1-ca6e57fa98dd"
+        ],
+        "order_id": "order-e2df23b2-df0c-467b-b8f3-b81cd68494b0",
+        "session_id": "8f72a686-1f56-5a44-a5e0-a4305e726e2d",
+        "stage_count": 23
+      },
+      "source": {
+        "schema_version": "1.0",
+        "path": "robotops/integration/engine.py",
+        "symbol": "GuidedEngine._execute",
+        "excerpt": "        if stage == 22:\n            return self.store.effect(\n                ident,\n                \"TRACE_SUMMARY\",\n                {\n                    \"session_id\": session.session_id,\n                    \"order_id\": session.order_id,\n                    \"job_ids\": session.job_ids,"
+      },
+      "invariant": "Each evidence ID refers to persisted backend work.",
+      "failure_semantics": "Query original command after uncertain effect; never blindly resend. Pre-effect and business failures require explicit retry.",
+      "timestamp": "2026-10-06T20:29:20.243705Z",
+      "duration_ms": 51.31029600011061,
+      "evidence_ids": [
+        "900fbcbb-20f5-5505-b339-4748ca05575f"
+      ],
+      "authorization_required": false
+    }
+  ],
+  "pending_authorization": null,
+  "context": {
+    "job_ids": [
+      "fe2e36c8-223b-5976-aac1-ca6e57fa98dd"
+    ],
+    "job_index": 0,
+    "pre_observation_id": "0de35c16-0e95-4624-8844-44acfa8dbd59",
+    "plan_id": "7c27d191-e5ea-5b67-b674-a9a4ccafde57",
+    "validated": true,
+    "physical_authorized": true,
+    "execution_preflight": {
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+      "state": "READY",
+      "result_sequence": 0,
+      "result": null,
+      "acknowledged": false,
+      "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+      "validated_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+      "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+      "protocol": "OPC UA",
+      "classification": "REAL PROTOCOL",
+      "system": "SIMULATED SYSTEM",
+      "method": "GetJobStatus",
+      "namespace": "urn:robotops:integration-lab:cell-1",
+      "browsed_children": 10,
+      "subscription_created": true,
+      "subscription_notifications": [
+        "READY"
+      ],
+      "security_mode": "None (isolated development lab)",
+      "opcua_client_component": "edge-adapter",
+      "edge_process_id": 32164,
+      "edge_control_protocol": "REST/JSON"
+    },
+    "execution_wire": {
+      "schema_version": "2.0",
+      "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "timestamp": "2026-10-06T20:29:16.878122Z",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+      "status": "SUCCEEDED",
+      "reason": "PICK_APPLIED",
+      "effect_count": 1,
+      "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+      "journal_durable": true,
+      "active_tool_id": "EE_VAC_SINGLE",
+      "tool_change_performed": false,
+      "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+      "runtime_profile_version": "hkm_inspired_v1"
+    },
+    "receipt": {
+      "schema_version": "2.0",
+      "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "timestamp": "2026-10-06T20:29:16.878122Z",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+      "status": "SUCCEEDED",
+      "reason": "PICK_APPLIED",
+      "effect_count": 1,
+      "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+      "journal_durable": true,
+      "active_tool_id": "EE_VAC_SINGLE",
+      "tool_change_performed": false,
+      "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7",
+      "runtime_profile_version": "hkm_inspired_v1"
+    },
+    "dispatch_uncertain": false,
+    "controller_wire": {
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+      "state": "SUCCEEDED",
+      "result_sequence": 1,
+      "result": {
+        "active_tool_id": "EE_VAC_SINGLE",
+        "causation_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+        "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+        "effect_count": 1,
+        "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+        "journal_durable": true,
+        "payload_hash": "f194c2ad7edc28a000bd6fe51e3d66f12341deeebe692c662d71e14fa8c70ab2",
+        "reason": "PICK_APPLIED",
+        "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+        "runtime_profile_version": "hkm_inspired_v1",
+        "scene_epoch": "dbb4a349-8523-4569-bf05-0b2e6fbbb5d6",
+        "schema_version": "2.0",
+        "status": "SUCCEEDED",
+        "timestamp": "2026-10-06T20:29:16.878122Z",
+        "tool_change_performed": false,
+        "trajectory_id": "trajectory-826e114cd80ff0c5bfd66f477a2a0c10069af631bfdcdfba8c307f27d0207fa7"
+      },
+      "acknowledged": false,
+      "accepted_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+      "validated_boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+      "boot_id": "05d5d750-393a-43b8-b174-0793ab3e7fbb",
+      "protocol": "OPC UA",
+      "classification": "REAL PROTOCOL",
+      "system": "SIMULATED SYSTEM",
+      "method": "GetJobStatus",
+      "namespace": "urn:robotops:integration-lab:cell-1",
+      "browsed_children": 10,
+      "subscription_created": true,
+      "subscription_notifications": [
+        "SUCCEEDED"
+      ],
+      "security_mode": "None (isolated development lab)",
+      "opcua_client_component": "edge-adapter",
+      "edge_process_id": 32164,
+      "edge_control_protocol": "REST/JSON"
+    },
+    "post_observation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+    "verification": {
+      "schema_version": "1.0",
+      "run_id": "08add1ba-1801-49bf-9c37-8ddbb2866ab6",
+      "correlation_id": "86f05ef6-7bf3-5a53-8852-24e2266590c2",
+      "causation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+      "timestamp": "2026-10-06T20:29:18.696672Z",
+      "verification_id": "4cd5e8ae-d440-4122-8bb2-c0f05ef7446f",
+      "job_id": "fe2e36c8-223b-5976-aac1-ca6e57fa98dd",
+      "command_id": "62920078-f365-5193-8cca-01d38c66249b",
+      "observation_id": "4c5e4f4d-d0c6-4777-9454-b3bf184afc19",
+      "verdict": "VERIFIED_SUCCESS",
+      "reason": "JOURNAL_AND_FRESH_DESTINATION_AGREE"
+    },
+    "wms_ack": true
+  },
+  "created_at": "2026-10-06T20:29:08.379919Z",
+  "updated_at": "2026-10-06T20:29:20.266886Z"
+}

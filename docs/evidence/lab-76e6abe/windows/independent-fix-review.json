@@ -1,0 +1,75 @@
+{
+  "status": "STATIC_WORKFLOW_CORRECTION_REVIEW_PASS_RUNTIME_AND_CORRECTED_SOURCE_REMOTE_PENDING",
+  "reviewed_utc": "2026-10-06T20:09:02.367785+00:00",
+  "reviewer": "requirements_audit",
+  "prior_source_P": "b38fb0f0106f850aacb08f0f250cec5e22ebcfd4",
+  "proposed_corrected_candidate_C": null,
+  "file": {
+    "path": ".github/workflows/desktop.yml",
+    "bytes": 1350,
+    "sha256": "fb51feca7dcf4e7c70ae0fdf88c136c8846d9f3e6ff094f424fab8c0244d2b7f",
+    "prior_committed_sha256": "2b0fc562136af968fcac21094e963e6d3fb225738096b41d1bac730f603ef28f"
+  },
+  "finding_from_parent": "Actual P Windows checkout failed with Filename too long for docs/evidence/lab-a881acf/response-sync-correction/delayed-body/browser-json/20261006T023527163778-viewport0-SyntheticRuntime.json. No successful P Windows claim is permitted. This reviewer did not download or independently parse that original runlog.",
+  "checks": [
+    {
+      "check": "YAML parses with yaml.BaseLoader preserving on and quotedstring semantics",
+      "passed": true
+    },
+    {
+      "check": "Exactly three recognized Git runtimeconfiguration envvariables appear only on first actions/checkout@v4step",
+      "passed": true
+    },
+    {
+      "check": "Removing that envmap yields identical parsedworkflow to P baseline",
+      "passed": true
+    },
+    {
+      "check": "All existing triggers,runner,permissions,build/testcommands,artifactsettings retained",
+      "passed": true
+    },
+    {
+      "check": "No globalconfig/security/OSmutation command introduced",
+      "passed": true
+    },
+    {
+      "check": "Step-env passthrough and runtime Gitconfig semantics supported by primarysources",
+      "passed": true
+    }
+  ],
+  "proposed_env": {
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "core.longpaths",
+    "GIT_CONFIG_VALUE_0": "true"
+  },
+  "primary_sources": [
+    {
+      "url": "https://git-scm.com/docs/git-config",
+      "reviewed_fact": "GIT_CONFIG_COUNT enables zero-indexed KEY_n/VALUE_n runtime config; overrides configuration-file values, lower precedence than explicit git -c; missingpairs are errors."
+    },
+    {
+      "url": "https://github.com/actions/checkout/blob/v4/src/git-command-manager.ts",
+      "reviewed_fact": "execGit copies process.env to childenv before its internal gitEnv overlay; checkout uses built-in git checkout. Existing overlay keys are interactiveprompt/auth related, not core.longpaths runtimeenv."
+    },
+    {
+      "url": "https://github.com/git-for-windows/git/blob/main/Documentation/config/core.adoc",
+      "reviewed_fact": "core.longpaths enables paths longer than260 for builtin Git for Windows commands; other Windows/toolchain operations may still have limitations."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsenv",
+      "reviewed_fact": "Step env is supported for action steps and takes precedence over job/workflow values while that step executes."
+    }
+  ],
+  "assessment": "Minimal coherent fix for Git built-in checkout at long hostedworkspace paths. The setting is inherited by checkout childGitprocesses and applies before workingtreepopulation; no persisted Gitconfiguration required. It does not weaken native smoke tests or hide failure.",
+  "limits": [
+    "Static YAML/implementation/docsreview only; no checkoutrepro,tests,build,remotequery/write executed here. Root owns isolated negativecontrol/positivecheckoutrepro.",
+    "Cannot claim wholeWindowsjobpasses. Later nonGit file APIs/packaging/upload may have independent longpath limits; require actual C Windows workflow and savedsourceboundartifact.",
+    "P remains failedWindows; all exact-source remote gates mustbe obtained for actualCbeforecompletionstatusR, preserving Pfailedhistory.",
+    "actions/checkout@v4 source reference is versiontag, not an independentlyretrievedresolvedactioncommit. No strongerimmutableexternalbinding claimed.",
+    "Repository guide currently recommends evidencepaths<=100relativechars; this fix addresses checkoutenvironment, not all archivalportability. Future R evidence should honor that limit."
+  ],
+  "blocking_findings": [],
+  "global_goal_status": "NOT ACHIEVED",
+  "tracked_edits_performed": false,
+  "remote_writes_performed": false
+}

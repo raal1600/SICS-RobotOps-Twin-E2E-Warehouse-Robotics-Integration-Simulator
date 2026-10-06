@@ -1,0 +1,62 @@
+"""Observe only the exact-P public documentation in one owned browser session."""
+import hashlib
+import json
+import subprocess
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT=Path(__file__).resolve().parents[4]
+HERE=Path(__file__).resolve().parent
+OUT=HERE/"live-browser"
+BASE="https://raal1600.github.io/SICS-RobotOps-Twin-E2E-Warehouse-Robotics-Integration-Simulator/"
+P="76e6abef95155b09484da9a226612d774ceb493d"
+EXE=ROOT/"artifacts/company-recording-20261006/preparation/tools/agent-browser-0.38.2.exe"
+SESSION="robotops-pages-c-20261006t2020"
+
+def main():
+    assert not OUT.exists();OUT.mkdir();commands=[]
+    def run(label,args,js=None):
+        command=[str(EXE),"--session",SESSION,"--json",*args]
+        start=datetime.now(UTC).isoformat()
+        with (OUT/(label+".stdout.log")).open("xb") as stdout,(OUT/(label+".stderr.log")).open("xb") as stderr:
+            result=subprocess.run(command,input=js.encode() if js else None,stdout=stdout,stderr=stderr,cwd=ROOT,timeout=60)
+        record={"at_utc":start,"command":command,"exit_code":result.returncode,"stdin_sha256":hashlib.sha256(js.encode()).hexdigest() if js else None}
+        commands.append(record);(OUT/(label+".exit.json")).write_text(json.dumps(record,indent=2)+"\n")
+        assert result.returncode==0,label
+        value=json.loads((OUT/(label+".stdout.log")).read_bytes());assert value.get("success"),value
+        value=value.get("data",value);value=value.get("result",value) if isinstance(value,dict) else value
+        (OUT/(label+".json")).write_text(json.dumps(value,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+        return value
+    guard=f'if(!location.href.startsWith({json.dumps(BASE)}))throw Error("Wrong project");'
+    provenance='(async()=>{'+guard+'const r=await fetch("build.json?verify='+P+'",{cache:"no-store"});const j=await r.json();if(j.source_commit!=="'+P+'")throw Error("Wrong source");return {url:location.href,build:j};})()'
+    dom='''(()=>{GUARD
+      const d=document.documentElement;const images=[...document.images].map(i=>({src:i.currentSrc||i.src,complete:i.complete,width:i.naturalWidth,height:i.naturalHeight}));
+      return {url:location.href,title:document.title,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},scrollY,
+       noHorizontalOverflow:d.scrollWidth<=d.clientWidth+1&&document.body.scrollWidth<=d.clientWidth+1,
+       widths:{client:d.clientWidth,scroll:d.scrollWidth,body:document.body.scrollWidth},images,
+       allImagesLoaded:images.every(i=>i.complete&&i.width>0),links:[...document.querySelectorAll('a[href]')].map(a=>({text:a.textContent,href:a.href})),bodyText:document.body.innerText};})()'''.replace('GUARD',guard)
+    pages=[]
+    try:
+        run("viewport",["set","viewport","1440","1000"])
+        for page in ["index","governance","design","avgransning","diskussion","diagram","kallor"]:
+            run(page+"-open",["open",BASE+page+".html"])
+            run(page+"-snapshot",["snapshot","-i"])
+            if page=="index":run("build-before",["eval","--stdin"],provenance)
+            state=run(page+"-dom",["eval","--stdin"],dom)
+            assert state["noHorizontalOverflow"] and state["allImagesLoaded"],page
+            pages.append({"page":page,"no_horizontal_overflow":True,"all_images_loaded":True,"images":len(state["images"])})
+            if page in {"index","governance"}:run(page+"-screen",["screenshot",str(OUT/(page+"-full.png")),"--full"])
+            if page=="design":
+                run("design-top-screen",["screenshot",str(OUT/"design-top.png")])
+                js=(ROOT/"artifacts/publication_candidate_integration.js").read_text()
+                run("design-integration-scroll",["eval","--stdin"],js)
+                run("design-integration-screen",["screenshot",str(OUT/"design-integration.png")])
+        run("build-after",["eval","--stdin"],provenance)
+        console=run("console",["console"]);errors=run("errors",["errors"])
+        receipt={"at_utc":datetime.now(UTC).isoformat(),"source_commit":P,"session":SESSION,"pages":pages,"console":console,"errors":errors,"visual":"Four screenshot regions await actual visual inspection; seven pages received DOM checks. No runtime executed.","commands":commands}
+        (OUT/"browser-observations.json").write_text(json.dumps(receipt,indent=2)+"\n")
+    finally:
+        run("close",["close"])
+    print(json.dumps({"output":str(OUT),"pages":len(pages),"closed":True}))
+
+if __name__=="__main__":main()

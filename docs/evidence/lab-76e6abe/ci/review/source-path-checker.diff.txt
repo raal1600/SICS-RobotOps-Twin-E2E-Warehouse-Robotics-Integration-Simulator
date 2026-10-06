@@ -1,0 +1,54 @@
+--- initial checker
++++ confined absolute source path checker
+@@ -141,10 +141,14 @@
+                 read(gate["log"])
+         check(all(gates.get(n, {}).get("passed") is False for n in REMOTE), "local CI manifest accurately leaves external remote refresh pending")
+         output["gates"] = gates
+-        suites, summaries, fixture_names = [], [], []
++        suites, summaries, fixture_names, checkout_roots = [], [], [], []
+         for i in (1, 2):
+             command = gates[f"tests_{i}"]["command"]
+             check(len(command) == 10 and command[1:4] == ["-m", "tools.dev", "test"] and command[6:8] == ["--cov=robotops", "--cov=apps"] and command[-1] == "--cov-report=term", f"suite {i} full unfiltered invocation")
++            junit_absolute = next(x.split("=", 1)[1] for x in command if x.startswith("--junitxml="))
++            junit_member = f"{base}/tests-{i}.xml"
++            check(junit_absolute.endswith("/" + junit_member) and PurePosixPath(junit_absolute).is_absolute(), f"suite {i} exact absolute JUnit output binding")
++            checkout_roots.append(PurePosixPath(junit_absolute[:-len("/" + junit_member)]))
+             fixture = next(x.split("=", 1)[1] for x in command if x.startswith("--basetemp="))
+             fixture_names.append(PurePosixPath(fixture).parent.name)
+             check(fixture_names[-1].startswith(f"robotops-acceptance-{i}-") and fixture.endswith("/fixtures"), f"suite {i} isolated fixture identity")
+@@ -167,6 +171,8 @@
+             suites.append(cases)
+             summaries.append({"pass": i, "counts": dict(counts), "unique_cases": len(cases), "declared_suites": declarations, "coverage": totals, "recomputed_coverage": percent, "fixture_basename": fixture_names[-1], "testcase_outcome_sha256": sha(json.dumps(cases, sort_keys=True).encode())})
+         check(suites[0] == suites[1] and all(suites[0].values()), "two identical complete clean testcase/outcome sets")
++        check(checkout_roots[0] == checkout_roots[1], "both suites use the same exact runner checkout root")
++        output["recorded_runner_checkout_root"] = str(checkout_roots[0])
+         repeat = js(f"{base}/repeatability.json")
+         check(repeat == {"passed": True, "test_count": len(suites[0]), "tests": suites}, "recorded repeatability equals independently parsed JUnits")
+         output["suites"] = summaries
+@@ -185,7 +191,16 @@
+             session = js(folder + "/session.json")
+             browser = js(folder + "/browser.json")
+             hashes = js(folder + "/source-hashes.json")
+-            check(len(hashes) >= 25 and all(path.replace("\\", "/") in blobs and sha(blobs[path.replace("\\", "/")]) == value for path, value in hashes.items()), folder + " recorded source hashes match exact C blobs")
++            normalized_hashes, path_normalizations = {}, []
++            for path, value in hashes.items():
++                canonical = PurePosixPath(path.replace("\\", "/"))
++                if canonical.is_absolute():
++                    original = str(canonical)
++                    canonical = canonical.relative_to(checkout_roots[matches[0] - 1])
++                    path_normalizations.append({"recorded": original, "repository_relative": str(canonical), "sha256": value})
++                check(".." not in canonical.parts and str(canonical) not in normalized_hashes, folder + " confined unique source path: " + str(canonical))
++                normalized_hashes[str(canonical)] = value
++            check(len(hashes) >= 25 and all(path in blobs and sha(blobs[path]) == value for path, value in normalized_hashes.items()), folder + " recorded source hashes match exact C blobs")
+             check(session["status"] == "COMPLETED" and session["current_stage"] == 22 and session["profile"] == "lab", folder + " completed guided lab session")
+             check(begin <= date(session["created_at"]) <= date(session["updated_at"]) <= end, folder + " current campaign session timestamps")
+             check(session["context"]["physical_authorized"] is True and session["context"]["wms_ack"] is True, folder + " authorization and business acknowledgement")
+@@ -206,7 +221,7 @@
+                 check(motion["before"]["pose"]["position"] != motion["after"]["pose"]["position"] and motion["before"]["rendered"] != motion["after"]["rendered"], folder + " evaluated and rendered robot positions change")
+             identity = "tests/lab/test_browser_lab.py::test_full_lab_browser_authorization_recovery_and_business_completion[" + ("" if scenario == "happy" else scenario) + "]"
+             check(suites[matches[0] - 1].get(identity) is True, folder + " exact saved case has formal clean JUnit outcome")
+-            lab_cases.append({"pass": matches[0], "scenario": scenario, "folder": folder, "session_id": session["session_id"], "command_id": session["command_id"], "job_id": session["job_id"], "revision": session["revision"], "effect_count": receipt["effect_count"], "runtime": stack["runtime"], "source_hash_count": len(hashes), "motion_recording": motion["recording"] if motion else None, "formal_test_id": identity})
++            lab_cases.append({"pass": matches[0], "scenario": scenario, "folder": folder, "session_id": session["session_id"], "command_id": session["command_id"], "job_id": session["job_id"], "revision": session["revision"], "effect_count": receipt["effect_count"], "runtime": stack["runtime"], "source_hash_count": len(hashes), "source_path_normalizations": path_normalizations, "motion_recording": motion["recording"] if motion else None, "formal_test_id": identity})
+         expected_pairs = {(i, s) for i in (1, 2) for s in ("happy", "DROP_ACK_AFTER_EFFECT", "DUPLICATE_DELIVERY", "WMS_UNAVAILABLE")}
+         check(len(lab_cases) == 8 and {(c["pass"], c["scenario"]) for c in lab_cases} == expected_pairs, "all eight saved formal full-lab case identities")
+         output["lab_browser_cases"] = lab_cases

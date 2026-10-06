@@ -24,14 +24,14 @@ from robotops.config import Settings
 
 
 @pytest.fixture
-def server(tmp_path, request):
+def server(tmp_path, request, http_server):
     runtime_type = getattr(request, "param", SyntheticRuntime)
     app = create_workspace_app(
         tmp_path / "worlds", runtime_type=runtime_type, settings=Settings.hkm()
     )
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
-        service = uvicorn.Server(uvicorn.Config(app, log_level="warning", access_log=False))
+        service = http_server(uvicorn.Config(app, log_level="warning", access_log=False))
         thread = threading.Thread(target=service.run, kwargs={"sockets": [listener]}, daemon=True)
         thread.start()
         deadline = time.monotonic() + 20
@@ -41,9 +41,7 @@ def server(tmp_path, request):
         try:
             yield f"http://127.0.0.1:{listener.getsockname()[1]}", app.state.test_registry
         finally:
-            service.should_exit = True
-            thread.join(timeout=20)
-            assert not thread.is_alive(), "Browser-test API did not shut down"
+            service.stop(thread, timeout=20)
 
 
 @pytest.fixture

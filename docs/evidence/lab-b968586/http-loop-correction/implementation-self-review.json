@@ -1,0 +1,93 @@
+{
+  "reviewed_at_utc": "2026-10-06T01:18:01.811974+00:00",
+  "review_kind": "IMPLEMENTATION_SELF_REVIEW",
+  "reviewer": "/root/final_audit authored the helper, native entry points, fixtures and docs; this is not an independent review.",
+  "status": "NO_ACTIONABLE_FINDINGS_IN_BOUNDED_REVIEW",
+  "source_base": "b9685864afb6f47e440bd051789052070456c7b2",
+  "source_state": "Uncommitted correction; focused proof only, not clean full acceptance.",
+  "checks": [
+    "Read final shared factory, all native API/desktop/edge/LabStack entry-point diffs, four Uvicorn fixtures, strict shutdown diagnostics, docs and full regression source.",
+    "Windows selector selection is local to the configured HTTP service; global policy, Playwright and separate OPC UA loops remain unchanged.",
+    "Desktop invokes the factory on asyncio.run itself; Config alone would not have changed its already-running loop. Python requirement is >=3.13,<3.14.",
+    "Existing 20/15/10-second fixture joins remain; callback/server errors also fail. Diagnostic cleanup in regression cannot convert timeout or assertion failure into success.",
+    "HTTP200/WS101 and actual peer resets precede clean completion assertions; injected shutdown error targets the observed Proactor cleanup operation.",
+    "Windows 512-socket and no asyncio subprocess/pipe constraints are documented; Blender uses synchronous subprocess.run in worker threads. Non-Windows preserves Uvicorn auto.",
+    "Saved lifecycle4, desktop3 and selected Blender browser4 JUnit files have no failures/errors/skips. Six browser cases were deliberately deselected, not passed.",
+    "All 11 frozen implementation hashes match current source. Saved full lint201/mypy67 logs and proper drift checker passed; rejected prior tools.dev invocation is not counted."
+  ],
+  "actionable_findings": [],
+  "proof": {
+    "lifecycle": {
+      "path": "artifacts/http-lifecycle-20261006/tests-final.xml",
+      "sha256": "cfbdb57c4c89db70db558fa82b6d9ae608698e710ead1da2fd1534ce6e2e3108",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "case_ids": [
+        "tests.integration.test_http_server_lifecycle::test_http_server_peer_reset_exits_cleanly[peer-reset-http]",
+        "tests.integration.test_http_server_lifecycle::test_http_server_peer_reset_exits_cleanly[peer-reset-websocket]",
+        "tests.integration.test_http_server_lifecycle::test_http_server_peer_reset_exits_cleanly[shutdown-reset-http]",
+        "tests.integration.test_http_server_lifecycle::test_http_server_peer_reset_exits_cleanly[shutdown-reset-websocket]"
+      ]
+    },
+    "desktop": {
+      "path": "artifacts/http-lifecycle-20261006/desktop.xml",
+      "sha256": "46d0a4c7d69c97341709566fb730f4ac4c7ffad1601a276489bd893b19327795",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "case_ids": [
+        "tests.integration.test_desktop_backend::test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick[False]",
+        "tests.integration.test_desktop_backend::test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick[True]",
+        "tests.integration.test_desktop_backend::test_desktop_instances_use_distinct_owned_ports_and_independent_stop_files"
+      ]
+    },
+    "selected_blender_browser": {
+      "path": "artifacts/http-lifecycle-browser-correction.xml",
+      "sha256": "57d7baf0c2243c5651c5c0c25eb7d7166c9ad74d68ae4558827d0ab35583fbfc",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "case_ids": [
+        "tests.browser.test_investigation::test_run_notice_investigate_and_return[blender-desktop]",
+        "tests.browser.test_investigation::test_run_notice_investigate_and_return[blender-compact]",
+        "tests.browser.test_guided_console::test_guided_happy_reload_gate_trace_and_business_completion[blender]",
+        "tests.lab.test_browser_lab::test_full_lab_browser_authorization_recovery_and_business_completion[]"
+      ]
+    }
+  },
+  "binding": {
+    "path": "artifacts/http-lifecycle-20261006/browser-source.json",
+    "checked_files": 11,
+    "mismatches": []
+  },
+  "selected_browser_exit": {
+    "ended_at": "2026-10-06T01:13:03.5074566Z",
+    "scope": "Selected Blender investigation desktop/compact, guided reload/happy, and separate-service lab happy cases; explicit marker excludes synthetic lane",
+    "started_at": "2026-10-06T01:09:18.4665712Z",
+    "source_base": "b9685864afb6f47e440bd051789052070456c7b2",
+    "exit_code": 0
+  },
+  "limits": [
+    "Full two-pass clean-source acceptance and final manual/remote requirements remain pending.",
+    "The actual Chromium timing race was not reproduced by ordinary resets; recorded failure plus live-transport fault injection demonstrate the matching mechanism.",
+    "Windows CPython3.13.15 validated here; Linux CI has not run this correction. Locked dependencies exclude uvloop; private diagnostic/test transport fields do not claim compatibility with optional uvloop.",
+    "Focused browser source metadata for individual lab artifacts does not list the new helper, but browser-source.json binds all 11 changed Python files and the next clean acceptance fingerprint must bind the entire source.",
+    "No tests, browser, Blender or services were run during this review."
+  ],
+  "evidence_hashes": {
+    "artifacts/http-lifecycle-20261006/browser-source.json": "8106d1c55fc2d383755f48eabaef8ae45a74d53b09c2a530d6f5bff15c7678f2",
+    "artifacts/http-lifecycle-20261006/browser-review.json": "2ea754da8f4d731e4b6827ea6e5f5429d17ac1539e8bf8c89028e547a2d34100",
+    "artifacts/http-lifecycle-20261006/review.json": "1fc121fa79b4cc43e147cef34664c3278490bd378a40d1505f3848d83c8f6576",
+    "artifacts/http-lifecycle-20261006/desktop-exit.json": "c6d9aa55efe3d1b9d6e047c8809c13555a4bf227d5262674c5524beebde9931e",
+    "artifacts/http-lifecycle-20261006/lint.log": "f0fa07661ef91ca45bbe06ca8489b0a48beb0baab4b70458ace864469f898f34",
+    "artifacts/http-lifecycle-20261006/typecheck.log": "8633d0d52ac421f1f2d92a39b029bda076c5f57b2064c12869363a26ab8289c9",
+    "artifacts/http-lifecycle-20261006/drift-check.log": "e62203615a3bd39f44104e025191d4cb7d9f5477782ba913ec91f20f2692d61d",
+    "artifacts/http-lifecycle-browser-correction-exit.json": "63d6af6375652864f085882c5818fc13a0aa16904b5c381f16ec3c762fd1b447",
+    "artifacts/http-lifecycle-browser-correction.stdout.log": "7dfe7c9c744ea879a07a30bf6244851efcdf14cb639d1c84266a77f719b38eb8"
+  },
+  "goal_status": "NOT_ACHIEVED"
+}

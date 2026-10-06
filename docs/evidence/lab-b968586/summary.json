@@ -1,0 +1,266 @@
+{
+  "archived_at_utc": "2026-10-06T01:03:09.141913+00:00",
+  "scope": "Failed corrected-source campaign and completed pass1 lab-case facts; local archive only. No final manual/CLI loop, complete saved-trace audit or remote result claimed.",
+  "source": {
+    "commit": "b9685864afb6f47e440bd051789052070456c7b2",
+    "dirty": false,
+    "source_sha256": "7160cbf5333d7cebace24551767402f7ce419dca489295eb45d340ab063fc264"
+  },
+  "status": "FAILED_FIRST_SUITE_TEARDOWN_SECOND_PASS_INTERRUPTED",
+  "goal_status": "NOT_ACHIEVED",
+  "acceptance_directory": "docs/evidence/acceptance/20261006T002816",
+  "manifest_raw_unchanged": true,
+  "local_manifest_gates": {
+    "setup": {
+      "passed": true,
+      "exit_code": 0
+    },
+    "browser_setup": {
+      "passed": true,
+      "exit_code": 0
+    },
+    "blender_version": {
+      "passed": true,
+      "exit_code": 0
+    },
+    "security": {
+      "passed": true,
+      "exit_code": 0
+    },
+    "tests_1": {
+      "passed": false,
+      "exit_code": 1
+    }
+  },
+  "first_suite": {
+    "junit": "docs/evidence/acceptance/20261006T002816/tests-1.xml",
+    "sha256": "c4a55cce1c16a04353b164df361bb6bdb9cffe6eaae72c2a48a298957b151305",
+    "declared_tests": 811,
+    "actual_testcases": 811,
+    "clean_passed_testcases": 810,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 0,
+    "seconds": 1680.091,
+    "pytest_console_summary": "============ 811 passed, 1 warning, 1 error in 1680.12s (0:28:00) =============",
+    "pytest_passed_test_bodies": 811,
+    "pytest_teardown_errors": 1,
+    "gate": {
+      "passed": false,
+      "exit_code": 1,
+      "command": [
+        "C:\\Users\\ramis\\source\\repos\\robotops-twin\\.venv\\Scripts\\python.exe",
+        "-m",
+        "tools.dev",
+        "test",
+        "--basetemp=C:\\Users\\ramis\\AppData\\Local\\Temp\\robotops-acceptance-1-6kdd_k5a/fixtures",
+        "--junitxml=C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T002816\\tests-1.xml",
+        "--cov=robotops",
+        "--cov=apps",
+        "--cov-report=json:C:\\Users\\ramis\\source\\repos\\robotops-twin\\docs\\evidence\\acceptance\\20261006T002816\\coverage-1.json",
+        "--cov-report=term"
+      ],
+      "seconds": 1681.4486719999986,
+      "log": "docs/evidence/acceptance/20261006T002816/tests_1.log"
+    }
+  },
+  "coverage": {
+    "path": "docs/evidence/acceptance/20261006T002816/coverage-1.json",
+    "sha256": "18646046ca7f3b2d4968fb0542da7e47e905cabf159de46efe75ef83e80d25e5",
+    "totals": {
+      "covered_lines": 4893,
+      "num_statements": 5349,
+      "percent_covered": 91.47504206393718,
+      "percent_covered_display": "91",
+      "missing_lines": 456,
+      "excluded_lines": 17,
+      "percent_statements_covered": 91.47504206393718,
+      "percent_statements_covered_display": "91"
+    }
+  },
+  "teardown_error": {
+    "classname": "tests.browser.test_investigation",
+    "name": "test_run_notice_investigate_and_return[blender-compact]",
+    "seconds": 95.883,
+    "kind": "error",
+    "message": "failed on teardown with \"AssertionError: Browser-test API did not shut down\nassert not True\n +  where True = is_alive()\n +    where is_alive = <Thread(Thread-231 (run), started daemon 10644)>.is_alive\"",
+    "detail": "tmp_path = WindowsPath('C:/Users/ramis/AppData/Local/Temp/robotops-acceptance-1-6kdd_k5a/fixtures/test_run_notice_investigate_an3')\nrequest = <SubRequest 'server' for <Function test_run_notice_investigate_and_return[blender-compact]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        runtime_type = getattr(request, \"param\", SyntheticRuntime)\n        app = create_workspace_app(\n            tmp_path / \"worlds\", runtime_type=runtime_type, settings=Settings.hkm()\n        )\n        with socket.socket() as listener:\n            listener.bind((\"127.0.0.1\", 0))\n            service = uvicorn.Server(uvicorn.Config(app, log_level=\"warning\", access_log=False))\n            thread = threading.Thread(target=service.run, kwargs={\"sockets\": [listener]}, daemon=True)\n            thread.start()\n            deadline = time.monotonic() + 20\n            while not service.started and thread.is_alive() and time.monotonic() < deadline:\n                time.sleep(0.02)\n            assert service.started, \"Local browser-test API failed to start\"\n            try:\n                yield f\"http://127.0.0.1:{listener.getsockname()[1]}\", app.state.test_registry\n            finally:\n                service.should_exit = True\n                thread.join(timeout=20)\n>               assert not thread.is_alive(), \"Browser-test API did not shut down\"\nE               AssertionError: Browser-test API did not shut down\nE               assert not True\nE                +  where True = is_alive()\nE                +    where is_alive = <Thread(Thread-231 (run), started daemon 10644)>.is_alive\n\ntests\\browser\\test_investigation.py:46: AssertionError"
+  },
+  "count_interpretation": "Pytest reports811 test bodies passed plus1 teardown error. JUnit records811 testcase elements,810 clean and1 error. The errored body passed but its fixture teardown failed; therefore tests_1 exit1 and suite FAILED.",
+  "lab_cases": [
+    {
+      "case": "happy",
+      "session": {
+        "session_id": "9988953e-db8d-50aa-91e9-25852ef1b906",
+        "correlation_id": "bc897e84-fb76-51f9-a288-f0652ccb02f4",
+        "order_id": "order-d51a62a9-34c6-488d-acbe-99cbaf0fdbf4",
+        "job_id": "b448dcbc-83df-5fba-9601-213603d40516",
+        "command_id": "29cdb8f0-cfb7-5729-b844-079cc799728a",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "updated_at": "2026-10-06T00:50:39.983494Z"
+      },
+      "runtime": "blender",
+      "physical_effect_count": 1,
+      "snapshot": "docs/evidence/lab-b968586/acceptance-browser/pass-1/happy.json",
+      "formal_test_status": "PASSED",
+      "testcase": {
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[]",
+        "seconds": 55.12
+      }
+    },
+    {
+      "case": "drop_ack_after_effect",
+      "session": {
+        "session_id": "8dc43bd2-53c1-55ab-a03d-f0e2819b72e6",
+        "correlation_id": "0b2c5789-0103-528e-aa27-3bfb36000658",
+        "order_id": "order-41debc2f-d67a-4085-8b1a-fb07f0025db2",
+        "job_id": "91bc3ce4-8197-5f62-a36b-9862e2656f63",
+        "command_id": "37221b0d-7145-504f-a70f-13dc656e7d23",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-06T00:51:20.729397Z"
+      },
+      "runtime": "synthetic",
+      "physical_effect_count": 1,
+      "snapshot": "docs/evidence/lab-b968586/acceptance-browser/pass-1/drop_ack_after_effect.json",
+      "formal_test_status": "PASSED",
+      "testcase": {
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[DROP_ACK_AFTER_EFFECT]",
+        "seconds": 38.981
+      }
+    },
+    {
+      "case": "duplicate_delivery",
+      "session": {
+        "session_id": "230c9c05-e933-565e-9621-111e3e5f1557",
+        "correlation_id": "990625d7-ce98-5f56-a7cc-04e535b46872",
+        "order_id": "order-3c699a2f-0cc5-46f7-ad37-41b26318cf67",
+        "job_id": "4a18c284-d4a1-5e57-85d6-2dbef19a7abc",
+        "command_id": "1b4451ff-003c-5501-914d-f55a0cdead00",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 44,
+        "updated_at": "2026-10-06T00:51:57.831539Z"
+      },
+      "runtime": "synthetic",
+      "physical_effect_count": 1,
+      "snapshot": "docs/evidence/lab-b968586/acceptance-browser/pass-1/duplicate_delivery.json",
+      "formal_test_status": "PASSED",
+      "testcase": {
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[DUPLICATE_DELIVERY]",
+        "seconds": 37.074
+      }
+    },
+    {
+      "case": "wms_unavailable",
+      "session": {
+        "session_id": "48a547b7-60a7-58d4-9a8a-867aeb699652",
+        "correlation_id": "0ecc6eb8-39aa-5a62-9fb5-67e2accf2e3c",
+        "order_id": "order-821c3a7b-740e-4084-8762-e58e15ba8d5c",
+        "job_id": "2764d15a-0a6a-5809-9f2c-8d77af2913d3",
+        "command_id": "a4bdd0d7-e319-5b1c-9fc4-94e8dfdb16ac",
+        "status": "COMPLETED",
+        "current_stage": 22,
+        "revision": 46,
+        "updated_at": "2026-10-06T00:52:36.075569Z"
+      },
+      "runtime": "synthetic",
+      "physical_effect_count": 1,
+      "snapshot": "docs/evidence/lab-b968586/acceptance-browser/pass-1/wms_unavailable.json",
+      "formal_test_status": "PASSED",
+      "testcase": {
+        "classname": "tests.lab.test_browser_lab",
+        "name": "test_full_lab_browser_authorization_recovery_and_business_completion[WMS_UNAVAILABLE]",
+        "seconds": 39.048
+      }
+    }
+  ],
+  "independent_review": {
+    "path": "docs/evidence/lab-b968586/reviews/pass1-case-review.json",
+    "observed_fact_checks": 129,
+    "all129_observed_checks_true": true,
+    "source_files_verified": 35,
+    "historical_formal_pending_labels_preserved": true,
+    "current_formal_result": "All four exact lab testcases PASSED in terminal first JUnit; overall suite FAILED.",
+    "snapshot_hash_transitions": []
+  },
+  "visual_review": {
+    "review_files": [
+      "docs/evidence/lab-b968586/reviews/pass1-happy-visual-review.json",
+      "docs/evidence/lab-b968586/reviews/pass1-fault-visual-review.json"
+    ],
+    "root_reviewed_png_count": 6,
+    "scope": "Root-reviewed saved automated screenshots only; corrected visible captions and different next-order selector at captured points are observations, not a complete DOM/no-POST audit or final manual run."
+  },
+  "second_suite": {
+    "status": "INTERRUPTED_NO_TERMINAL_JUNIT",
+    "fixture_basename": "robotops-acceptance-2-0kc1x2__",
+    "actual_pytest_pid_at_stop": 30508,
+    "watcher_pass2_binding": null,
+    "meaning": "Pass2 had started per actual process command lines; watcher never bound any qualifying lab case before stop."
+  },
+  "interruption": {
+    "stopped_at_utc": "2026-10-06T00:59:08.0810701Z",
+    "verified_acceptance_processes_stopped": [
+      31732,
+      9476,
+      32644,
+      13052,
+      14808,
+      35948,
+      30008,
+      25148,
+      14736,
+      30508
+    ],
+    "remaining_after_stop": [],
+    "preflight_excluded": "conhost and all processes outside the verified acceptance tree",
+    "preflight_target_count": 10,
+    "watcher_stopped_at_utc": "2026-10-06T00:59:25.9802270Z",
+    "watcher_pids": [
+      29040,
+      21232
+    ],
+    "reason": "First complete suite failed teardown; prevent redundant uncorrected second pass and preserve evidence before source diagnosis."
+  },
+  "watcher": {
+    "sha256": "7bc11b35236f5194aadbb594615c7e985b8332d0c487cfad37e521cf3dc93955",
+    "byte_identical_to_previously_fixed_watcher": true,
+    "source_snapshot": "docs/evidence/lab-b968586/process/watcher-used.source.txt",
+    "connection_management": "contextlib.closing(sqlite3.connect(...mode=ro...)) with transaction context and PRAGMA query_only=ON",
+    "causation": "No watcher-handle cause inferred for this API-thread teardown assertion; no database/handle probe performed in this archive task."
+  },
+  "not_established": {
+    "whole_local_acceptance": "FAILED_AND_INTERRUPTED_NOT_PASS",
+    "full_acceptance_exit_record": "ABSENT_DUE_TO_INTENTIONAL_PROCESS_STOP",
+    "final_manual_and_exact_README_CLI_on_b968586": "NOT_RUN",
+    "complete_saved_DOM_trace_secret_audit": "NOT_RUN",
+    "prepared_scanners": "Excluded; preparation is not tested audit evidence",
+    "remote_CI_Pages_publication": "NOT_ESTABLISHED"
+  },
+  "expected_absent_terminal_outputs": [
+    "docs/evidence/acceptance/20261006T002816/tests-2.xml",
+    "docs/evidence/acceptance/20261006T002816/coverage-2.json",
+    "artifacts/acceptance-scenario-labels-exit.json"
+  ],
+  "archive": {
+    "copied_nonempty_files": 41,
+    "copied_bytes": 3711189,
+    "empty_inputs_not_copied": 2,
+    "missing_required_inputs": [],
+    "canonical_raw_references": 13,
+    "large_zip_pdf_render_copies": 0
+  },
+  "limits": [
+    "Original files and historical pending statements are byte-preserved; current terminal interpretation is supplied here.",
+    "Only happy case is Blender evaluated motion; three fault cases use synthetic runtime with real distributed protocols.",
+    "No full-loop/manual/current-source or whole-suite completion can be inferred from four completed case snapshots.",
+    "The precise reason the browser-test API thread remained alive is not diagnosed by this archive; preserve error rather than asserting root cause."
+  ]
+}

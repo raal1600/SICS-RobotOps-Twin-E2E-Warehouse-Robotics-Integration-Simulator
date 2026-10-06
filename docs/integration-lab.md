@@ -45,8 +45,8 @@ process environment, then run these in separate terminals:
 ```sh
 uv run python -m robotops.lab plc
 uv run python -m robotops.lab edge
-uv run uvicorn robotops.lab.business:create_app --factory --host 127.0.0.1 --port 8081
-uv run uvicorn robotops.lab.api:create_app --factory --host 127.0.0.1 --port 8000
+uv run uvicorn robotops.lab.business:create_app --factory --loop robotops.http_server:new_event_loop --host 127.0.0.1 --port 8081
+uv run uvicorn robotops.lab.api:create_app --factory --loop robotops.http_server:new_event_loop --host 127.0.0.1 --port 8000
 ```
 
 `ROBOTOPS_LAB_DATA` selects runtime artifacts (default `runs/lab`).

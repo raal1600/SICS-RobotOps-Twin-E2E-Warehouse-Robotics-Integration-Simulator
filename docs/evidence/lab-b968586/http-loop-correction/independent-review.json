@@ -1,0 +1,433 @@
+{
+  "reviewed_at_utc": "2026-10-06T01:20:46.834246+00:00",
+  "reviewer": "evidence_pack; did not author correction",
+  "verdict": "NO_BLOCKING_FINDING_IN_BOUNDED_REVIEW",
+  "scope": "Independent static helper/entrypoint/fixture/regression review and exact saved focused result/hash verification only.",
+  "source_base": "b9685864afb6f47e440bd051789052070456c7b2",
+  "source_state": "Corrective working bytes over b968586, not relabeled clean b968586; no new commit/fingerprint inferred.",
+  "source_hashes": [
+    {
+      "path": "apps/api/__main__.py",
+      "recorded_sha256": "cb46858e3d1948d75317eb3593937f4c3fd0e00370d2777939b27eff930095b0",
+      "review_sha256": "cb46858e3d1948d75317eb3593937f4c3fd0e00370d2777939b27eff930095b0",
+      "matches": true
+    },
+    {
+      "path": "apps/desktop/backend.py",
+      "recorded_sha256": "09da7e9e172864f51db1839ce3954ea872f2bdb72d38f48173ac2855c7a9b20b",
+      "review_sha256": "09da7e9e172864f51db1839ce3954ea872f2bdb72d38f48173ac2855c7a9b20b",
+      "matches": true
+    },
+    {
+      "path": "robotops/lab/__main__.py",
+      "recorded_sha256": "6dc59ea2ab224f55cf0badeaec8a8d72f2f86dfa1301e4db4936826e35bcaa34",
+      "review_sha256": "6dc59ea2ab224f55cf0badeaec8a8d72f2f86dfa1301e4db4936826e35bcaa34",
+      "matches": true
+    },
+    {
+      "path": "tests/browser/test_investigation.py",
+      "recorded_sha256": "7f8bb8675a9090265f48d7c13326f89cbc783582ea3e917d77cb028dd3c1147e",
+      "review_sha256": "7f8bb8675a9090265f48d7c13326f89cbc783582ea3e917d77cb028dd3c1147e",
+      "matches": true
+    },
+    {
+      "path": "tests/conftest.py",
+      "recorded_sha256": "ff23b5cbd01f1d2ba3004c842c50e625dd618340e8507d8e1b54d9b3db1cdda0",
+      "review_sha256": "ff23b5cbd01f1d2ba3004c842c50e625dd618340e8507d8e1b54d9b3db1cdda0",
+      "matches": true
+    },
+    {
+      "path": "tests/lab/conftest.py",
+      "recorded_sha256": "babd2983d3fb930f38bbd730d99209bb6b0c4c2646aa3f3786efc46550e3eb9f",
+      "review_sha256": "babd2983d3fb930f38bbd730d99209bb6b0c4c2646aa3f3786efc46550e3eb9f",
+      "matches": true
+    },
+    {
+      "path": "tests/lab/test_guided_lab.py",
+      "recorded_sha256": "0d669b6e4bf53ea4be3e351798d000c801dd6305368f43500a9dc5af1700b426",
+      "review_sha256": "0d669b6e4bf53ea4be3e351798d000c801dd6305368f43500a9dc5af1700b426",
+      "matches": true
+    },
+    {
+      "path": "tests/lab/test_source_map.py",
+      "recorded_sha256": "8e6442be37b6a8f4345356f0162446ee4e2f19cc2d8c04984c3686629e4e1321",
+      "review_sha256": "8e6442be37b6a8f4345356f0162446ee4e2f19cc2d8c04984c3686629e4e1321",
+      "matches": true
+    },
+    {
+      "path": "tools/lab_stack.py",
+      "recorded_sha256": "e5eab0ed7fabdcda4b0c093f23734231df9eea31f8333a091ffb8aaa34462eea",
+      "review_sha256": "e5eab0ed7fabdcda4b0c093f23734231df9eea31f8333a091ffb8aaa34462eea",
+      "matches": true
+    },
+    {
+      "path": "robotops/http_server.py",
+      "recorded_sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "review_sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "matches": true
+    },
+    {
+      "path": "tests/integration/test_http_server_lifecycle.py",
+      "recorded_sha256": "f7899f33c67a4a8d1664a3308d1e7bb8dc731cbecc58c2f7d18308fa823c4664",
+      "review_sha256": "f7899f33c67a4a8d1664a3308d1e7bb8dc731cbecc58c2f7d18308fa823c4664",
+      "matches": true
+    }
+  ],
+  "all_11_frozen_source_hashes_match": true,
+  "findings": [],
+  "reviewed_boundaries": [
+    {
+      "boundary": "Scoped loop",
+      "finding": "Windows Selector is per service; non-Windows delegates installed Uvicorn auto_loop_factory(use_subprocess=False). No global asyncio policy or stdlib patch.",
+      "source": [
+        "robotops/http_server.py",
+        ".venv/Lib/site-packages/uvicorn/loops/auto.py",
+        ".venv/Lib/site-packages/uvicorn/loops/asyncio.py"
+      ]
+    },
+    {
+      "boundary": "Production parity",
+      "finding": "API/edge use UVICORN_LOOP; LabStack WMS/API commands pass that custom --loop; desktop asyncio.run uses new_event_loop directly around Server.serve. Separate OPC UA standalone/client loops are unchanged.",
+      "source": [
+        "apps/api/__main__.py",
+        "apps/desktop/backend.py",
+        "robotops/lab/__main__.py",
+        "tools/lab_stack.py",
+        "robotops/lab/opcua.py"
+      ]
+    },
+    {
+      "boundary": "Four fixture locations",
+      "finding": "Investigation, lab edge, guided-lab business and source-map business servers use HTTPTestServer. Guided browser aliases investigation.server and inherits the same loop.",
+      "source": [
+        "tests/conftest.py",
+        "tests/browser/test_investigation.py",
+        "tests/browser/test_guided_console.py",
+        "tests/lab/conftest.py",
+        "tests/lab/test_guided_lab.py",
+        "tests/lab/test_source_map.py"
+      ]
+    },
+    {
+      "boundary": "Strict shutdown preserved",
+      "finding": "Join deadlines remain 20/15/10/15 seconds. should_exit plus thread.join still requires termination. Loop/server errors now fail even if the thread exits, and default error logging remains. No force_exit, timeout increase or production suppression. Desktop existing 65-second grace is unchanged.",
+      "source": [
+        "tests/conftest.py",
+        "apps/desktop/backend.py"
+      ]
+    },
+    {
+      "boundary": "Meaningful regression",
+      "finding": "Real HTTP200/WS101 precedes actual TCP reset. Injected socket proxy targets shutdown reset boundary. Successful path requires shielded natural serve completion within 5 seconds, no loop errors, zero Uvicorn connections/tasks and zero retained transports. Failure-only private cleanup follows assertions or propagating failure and cannot convert failure into PASS. No platform skip or graceful timeout cancellation added.",
+      "source": [
+        "tests/integration/test_http_server_lifecycle.py"
+      ]
+    },
+    {
+      "boundary": "Runtime invariants",
+      "finding": "Correction diff changes HTTP loop selection, test diagnostics and wiring; authorization/command/reconciliation/effect logic stays unchanged. Blender adapter uses synchronous subprocess calls compatible with worker-thread execution. Saved desktop lane covers persistence/no duplicate pick and independent stop ownership.",
+      "source": [
+        "robotops/blender/adapter.py",
+        "artifacts/http-lifecycle-20261006/desktop.xml"
+      ]
+    },
+    {
+      "boundary": "Negative control limit",
+      "finding": "Saved injection proves Proactor shutdown-reset transport retention versus Selector cleanup; ordinary resets succeeded on both loops. The original fixture had no blocked-task dump, so the exact Chromium race remains unproven.",
+      "source": [
+        "artifacts/repro-proactor-shutdown-result.json",
+        "artifacts/http-lifecycle-20261006/review.json"
+      ]
+    },
+    {
+      "boundary": "Platform/lock limits",
+      "finding": "Observed Windows CPython3.13.15/Uvicorn0.54.0. Documented Windows Selector 512-socket/no asyncio subprocess or pipe limit bounds this to small single-process services. Linux was not executed; uv.lock has no uvloop, and private regression instrumentation does not promise optional uvloop compatibility.",
+      "source": [
+        "docs/integration-lab-native.md",
+        "docs/implementation/desktop.md",
+        "uv.lock",
+        "artifacts/http-lifecycle-20261006/review.json"
+      ]
+    }
+  ],
+  "focused_results": [
+    {
+      "lane": "http_lifecycle",
+      "path": "artifacts/http-lifecycle-20261006/tests-final.xml",
+      "sha256": "cfbdb57c4c89db70db558fa82b6d9ae608698e710ead1da2fd1534ce6e2e3108",
+      "declared_tests": 4,
+      "actual_testcases": 4,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 0.955,
+      "problem_children": [],
+      "testcases": [
+        {
+          "classname": "tests.integration.test_http_server_lifecycle",
+          "name": "test_http_server_peer_reset_exits_cleanly[peer-reset-http]",
+          "seconds": 0.273
+        },
+        {
+          "classname": "tests.integration.test_http_server_lifecycle",
+          "name": "test_http_server_peer_reset_exits_cleanly[peer-reset-websocket]",
+          "seconds": 0.216
+        },
+        {
+          "classname": "tests.integration.test_http_server_lifecycle",
+          "name": "test_http_server_peer_reset_exits_cleanly[shutdown-reset-http]",
+          "seconds": 0.221
+        },
+        {
+          "classname": "tests.integration.test_http_server_lifecycle",
+          "name": "test_http_server_peer_reset_exits_cleanly[shutdown-reset-websocket]",
+          "seconds": 0.219
+        }
+      ]
+    },
+    {
+      "lane": "desktop_backend",
+      "path": "artifacts/http-lifecycle-20261006/desktop.xml",
+      "sha256": "46d0a4c7d69c97341709566fb730f4ac4c7ffad1601a276489bd893b19327795",
+      "declared_tests": 3,
+      "actual_testcases": 3,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 15.667,
+      "problem_children": [],
+      "testcases": [
+        {
+          "classname": "tests.integration.test_desktop_backend",
+          "name": "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick[False]",
+          "seconds": 5.51
+        },
+        {
+          "classname": "tests.integration.test_desktop_backend",
+          "name": "test_desktop_close_reopen_preserves_uncertain_job_without_duplicate_pick[True]",
+          "seconds": 5.198
+        },
+        {
+          "classname": "tests.integration.test_desktop_backend",
+          "name": "test_desktop_instances_use_distinct_owned_ports_and_independent_stop_files",
+          "seconds": 4.843
+        }
+      ]
+    },
+    {
+      "lane": "blender_browser",
+      "path": "artifacts/http-lifecycle-browser-correction.xml",
+      "sha256": "57d7baf0c2243c5651c5c0c25eb7d7166c9ad74d68ae4558827d0ab35583fbfc",
+      "declared_tests": 4,
+      "actual_testcases": 4,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 223.458,
+      "problem_children": [],
+      "testcases": [
+        {
+          "classname": "tests.browser.test_investigation",
+          "name": "test_run_notice_investigate_and_return[blender-desktop]",
+          "seconds": 77.433
+        },
+        {
+          "classname": "tests.browser.test_investigation",
+          "name": "test_run_notice_investigate_and_return[blender-compact]",
+          "seconds": 69.967
+        },
+        {
+          "classname": "tests.browser.test_guided_console",
+          "name": "test_guided_happy_reload_gate_trace_and_business_completion[blender]",
+          "seconds": 24.816
+        },
+        {
+          "classname": "tests.lab.test_browser_lab",
+          "name": "test_full_lab_browser_authorization_recovery_and_business_completion[]",
+          "seconds": 51.074
+        }
+      ]
+    }
+  ],
+  "exit_evidence": {
+    "http_lifecycle": 0,
+    "desktop": {
+      "exit_code": 0,
+      "ended_at": "2026-10-06T01:08:44.4537517Z",
+      "started_at": "2026-10-06T01:08:28.0625512Z"
+    },
+    "blender_browser": {
+      "ended_at": "2026-10-06T01:13:03.5074566Z",
+      "scope": "Selected Blender investigation desktop/compact, guided reload/happy, and separate-service lab happy cases; explicit marker excludes synthetic lane",
+      "started_at": "2026-10-06T01:09:18.4665712Z",
+      "source_base": "b9685864afb6f47e440bd051789052070456c7b2",
+      "exit_code": 0
+    }
+  },
+  "count_scope": "11 distinct focused cases: 4 HTTP lifecycle + 3 desktop + 4 Blender browser. tests.xml repeats the same 4 lifecycle cases before formatting, not 4 extra distinct cases. Six browser deselections are not passes.",
+  "quality_evidence": {
+    "lint": "Saved log: all checks passed; 201 files formatted.",
+    "typecheck": "Saved log: no issues in 67 source files.",
+    "drift": "drift.log is a failed invalid tools.dev drift invocation, not PASS. Separate authoritative drift-check.log reports passed:true.",
+    "drift_check_passed": true
+  },
+  "limits": [
+    "Fresh complete acceptance on a clean corrected commit is still required.",
+    "No Linux/Docker/remote parity execution established here.",
+    "Focused cases do not establish final mandatory manual/README CLI loop, complete trace audit or whole goal."
+  ],
+  "inputs": [
+    {
+      "path": "artifacts/http-lifecycle-20261006/review.json",
+      "sha256": "1fc121fa79b4cc43e147cef34664c3278490bd378a40d1505f3848d83c8f6576",
+      "bytes": 4830
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/implementation-ready.json",
+      "sha256": "2914890a093475c9fbab77f81059ad76ea514d86439ac14522a2ef225501bfdd",
+      "bytes": 1815
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/browser-source.json",
+      "sha256": "8106d1c55fc2d383755f48eabaef8ae45a74d53b09c2a530d6f5bff15c7678f2",
+      "bytes": 1435
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/browser-review.json",
+      "sha256": "2ea754da8f4d731e4b6827ea6e5f5429d17ac1539e8bf8c89028e547a2d34100",
+      "bytes": 706
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/tests.xml",
+      "sha256": "8a7d227f4d648c9cd46f91920d53933c15e56482bb8f9ccf649493555bdf954e",
+      "bytes": 861
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/tests-final.xml",
+      "sha256": "cfbdb57c4c89db70db558fa82b6d9ae608698e710ead1da2fd1534ce6e2e3108",
+      "bytes": 861
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/pytest.log",
+      "sha256": "79f5b3d70b7459d42ab214def574300c31c2c3c58f132a466c2d64576f496bcd",
+      "bytes": 202
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/pytest-final.log",
+      "sha256": "79f5b3d70b7459d42ab214def574300c31c2c3c58f132a466c2d64576f496bcd",
+      "bytes": 202
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/desktop.xml",
+      "sha256": "46d0a4c7d69c97341709566fb730f4ac4c7ffad1601a276489bd893b19327795",
+      "bytes": 735
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/desktop.log",
+      "sha256": "70c027ea7467fcb32a04df5faf4614303eed8faed034f2167700670bcd4e5314",
+      "bytes": 204
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/desktop-exit.json",
+      "sha256": "c6d9aa55efe3d1b9d6e047c8809c13555a4bf227d5262674c5524beebde9931e",
+      "bytes": 132
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/lint.log",
+      "sha256": "f0fa07661ef91ca45bbe06ca8489b0a48beb0baab4b70458ace864469f898f34",
+      "bytes": 100
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/typecheck.log",
+      "sha256": "8633d0d52ac421f1f2d92a39b029bda076c5f57b2064c12869363a26ab8289c9",
+      "bytes": 92
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/drift.log",
+      "sha256": "d4b66d24147b9754c6204b8120efd3457441f0c52c6f50d07bfbb9beac89e41f",
+      "bytes": 1156
+    },
+    {
+      "path": "artifacts/http-lifecycle-20261006/drift-check.log",
+      "sha256": "e62203615a3bd39f44104e025191d4cb7d9f5477782ba913ec91f20f2692d61d",
+      "bytes": 6394
+    },
+    {
+      "path": "artifacts/http-lifecycle-browser-correction.xml",
+      "sha256": "57d7baf0c2243c5651c5c0c25eb7d7166c9ad74d68ae4558827d0ab35583fbfc",
+      "bytes": 812
+    },
+    {
+      "path": "artifacts/http-lifecycle-browser-correction-exit.json",
+      "sha256": "63d6af6375652864f085882c5818fc13a0aa16904b5c381f16ec3c762fd1b447",
+      "bytes": 362
+    },
+    {
+      "path": "artifacts/http-lifecycle-browser-correction.stdout.log",
+      "sha256": "7dfe7c9c744ea879a07a30bf6244851efcdf14cb639d1c84266a77f719b38eb8",
+      "bytes": 126
+    },
+    {
+      "path": "artifacts/repro-proactor-shutdown-result.json",
+      "sha256": "24f23a14f5939210d18cf741eb167c0963d1b9c11d0f40564cfd9932ee35cd0c",
+      "bytes": 15384
+    },
+    {
+      "path": "tests/browser/test_guided_console.py",
+      "sha256": "0264878f66daa3f492bd19f7c7208db39c2b3a175cb41ae709363d7425a3daf4",
+      "bytes": 9519
+    },
+    {
+      "path": "robotops/lab/opcua.py",
+      "sha256": "01a02954c653f77889146ce97b09aeadeae131031d03dc20ed98761c8f2683cd",
+      "bytes": 10046
+    },
+    {
+      "path": "robotops/blender/adapter.py",
+      "sha256": "c1cfa650069e8390c56a479f7a3e8ac01d7fbc0d15ed24942bf64f79ead71588",
+      "bytes": 20492
+    },
+    {
+      "path": "docs/integration-lab-native.md",
+      "sha256": "6b96033fb8643ea8c7282f8c83f2076e94b6d7dcdd45f3a1fad5a3c542908c74",
+      "bytes": 7812
+    },
+    {
+      "path": "docs/integration-lab.md",
+      "sha256": "1112ead4f64421a57c4e36495e7e0521505ea5b096d7b7685120f94ce159f6f3",
+      "bytes": 15329
+    },
+    {
+      "path": "docs/implementation/desktop.md",
+      "sha256": "60fe5ab01ecf80afa6d8bb69fb7ccb4a99ced9612b3e1b37761b3962ea088611",
+      "bytes": 9526
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "50f23c94f4a7601404f7c45ea324a846afe34cb0cfa890c6c44963aca8cd26d1",
+      "bytes": 174866
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "b9cd1ea5a6c68d68c1ef0dc265eb8e67a4407912f2b6f629b3049d52df395bae",
+      "bytes": 1412
+    },
+    {
+      "path": ".venv/Lib/site-packages/uvicorn/config.py",
+      "sha256": "cf91c6ffae283a2b2020da954b4cc4ed47d3246cb062afd09fb77d98e4c5ca87",
+      "bytes": 25482
+    },
+    {
+      "path": ".venv/Lib/site-packages/uvicorn/loops/auto.py",
+      "sha256": "a5d4ec31caa46c4f1fbdd3602ecd72e1cea1b2e379f7c9993923a50b46b6dd2e",
+      "bytes": 566
+    },
+    {
+      "path": ".venv/Lib/site-packages/uvicorn/loops/asyncio.py",
+      "sha256": "6bcc0ee1f078a4293e44b202abb0a71abfdcc5023b3012c98fe1a8e14425743f",
+      "bytes": 333
+    }
+  ],
+  "actions_performed": "Read code/diffs/saved JSON/XML/logs, recomputed hashes, wrote this ignored report. No new test, browser, service, rendering or source edit.",
+  "goal_status": "NOT_ACHIEVED"
+}

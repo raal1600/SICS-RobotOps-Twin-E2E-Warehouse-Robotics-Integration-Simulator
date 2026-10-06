@@ -21,12 +21,12 @@ pytestmark = pytest.mark.lab_integration
     "fault", [None, "DROP_ACK_AFTER_EFFECT", "DUPLICATE_DELIVERY", "PLC_RESTART", "WMS_UNAVAILABLE"]
 )
 def test_guided_network_stack_recovers_without_repeating_motion(
-    lab_config, tmp_path, monkeypatch, fault
+    lab_config, tmp_path, monkeypatch, fault, http_server
 ):
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         business_port = listener.getsockname()[1]
-    business_server = uvicorn.Server(
+    business_server = http_server(
         uvicorn.Config(
             business_app(lab_config), host="127.0.0.1", port=business_port, log_level="error"
         )
@@ -198,6 +198,4 @@ def test_guided_network_stack_recovers_without_repeating_motion(
         stopped.set()
         worker.join(15)
         assert not worker.is_alive()
-        business_server.should_exit = True
-        business_thread.join(10)
-        assert not business_thread.is_alive()
+        business_server.stop(business_thread, timeout=10)

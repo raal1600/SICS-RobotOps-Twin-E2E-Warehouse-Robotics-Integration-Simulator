@@ -24,13 +24,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_every_lab_stage_source_symbol_executes_and_excerpt_matches(
-    lab_config, tmp_path, order_request
+    lab_config, tmp_path, order_request, http_server
 ):
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         business_port = listener.getsockname()[1]
     config = replace(lab_config, wms_url=f"http://127.0.0.1:{business_port}")
-    server = uvicorn.Server(
+    server = http_server(
         uvicorn.Config(
             business_app(config), host="127.0.0.1", port=business_port, log_level="error"
         )
@@ -115,6 +115,5 @@ def test_every_lab_stage_source_symbol_executes_and_excerpt_matches(
     finally:
         stopped.set()
         consumer.join(15)
-        server.should_exit = True
-        thread.join(15)
-        assert not consumer.is_alive() and not thread.is_alive()
+        server.stop(thread, timeout=15)
+        assert not consumer.is_alive()

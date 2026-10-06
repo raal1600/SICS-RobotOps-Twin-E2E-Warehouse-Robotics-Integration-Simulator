@@ -43,8 +43,8 @@ service per terminal:
 ```powershell
 uv run --locked python -m robotops.lab plc
 uv run --locked python -m robotops.lab edge
-uv run --locked uvicorn robotops.lab.business:create_app --factory --host 127.0.0.1 --port 8081
-uv run --locked uvicorn robotops.lab.api:create_app --factory --host 127.0.0.1 --port 8000
+uv run --locked uvicorn robotops.lab.business:create_app --factory --loop robotops.http_server:new_event_loop --host 127.0.0.1 --port 8081
+uv run --locked uvicorn robotops.lab.api:create_app --factory --loop robotops.http_server:new_event_loop --host 127.0.0.1 --port 8000
 ```
 
 The edge service listens for bounded REST control on `127.0.0.1:8082` and owns the
@@ -52,6 +52,20 @@ OPC UA client sessions to the virtual PLC. The WMS acknowledgement service liste
 on `127.0.0.1:8081`. The API never falls back to opening its own OPC UA session when
 the edge is unavailable. Set `ROBOTOPS_EDGE_URL` and `ROBOTOPS_WMS_URL` if those
 addresses differ from the defaults.
+
+The native API, desktop backend, WMS and edge HTTP services share the explicit
+`robotops.http_server:new_event_loop` factory with their network tests. On Windows
+it selects `SelectorEventLoop`: a peer reset during Proactor socket shutdown can
+otherwise skip transport detachment and leave graceful HTTP shutdown waiting.
+The selector supports at most 512 sockets and no asyncio subprocesses or pipes;
+these single-process local services are intended for a small lab, not high-volume
+hosting. Blender uses synchronous subprocess calls in worker threads. The factory
+does not change the separate OPC UA or Playwright loops or the global event-loop
+policy. Other platforms retain Uvicorn's automatic loop selection. See the
+[Uvicorn loop configuration](https://uvicorn.dev/concepts/event-loop/) and
+[Python platform limits](https://docs.python.org/3.13/library/asyncio-platforms.html).
+Test shutdown deadlines remain strict; loop callback errors and a server thread
+that fails to terminate are failures with diagnostic task/thread stacks.
 
 For a clean application-stack namespace over these existing PostgreSQL/RabbitMQ
 services, the scoped launcher starts fresh API/edge/PLC/WMS processes and writes

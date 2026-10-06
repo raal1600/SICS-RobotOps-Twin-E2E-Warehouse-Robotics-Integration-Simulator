@@ -10,6 +10,7 @@ import httpx
 import psycopg
 import uvicorn
 
+from robotops.http_server import UVICORN_LOOP
 from robotops.lab.config import LabConfig
 from robotops.lab.journal import PLCJournal
 from robotops.lab.opcua import OPCClient, VirtualPLC
@@ -53,6 +54,7 @@ def main() -> None:
         uvicorn.run(
             "robotops.lab.edge:create_app",
             factory=True,
+            loop=UVICORN_LOOP,
             host=os.getenv("ROBOTOPS_EDGE_BIND_HOST", "127.0.0.1"),
             port=urlsplit(config.edge_url).port or 8082,
         )

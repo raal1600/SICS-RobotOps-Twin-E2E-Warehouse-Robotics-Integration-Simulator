@@ -13,6 +13,7 @@ from apps.api.app import create_workspace_app
 from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.config import Settings
+from robotops.http_server import new_event_loop
 
 
 async def serve(data: Path, session: Path, identity: str, runtime_name: str) -> None:
@@ -71,7 +72,8 @@ def main() -> None:
     parser.add_argument("--runtime", choices=["blender", "headless"], default="blender")
     args = parser.parse_args()
     asyncio.run(
-        serve(args.data_dir.resolve(), args.session_dir.resolve(), args.session_id, args.runtime)
+        serve(args.data_dir.resolve(), args.session_dir.resolve(), args.session_id, args.runtime),
+        loop_factory=new_event_loop,
     )
 
 

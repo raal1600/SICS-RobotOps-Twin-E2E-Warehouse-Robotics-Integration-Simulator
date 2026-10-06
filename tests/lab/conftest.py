@@ -96,7 +96,7 @@ def running_plc(tmp_path):
 
 
 @pytest.fixture
-def lab_config(running_plc):
+def lab_config(running_plc, http_server):
     original = LabConfig.from_env()
     schema = "lab_test_" + uuid4().hex
     with psycopg.connect(original.postgres_dsn, autocommit=True) as db:
@@ -112,7 +112,7 @@ def lab_config(running_plc):
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]
     config = replace(config, edge_url=f"http://127.0.0.1:{port}")
-    edge_server = uvicorn.Server(
+    edge_server = http_server(
         uvicorn.Config(
             edge_app(config, consume=False), host="127.0.0.1", port=port, log_level="error"
         )
@@ -124,9 +124,7 @@ def lab_config(running_plc):
         time.sleep(0.01)
     assert edge_server.started
     yield config
-    edge_server.should_exit = True
-    edge_thread.join(15)
-    assert not edge_thread.is_alive()
+    edge_server.stop(edge_thread, timeout=15)
     connection = broker(config)
     try:
         connection.channel().queue_delete(queue=config.queue)

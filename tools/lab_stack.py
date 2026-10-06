@@ -21,6 +21,7 @@ import psycopg
 from psycopg import sql
 from psycopg.conninfo import make_conninfo
 
+from robotops.http_server import UVICORN_LOOP
 from robotops.lab.config import LabConfig
 from robotops.lab.opcua import OPCClient
 
@@ -169,6 +170,8 @@ class LabStack:
                 "uvicorn",
                 "robotops.lab.business:create_app",
                 "--factory",
+                "--loop",
+                UVICORN_LOOP,
                 "--host",
                 "127.0.0.1",
                 "--port",
@@ -182,6 +185,8 @@ class LabStack:
                 "uvicorn",
                 "robotops.lab.api:create_app",
                 "--factory",
+                "--loop",
+                UVICORN_LOOP,
                 "--host",
                 "127.0.0.1",
                 "--port",

@@ -124,8 +124,42 @@ saved lab trace scan found no credential candidates in its listed scope, while
 preserving the historical caption findings. All 64 generated PDF pages were
 visually reviewed before the final status rebuild.
 
-Required next evidence: validate the
-corrected source, repeat the final manual checks, finish trace/publication review,
+The clean corrected-source campaign on `b968586` passed all **811 test bodies**
+but failed one compact Blender investigation fixture teardown: the API thread
+did not stop within 20 seconds. Its JUnit therefore has **810 clean cases and one
+error**, with no test-body failures or skips; coverage is **91.4750%**. All four
+distributed browser cases passed, and six saved screenshots show the corrected
+captions. The second pass was stopped after the first failure and has no terminal
+result. [The failed campaign archive](docs/evidence/lab-b968586/summary.json)
+preserves these results without claiming full acceptance.
+
+The saved log contains a Windows Proactor socket-shutdown reset. A deterministic
+probe reproduced its cleanup mechanism: the exception skips socket close and
+transport detachment, leaving Uvicorn waiting for an accepted connection even
+after its request/connection sets are empty. Ordinary loopback resets did not
+reproduce the timing-sensitive Chromium trigger. The correction configures the
+same explicit Windows HTTP selector loop for native services and their fixtures;
+it does not change the global policy, OPC UA loop, Playwright loop or workflow.
+Existing shutdown bounds remain strict and fixture failures now include task and
+thread diagnostics. [Native loop limits](docs/integration-lab-native.md) document
+the 512-socket limit and lack of asyncio subprocess support; Blender continues to
+use synchronous worker-thread subprocess calls.
+
+Four real HTTP/WebSocket lifecycle regressions pass, as do the three existing
+desktop close/reopen/isolation cases (15.70 seconds), repository lint/formatting
+(201 files), strict typing (67 source files), and the 169-MUST drift check. The
+four selected Blender browser checks also pass in **223.46 seconds**, with six
+synthetic cases deliberately deselected: investigation at desktop and compact
+sizes, guided happy/reload, and the separate-service lab happy path. No failures,
+errors or skips were recorded, and the frozen source hashes are unchanged.
+An independent bounded review found no blocking issue. The
+[correction archive](docs/evidence/lab-b968586/http-loop-correction/summary.json)
+preserves the probe, exact focused results, source hashes and review receipts.
+These focused results do not replace a new clean, two-pass acceptance campaign
+or the final manual loop.
+
+Required next evidence: run full acceptance on the clean corrected source,
+repeat the final manual checks, finish trace/publication review,
 then update the final report and all requirement evidence. Exact-source CI, publication and
 Pages verification remain mandatory. Remote publication requires explicit approval
 following the earlier automatic approval rejection; no remote action is inferred

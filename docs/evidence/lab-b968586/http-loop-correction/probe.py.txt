@@ -1,0 +1,161 @@
+"""Ignored diagnostic only: installed cleanup ordering and real reset lifecycle."""
+import asyncio
+import hashlib
+import json
+import pathlib
+import socket
+import struct
+import sys
+import time
+from asyncio import proactor_events, selector_events
+from datetime import datetime, timezone
+
+import uvicorn
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+
+
+def injected_cleanup():
+    output = []
+    for name, cls in [("Proactor", proactor_events._ProactorBasePipeTransport), ("Selector", selector_events._SelectorTransport)]:
+        events = []
+        class Sock:
+            def fileno(self): return 999
+            def shutdown(self, how):
+                events.append("socket.shutdown")
+                raise ConnectionResetError(10054, "diagnostic injected reset")
+            def close(self): events.append("socket.close")
+        class Protocol:
+            def connection_lost(self, exc): events.append("protocol.connection_lost")
+        class Server:
+            def _detach(self, transport): events.append("server._detach")
+        transport = object.__new__(cls)
+        transport._called_connection_lost = False
+        transport._protocol_connected = True
+        transport._protocol = Protocol()
+        transport._sock = Sock()
+        transport._server = Server()
+        transport._loop = None
+        error = None
+        try:
+            transport._call_connection_lost(None)
+        except ConnectionResetError as exc:
+            error = {"type": type(exc).__name__, "errno": exc.errno, "message": str(exc)}
+        output.append({"loop_transport": name, "injected_shutdown_reset": True, "events": events, "raised": error, "socket_closed": "socket.close" in events, "server_detached": "server._detach" in events})
+        # Fake object only: prevent destructor warnings; there is no OS resource.
+        transport._sock = None
+        transport._server = None
+    return output
+
+
+async def app(scope, receive, send):
+    if scope["type"] == "http":
+        await send({"type": "http.response.start", "status": 200, "headers": [(b"content-length", b"2")]})
+        await send({"type": "http.response.body", "body": b"OK"})
+    elif scope["type"] == "websocket":
+        await receive()
+        await send({"type": "websocket.accept"})
+        while (await receive())["type"] != "websocket.disconnect":
+            pass
+
+
+def task_stack(task):
+    frames = []
+    current = task.get_coro()
+    seen = set()
+    while current is not None and id(current) not in seen and len(frames) < 16:
+        seen.add(id(current))
+        frame = getattr(current, "cr_frame", None) or getattr(current, "gi_frame", None)
+        if frame:
+            frames.append({"file": frame.f_code.co_filename, "function": frame.f_code.co_name, "line": frame.f_lineno})
+        current = getattr(current, "cr_await", None) or getattr(current, "gi_yieldfrom", None)
+    return frames
+
+
+async def real_reset(loop_name, protocol, iteration, inject_shutdown=False):
+    loop = asyncio.get_running_loop()
+    errors = []
+    loop.set_exception_handler(lambda _, context: errors.append({"message": context.get("message"), "exception_type": type(context.get("exception")).__name__, "exception": str(context.get("exception"))}))
+    listener = socket.socket()
+    listener.bind(("127.0.0.1", 0))
+    listener.setblocking(False)
+    server = uvicorn.Server(uvicorn.Config(app, lifespan="off", access_log=False, log_level="error", timeout_graceful_shutdown=None))
+    serve = asyncio.create_task(server.serve(sockets=[listener]))
+    deadline = time.monotonic() + 3
+    while not server.started and not serve.done() and time.monotonic() < deadline:
+        await asyncio.sleep(0.01)
+    if not server.started:
+        raise RuntimeError("diagnostic listener startup failed")
+    client = socket.socket()
+    client.setblocking(False)
+    await loop.sock_connect(client, listener.getsockname())
+    if protocol == "http":
+        request = b"GET / HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: keep-alive\r\n\r\n"
+    else:
+        request = b"GET /stream HTTP/1.1\r\nHost: 127.0.0.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version: 13\r\n\r\n"
+    await loop.sock_sendall(client, request)
+    response = await asyncio.wait_for(loop.sock_recv(client, 8192), 2)
+    expected = b"200" if protocol == "http" else b"101"
+    if expected not in response.split(b"\r\n", 1)[0]:
+        raise RuntimeError(repr(response))
+    if inject_shutdown:
+        class InjectedShutdownReset:
+            def __init__(self, underlying): self.underlying = underlying
+            def __getattr__(self, name): return getattr(self.underlying, name)
+            def shutdown(self, how):
+                raise ConnectionResetError(10054, "diagnostic real-transport shutdown reset")
+        for connection in server.server_state.connections:
+            connection.transport._sock = InjectedShutdownReset(connection.transport._sock)
+    # SO_LINGER(1, 0) deliberately generates a real TCP reset, no browser involved.
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("hh", 1, 0))
+    client.close()
+    await asyncio.sleep(0.025)
+    server.should_exit = True
+    start = time.monotonic()
+    clean = False
+    blocked_stack = []
+    try:
+        await asyncio.wait_for(asyncio.shield(serve), 1.5)
+        clean = True
+    except TimeoutError:
+        blocked_stack = task_stack(serve)
+    result = {"loop_factory": loop_name, "protocol": protocol, "iteration": iteration, "actual_response_status_line": response.split(b"\r\n", 1)[0].decode(), "real_tcp_reset": True, "socket_shutdown_reset_injected": inject_shutdown, "graceful_timeout_config": None, "server_finished_without_cancellation": clean, "shutdown_seconds": time.monotonic()-start, "loop_errors": errors.copy(), "remaining_uvicorn_connections": len(server.server_state.connections), "remaining_uvicorn_tasks": len(server.server_state.tasks), "remaining_asyncio_server_transports": [len(s._clients) for s in server.servers], "blocked_await_chain": blocked_stack}
+    if not clean:
+        # Diagnostic-only cleanup of owned leaked transports, never a product fix.
+        serve.cancel()
+        await asyncio.gather(serve, return_exceptions=True)
+        for s in server.servers:
+            s.close()
+            for transport in list(s._clients):
+                if getattr(transport, "_sock", None) is not None:
+                    transport._sock.close()
+                    transport._sock = None
+                s._detach(transport)
+                transport._server = None
+        result["diagnostic_private_cleanup_required"] = True
+    else:
+        result["diagnostic_private_cleanup_required"] = False
+    listener.close()
+    await asyncio.sleep(0.01)
+    result["loop_errors"] = errors.copy()
+    return result
+
+
+def main():
+    cases = []
+    for name, factory in [("ProactorEventLoop", asyncio.ProactorEventLoop), ("SelectorEventLoop", asyncio.SelectorEventLoop)]:
+        for protocol in ["http", "websocket"]:
+            for iteration in range(1, 4):
+                cases.append(asyncio.run(real_reset(name, protocol, iteration), loop_factory=factory))
+    for name, factory in [("ProactorEventLoop", asyncio.ProactorEventLoop), ("SelectorEventLoop", asyncio.SelectorEventLoop)]:
+        for protocol in ["http", "websocket"]:
+            cases.append(asyncio.run(real_reset(name, protocol, 1, inject_shutdown=True), loop_factory=factory))
+    source = pathlib.Path(proactor_events.__file__)
+    result = {"recorded_at_utc": datetime.now(timezone.utc).isoformat(), "scope": "Ignored deterministic installed-transport diagnostic and minimal real HTTP/WebSocket reset probes; no application/database/browser/Blender/test-suite execution.", "python": sys.version, "uvicorn": uvicorn.__version__, "proactor_source": str(source), "proactor_source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(), "injected_cleanup": injected_cleanup(), "real_reset_cases": cases, "diagnostic_script_sha256": hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(), "candidate": "Explicit per-server Windows SelectorEventLoop avoids the failing Proactor socket.shutdown cleanup path. No global policy or stdlib monkeypatch is applied.", "limits": "Minimal probes do not establish application/browser regression success. Actual resets are timing-sensitive; the injected ordering probe is deterministic. Any private cleanup is diagnostic-only and means the case failed to shut down cleanly."}
+    out = ROOT / "artifacts/repro-proactor-shutdown-result.json"
+    out.write_text(json.dumps(result, indent=2)+"\n", encoding="utf-8")
+    print(json.dumps({"result": str(out), "sha256": hashlib.sha256(out.read_bytes()).hexdigest(), "injected_cleanup": result["injected_cleanup"], "real_cases": len(cases), "clean_by_loop": {name: sum(c["server_finished_without_cancellation"] and not c["loop_errors"] for c in cases if c["loop_factory"] == name) for name in ["ProactorEventLoop", "SelectorEventLoop"]}, "unclean": [c for c in cases if not c["server_finished_without_cancellation"] or c["loop_errors"]]}))
+
+
+if __name__ == "__main__":
+    main()

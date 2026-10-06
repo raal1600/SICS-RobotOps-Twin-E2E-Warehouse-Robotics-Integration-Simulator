@@ -1,0 +1,33 @@
+{
+  "source_base": "b9685864afb6f47e440bd051789052070456c7b2",
+  "reviewer": "root",
+  "read_files": [
+    "robotops/http_server.py",
+    "apps/api/__main__.py",
+    "apps/desktop/backend.py",
+    "robotops/lab/__main__.py",
+    "tools/lab_stack.py",
+    "tests/conftest.py",
+    "tests/browser/test_investigation.py",
+    "tests/lab/conftest.py",
+    "tests/lab/test_guided_lab.py",
+    "tests/lab/test_source_map.py",
+    "tests/integration/test_http_server_lifecycle.py",
+    "docs/integration-lab-native.md",
+    "docs/integration-lab.md",
+    "docs/implementation/desktop.md"
+  ],
+  "assessment": "No actionable issue found in inspected correction. Per-server configuration covers native HTTP product entrypoints and test fixtures, preserves non-Windows Uvicorn auto selection, does not modify global/OPC/Playwright loops, retains strict teardown failure. Python requirement is3.13, satisfying loop_factory support.",
+  "proof": {
+    "diagnostic": "Injected exact socket.shutdown reset reproduces retained Proactor transport and blocked server.wait_closed. Ordinary resets did not reproduce the actual timing-sensitive Chromium trigger.",
+    "http_websocket": "4 real network reset regression cases pass; injected fault instrumentation is for locked stdlib asyncio transport, not optional uvloop compatibility.",
+    "desktop": "3 actual child-process close/reopen/isolation cases pass15.70s.",
+    "browser": "4 Blender cases pass223.46s,6 synthetic deselected; see browser-review.json.",
+    "checks": "Full lint201formatted, strict mypy67files, drift169MUST pass; incorrect tools.dev drift command was rejected by argparse and corrected to tools.drift_check."
+  },
+  "limits": [
+    "Focused working-tree checks, not clean two-pass full acceptance.",
+    "Windows Selector limit512sockets/noasyncio subprocesses documented; Blender uses synchronous subprocess calls in worker threads.",
+    "No full current manual/CLI/trace/PDF or remoteattestation yet."
+  ]
+}

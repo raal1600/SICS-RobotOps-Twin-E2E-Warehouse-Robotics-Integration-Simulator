@@ -7,6 +7,7 @@ from apps.api.app import create_workspace_app
 from robotops.blender.adapter import BlenderRuntime
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.config import Settings
+from robotops.http_server import UVICORN_LOOP
 
 
 def main() -> None:
@@ -26,7 +27,7 @@ def main() -> None:
         runtime_type=BlenderRuntime if args.runtime == "blender" else SyntheticRuntime,
         settings=settings,
     )
-    uvicorn.run(app, host="127.0.0.1", port=args.port)
+    uvicorn.run(app, host="127.0.0.1", port=args.port, loop=UVICORN_LOOP)
 
 
 if __name__ == "__main__":

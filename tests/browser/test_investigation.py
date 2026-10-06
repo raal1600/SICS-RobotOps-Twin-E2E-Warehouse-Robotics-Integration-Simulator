@@ -489,7 +489,23 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     )
     page.locator("#clear-test").click()
     write_count = len([r for r in requests if physical_request(r)])
-    page.locator("#confirm-delete-test").click()
+    # Durable management can outlast a UI assertion's five-second window.
+    # Keep the existing request bound and start projection checks after its body.
+    clear_url = origin + "/simulation-tests/original/clear"
+    with (
+        page.expect_response(
+            lambda response: response.request.method == "POST" and response.url == clear_url
+        ) as cleared,
+        page.expect_request_finished(
+            lambda request: request.method == "POST" and request.url == clear_url
+        ),
+    ):
+        page.locator("#confirm-delete-test").click()
+    assert cleared.value.status == 200, cleared.value.text()
+    clear_result = cleared.value.json()
+    assert clear_result["request_id"] == cleared.value.request.post_data_json["request_id"]
+    assert clear_result["test_id"] == "original"
+    assert clear_result["cleanup_pending"] is False
     expect(page.locator("#delete-test-dialog")).not_to_be_visible()
     expect(page.locator("#message")).to_contain_text("Test 1 cleared")
     expect(page.locator("#test-history")).to_have_value("original")
@@ -520,7 +536,21 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     page.locator("#cancel-delete-test").click()
     assert registry.exists("original")
     page.locator("#delete-test").click()
-    page.locator("#confirm-delete-test").click()
+    delete_url = origin + "/simulation-tests/original/delete"
+    with (
+        page.expect_response(
+            lambda response: response.request.method == "POST" and response.url == delete_url
+        ) as deleted,
+        page.expect_request_finished(
+            lambda request: request.method == "POST" and request.url == delete_url
+        ),
+    ):
+        page.locator("#confirm-delete-test").click()
+    assert deleted.value.status == 200, deleted.value.text()
+    delete_result = deleted.value.json()
+    assert delete_result["request_id"] == deleted.value.request.post_data_json["request_id"]
+    assert delete_result["deleted_test_ids"] == ["original"]
+    assert delete_result["cleanup_pending"] is False
     expect(page.locator("#empty-workspace")).to_be_visible()
     expect(page.locator("#delete-test-dialog")).not_to_be_visible()
     assert not (registry.data_dir / "workflow.db").exists()
@@ -528,13 +558,25 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     with registry.connect() as db:
         assert not db.execute("SELECT 1 FROM tests").fetchone()
     page.locator("#empty-new-test").click()
-    page.locator("#create-test").click()
+    create_url = origin + "/simulation-tests"
+    with (
+        page.expect_response(
+            lambda response: response.request.method == "POST" and response.url == create_url
+        ) as created,
+        page.expect_request_finished(
+            lambda request: request.method == "POST" and request.url == create_url
+        ),
+    ):
+        page.locator("#create-test").click()
+    assert created.value.status == 201, created.value.text()
+    created_test = created.value.json()
+    assert created_test["test_id"] == created.value.request.post_data_json["request_id"]
     expect(page.locator("#new-test-dialog")).not_to_be_visible()
     expect(page.locator("#message")).to_contain_text("Test 1 created")
     expect(page.locator("#create")).to_be_enabled()
     fresh = get(page, origin + "/simulation-tests")
     assert len(fresh["tests"]) == 1 and fresh["tests"][0]["number"] == 1
-    assert fresh["tests"][0]["test_id"] != "original"
+    assert fresh["tests"][0]["test_id"] == created_test["test_id"] != "original"
     assert fresh["tests"][0]["order_count"] == 0
     screenshot(page, directory, "deleted-then-new-test-one")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")

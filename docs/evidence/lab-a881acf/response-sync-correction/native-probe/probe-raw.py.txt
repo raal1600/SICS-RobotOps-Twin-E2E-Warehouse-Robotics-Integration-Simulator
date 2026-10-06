@@ -1,0 +1,225 @@
+"""Bounded diagnostic: three native HTTP Synthetic clear operations; no product edits."""
+from __future__ import annotations
+import asyncio
+from contextlib import contextmanager
+from contextvars import ContextVar
+from functools import wraps
+import hashlib
+import itertools
+import json
+from pathlib import Path
+import socket
+import sqlite3
+import sys
+import threading
+import time
+from datetime import datetime, timezone
+from uuid import uuid4
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+import httpx
+import uvicorn
+from websockets.sync.client import connect as ws_connect
+from websockets.exceptions import ConnectionClosed
+from apps.api.app import create_workspace_app
+from apps.api.test_sessions import TestRegistry
+from robotops.cell.runtime import SyntheticRuntime
+from robotops.config import Settings
+from robotops.http_server import UVICORN_LOOP
+from robotops.workflow.store import Store
+
+OUT = Path(__file__).resolve().parent
+EVENTS = []
+IDS = itertools.count(1)
+PHASE = "startup"
+ZERO = time.perf_counter()
+PARENT = ContextVar("diagnostic_parent", default=None)
+LOOP_ERRORS = []
+LAG = []
+
+@contextmanager
+def measured(kind, name, **fields):
+    ident = next(IDS)
+    parent = PARENT.get()
+    token = PARENT.set(ident)
+    started = time.perf_counter()
+    phase = PHASE
+    error = None
+    try:
+        yield
+    except BaseException as exc:
+        error = type(exc).__name__ + ": " + str(exc)[:180]
+        raise
+    finally:
+        ended = time.perf_counter()
+        EVENTS.append({"id":ident,"parent":parent,"phase":phase,"kind":kind,"name":name,"start_ms":(started-ZERO)*1000,"end_ms":(ended-ZERO)*1000,"elapsed_ms":(ended-started)*1000,"thread":threading.current_thread().name,"error":error,**fields})
+        PARENT.reset(token)
+
+class TimedConnection(sqlite3.Connection):
+    def __init__(self, database, *args, **kwargs):
+        self.diagnostic_path = str(database)
+        with measured("sqlite", "connect", database=self.diagnostic_path, timeout=kwargs.get("timeout", args[0] if args else 5.0)):
+            super().__init__(database, *args, **kwargs)
+    def execute(self, sql, parameters=(), /):
+        with measured("sqlite", "execute", database=self.diagnostic_path, sql=" ".join(sql.split())[:160]):
+            return super().execute(sql, parameters)
+    def executescript(self, sql, /):
+        with measured("sqlite", "executescript", database=self.diagnostic_path, sql=" ".join(sql.split())[:160]):
+            return super().executescript(sql)
+    def commit(self):
+        with measured("sqlite", "commit", database=self.diagnostic_path):
+            return super().commit()
+    def rollback(self):
+        with measured("sqlite", "rollback", database=self.diagnostic_path):
+            return super().rollback()
+    def close(self):
+        with measured("sqlite", "close", database=self.diagnostic_path):
+            return super().close()
+
+ORIGINAL_CONNECT = sqlite3.connect
+def timed_connect(*args, **kwargs):
+    kwargs.setdefault("factory", TimedConnection)
+    return ORIGINAL_CONNECT(*args, **kwargs)
+
+ORIGINALS = []
+def instrument(cls, name, context=False):
+    original = getattr(cls, name)
+    ORIGINALS.append((cls, name, original))
+    if context:
+        @contextmanager
+        @wraps(original)
+        def replacement(*args, **kwargs):
+            with measured("method", cls.__name__+"."+name, exclusive=kwargs.get("exclusive")):
+                with original(*args, **kwargs) as value:
+                    yield value
+    else:
+        @wraps(original)
+        def replacement(*args, **kwargs):
+            with measured("method", cls.__name__+"."+name):
+                return original(*args, **kwargs)
+    setattr(cls, name, replacement)
+
+class RequestTiming:
+    def __init__(self, app): self.app = app
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        start = time.perf_counter()
+        sent = []
+        async def timed_send(message):
+            if message["type"].startswith("http.response"):
+                sent.append({"type":message["type"],"status":message.get("status"),"more_body":message.get("more_body"),"elapsed_ms":(time.perf_counter()-start)*1000})
+            await send(message)
+        with measured("http_server",scope["method"]+" "+scope["path"],response_messages=sent):
+            await self.app(scope, receive, timed_send)
+
+class DiagnosticServer(uvicorn.Server):
+    async def serve(self, sockets=None):
+        self.diagnostic_loop = asyncio.get_running_loop()
+        def exception_handler(loop, context):
+            LOOP_ERRORS.append({"message":context.get("message"),"exception":repr(context.get("exception"))})
+            loop.default_exception_handler(context)
+        self.diagnostic_loop.set_exception_handler(exception_handler)
+        async def lag():
+            expected = time.perf_counter()+0.01
+            while True:
+                await asyncio.sleep(0.01)
+                now=time.perf_counter()
+                LAG.append({"phase":PHASE,"ms":max(0,(now-expected)*1000)})
+                expected=now+0.01
+        task=asyncio.create_task(lag())
+        try: await super().serve(sockets=sockets)
+        finally:
+            task.cancel()
+            try: await task
+            except asyncio.CancelledError: pass
+
+def main():
+    global PHASE
+    sources=['apps/api/test_sessions.py','apps/api/app.py','apps/api/guided.py','apps/api/playback.py','robotops/cell/runtime.py','robotops/workflow/store.py','robotops/http_server.py','apps/erp_ui/app.js','tests/browser/test_investigation.py']
+    hashes={name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in sources}
+    result={"started_at_utc":datetime.now(timezone.utc).isoformat(),"scope":"Three native HTTP Synthetic guided lost-ACK clears, diagnostic instrumentation only; no browser/Blender/product source edits. SQLite connection subclass times real calls without changing SQL/durability/timeouts.","script_sha256":hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),"source_hashes":hashes,"operations":[],"issues":[],"probe_limit":3}
+    sqlite3.connect=timed_connect
+    for name in ['clear','_finish_clear','_remove_world','_cleanup_paths','make_engine','history']:
+        instrument(TestRegistry,name)
+    for name in ['access','exclusive']:
+        instrument(TestRegistry,name,context=True)
+    instrument(Store,'__init__');instrument(SyntheticRuntime,'__init__');instrument(SyntheticRuntime,'_reset')
+    listener=socket.socket();listener.bind(('127.0.0.1',0));origin=f'http://127.0.0.1:{listener.getsockname()[1]}'
+    service=None;thread=None;websocket=None
+    try:
+        app=create_workspace_app(OUT/'workspace',runtime_type=SyntheticRuntime,settings=Settings.hkm())
+        registry=app.state.test_registry
+        service=DiagnosticServer(uvicorn.Config(RequestTiming(app),loop=UVICORN_LOOP,log_level='warning',access_log=False))
+        thread=threading.Thread(target=service.run,kwargs={'sockets':[listener]},name='diagnostic-http-server',daemon=True)
+        thread.start();deadline=time.perf_counter()+10
+        while not service.started and thread.is_alive() and time.perf_counter()<deadline:time.sleep(0.01)
+        if not service.started:raise RuntimeError('server did not start')
+        result['origin']=origin;result['loop_type']=type(service.diagnostic_loop).__name__
+        with httpx.Client(base_url=origin,timeout=30) as client:
+            def get(path):
+                response=client.get(path);response.raise_for_status();return response.json()
+            def post(path,body):
+                response=client.post(path,json=body);response.raise_for_status();return response
+            for index,mode in enumerate(['no_stream','stream_closed_before_clear','stream_open_during_clear'],1):
+                PHASE=f'baseline_{index}'
+                fixture=get('/fixtures');product=fixture['products'][0]['product_id']
+                session=post('/v1/wms/tasks',{'request_id':str(uuid4()),'fault':'DROP_ACK_AFTER_EFFECT','mode':'guided','request':{'order_id':str(uuid4()),'lines':[{'order_line_id':'line','product_id':product,'source_id':fixture['product_sources'][product],'destination_id':fixture['destination_id']}]}}).json()
+                for _ in range(30):
+                    if session['status']=='UNKNOWN_OUTCOME':break
+                    if session['status']!='WAITING_AUTHORIZATION':raise RuntimeError('unexpected guided state '+session['status'])
+                    session=post(f"/integration/sessions/{session['session_id']}/authorize",{'request_id':str(uuid4()),'expected_revision':session['revision'],'stage':session['current_stage'],'decision':'approve'}).json()
+                if session['status']!='UNKNOWN_OUTCOME':raise RuntimeError('missing uncertainty')
+                engine=registry.engine('original');receipt=engine.runtime.journal(session['command_id']);world=engine.runtime.world()
+                if receipt.effect_count!=1 or world.step!=1:raise RuntimeError('baseline original effect not one')
+                before=get('/simulation-tests')['tests'][0]
+                if mode!='no_stream':
+                    websocket=ws_connect(origin.replace('http://','ws://')+f"/integration/sessions/{session['session_id']}/stream",open_timeout=5,close_timeout=2)
+                    stream_first=json.loads(websocket.recv(timeout=5))
+                    if stream_first['session_id']!=session['session_id']:raise RuntimeError('wrong stream identity')
+                    if mode=='stream_closed_before_clear':websocket.close();websocket=None
+                PHASE=f'clear_{index}';start=time.perf_counter();clear_id=str(uuid4());response=post('/simulation-tests/original/clear',{'request_id':clear_id,'expected_revision':before['revision']});elapsed=(time.perf_counter()-start)*1000;body=response.json()
+                op={'index':index,'mode':mode,'request_id':clear_id,'before':{'test_id':before['test_id'],'number':before['number'],'revision':before['revision'],'session_id':session['session_id'],'job_id':session['job_id'],'command_id':session['command_id'],'scene_epoch':world.scene_epoch,'state':session['status'],'receipt':receipt.model_dump(mode='json'),'world_step':world.step},'clear_http_status':response.status_code,'clear_ms':elapsed,'clear_response':body}
+                if websocket is not None:
+                    try:
+                        while True:websocket.recv(timeout=3)
+                    except ConnectionClosed as exc:op['stream_closed']={'code':exc.rcvd.code if exc.rcvd else None,'reason':exc.rcvd.reason if exc.rcvd else None}
+                    finally:websocket.close();websocket=None
+                PHASE=f'projection_{index}';projection_start=time.perf_counter()
+                after=get('/simulation-tests')['tests'][0]
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=4) as pool:
+                    reads=list(pool.map(get,['/orders','/cell','/fixtures','/deliveries']))
+                scene=get('/cell/scene');fresh=registry.engine('original').runtime.world()
+                op['projection_ms']=(time.perf_counter()-projection_start)*1000
+                op['after']={'history':after,'scene_epoch':fresh.scene_epoch,'world_step':fresh.step,'old_evidence_status':client.get(f"/jobs/{session['job_id']}/evidence").status_code,'scene_objects':len(scene['objects'])}
+                op['checks']={'clear_complete':body['cleanup_pending'] is False,'same_identity_number':(after['test_id'],after['number'])==(before['test_id'],before['number']),'revision_once':after['revision']==before['revision']+1,'zero_orders':after['order_count']==0 and reads[0]==[],'fresh_epoch':fresh.scene_epoch!=world.scene_epoch,'no_new_effect':fresh.step==0,'old_evidence_removed':op['after']['old_evidence_status']==404}
+                if not all(op['checks'].values()):result['issues'].append({'index':index,'checks':op['checks']})
+                result['operations'].append(op)
+    except BaseException as exc:
+        result['issues'].append({'exception':type(exc).__name__,'detail':str(exc)})
+        raise
+    finally:
+        PHASE='shutdown'
+        if websocket is not None:websocket.close()
+        if service is not None:service.should_exit=True
+        if thread is not None:thread.join(10)
+        result['server_thread_alive_after_10s']=thread.is_alive() if thread else None
+        result['loop_errors']=LOOP_ERRORS
+        result['server_connections']=len(service.server_state.connections) if service else None
+        result['server_tasks']=len(service.server_state.tasks) if service else None
+        result['retained_server_clients']=[len(getattr(s,'_clients',())) for s in getattr(service,'servers',[])] if service else []
+        listener.close()
+        sqlite3.connect=ORIGINAL_CONNECT
+        for cls,name,original in reversed(ORIGINALS):setattr(cls,name,original)
+        result['finished_at_utc']=datetime.now(timezone.utc).isoformat()
+        result['events']=sorted(EVENTS,key=lambda x:x['start_ms'])
+        result['loop_lag_max_ms_by_phase']={phase:max(x['ms'] for x in LAG if x['phase']==phase) for phase in sorted({x['phase'] for x in LAG})}
+        result['source_unchanged']=all(hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==digest for name,digest in hashes.items())
+        result['passed']=len(result['operations'])==3 and not result['issues'] and not result['server_thread_alive_after_10s'] and not LOOP_ERRORS and result['source_unchanged']
+        (OUT/'probe-result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+        print(json.dumps({'passed':result['passed'],'operations':[{'index':v['index'],'mode':v['mode'],'clear_ms':v['clear_ms'],'projection_ms':v['projection_ms'],'checks':v['checks']} for v in result['operations']],'issues':result['issues'],'server_thread_alive':result['server_thread_alive_after_10s'],'loop_errors':LOOP_ERRORS,'source_unchanged':result['source_unchanged'],'result':str(OUT/'probe-result.json')},indent=2))
+        if result['server_thread_alive_after_10s']:raise RuntimeError('owned server failed clean shutdown')
+
+if __name__=='__main__':main()

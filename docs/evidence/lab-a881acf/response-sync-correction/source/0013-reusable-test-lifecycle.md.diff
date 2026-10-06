@@ -1,0 +1,18 @@
+diff --git a/docs/adr/0013-reusable-test-lifecycle.md b/docs/adr/0013-reusable-test-lifecycle.md
+index 1209ed5..e202531 100644
+--- a/docs/adr/0013-reusable-test-lifecycle.md
++++ b/docs/adr/0013-reusable-test-lifecycle.md
+@@ -94,3 +94,13 @@ final refresh. Other clients' reads/downloads and real execution still block
+ destruction. Controlled delayed-body, failed-read and stalled-read tests exercise
+ this boundary without raising robot timeouts or retrying a pick. The original
+ failure is preserved in [read-race evidence](../evidence/test-reset-read-drain/README.md).
++
++Later repetition recorded a successful clear HTTP response taking 4.914 seconds.
++The browser's five-second dialog assertion started after the click and expired
++during the following view refresh. Lifecycle browser checks now wait for the
++exact management response and its completed body, validate its status and request
++identity, then check the UI. The existing 20-second request budget and five-second
++UI assertions remain in force for clear, delete and creation. Product behavior,
++durability, read-drain limits and robot execution timeouts are unchanged. The
++[failed campaign and request timing](../evidence/lab-a881acf/README.md) remain
++preserved; isolated native HTTP probes did not reproduce the original delay.

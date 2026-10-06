@@ -1,0 +1,102 @@
+{
+  "reviewed_at_utc": "2026-10-06T02:29:36.739228+00:00",
+  "reviewer": "/root/final_audit",
+  "review_type": "Independent read-only review of root-authored test correction",
+  "baseline_commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+  "current_test_file_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+  "baseline_test_file_sha256": "76e9143c6532c3182de636d42b5a46b158183bcce21a55a9f39bc240ee41811a",
+  "git_diff_sha256": "5cc07cba5899c2a08baa3dc2723545c41cd660aaa6b259e47a2394dd357b07fa",
+  "verdict": "NO_BLOCKING_FINDING_READY_FOR_FOCUSED_FOUR_CASE_VALIDATION",
+  "runtime_validation_performed_by_reviewer": false,
+  "scope": {
+    "changed_function": "test_clear_retries_same_test_and_delete_starts_again_at_one",
+    "existing_parameterizations": "SyntheticRuntime and BlenderRuntime x desktop 1440x1000 and compact 390x844",
+    "test_parameterization_unchanged": true,
+    "product_edit_in_reviewed_diff": false,
+    "timeouts_changed": false,
+    "retries_added": false
+  },
+  "checks": [
+    "All three exact endpoint/method response and requestfinished waiters are entered before the corresponding click.",
+    "Installed Playwright _page._expect_event uses the existing page timeout when timeout is omitted. browser_page sets it to 20,000 ms. Both waiters are armed concurrently before clicking; this is not two sequential added twenty-second sleeps.",
+    "requestfinished is awaited on context exit before parsing response JSON, so body completion is observed before the UI projection budget starts.",
+    "Response predicates match exact POST URL without filtering success status; HTTP failure is not silently ignored. Clear and delete require 200; create requires 201.",
+    "Clear/delete validate returned request identity against actual submitted body, expected test identities and cleanup_pending false.",
+    "Create validates returned test identity against its submitted request UUID. TestRegistry.start explicitly derives test_id from request_id, so this check matches the product contract.",
+    "Each existing five-second UI assertion remains unchanged, as do cancellation, current-test selection, scenario retention, product restoration, revision, prior-evidence 404, no-physical-request, old/new command identity, journal effect count, world/catalog cleanup and fresh Test 1 checks.",
+    "The final fresh history test identity assertion is strengthened to equal the actual creation response while still excluding original.",
+    "No product dialog dismissal, busy lifetime, read drain, API, world freshness or robot timeout behavior is changed by this diff."
+  ],
+  "ast_assertion_comparison": {
+    "baseline_assertions": 23,
+    "corrected_assertions": 33,
+    "removed_text": [
+      "fresh['tests'][0]['test_id'] != 'original'"
+    ],
+    "replacement": "The only removed assertion text is preserved as the tail of a stronger chained comparison binding the fresh ID to the returned ID.",
+    "new_assertion_texts": [
+      "cleared.value.status == 200",
+      "clear_result['request_id'] == cleared.value.request.post_data_json['request_id']",
+      "clear_result['test_id'] == 'original'",
+      "clear_result['cleanup_pending'] is False",
+      "deleted.value.status == 200",
+      "delete_result['request_id'] == deleted.value.request.post_data_json['request_id']",
+      "delete_result['deleted_test_ids'] == ['original']",
+      "delete_result['cleanup_pending'] is False",
+      "created.value.status == 201",
+      "created_test['test_id'] == created.value.request.post_data_json['request_id']",
+      "fresh['tests'][0]['test_id'] == created_test['test_id'] != 'original'"
+    ]
+  },
+  "native_probe_attribution": {
+    "path": "artifacts/clear-latency-20261006/probe-review.json",
+    "performed_by": "/root/requirements_audit",
+    "scope": "Three unchanged-product native HTTP SyntheticRuntime clear cases before this test edit; not the browser regression.",
+    "reported_results": "Clear approximately 159-170 ms and projection reads 95-110 ms, normal initialization dominant, no retained server state/errors. Original 4.914-second delay not reproduced and cause remains unproven.",
+    "source_limit": "Only nine explicitly listed input hashes were bound at probe start/end, not the whole tree or the subsequently edited browser test."
+  },
+  "validation_status": {
+    "root_reported_ruff_check_and_format": "PASS; not rerun by reviewer",
+    "focused_four_browser_cases": "PENDING; root to execute",
+    "new_clean_full_acceptance": "PENDING",
+    "old_a881_acceptance": "FAILED, preserved; test review does not promote it"
+  },
+  "limitations": [
+    "Static source and exact-diff review only; no new browser, tests, runtime, network, DB or ZIP scan.",
+    "No claim that the new waits guarantee all UI projections meet five seconds; focused execution must establish that.",
+    "No product performance claim or root-cause attribution for the historical server delay.",
+    "The independent duplicate-select efficiency concern is intentionally unchanged."
+  ],
+  "inputs": [
+    {
+      "path": "tests/browser/test_investigation.py",
+      "bytes": 28449,
+      "sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5"
+    },
+    {
+      "path": "apps/erp_ui/app.js",
+      "bytes": 50834,
+      "sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab"
+    },
+    {
+      "path": "apps/api/test_sessions.py",
+      "bytes": 35454,
+      "sha256": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8"
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/synchronization-independent-review.json",
+      "bytes": 9372,
+      "sha256": "b9f8764fc582163183ca8b250d7d1242bbaf372aa3979d77dacf3d6854b0302c"
+    },
+    {
+      "path": "artifacts/clear-latency-20261006/probe-review.json",
+      "bytes": 18611,
+      "sha256": "f417c45004d05745f2d36e9443c7736fa1b5a83f1379a7dc00fa10b572a5a756"
+    },
+    {
+      "path": ".venv/Lib/site-packages/playwright/_impl/_page.py",
+      "bytes": 55317,
+      "sha256": "3b79b620022bb32786a39fe6338b3f7fdc84f1c8cc5699a95c0eea278d0d0fdd"
+    }
+  ]
+}

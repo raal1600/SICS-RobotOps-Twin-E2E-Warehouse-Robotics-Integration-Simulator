@@ -1,0 +1,453 @@
+{
+  "archived_at_utc": "2026-10-06T02:39:29.023013+00:00",
+  "status": "RESPONSE_SYNC_CORRECTION_FOCUSED_VALIDATION_PASSED_FULL_ACCEPTANCE_PENDING",
+  "goal_status": "NOT_ACHIEVED",
+  "source_base_commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+  "source_state": "Uncommitted test synchronization +ADR correction at recorded hashes; not relabeled clean source A.",
+  "corrected_test_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+  "original_campaign_status": "FAILED unchanged;815pass then814pass1failure;wrapperexit1",
+  "change_scope": {
+    "production_code_changed": false,
+    "test_parameterization_changed": false,
+    "mutation_retries_added": false,
+    "request_timeout_seconds": 20,
+    "ui_assertion_timeout_seconds": 5,
+    "change": "Observe exact mutation response and completed body; check status/request identity/cleanup before unchanged UI assertions for clear/delete/create."
+  },
+  "native_probe": {
+    "operations": 3,
+    "pytest_cases": 0,
+    "status": "THREE_DIAGNOSTIC_CLEARS_PASS_ORIGINAL_LATENCY_NOT_REPRODUCED",
+    "operations_summary": [
+      {
+        "mode": "no_stream",
+        "clear_http_ms": 158.88409997569397,
+        "projection_read_ms": 110.14330000034533,
+        "clear_status": 200,
+        "checks": {
+          "clear_complete": true,
+          "same_identity_number": true,
+          "revision_once": true,
+          "zero_orders": true,
+          "fresh_epoch": true,
+          "no_new_effect": true,
+          "old_evidence_removed": true
+        }
+      },
+      {
+        "mode": "stream_closed_before_clear",
+        "clear_http_ms": 165.71260002092458,
+        "projection_read_ms": 95.12340000947006,
+        "clear_status": 200,
+        "checks": {
+          "clear_complete": true,
+          "same_identity_number": true,
+          "revision_once": true,
+          "zero_orders": true,
+          "fresh_epoch": true,
+          "no_new_effect": true,
+          "old_evidence_removed": true
+        }
+      },
+      {
+        "mode": "stream_open_during_clear",
+        "clear_http_ms": 169.61020001326688,
+        "projection_read_ms": 100.63879998051561,
+        "clear_status": 200,
+        "checks": {
+          "clear_complete": true,
+          "same_identity_number": true,
+          "revision_once": true,
+          "zero_orders": true,
+          "fresh_epoch": true,
+          "no_new_effect": true,
+          "old_evidence_removed": true
+        }
+      }
+    ],
+    "cleanup": {
+      "server_thread_alive_after_10s": false,
+      "loop_errors": [],
+      "server_connections": 0,
+      "server_tasks": 0,
+      "retained_server_clients": [
+        0
+      ]
+    },
+    "source_scope": {
+      "recorded_source_unchanged": true,
+      "meaning": "Only the nine files in source_hashes were hashed before startup and after teardown, and matched then. This does not assert whole-tree immutability or equality with subsequent root edits. Root later edited the browser test for response synchronization; recorded source hashes remain the diagnostic input boundary.",
+      "source_hashes_at_start_and_verified_end": {
+        "apps/api/test_sessions.py": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+        "apps/api/app.py": "af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888",
+        "apps/api/guided.py": "c38c1858ee6946b27e64654e434c2d33bf2cefcece043b568dd68d33c28a855e",
+        "apps/api/playback.py": "7c5ab9bdc9a9355b4f0dedcde0daeb242b1715367d589a0a9fc3f67b12c98f28",
+        "robotops/cell/runtime.py": "985d07f69ca4fdc400a56493b3d06d04af0d3a08baad493900c9c5773f8f665f",
+        "robotops/workflow/store.py": "d9e32944c193f3aa78a59755abdac778d7e1084320ae4989379017ac418f6ea7",
+        "robotops/http_server.py": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+        "apps/erp_ui/app.js": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+        "tests/browser/test_investigation.py": "7f8bb8675a9090265f48d7c13326f89cbc783582ea3e917d77cb028dd3c1147e"
+      }
+    },
+    "warnings": [
+      "Tool output recorded two websockets.sync.client deprecation warnings: connect() should be used as a context manager or explicit legacy mode. Connections were explicitly closed; server finished with zero connections/tasks/retained clients. This is diagnostic API style, not a product warning or test failure."
+    ],
+    "original_4913_785ms_cause_reproduced": false
+  },
+  "focused_browser": {
+    "result": {
+      "artifact": {
+        "path": "artifacts/lifecycle-response-sync.xml",
+        "sha256": "337be62d12a3295a68481d3d0fe99e7d8e4dad96f486571391da05c5d002412a",
+        "bytes": 913
+      },
+      "cases": [
+        {
+          "classname": "tests.browser.test_investigation",
+          "name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+          "time": "17.622"
+        },
+        {
+          "classname": "tests.browser.test_investigation",
+          "name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]",
+          "time": "46.130"
+        },
+        {
+          "classname": "tests.browser.test_investigation",
+          "name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-SyntheticRuntime]",
+          "time": "16.736"
+        },
+        {
+          "classname": "tests.browser.test_investigation",
+          "name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-BlenderRuntime]",
+          "time": "41.438"
+        }
+      ],
+      "case_count": 4,
+      "passed": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "4",
+          "time": "122.443",
+          "timestamp": "2026-10-06T04:30:37.623593+02:00",
+          "hostname": "DESKTOP-AZDXEDL"
+        }
+      ]
+    },
+    "exit": {
+      "source_base": "a881acfee55bb56e808882f724a150ad77d05eb6",
+      "started_at": "2026-10-06T02:30:34.9958971Z",
+      "test_sha256_before": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "test_source": "tests/browser/test_investigation.py",
+      "scope": "Four existing synthetic/Blender desktop/mobile lifecycle browser cases; exact mutation responses and completed bodies before unchanged UI assertions; no mutation retries",
+      "test_sha256_after": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "test_source_unchanged": true,
+      "exit_code": 0,
+      "ended_at": "2026-10-06T02:32:40.3178875Z"
+    },
+    "distinct_existing_cases": 4,
+    "console_seconds": 122.45
+  },
+  "controlled_delayed_body": {
+    "result": {
+      "artifact": {
+        "path": "artifacts/clear-response-delay-20261006/run/test.xml",
+        "sha256": "9f773680e15de7c4f3b9ce9e712dda0d2d1ae69a1d3cf82280ce6f0bddf44ecc",
+        "bytes": 418
+      },
+      "cases": [
+        {
+          "classname": "tests.browser.test_investigation",
+          "name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+          "time": "22.337"
+        }
+      ],
+      "case_count": 1,
+      "passed": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "1",
+          "time": "22.777",
+          "timestamp": "2026-10-06T04:35:26.392088+02:00",
+          "hostname": "DESKTOP-AZDXEDL"
+        }
+      ]
+    },
+    "exit": {
+      "exit_code": 0,
+      "process_exited": true,
+      "diagnostic_only": true,
+      "process_id": 40332,
+      "finished_at_utc": "2026-10-06T02:35:49.3770697Z"
+    },
+    "repeat_of_existing_focused_case": true,
+    "additional_unique_cases": 0,
+    "requested_delay_seconds": 5.25,
+    "observed_delay_seconds": 5.265089099993929,
+    "matching_requests": 1,
+    "delay_count": 1,
+    "injection": {
+      "path": "/simulation-tests/original/clear",
+      "method": "POST",
+      "request_seen_at_utc": "2026-10-06T02:35:34.188084+00:00",
+      "request_seen_monotonic": 218183.6977641,
+      "chunks": 1,
+      "status": 200,
+      "headers_ready_at_utc": "2026-10-06T02:35:34.357970+00:00",
+      "headers_ready_monotonic": 218183.867644,
+      "headers_sent_at_utc": "2026-10-06T02:35:34.358108+00:00",
+      "headers_sent_monotonic": 218183.8677771,
+      "body_ready_at_utc": "2026-10-06T02:35:34.358118+00:00",
+      "body_ready_monotonic": 218183.8677848,
+      "request_id": "511965a0-affa-44f0-b43d-373a979c1dd1",
+      "durable_clear_summary": {
+        "test_id": "original",
+        "cleanup_pending": false,
+        "revision": 2,
+        "order_count": 0,
+        "clearing": false
+      },
+      "response_body_sha256": "d171b60bb6e0181185de75b0229b9890e47514eb95b373f0138f1c20d4330cf8",
+      "response_body_bytes": 458,
+      "requested_delay_seconds": 5.25,
+      "delay_started_at_utc": "2026-10-06T02:35:34.358164+00:00",
+      "delay_started_monotonic": 218183.8678298,
+      "delay_finished_at_utc": "2026-10-06T02:35:39.623296+00:00",
+      "delay_finished_monotonic": 218189.1329189,
+      "actual_delay_seconds": 5.265089099993929,
+      "body_sent_at_utc": "2026-10-06T02:35:39.623464+00:00",
+      "body_sent_monotonic": 218189.1330749,
+      "request_finished_at_utc": "2026-10-06T02:35:39.623489+00:00",
+      "request_finished_monotonic": 218189.1330957
+    },
+    "checks": {
+      "one_exact_collected_case": true,
+      "existing_case_setup_call_teardown_passed": true,
+      "one_target_request": true,
+      "one_successful_body_delay": true,
+      "requested_5_25_seconds": true,
+      "actual_delay_at_least_requested": true,
+      "headers_sent_before_delay": true,
+      "body_sent_after_delay": true,
+      "source_inputs_unchanged": true,
+      "pytest_exit0": true
+    },
+    "setup_call_teardown": [
+      {
+        "nodeid": "tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration_seconds": 0.6993769999826327,
+        "longrepr": null
+      },
+      {
+        "nodeid": "tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+        "when": "call",
+        "outcome": "passed",
+        "duration_seconds": 20.733261899993522,
+        "longrepr": null
+      },
+      {
+        "nodeid": "tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration_seconds": 0.9047945000056643,
+        "longrepr": null
+      }
+    ],
+    "source_hashes_unchanged": true,
+    "warning": "PytestCacheWarning: old .pytest_cache write denied; test and teardown passed. No retry or cache modification performed.",
+    "earlier_launcher_attempt": "Direct PowerShell & script invocation rejected by execution policy before any run directory or test was created. Confirmed run directory absent before process-local launcher invocation. Not an automatic approval rejection or mutation retry.",
+    "actual_outer_invocation": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File artifacts/clear-response-delay-20261006/run-diagnostic.ps1 -RunDiagnostic"
+  },
+  "count_interpretation": {
+    "focused_existing_unique_cases": 4,
+    "controlled_repeat_executions": 1,
+    "total_unique_pytest_cases_across_these_runs": 4,
+    "native_diagnostic_operations_not_tests": 3
+  },
+  "quality_checks": [
+    {
+      "command": "uv run --locked python -m tools.dev lint",
+      "observed_exit_code": 0,
+      "observed_output": "All checks passed!\n203 files already formatted"
+    },
+    {
+      "command": "uv run --locked python -m tools.dev typecheck",
+      "observed_exit_code": 0,
+      "observed_output": "Success: no issues found in 67 source files"
+    },
+    {
+      "command": "uv run --locked python -m tools.drift_check",
+      "observed_exit_code": 0,
+      "observed_passed": true,
+      "errors": [],
+      "must_count": 169,
+      "source_count": 31,
+      "diagram_count": 13
+    }
+  ],
+  "nine_source_hashes_verified_at_archive": [
+    {
+      "path": "tests/browser/test_investigation.py",
+      "recorded_start_and_end_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "archive_time_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "matches": true
+    },
+    {
+      "path": "tests/conftest.py",
+      "recorded_start_and_end_sha256": "ff23b5cbd01f1d2ba3004c842c50e625dd618340e8507d8e1b54d9b3db1cdda0",
+      "archive_time_sha256": "ff23b5cbd01f1d2ba3004c842c50e625dd618340e8507d8e1b54d9b3db1cdda0",
+      "matches": true
+    },
+    {
+      "path": "apps/api/app.py",
+      "recorded_start_and_end_sha256": "af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888",
+      "archive_time_sha256": "af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888",
+      "matches": true
+    },
+    {
+      "path": "apps/api/test_sessions.py",
+      "recorded_start_and_end_sha256": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+      "archive_time_sha256": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+      "matches": true
+    },
+    {
+      "path": "apps/api/guided.py",
+      "recorded_start_and_end_sha256": "c38c1858ee6946b27e64654e434c2d33bf2cefcece043b568dd68d33c28a855e",
+      "archive_time_sha256": "c38c1858ee6946b27e64654e434c2d33bf2cefcece043b568dd68d33c28a855e",
+      "matches": true
+    },
+    {
+      "path": "apps/erp_ui/app.js",
+      "recorded_start_and_end_sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "archive_time_sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "matches": true
+    },
+    {
+      "path": "robotops/cell/runtime.py",
+      "recorded_start_and_end_sha256": "985d07f69ca4fdc400a56493b3d06d04af0d3a08baad493900c9c5773f8f665f",
+      "archive_time_sha256": "985d07f69ca4fdc400a56493b3d06d04af0d3a08baad493900c9c5773f8f665f",
+      "matches": true
+    },
+    {
+      "path": "robotops/workflow/store.py",
+      "recorded_start_and_end_sha256": "d9e32944c193f3aa78a59755abdac778d7e1084320ae4989379017ac418f6ea7",
+      "archive_time_sha256": "d9e32944c193f3aa78a59755abdac778d7e1084320ae4989379017ac418f6ea7",
+      "matches": true
+    },
+    {
+      "path": "robotops/http_server.py",
+      "recorded_start_and_end_sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "archive_time_sha256": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f",
+      "matches": true
+    }
+  ],
+  "small_browser_jsons": [
+    {
+      "group": "focused",
+      "case_name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+      "artifact_stamp_utc": "20261006T023038470574",
+      "archive_path": "docs/evidence/lab-a881acf/response-sync-correction/focused/browser-json/20261006T023038470574-viewport0-SyntheticRuntime.json",
+      "request_count": 351,
+      "page_errors": [],
+      "console_errors": [],
+      "test_source_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "binding": "Exact existing case name, run timestamp interval and test source hash. Browser JSON itself does not record fixture directory; launcher command retains that separate binding.",
+      "new_trace_or_visual_review": false
+    },
+    {
+      "group": "focused",
+      "case_name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-BlenderRuntime]",
+      "artifact_stamp_utc": "20261006T023056137727",
+      "archive_path": "docs/evidence/lab-a881acf/response-sync-correction/focused/browser-json/20261006T023056137727-viewport0-BlenderRuntime.json",
+      "request_count": 641,
+      "page_errors": [],
+      "console_errors": [],
+      "test_source_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "binding": "Exact existing case name, run timestamp interval and test source hash. Browser JSON itself does not record fixture directory; launcher command retains that separate binding.",
+      "new_trace_or_visual_review": false
+    },
+    {
+      "group": "focused",
+      "case_name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-SyntheticRuntime]",
+      "artifact_stamp_utc": "20261006T023142726748",
+      "archive_path": "docs/evidence/lab-a881acf/response-sync-correction/focused/browser-json/20261006T023142726748-viewport1-SyntheticRuntime.json",
+      "request_count": 356,
+      "page_errors": [],
+      "console_errors": [],
+      "test_source_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "binding": "Exact existing case name, run timestamp interval and test source hash. Browser JSON itself does not record fixture directory; launcher command retains that separate binding.",
+      "new_trace_or_visual_review": false
+    },
+    {
+      "group": "focused",
+      "case_name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport1-BlenderRuntime]",
+      "artifact_stamp_utc": "20261006T023158883193",
+      "archive_path": "docs/evidence/lab-a881acf/response-sync-correction/focused/browser-json/20261006T023158883193-viewport1-BlenderRuntime.json",
+      "request_count": 592,
+      "page_errors": [],
+      "console_errors": [],
+      "test_source_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "binding": "Exact existing case name, run timestamp interval and test source hash. Browser JSON itself does not record fixture directory; launcher command retains that separate binding.",
+      "new_trace_or_visual_review": false
+    },
+    {
+      "group": "delayed-body",
+      "case_name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+      "artifact_stamp_utc": "20261006T023527163778",
+      "archive_path": "docs/evidence/lab-a881acf/response-sync-correction/delayed-body/browser-json/20261006T023527163778-viewport0-SyntheticRuntime.json",
+      "request_count": 379,
+      "page_errors": [],
+      "console_errors": [],
+      "test_source_sha256": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+      "binding": "Exact existing case name, run timestamp interval and test source hash. Browser JSON itself does not record fixture directory; launcher command retains that separate binding.",
+      "new_trace_or_visual_review": false
+    }
+  ],
+  "proof_limits": [
+    "Original4.9s latency was not reproduced or attributed to a product/OS/locking cause.",
+    "No new clean full corrected-source acceptance, final manual loop, full trace/DOM/secret/PDF review or remote PASS.",
+    "Native three diagnostic clears are not repository pytest cases; delayed-body run repeats one of the focused four.",
+    "Saved independent reviews keep original observation times and pending statuses; later terminal files establish focused results.",
+    "No new runtime, test, browser, DB, render or ZIP scan performed to create this archive."
+  ],
+  "archive": {
+    "copied_files": 28,
+    "copied_bytes": 5092896,
+    "empty_inputs_not_copied": [
+      {
+        "path": "artifacts/lifecycle-response-sync.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "reason": "Empty stderr is preserved as a hash/size fact; not copied."
+      },
+      {
+        "path": "artifacts/clear-response-delay-20261006/run/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "reason": "Empty stderr is preserved as a hash/size fact; not copied."
+      }
+    ],
+    "parent_baseline_unchanged": {
+      "summary.json": "c8b58ed088200fdfe07c83b24b657783991b457696fc15ab5379ccbdb6866e52",
+      "inputs.json": "eb9c1187f8ee041527b5af487ca61807351f4500fb06ac4c1c9830b3e76eb3d3",
+      "root-review.json": "7c26e0f01faa8aac4ddd69fda4fe52506aea84563f808e04546e8eb8ba2dfba8"
+    },
+    "root_review_required": true
+  }
+}

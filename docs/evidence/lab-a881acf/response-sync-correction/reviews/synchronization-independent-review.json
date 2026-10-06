@@ -1,0 +1,159 @@
+{
+  "reviewed_at_utc": "2026-10-06T02:26:52.752480+00:00",
+  "reviewer": "/root/final_audit",
+  "review_type": "Independent static synchronization assessment of current failure; no runtime reproduction",
+  "source": {
+    "commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+    "dirty": false,
+    "source_sha256": "cc354a6e622b244619e4766280632822781ae974770122ed3850fe136f90150f"
+  },
+  "case": "tests.browser.test_investigation::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+  "verdict": "RECOMMEND_EXACT_MUTATION_RESPONSE_BODY_BOUNDARY_BEFORE_EXISTING_UI_ASSERTIONS",
+  "product_bug_proven": false,
+  "full_acceptance_passed": false,
+  "evidence_attribution": "Trace timings and terminal outcome are read from evidence_pack compact receipts; this review independently inspected implementation, browser test and lifecycle docs. It did not reopen or scan the ZIP.",
+  "actual_timing": {
+    "confirm_click_ms": 9549.715,
+    "clear_POST_start_ms": 9554.007,
+    "clear_HTTP_status": 200,
+    "clear_total_ms": 4913.785,
+    "clear_server_wait_ms": 4913.316,
+    "clear_receive_ms": 0.469,
+    "clear_calculated_end_ms": 14467.792,
+    "dialog_assert_start_ms": 9559.186,
+    "dialog_nominal_budget_ms": 5000,
+    "dialog_assert_failure_ms": 14575.24,
+    "remaining_nominal_UI_budget_after_clear_ms": 91.394,
+    "post_clear_required_first_refresh_completed_range_ms": [
+      14799.109,
+      14828.457
+    ],
+    "cell_scene_body_completion_known": false,
+    "recorded_page_errors": [],
+    "recorded_console_errors": []
+  },
+  "source_findings": [
+    {
+      "path": "tests/browser/test_investigation.py",
+      "lines": "490-496,71",
+      "fact": "The clear click is followed immediately by Playwright expect(not visible), which has a five-second assertion budget. The existing page operation timeout is twenty seconds. The test does not first observe its mutation response."
+    },
+    {
+      "path": "apps/erp_ui/app.js",
+      "lines": "571-591",
+      "fact": "manageTests marks busy, disables controls, drains pending reads, awaits the operation, then closes the dialog. Its finally block refreshes more state before releasing busy. Failure leaves the dialog/error visible; closure before operation completion would change the contract."
+    },
+    {
+      "path": "apps/erp_ui/app.js",
+      "lines": "633-645,153-187",
+      "fact": "Clear operation awaits POST, refreshHistory, and selectTest. refreshHistory can itself select the same test when clear changes its revision, making the later explicit selection redundant. Each select awaits refresh, motion and integration loading."
+    },
+    {
+      "path": "apps/erp_ui/app.js",
+      "lines": "403-450",
+      "fact": "A newly cleared empty test refresh awaits orders/cell/fixtures/deliveries, then cell/scene and guide projection. The trace shows the first four required GETs still finishing after the failed assertion."
+    },
+    {
+      "path": "apps/api/test_sessions.py",
+      "lines": "595-652",
+      "fact": "Clear commits intent and incremented revision, removes the old world, initializes the fresh world, then returns TestClearing with cleanup_pending and current history. HTTP work is not just a modal dismissal."
+    },
+    {
+      "path": "docs/adr/0013-reusable-test-lifecycle.md",
+      "lines": "29-50,87-95",
+      "fact": "The documented five seconds bounds stalled pre-mutation view draining. It is not an end-to-end clear/reinitialization/UI SLA. Pending cleanup must stay visible, and controls remain busy through final refresh."
+    }
+  ],
+  "assessment": [
+    "The observed assertion conflates backend completion and subsequent UI projection in one five-second window. After the successful complete POST response, only about 91 ms of its nominal budget remained.",
+    "Necessary first-refresh responses had not completed at assertion failure. This supports synchronization correction without changing product closure semantics.",
+    "The trace does not establish why the backend took about 4.9 seconds, that this latency is normal, eventual dialog closure, or success of the whole lifecycle journey. Await the separately owned bounded native profiling result before attributing server latency.",
+    "No stale-state, failed HTTP response, JavaScript exception or swallowed error is demonstrated by the compact evidence. A product bug remains possible only if additional evidence demonstrates an unmet lifecycle contract."
+  ],
+  "minimal_recommendation": {
+    "location": "tests/browser/test_investigation.py clear confirmation at line 492",
+    "steps": [
+      "Arm a waiter before clicking for the exact POST URL origin + /simulation-tests/original/clear; match method and exact endpoint, not status, so failure responses surface immediately.",
+      "Use the existing twenty-second page-operation budget for response completion, without a blanket timeout increase. Read/validate the complete JSON body and assert HTTP success, original test identity, matching request identity and cleanup_pending == false.",
+      "For an explicitly bounded body-completion wait, arm expect_request_finished for the same exact POST alongside expect_response before the click, using the existing page-operation timeout. Read response.json only after requestfinished. This is a condition-based wait, not a sleep or retry.",
+      "Then retain the existing five-second not-visible, cleared-message, selected-test, create-enabled and scenario-preservation assertions unchanged.",
+      "Preserve all existing no-physical-request, journal effect, revision, product restoration, old-evidence 404, subsequent-pick identity/effect and deletion/recreation assertions."
+    ],
+    "no_product_edit_required_by_this_evidence": true,
+    "do_not": [
+      "Increase the generic expect timeout",
+      "Close the dialog on click or merely upon HTTP headers",
+      "Retry clear or other mutations automatically",
+      "Treat HTTP 200 alone as successful cleanup",
+      "Remove or bypass any semantic/physical-effect assertion"
+    ]
+  },
+  "adjacent_same_journey": [
+    {
+      "lines": "523-525",
+      "action": "delete selected test",
+      "finding": "Also click followed immediately by UI projection assertions; same exact mutation-response/body synchronization is appropriate if the authorized test correction covers this journey."
+    },
+    {
+      "lines": "531-534",
+      "action": "create replacement test",
+      "finding": "Also click followed immediately by UI projection assertions; synchronize its exact creation response/body using existing request budget, retain five-second UI assertions and final fresh identity/number checks."
+    }
+  ],
+  "duplicate_refresh_assessment": {
+    "exists_in_source": true,
+    "description": "Revision-sensitive refreshHistory can call selectTest; clear then calls selectTest again, and manageTests finally refreshes once more.",
+    "classification": "Independent efficiency concern; not a demonstrated correctness defect or required correction for this failure.",
+    "causality_limit": "The assertion already expired while the first required refresh was in progress, before a later sequential redundant selection could be responsible. Optimizing duplicate work is not a substitute for observing mutation completion.",
+    "recommendation": "Keep product refactoring separate until timing/behavior evidence justifies it."
+  },
+  "scope_limits": [
+    "No source or test edits.",
+    "No tests, browser, network, database, server or runtime probes.",
+    "No new ZIP scan or screenshot review.",
+    "No independent backend latency reproduction; requirements_audit owns that work.",
+    "No formal pass promotion; current A second suite has one failure and full acceptance remains failed."
+  ],
+  "inputs": [
+    {
+      "path": "apps/erp_ui/app.js",
+      "sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "bytes": 50834
+    },
+    {
+      "path": "apps/api/test_sessions.py",
+      "sha256": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+      "bytes": 35454
+    },
+    {
+      "path": "tests/browser/test_investigation.py",
+      "sha256": "7f8bb8675a9090265f48d7c13326f89cbc783582ea3e917d77cb028dd3c1147e",
+      "bytes": 26365
+    },
+    {
+      "path": "docs/adr/0013-reusable-test-lifecycle.md",
+      "sha256": "374c6d3efdf34020b3399866521b8a29f8430198b96cba313e6dafc977b33860",
+      "bytes": 6153
+    },
+    {
+      "path": "docs/implementation/persistence.md",
+      "sha256": "21858c81fd3104e66ee5b54ce3f61e356050562ed0e185c0080e4e3127c513d3",
+      "bytes": 7338
+    },
+    {
+      "path": "docs/implementation/acceptance.md",
+      "sha256": "a16f2d0e4588184cb2121558c5ed63f7b88c59419dc2471ca14ae4cc7a9ec734",
+      "bytes": 9455
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/trace-timing.json",
+      "sha256": "38be981ffe9d8316fb285b3c406a6a7d299bca609d3ecd7196d5cc3c2082f1ed",
+      "bytes": 8356
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/failure-review.json",
+      "sha256": "82d528f31a252fc879585555dc51790b198bee423a58de0790c8c930363cc431",
+      "bytes": 8855
+    }
+  ]
+}

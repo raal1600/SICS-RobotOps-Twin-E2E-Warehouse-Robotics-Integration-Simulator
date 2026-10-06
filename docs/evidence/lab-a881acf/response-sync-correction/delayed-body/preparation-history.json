@@ -1,0 +1,44 @@
+{
+  "prepared_at_utc": "2026-10-06T02:33:43.400777+00:00",
+  "status": "PREPARATION_ONLY_NOT_EXECUTED",
+  "plugin": {
+    "path": "artifacts/clear-response-delay-20261006/clear_response_delay_plugin.py",
+    "bytes": 10612,
+    "sha256": "3c731ebffd73146fcc6eb54745ab45a9f1744490f7c4edba4433d90eb5bbb1c1"
+  },
+  "launcher": {
+    "path": "artifacts/clear-response-delay-20261006/run-diagnostic.ps1",
+    "bytes": 3366,
+    "sha256": "894f9b9c4ab772432f5e6119d8c3393dfb895b2dd477a5d55225924ca160508b"
+  },
+  "source_hashes": {
+    "tests/browser/test_investigation.py": "1bde15b45d789adb35b0f55cebc667e2cc06d2ab167dc9dad095fb16cae5f5b5",
+    "tests/conftest.py": "ff23b5cbd01f1d2ba3004c842c50e625dd618340e8507d8e1b54d9b3db1cdda0",
+    "apps/api/app.py": "af62fdc2423ee7838b9d4ff1e76631c3dcb633f70a7f44d731057591d2e08888",
+    "apps/api/test_sessions.py": "f3de9bc983d3c4c5a0a773a4469c189ff6c6f6f38c803d908e74532d20a795b8",
+    "apps/api/guided.py": "c38c1858ee6946b27e64654e434c2d33bf2cefcece043b568dd68d33c28a855e",
+    "apps/erp_ui/app.js": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+    "robotops/cell/runtime.py": "985d07f69ca4fdc400a56493b3d06d04af0d3a08baad493900c9c5773f8f665f",
+    "robotops/workflow/store.py": "d9e32944c193f3aa78a59755abdac778d7e1084320ae4989379017ac418f6ea7",
+    "robotops/http_server.py": "3c701bbbce195f3808e2426f00cb650367dc2118b97e01ae62329f0b248fd02f"
+  },
+  "expected_nodeid": "tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+  "requested_delay_seconds": 5.25,
+  "requested_delay_count": 1,
+  "purpose": "Prove existing corrected test waits for completed clear response body before unchanged5s DOM checks; original20s fixture wait bound remains unchanged.",
+  "validation": "Plugin ast.parse and compile only; PowerShell launcher ParseFile reports zero errors. Neither imported/executed; no pytest/browser/native server launched.",
+  "outputs_expected_later": [
+    "run/command.json",
+    "run/owner.json",
+    "run/stdout.log",
+    "run/stderr.log",
+    "run/test.xml",
+    "run/diagnostic-result.json",
+    "run/exit.json"
+  ],
+  "limits": [
+    "One explicit diagnostic, not a normal full-suite pass or extra repository testcase.",
+    "No original-source negative rerun; archived4.914s failure remains negative evidence.",
+    "No product code or permanent test changes, no retry."
+  ]
+}

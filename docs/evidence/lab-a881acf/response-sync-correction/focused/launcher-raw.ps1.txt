@@ -1,0 +1,17 @@
+$ErrorActionPreference = 'Stop'
+Set-Location -LiteralPath 'C:\Users\ramis\source\repos\robotops-twin'
+foreach ($taskPath in @('artifacts/lifecycle-response-sync-exit.json','artifacts/lifecycle-response-sync.xml','artifacts/pytest-lifecycle-response-sync')) {
+    if (Test-Path -LiteralPath $taskPath) { throw "Existing evidence must be reviewed, not overwritten: $taskPath" }
+}
+$taskBase = (& git rev-parse HEAD).Trim()
+if ($taskBase -ne 'a881acfee55bb56e808882f724a150ad77d05eb6') { throw 'Unexpected source base' }
+$taskHash = (Get-FileHash -LiteralPath 'tests/browser/test_investigation.py' -Algorithm SHA256).Hash.ToLowerInvariant()
+$env:BLENDER_EXECUTABLE = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
+$env:PYTEST_ADDOPTS = '-o cache_dir=artifacts/pytest-cache-lifecycle-response-sync -o faulthandler_timeout=300'
+$env:PYTHONUNBUFFERED = '1'
+$taskStarted = [DateTime]::UtcNow.ToString('o')
+& 'C:\Users\ramis\.local\bin\uv.exe' run --locked python -m pytest 'tests/browser/test_investigation.py::test_clear_retries_same_test_and_delete_starts_again_at_one' --basetemp=artifacts/pytest-lifecycle-response-sync --junitxml=artifacts/lifecycle-response-sync.xml -q
+$taskExit = $LASTEXITCODE
+$taskHashAfter = (Get-FileHash -LiteralPath 'tests/browser/test_investigation.py' -Algorithm SHA256).Hash.ToLowerInvariant()
+@{source_base=$taskBase;exit_code=$taskExit;started_at=$taskStarted;ended_at=[DateTime]::UtcNow.ToString('o');test_source='tests/browser/test_investigation.py';test_sha256_before=$taskHash;test_sha256_after=$taskHashAfter;test_source_unchanged=($taskHash -eq $taskHashAfter);scope='Four existing synthetic/Blender desktop/mobile lifecycle browser cases; exact mutation responses and completed bodies before unchanged UI assertions; no mutation retries'} | ConvertTo-Json | Set-Content -LiteralPath 'artifacts/lifecycle-response-sync-exit.json' -Encoding UTF8
+exit $taskExit

@@ -1,0 +1,240 @@
+{
+  "reviewed_at_utc": "2026-10-06T02:24:58.187958+00:00",
+  "source": {
+    "commit": "a881acfee55bb56e808882f724a150ad77d05eb6",
+    "dirty": false,
+    "source_sha256": "cc354a6e622b244619e4766280632822781ae974770122ed3850fe136f90150f"
+  },
+  "campaign": "docs/evidence/acceptance/20261006T012424",
+  "verdict": "FIRST_PASS_PASSED_SECOND_PASS_FAILED_LOCAL_ACCEPTANCE_FAILED",
+  "overall_acceptance_passed": false,
+  "goal_status": "NOT_ACHIEVED",
+  "terminal": {
+    "source": "a881acfee55bb56e808882f724a150ad77d05eb6",
+    "started_at": "2026-10-06T01:24:24.2394459Z",
+    "ended_at": "2026-10-06T02:21:59.7083624Z",
+    "exit_code": 1
+  },
+  "local_gates_passed": 18,
+  "local_gates_failed": [
+    "tests_2",
+    "repeatability"
+  ],
+  "remote_gates_pending": [
+    "ci",
+    "pages",
+    "publication_remote"
+  ],
+  "junit": {
+    "artifact": {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/tests-2.xml",
+      "sha256": "a219cfb1ea61eea0553b0f05b1a35d5fdd376e2ce390fa5552f19feaa393a517",
+      "bytes": 129601
+    },
+    "testcases": 815,
+    "outcomes": {
+      "passed": 814,
+      "failure": 1
+    },
+    "failed_case": {
+      "classname": "tests.browser.test_investigation",
+      "name": "test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]",
+      "time": "15.818"
+    },
+    "failure_artifact": {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/junit-failure.json",
+      "sha256": "39daa0c1f57270ecfc90a469735e21f5e475bcd3d1b36ae23b6756b004b0b055",
+      "bytes": 4229
+    }
+  },
+  "browser": {
+    "artifact": {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/browser.json",
+      "sha256": "4d6075026937883c1c9556933c27a5449f732d88950e1f58dbaf1c075f566620",
+      "bytes": 25856
+    },
+    "request_count": 164,
+    "page_errors": [],
+    "console_errors": [],
+    "clear_requests": [
+      {
+        "index": 157,
+        "method": "POST",
+        "url": "http://127.0.0.1:52208/simulation-tests/original/clear",
+        "body": {
+          "request_id": "335a774b-1d50-4c0e-8508-537477d769b3",
+          "expected_revision": 1
+        }
+      }
+    ],
+    "following_requests": [
+      {
+        "index": 158,
+        "method": "GET",
+        "url": "http://127.0.0.1:52208/simulation-tests",
+        "body": null
+      },
+      {
+        "index": 159,
+        "method": "GET",
+        "url": "http://127.0.0.1:52208/orders",
+        "body": null
+      },
+      {
+        "index": 160,
+        "method": "GET",
+        "url": "http://127.0.0.1:52208/cell",
+        "body": null
+      },
+      {
+        "index": 161,
+        "method": "GET",
+        "url": "http://127.0.0.1:52208/fixtures",
+        "body": null
+      },
+      {
+        "index": 162,
+        "method": "GET",
+        "url": "http://127.0.0.1:52208/deliveries",
+        "body": null
+      },
+      {
+        "index": 163,
+        "method": "GET",
+        "url": "http://127.0.0.1:52208/cell/scene",
+        "body": null
+      }
+    ],
+    "request_log_limit": "method/url/body only; timing/status comes from separately bounded trace metadata"
+  },
+  "timing_artifact": {
+    "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/trace-timing.json",
+    "sha256": "38be981ffe9d8316fb285b3c406a6a7d299bca609d3ecd7196d5cc3c2082f1ed",
+    "bytes": 8356
+  },
+  "findings": [
+    {
+      "kind": "OBSERVED",
+      "detail": "Confirm click reaches clear POST within about4.3ms; this instance does not show a5s pre-POST drain delay."
+    },
+    {
+      "kind": "OBSERVED",
+      "detail": "Clear POST succeeds with HTTP200 after4913.785ms;4913.316ms is recorded wait time."
+    },
+    {
+      "kind": "OBSERVED",
+      "detail": "The5s hidden-dialog assertion fails while subsequent refresh GETs are still completing; four completed refreshes finish after the assertion and cell/scene begins after it."
+    },
+    {
+      "kind": "LIMIT",
+      "detail": "The trace proves the expensive clear HTTP round trip and later refresh overlap, not the backend reason for that wait. Server read-drain/lock/fs attribution requires source/log evidence or focused measurement."
+    },
+    {
+      "kind": "LIMIT",
+      "detail": "No inference of eventual dialog closure, absent errors outside captured scope, fullDOM/secret audit, or manual proof."
+    }
+  ],
+  "source_checks": [
+    {
+      "path": "apps/erp_ui/app.js",
+      "recorded_sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "current_sha256": "9bb3c54fc98d345415f8281327c38765ee8a546ef7d7ffd7ee93c81ee2d251ab",
+      "matches": true
+    },
+    {
+      "path": "apps/erp_ui/integration-console.js",
+      "recorded_sha256": "eb5f7d6c27189e7e17c462698158a3018413bf3169ebdd5f1e8cfc5662b28175",
+      "current_sha256": "eb5f7d6c27189e7e17c462698158a3018413bf3169ebdd5f1e8cfc5662b28175",
+      "matches": true
+    },
+    {
+      "path": "apps/erp_ui/playback.js",
+      "recorded_sha256": "b5403c4f2ae03b4046a962ecdca27440df7d824209474ab6ea575cc4baf9fe0e",
+      "current_sha256": "b5403c4f2ae03b4046a962ecdca27440df7d824209474ab6ea575cc4baf9fe0e",
+      "matches": true
+    },
+    {
+      "path": "apps/erp_ui/scene-view.js",
+      "recorded_sha256": "f51ffb0711b8f5b3cb2d5c523a7d7cce1e4c8531deb61248ab89b5c3320be6e3",
+      "current_sha256": "f51ffb0711b8f5b3cb2d5c523a7d7cce1e4c8531deb61248ab89b5c3320be6e3",
+      "matches": true
+    },
+    {
+      "path": "apps/erp_ui/workflow-guide.js",
+      "recorded_sha256": "7999b1055528382962ad2c1651f1ed58dac231a7931127ca4c6cbf62c685b488",
+      "current_sha256": "7999b1055528382962ad2c1651f1ed58dac231a7931127ca4c6cbf62c685b488",
+      "matches": true
+    },
+    {
+      "path": "apps/erp_ui/index.html",
+      "recorded_sha256": "4567d2903b4093a91bead7de8f801532d94d84452442e66e9fc912551651c8f4",
+      "current_sha256": "4567d2903b4093a91bead7de8f801532d94d84452442e66e9fc912551651c8f4",
+      "matches": true
+    },
+    {
+      "path": "apps/erp_ui/theme.css",
+      "recorded_sha256": "5b91370e31672fe4b64c49cf1c521f219bc5b790e98247658217a88243075503",
+      "current_sha256": "5b91370e31672fe4b64c49cf1c521f219bc5b790e98247658217a88243075503",
+      "matches": true
+    },
+    {
+      "path": "tests/browser/test_investigation.py",
+      "recorded_sha256": "7f8bb8675a9090265f48d7c13326f89cbc783582ea3e917d77cb028dd3c1147e",
+      "current_sha256": "7f8bb8675a9090265f48d7c13326f89cbc783582ea3e917d77cb028dd3c1147e",
+      "matches": true
+    }
+  ],
+  "all8_recorded_source_hashes_match": true,
+  "inputs": [
+    {
+      "path": "artifacts/investigation-browser/20261006T020044578397/test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]/browser.json",
+      "sha256": "4d6075026937883c1c9556933c27a5449f732d88950e1f58dbaf1c075f566620",
+      "bytes": 25856
+    },
+    {
+      "path": "artifacts/investigation-browser/20261006T020044578397/test_clear_retries_same_test_and_delete_starts_again_at_one[viewport0-SyntheticRuntime]/trace.zip",
+      "sha256": "c3116891ab774cd99233f678604c79499da13dc735d435be86d2d745821e789a",
+      "bytes": 4848317
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T012424/tests-2.xml",
+      "sha256": "a219cfb1ea61eea0553b0f05b1a35d5fdd376e2ce390fa5552f19feaa393a517",
+      "bytes": 129601
+    },
+    {
+      "path": "docs/evidence/acceptance/20261006T012424/manifest.json",
+      "sha256": "815179ee56c7f918a6fb60ea884c750c16158cf4410dc4e9b8d98d0d41d2b4c8",
+      "bytes": 29012
+    },
+    {
+      "path": "artifacts/acceptance-http-lifecycle-exit.json",
+      "sha256": "26535f0dfd268f84e7960738b8bdb02d47fc009123bcfe2f444f543bb56ac675",
+      "bytes": 192
+    }
+  ],
+  "preserved_copies": [
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/browser.json",
+      "sha256": "4d6075026937883c1c9556933c27a5449f732d88950e1f58dbaf1c075f566620",
+      "bytes": 25856
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/tests-2.xml",
+      "sha256": "a219cfb1ea61eea0553b0f05b1a35d5fdd376e2ce390fa5552f19feaa393a517",
+      "bytes": 129601
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/terminal-manifest.json",
+      "sha256": "815179ee56c7f918a6fb60ea884c750c16158cf4410dc4e9b8d98d0d41d2b4c8",
+      "bytes": 29012
+    },
+    {
+      "path": "artifacts/final-evidence-pack/a881acf/pass2-clear-failure/terminal-exit.json",
+      "sha256": "26535f0dfd268f84e7960738b8bdb02d47fc009123bcfe2f444f543bb56ac675",
+      "bytes": 192
+    }
+  ],
+  "original_artifacts_modified": false,
+  "preparation_helper_executed": false,
+  "next_action": "Combine these actual timestamps with requirements_audit static clear/read-drain analysis before selecting a correction; preserve failure and use focused validation after source freeze is released."
+}

@@ -252,7 +252,13 @@ const SimulationGuide = (() => {
     LOGICAL_ESTOP: ["A simulated stop request blocks the pick before movement.", "The cell becomes ESTOP_LOGICAL and the product stays still."],
     CELL_FAULT: ["A simulated controller error blocks the pick before movement.", "The cell becomes FAULTED and the product stays still."],
     BRAIN_INVALID_OUTPUT: ["The pick planner returns an invalid plan, which validation rejects.", "The order fails before a robot command is created."],
-    BRAIN_TIMEOUT: ["The pick planner misses its deadline.", "The order fails before a robot command is created."]
+    BRAIN_TIMEOUT: ["The pick planner misses its deadline.", "The order fails before a robot command is created."],
+    DUPLICATE_DELIVERY: ["Deliver the original command twice. The edge inbox and PLC retain its identity and result.", "Delivery count increases; the authorized pick must still have only one physical effect."],
+    BROKER_TRANSIENT: ["The first bounded publication attempt is deliberately stopped before broker delivery.", "Retry outbox publication with the same command; robot execution remains separately gated."],
+    EDGE_TRANSIENT: ["The first edge-delivery attempt is deliberately stopped before inbox confirmation.", "Retry the delivery stage; publisher confirmation alone does not prove consumer acceptance."],
+    OPC_UA_DISCONNECT: ["The first controller-session attempt is interrupted before command acceptance.", "Retry the connection stage, then continue through preconditions and physical authorization."],
+    PLC_RESTART: ["Restart the virtual controller after execution, then query the original command.", "A changed boot must retain the original result and must not authorize another pick."],
+    WMS_UNAVAILABLE: ["The first WMS acknowledgement fails after the robot outcome has been verified.", "Retry business reconciliation only; the robot effect and original command remain unchanged."]
   }[value] || ["Choose a supported scenario.", "No behavior is defined for this selection."]);
   return {describe, evidenceSummary, explain, inspect, brief,
     choices: kind => Object.entries(catalog(kind)).map(([value, info]) => ({value, ...info})),

@@ -253,6 +253,9 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                         assert live["read_only"] is True
                         assert any(event["value"] == "EXECUTING" for event in live["events"])
                         expect(page.locator("#integration-protocol-live")).to_contain_text("OPC UA")
+                        expect(page.locator("#integration-protocol-live")).to_contain_text(
+                            executed["command_id"]
+                        )
                         physical_request = next(
                             item
                             for item in reversed(requests)
@@ -289,6 +292,20 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                     advance(page, stack.origin)
                 final = state(page, stack.origin)
                 assert final["status"] == "COMPLETED", final
+                expected_scenario = {
+                    "": "Happy path (no injected scenario)",
+                    "DROP_ACK_AFTER_EFFECT": "Lose acknowledgement after effect",
+                    "DUPLICATE_DELIVERY": "Duplicate command delivery",
+                    "WMS_UNAVAILABLE": "WMS unavailable after verified pick",
+                }[scenario]
+                expect(page.locator("#motion-scenario")).to_contain_text(expected_scenario)
+                page.locator("#scenario").select_option("BRAIN_TIMEOUT")
+                expect(page.locator("#motion-scenario")).to_contain_text(expected_scenario)
+                saved_playback = page.request.get(
+                    f"{stack.origin}/jobs/{final['job_id']}/playback"
+                ).json()
+                assert saved_playback["execution_scenario"]["fault"] == (scenario or None)
+                assert saved_playback["execution_scenario"]["session_id"] == final["session_id"]
                 assert reloaded and physical_request
                 assert unknown_seen == (scenario == "DROP_ACK_AFTER_EFFECT")
                 assert business_retry_seen == (scenario == "WMS_UNAVAILABLE")

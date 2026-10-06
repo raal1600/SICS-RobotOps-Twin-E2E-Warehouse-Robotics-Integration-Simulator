@@ -157,6 +157,13 @@ def test_guided_network_stack_recovers_without_repeating_motion(
             receipt = workflow.runtime.recorded_journal(session["command_id"])
             assert receipt.effect_count == 1
             assert workflow.runtime.world().step == 1
+            playback = client.get(f"/jobs/{session['job_id']}/playback").json()
+            assert playback["execution_scenario"] == {
+                "schema_version": "1.0",
+                "source": "GUIDED_SESSION",
+                "session_id": session["session_id"],
+                "fault": fault,
+            }
             assert workflow.store.order(session["order_id"]).status == "COMPLETED"
             assert workflow.lab.status(session["command_id"])["result"]["effect_count"] == 1
             business_payload = {

@@ -247,6 +247,14 @@ class VisualCamera(V2Contract):
     camera_model_version: Identifier
 
 
+class ExecutionScenario(Contract):
+    """Recorded test configuration, not proof of an injection or physical outcome."""
+
+    source: Literal["GUIDED_SESSION"] = "GUIDED_SESSION"
+    session_id: Identifier
+    fault: str | None
+
+
 class JobPlayback(Contract):
     job_id: Identifier
     command_id: Identifier | None
@@ -258,6 +266,7 @@ class JobPlayback(Contract):
     scene: VisualScene
     product_id: Identifier
     events: list[AuditEvent] = Field(default_factory=list)
+    execution_scenario: ExecutionScenario | None = None
 
 
 class DeliveryExecution(Contract):
@@ -302,6 +311,7 @@ VISUAL_SCHEMAS = (
     VisualFrame,
     MotionRecording,
     VisualScene,
+    ExecutionScenario,
     JobPlayback,
     DeliveryExecution,
     DeliverySummary,

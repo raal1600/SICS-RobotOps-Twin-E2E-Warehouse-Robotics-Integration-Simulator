@@ -128,6 +128,11 @@ def test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_a
     origin, registry = server
     page, _, errors, console_errors, requests = browser_page
     start_guided(page, origin, fault)
+    expect(page.locator("#scenario-brief")).not_to_contain_text("Choose a supported scenario")
+    expect(page.locator("#scenario-watch")).not_to_contain_text("No behavior is defined")
+    expect(page.locator("#scenario-brief")).to_contain_text(
+        "original command" if fault == "DUPLICATE_DELIVERY" else "publication attempt"
+    )
     saved = until_stage(page, origin, 12)
     page.wait_for_function("() => !integration.busy")
     if fault == "BROKER_TRANSIENT":

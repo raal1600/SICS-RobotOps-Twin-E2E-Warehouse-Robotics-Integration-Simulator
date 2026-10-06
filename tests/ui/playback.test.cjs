@@ -11,6 +11,7 @@ function setup() {
     return elements.get(id);
   }};
   const context=vm.createContext({document,SceneView:class {constructor(canvas){this.canvas=canvas;this.views=[];}render(){}reset(){}rotate(){}zoom(){}configure(){}viewpoint(name){this.views.push(name);}},requestAnimationFrame(){},fetch(){throw Error('Playback must not dispatch');}});
+  vm.runInContext(fs.readFileSync('apps/erp_ui/workflow-guide.js','utf8'),context);
   vm.runInContext(fs.readFileSync('apps/erp_ui/playback.js','utf8')+'\nglobalThis.player=new MotionPlayer();',context);
   return {player:context.player, el:id=>document.getElementById(id)};
 }
@@ -235,6 +236,43 @@ function realSceneTypes(){
   vm.runInContext(fs.readFileSync('apps/erp_ui/scene-view.js','utf8')+'\nglobalThis.types={SceneView,SoftwareSceneView};',context);
   return context.types;
 }
+
+test('replay uses the saved per-job integration scenario, independent of dropdown and later jobs',()=>{
+  const {player:p,el}=setup();
+  const first={...clip(4,true,'first'),execution_scenario:{source:'GUIDED_SESSION',session_id:'saved-1',fault:'DUPLICATE_DELIVERY'}};
+  const second={...clip(4,true,'second'),execution_scenario:{source:'GUIDED_SESSION',session_id:'saved-2',fault:'WMS_UNAVAILABLE'}};
+  const before=JSON.stringify([first,second]);
+  p.select('first');p.update(first);assert.match(el('motion-scenario').textContent,/Duplicate command delivery/);
+  el('scenario').value='BRAIN_TIMEOUT';p.describeClips();assert.match(el('motion-scenario').textContent,/Duplicate command delivery/);
+  p.select('second');p.update(second);assert.match(el('motion-scenario').textContent,/WMS unavailable/);
+  p.select('first');p.update(first);assert.match(el('motion-scenario').textContent,/Duplicate command delivery/);
+  p.select('delivery:saved');p.updateDelivery({delivery_id:'saved',scene:first.scene,jobs:[first,second]});
+  assert.match(el('motion-scenario').textContent,/Mixed recorded scenarios/);
+  assert.match(el('motion-scenario').textContent,/Duplicate command delivery/);assert.match(el('motion-scenario').textContent,/WMS unavailable/);
+  assert.equal(JSON.stringify([first,second]),before);
+});
+
+test('recorded baseline, missing scenario and unknown scenario are distinct from outcomes',()=>{
+  const {player:p,el}=setup();p.select('j1');const data=clip(4,true);
+  p.update(data);assert.match(el('motion-scenario').textContent,/No execution scenario recorded/);
+  data.execution_scenario={source:'GUIDED_SESSION',session_id:'saved',fault:null};
+  p.update(data);assert.match(el('motion-scenario').textContent,/Happy path \(no injected scenario\)/);
+  assert.equal(el('motion-outcome').textContent,'Job: UNKNOWN_OUTCOME');
+  data.execution_scenario.fault='UNSUPPORTED_SAVED_FAULT';p.update(data);
+  assert.match(el('motion-scenario').textContent,/Unrecognized recorded scenario \(UNSUPPORTED_SAVED_FAULT\)/);
+  assert.doesNotMatch(el('motion-scenario').textContent,/Happy path/);
+});
+
+test('legacy replay does not misattribute later review faults or another job to the original scenario',()=>{
+  const {player:p,el}=setup();p.select('j1');const data=clip(4,true);
+  data.events=[{job_id:'other',event_type:'FAULT_INJECTED',reason:'CELL_FAULT'},
+    {job_id:'j1',event_type:'JOB_TRANSITION',state_after:'UNKNOWN_OUTCOME'},
+    {job_id:'j1',event_type:'FAULT_INJECTED',reason:'STALE_OBSERVATION'}];
+  p.update(data);assert.match(el('motion-scenario').textContent,/No execution scenario recorded/);
+  data.events.unshift({job_id:'j1',event_type:'FAULT_INJECTED',reason:'DROP_ACK_AFTER_EFFECT'});
+  p.update(data);assert.match(el('motion-scenario').textContent,/acknowledgement after effect/);
+  assert.doesNotMatch(el('motion-scenario').textContent,/Stale|Cell fault/);
+});
 
 function softwareCanvas(){
   const points=[];

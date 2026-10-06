@@ -11,6 +11,7 @@ class IntegrationConsole {
     this.retry = null;
     this.liveTimer = null;
     this.pollingLive = false;
+    this.liveGeneration = 0;
     this.selected = null;
     this.pinned = false;
     this.tab = "What";
@@ -42,6 +43,7 @@ class IntegrationConsole {
   async load() {
     const generation = ++this.generation;
     this.disconnect();
+    this.resetLive();
     this.session = null;
     this.selected = null; this.pinned = false;
     this.el("integration-console").hidden = true;
@@ -67,8 +69,7 @@ class IntegrationConsole {
   clear() {
     ++this.generation;
     this.disconnect();
-    if(this.liveTimer)clearTimeout(this.liveTimer);
-    this.liveTimer=null;
+    this.resetLive();
     this.session = null;
     this.el("integration-console").hidden = true;
     this.el("integration-live").hidden = true;
@@ -100,11 +101,12 @@ class IntegrationConsole {
     this.disconnect();
     if (!this.session || typeof WebSocket === "undefined") return;
     const generation = this.generation;
+    const sessionId = this.session.session_id;
     const url = new URL(this.path(`/integration/sessions/${this.session.session_id}/stream`), location.href);
     url.protocol = location.protocol === "https:" ? "wss:" : "ws:";
     this.socket = new WebSocket(url);
     this.socket.onmessage = event => {
-      if (generation !== this.generation) return;
+      if (generation !== this.generation || sessionId !== this.session?.session_id) return;
       try { const data = JSON.parse(event.data); this.accept(data.session || data); }
       catch { this.el("integration-stream").textContent = "Trace message unavailable; reload from persisted state."; }
     };
@@ -125,25 +127,41 @@ class IntegrationConsole {
     if (!session?.session_id) return;
     if (this.session?.session_id === session.session_id && session.revision < this.session.revision) return;
     if(this.session?.session_id !== session.session_id){this.selected=null;this.pinned=false;}
+    if(this.session?.session_id !== session.session_id || this.session?.command_id !== session.command_id)this.resetLive(session.command_id);
     this.session = session;
     this.render();
     if(session.current_stage>=16 && session.command_id && !this.liveTimer && !this.pollingLive)this.pollLive();
   }
 
+  resetLive(commandId = null) {
+    ++this.liveGeneration;
+    if(this.liveTimer)clearTimeout(this.liveTimer);
+    this.liveTimer=null;
+    this.pollingLive=false;
+    this.el("integration-protocol-live").textContent=commandId
+      ? `Waiting for protocol evidence for command ${commandId}.`
+      : "No protocol evidence loaded for this session.";
+    this.el("integration-live-state").textContent="";
+  }
+
   async pollLive() {
-    if(!this.session?.command_id || this.pollingLive)return;
+    if(!this.session?.command_id || !this.session.context?.physical_authorized || this.pollingLive)return;
     this.pollingLive=true;
-    const generation=this.generation,sessionId=this.session.session_id;
+    const generation=this.liveGeneration,sessionId=this.session.session_id,commandId=this.session.command_id;
+    const current=()=>generation===this.liveGeneration && sessionId===this.session?.session_id && commandId===this.session?.command_id;
     try{
       const live=await this.request(`/integration/sessions/${sessionId}/live`);
-      if(generation!==this.generation || sessionId!==this.session?.session_id)return;
+      if(!current())return;
+      if(live.command_id!==commandId)throw new Error("Response belongs to a different command");
       this.el("integration-protocol-live").textContent=JSON.stringify(live,null,2);
     }catch(error){
-      if(generation===this.generation)this.el("integration-protocol-live").textContent=`Protocol evidence unavailable: ${error.message}. This read does not establish an execution outcome.`;
+      if(current())this.el("integration-protocol-live").textContent=`Protocol evidence unavailable for command ${commandId}: ${error.message}. This read does not establish an execution outcome.`;
     }finally{
-      this.pollingLive=false;
-      if(generation===this.generation && this.session?.current_stage===16){
-        this.liveTimer=setTimeout(()=>{this.liveTimer=null;this.pollLive();},500);
+      if(current()){
+        this.pollingLive=false;
+        if(this.session?.current_stage===16 && this.session.context?.physical_authorized){
+          this.liveTimer=setTimeout(()=>{this.liveTimer=null;this.pollLive();},500);
+        }
       }
     }
   }

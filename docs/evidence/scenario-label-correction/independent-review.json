@@ -1,0 +1,246 @@
+{
+  "reviewed_at_utc": "2026-10-06T00:21:46.605949+00:00",
+  "verdict": "NO_ACTIONABLE_BUG_FOUND_IN_BOUNDED_STATIC_REVIEW",
+  "base_commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+  "source_state": "Uncommitted correction under root-owned validation; not represented as clean4774 or final validated source. Exact reviewed file bytes are hashed below.",
+  "scope": "Independent read-only boundary review of scenario caption corrections and live protocol response ownership. No tests/browser/database/runtime calls and no tracked edits.",
+  "findings": [],
+  "boundary_reviews": [
+    {
+      "boundary": "Saved per-job scenario authority",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/api/playback.py:106",
+        "robotops/integration/engine.py:360",
+        "robotops/integration/store.py:131"
+      ],
+      "reason": "Playback follows meta guided:<job_id> to the persisted ExecutionSession, validates session identity, order and order-line membership, then returns its saved fault. It does not use current session.job_id, dropdown state, a later review fault or the latest job. Earlier lines retain their own authority link."
+    },
+    {
+      "boundary": "Read-only backend metadata lookup",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/api/playback.py:108",
+        "robotops/workflow/store.py:112"
+      ],
+      "reason": "Uses existing store readonly_connect(mode=ro/query_only) with guaranteed close. No GuidedStore initialization or table bootstrap is added to playback."
+    },
+    {
+      "boundary": "Unavailable or invalid saved metadata",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/api/playback.py:112",
+        "apps/erp_ui/playback.js:18"
+      ],
+      "reason": "Missing marker/row, invalid session, mismatched session/order/line produce absent scenario metadata. Frontend does not relabel absence as Happy path; unknown recorded fault is explicitly unrecognized. Explicit saved null is separately labeled baseline and does not replace the job outcome."
+    },
+    {
+      "boundary": "Legacy fault history",
+      "assessment": "No actionable defect found in the supplied per-job API path",
+      "evidence": [
+        "apps/api/playback.py:140",
+        "apps/erp_ui/playback.js:20"
+      ],
+      "reason": "API clips contain only that job timeline. Frontend fallback searches a matching-job FAULT_INJECTED only before the first terminal/uncertain boundary, preventing later observation/reconciliation faults from becoming the execution caption. It returns a neutral missing label if none qualifies."
+    },
+    {
+      "boundary": "Dropdown, history and mixed delivery",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/erp_ui/playback.js:13",
+        "apps/erp_ui/playback.js:93",
+        "apps/api/playback.py:63"
+      ],
+      "reason": "Caption derives from each saved clip, not current selector. Delivery playback calls per-job playback and reports the distinct labels as mixed when needed. Scenario labeling remains separate from status/outcome."
+    },
+    {
+      "boundary": "Scenario help coverage",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/erp_ui/workflow-guide.js:256",
+        "tests/ui/investigation.test.cjs:48"
+      ],
+      "reason": "Six integration faults receive defined purpose/watch text, while unsupported selections retain the neutral unsupported fallback. The new tests explicitly distinguish both behaviors."
+    },
+    {
+      "boundary": "Session and command change resets live text",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/erp_ui/integration-console.js:130",
+        "apps/erp_ui/integration-console.js:136"
+      ],
+      "reason": "accept resets on session or command ID change, including same-session move to another job command. resetLive increments independent generation, cancels prior timer, clears prior presentation and releases the old in-flight flag so a current poll can start."
+    },
+    {
+      "boundary": "Late old response or error cannot overwrite new command",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/erp_ui/integration-console.js:150",
+        "apps/erp_ui/integration-console.js:154",
+        "apps/erp_ui/integration-console.js:158"
+      ],
+      "reason": "Successful response and error presentation require matching live generation, session ID and command ID. A returned payload naming another command becomes unavailable evidence without exposing its unrelated events."
+    },
+    {
+      "boundary": "Late old finally cannot release new poll or create timer",
+      "assessment": "No actionable defect found",
+      "evidence": [
+        "apps/erp_ui/integration-console.js:159"
+      ],
+      "reason": "The same current() guard owns pollingLive release and timer scheduling. Completion of the old promise cannot set the new poll idle or schedule an obsolete timer."
+    },
+    {
+      "boundary": "Clear, load, authorization and socket ownership",
+      "assessment": "No actionable defect found in changed paths",
+      "evidence": [
+        "apps/erp_ui/integration-console.js:46",
+        "apps/erp_ui/integration-console.js:72",
+        "apps/erp_ui/integration-console.js:109",
+        "apps/erp_ui/integration-console.js:148",
+        "apps/erp_ui/integration-console.js:162"
+      ],
+      "reason": "Clear/load invalidate live generation; polling requires physical authorization and repeated polling requires current stage16. WebSocket message handling now checks saved session ownership as well as generation."
+    }
+  ],
+  "test_source_inspected": [
+    {
+      "path": "tests/integration/test_guided_playback.py",
+      "covered_in_source": [
+        "Every declared integration scenario through reload, two order lines, unchanged session/world/timeline, no command dispatch",
+        "Missing/invalid/different-order authority yields None",
+        "Legacy read does not create guided schema"
+      ]
+    },
+    {
+      "path": "tests/ui/playback.test.cjs",
+      "covered_in_source": [
+        "Saved duplicate/WMS labels survive dropdown changes and historical selection",
+        "Mixed delivery labels",
+        "Explicit baseline vs missing vs unknown saved fault",
+        "Late review fault and other-job fault excluded"
+      ]
+    },
+    {
+      "path": "tests/ui/integration-console.test.cjs",
+      "covered_in_source": [
+        "New command placeholder replaces prior live text",
+        "Same-session and other-session command changes against late success and error",
+        "Old finally does not release current in-flight poll",
+        "Mismatched payload and clear invalidation"
+      ]
+    },
+    {
+      "path": "tests/lab/test_browser_lab.py",
+      "covered_in_source": [
+        "Real lab scenario caption and persisted API metadata",
+        "Current live command ID",
+        "Changing future dropdown leaves recorded caption unchanged"
+      ]
+    }
+  ],
+  "validation_claim": "Test definitions were inspected but not executed by this review. Running lane results and corrected-source full acceptance remain root-owned and pending.",
+  "source_fingerprints": [
+    {
+      "path": "apps/api/playback.py",
+      "sha256": "7c5ab9bdc9a9355b4f0dedcde0daeb242b1715367d589a0a9fc3f67b12c98f28",
+      "bytes": 6988
+    },
+    {
+      "path": "apps/erp_ui/integration-console.js",
+      "sha256": "eb5f7d6c27189e7e17c462698158a3018413bf3169ebdd5f1e8cfc5662b28175",
+      "bytes": 17181
+    },
+    {
+      "path": "apps/erp_ui/playback.js",
+      "sha256": "b5403c4f2ae03b4046a962ecdca27440df7d824209474ab6ea575cc4baf9fe0e",
+      "bytes": 16474
+    },
+    {
+      "path": "apps/erp_ui/workflow-guide.js",
+      "sha256": "7999b1055528382962ad2c1651f1ed58dac231a7931127ca4c6cbf62c685b488",
+      "bytes": 27379
+    },
+    {
+      "path": "robotops/blender/visualization.py",
+      "sha256": "c760e0048fbd4a7b26d308d3a14146d9649e7f0409e9ba38a92d262262ee62cc",
+      "bytes": 11490
+    },
+    {
+      "path": "robotops/integration/engine.py",
+      "sha256": "f1ca6c9db8e3ba7152875c98eb3f85c541f11b26b614739edd246b1ec9a77433",
+      "bytes": 49371
+    },
+    {
+      "path": "robotops/integration/store.py",
+      "sha256": "e25024c23dae400dec501cef5326bacc892d752df058f11c3271f8ddd7c2bc80",
+      "bytes": 17148
+    },
+    {
+      "path": "robotops/integration/models.py",
+      "sha256": "96f3565013597118373bd5a5f82e30455a9f68b6972d36f7cf5c3acdab932e16",
+      "bytes": 2855
+    },
+    {
+      "path": "robotops/workflow/store.py",
+      "sha256": "d9e32944c193f3aa78a59755abdac778d7e1084320ae4989379017ac418f6ea7",
+      "bytes": 26464
+    },
+    {
+      "path": "contracts/schemas/JobPlayback.json",
+      "sha256": "4cbfc74aa420d01fe0929d8dd2bf7565cd53abc7f3902cdf4ab793681b49c063",
+      "bytes": 28902
+    },
+    {
+      "path": "contracts/schemas/DeliveryPlayback.json",
+      "sha256": "e627b785baa68ef3bd033925c3069ae017f44a66439bee81240f11bed946a3a3",
+      "bytes": 30231
+    },
+    {
+      "path": "tests/integration/test_guided_playback.py",
+      "sha256": "1ac1093144a5bd00db447677ef6ecb25a525e3326928a62a1c5a0f17dc25655d",
+      "bytes": 5017
+    },
+    {
+      "path": "tests/ui/integration-console.test.cjs",
+      "sha256": "e918f701235ca0cd0073d5f2dd15a929402682d95cae7b95a2ad95c2776bc5f4",
+      "bytes": 4701
+    },
+    {
+      "path": "tests/ui/playback.test.cjs",
+      "sha256": "48cf6ac5165fe40dd5e7bdc47e2b32cd316b55b3a5e3bd9a094ad2eb18c0777d",
+      "bytes": 22592
+    },
+    {
+      "path": "tests/ui/investigation.test.cjs",
+      "sha256": "72c497631bda6c4d6125805c9dd37c1d374d3ad662c35bb7784b52cfa7b6e5b8",
+      "bytes": 5157
+    },
+    {
+      "path": "tests/lab/test_guided_lab.py",
+      "sha256": "4aa2685555c19db8db5153cca08959a4f69132b3924b8dc00e8d0fc7f5e602ab",
+      "bytes": 9183
+    },
+    {
+      "path": "tests/lab/test_browser_lab.py",
+      "sha256": "68bffcbd6f9d6dd2b2ab0141df9ee15402822fb535bbb447bad3369cd4497c06",
+      "bytes": 19161
+    },
+    {
+      "path": "tests/browser/test_guided_console.py",
+      "sha256": "0264878f66daa3f492bd19f7c7208db39c2b3a175cb41ae709363d7425a3daf4",
+      "bytes": 9519
+    },
+    {
+      "path": "tests/unit/test_visualization.py",
+      "sha256": "e307a0cfd1e95cadb0e7ff81569e3d3d8bdddf360fb410dd8529ccbedfab1631",
+      "bytes": 6703
+    }
+  ],
+  "limits": [
+    "Static review is bounded to changed caption/metadata/live-poll paths and immediately relevant authority/storage/contract/tests. It is not a general concurrency or corruption audit of all existing mutation handlers.",
+    "Legacy fallback assumes the API supplied per-job ordered events; the current playback endpoint explicitly filters job IDs. Missing or later-only evidence remains neutral.",
+    "Invalid/missing saved scenario is handled at marker/row/validation boundaries; arbitrary database/schema corruption is outside this review.",
+    "Archive remained unchanged as instructed; the caption wording correction must refer to recorded replay caption, not the future Execution selector.",
+    "No overall GOAL completion or production/deployment validation is claimed."
+  ]
+}

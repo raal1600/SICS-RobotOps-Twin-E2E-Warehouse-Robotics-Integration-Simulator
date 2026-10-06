@@ -1,0 +1,221 @@
+"""Read-only, complete saved-text audit; writes only ignored review artifacts."""
+from __future__ import annotations
+
+import collections
+import datetime as dt
+import hashlib
+import json
+import re
+import zipfile
+from pathlib import Path
+from urllib.parse import parse_qsl, urlsplit
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = Path(__file__).resolve().parent
+SOURCE = "4774af56c656091a766c1f105b495c06e96e27ab"
+EXPECTED_PROTOCOL = {10: "AMQP", 11: "AMQP", 12: "OPC UA", 13: "OPC UA", 14: "OPC UA", 17: "OPC UA", 20: "REST"}
+SENSITIVE = {"password", "passwd", "pwd", "secret", "token", "authtoken", "idtoken", "xauthtoken", "xcsrftoken", "clientsecret", "accesstoken", "refreshtoken", "authorization", "proxyauthorization", "cookie", "setcookie", "apikey", "xapikey", "secretkey", "privatekey", "awssecretaccesskey", "sessiontoken"}
+PATTERNS = {
+    "private_key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
+    "credential_prefix": re.compile(r"\b(?:AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{30,}|sk-(?:proj-)?[A-Za-z0-9_-]{24,}|xox[baprs]-[A-Za-z0-9-]{15,})\b"),
+    "jwt_shape": re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b"),
+    "authorization_literal": re.compile(r"\b(?:Bearer|Basic)\s+([A-Za-z0-9_./+=:-]{8,})", re.I),
+    "credential_assignment": re.compile(r'''["']?(password|passwd|client_secret|access_token|refresh_token|api[_-]?key|aws_secret_access_key)["']?\s*[:=]\s*["']([^"'\r\n]{1,512})["']''', re.I),
+    "unquoted_credential_assignment": re.compile(r'''\b(password|passwd|pwd|client_secret|access_token|refresh_token|api[_-]?key|aws_secret_access_key|Authorization|Cookie|Set-Cookie)\s*[:=]\s*([^\s,;"'<>]{3,512})''', re.I),
+    "url_userinfo": re.compile(r"\b(?:https?|amqps?|postgres(?:ql)?|mongodb(?:\+srv)?)://([^\s/@]+:[^\s/@]+)@", re.I),
+}
+BINARY_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".woff", ".woff2", ".ttf", ".mp4", ".webm", ".zip", ".blend", ".pdf"}
+TEXT_EXT = {".json", ".jsonl", ".trace", ".network", ".log", ".txt", ".md", ".js", ".css", ".html", ".svg", ".xml", ".stacks"}
+findings: dict[tuple, dict] = {}
+steps: dict[tuple, dict] = {}
+sessions: dict[tuple, dict] = {}
+decode_failures: list[dict] = []
+json_failures: list[dict] = []
+network_counts = collections.Counter()
+header_names = collections.Counter()
+inventory = json.loads((OUT / "final-trace-audit-inventory.json").read_text(encoding="utf-8-sig"))
+expected = inventory["expected_lab_stage_classification"]
+
+
+def sha(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+def keyname(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+
+def candidate(value, category: str, location: str, pointer: str) -> None:
+    if value is None or value is False or value is True or value == "" or value == [] or value == {}:
+        return
+    text = value if isinstance(value, str) else json.dumps(value, sort_keys=True)
+    low = text.strip().lower()
+    if "[redacted]" in low or "<redacted>" in low or low in {"***", "********", "redacted"}:
+        classification = "redaction_marker"
+    elif low in {"demo-only", "guest:guest", "robotops:demo-only"}:
+        classification = "public_repository_demo_credential"
+    elif low in {"placeholder", "example", "changeme", "your-api-key", "your_api_key"}:
+        classification = "placeholder_requires_context_review"
+    else:
+        classification = "POTENTIAL_REQUIRES_REVIEW"
+    digest = sha(text.encode())
+    ident = (location, category, digest)
+    if ident in findings:
+        findings[ident]["occurrences"] += 1
+        return
+    findings[ident] = {"file_or_member": location, "first_location": pointer, "category": category,
+                       "value": "[REDACTED BY AUDIT]", "length": len(text), "sha256": digest,
+                       "classification": classification, "occurrences": 1}
+
+
+def raw_scan(text: str, location: str) -> None:
+    for category, regex in PATTERNS.items():
+        for match in regex.finditer(text):
+            value = match.group(2) if category in {"credential_assignment", "unquoted_credential_assignment"} else (match.group(1) if match.lastindex else match.group(0))
+            candidate(value, category, location, f"character:{match.start()}")
+
+
+def inspect_url(value: str, location: str, pointer: str) -> None:
+    try:
+        u = urlsplit(value)
+        if u.password is not None:
+            candidate(f"{u.username}:{u.password}", "url_userinfo", location, pointer)
+        for k, v in parse_qsl(u.query, keep_blank_values=True):
+            if keyname(k) in SENSITIVE:
+                candidate(v, "sensitive_query_parameter", location, pointer + "/query/" + k)
+    except ValueError:
+        pass
+
+
+def walk(obj, location: str, pointer: str = "$", embedded_depth: int = 0) -> None:
+    if isinstance(obj, dict):
+        if isinstance(obj.get("name"), str) and "value" in obj and keyname(obj["name"]) in SENSITIVE:
+            candidate(obj["value"], "sensitive_named_header_or_parameter", location, pointer + "/value")
+        if "session_id" in obj and isinstance(obj.get("steps"), list) and "current_stage" in obj:
+            ident = (obj["session_id"], obj.get("revision"), obj.get("status"), len(obj["steps"]))
+            sessions.setdefault(ident, {"session_id": obj["session_id"], "revision": obj.get("revision"), "status": obj.get("status"), "stage": obj.get("current_stage"), "profile": obj.get("profile"), "fault": obj.get("fault"), "command_id": obj.get("command_id"), "step_count": len(obj["steps"]), "location": location, "pointer": pointer})
+        if "step_id" in obj and "classification" in obj and isinstance(obj.get("stage"), int):
+            stage = obj["stage"]
+            exp = "REAL CODE" if obj.get("component") == "reconciliation" else expected.get(str(stage))
+            protocol = None if obj.get("component") == "reconciliation" else EXPECTED_PROTOCOL.get(stage)
+            ident = (obj["step_id"], obj.get("classification"), obj.get("protocol"))
+            steps.setdefault(ident, {"step_id": obj["step_id"], "session_id": obj.get("session_id"), "stage": stage, "component": obj.get("component"), "classification": obj.get("classification"), "expected": exp, "classification_matches": obj.get("classification") == exp, "protocol": obj.get("protocol"), "expected_protocol": protocol, "protocol_matches": protocol is None or obj.get("protocol") == protocol, "source": obj.get("source", {}).get("path"), "symbol": obj.get("source", {}).get("symbol"), "location": location, "pointer": pointer})
+        if obj.get("type") == "resource-snapshot" and isinstance(obj.get("snapshot"), dict):
+            snap = obj["snapshot"]
+            network_counts["snapshots"] += 1
+            for side in ("request", "response"):
+                for h in snap.get(side, {}).get("headers", []):
+                    header_names[side + ":" + str(h.get("name", "")).lower()] += 1
+            network_counts["response_status_" + str(snap.get("response", {}).get("status"))] += 1
+        for k, v in obj.items():
+            path = pointer + "/" + str(k)
+            if keyname(str(k)) in SENSITIVE:
+                candidate(v, "sensitive_json_key", location, path)
+            if isinstance(v, str) and (k.lower() in {"url", "uri", "dsn", "amqp_url", "database_url"} or v.startswith(("http://", "https://", "amqp://", "postgresql://"))):
+                inspect_url(v, location, path)
+            walk(v, location, path, embedded_depth)
+    elif isinstance(obj, list):
+        for n, v in enumerate(obj):
+            walk(v, location, pointer + "/" + str(n), embedded_depth)
+    elif isinstance(obj, str):
+        # Examine decoded strings too: saved trace text may contain escaped JSON/headers.
+        if any(marker in obj.lower() for marker in ("password", "passwd", "secret", "token", "bearer", "basic ", "://", "api_key", "apikey", "private key")):
+            raw_scan(obj, location + "::decoded")
+        stripped = obj.lstrip()
+        if embedded_depth < 8 and stripped[:1] in {"{", "["}:
+            try:
+                nested = json.loads(obj)
+            except (ValueError, RecursionError):
+                return
+            walk(nested, location, pointer + "/embedded_json", embedded_depth + 1)
+
+
+def scan_text(data: bytes, location: str, suffix: str) -> dict:
+    encoding = "utf-16" if data.startswith((b"\xff\xfe", b"\xfe\xff")) else "utf-8-sig"
+    try:
+        text = data.decode(encoding)
+    except UnicodeDecodeError as exc:
+        decode_failures.append({"location": location, "offset": exc.start, "bytes": len(data)})
+        return {"disposition": "decode_failure", "encoding": encoding}
+    if "\x00" in text:
+        return {"disposition": "binary_nul_detected", "encoding": encoding}
+    raw_scan(text, location)
+    if suffix in {".trace", ".network", ".jsonl"}:
+        for number, line in enumerate(text.splitlines(), 1):
+            if not line.strip():
+                continue
+            try:
+                walk(json.loads(line), location, f"line:{number}")
+            except (ValueError, RecursionError) as exc:
+                json_failures.append({"location": location, "line": number, "error": type(exc).__name__})
+    elif suffix == ".json" or text.lstrip().startswith(("{", "[")):
+        try:
+            walk(json.loads(text), location)
+        except (ValueError, RecursionError) as exc:
+            if suffix == ".json":
+                json_failures.append({"location": location, "error": type(exc).__name__})
+    return {"disposition": "complete_text_scanned", "encoding": encoding, "characters": len(text)}
+
+
+def metadata(path: str, kind: str, group: str) -> dict:
+    p = ROOT / path
+    st = p.stat()
+    return {"path": path, "kind": kind, "group": group, "exists": True, "mutable": False, "bytes": st.st_size,
+            "mtime_utc": dt.datetime.fromtimestamp(st.st_mtime, dt.timezone.utc).isoformat()}
+
+
+def main() -> None:
+    manual = ROOT / inventory["manual_directory"]
+    inventory["manual_files"] = [metadata(p.relative_to(ROOT).as_posix(), "manual_text", "completed-manual") for p in sorted(manual.iterdir()) if p.is_file() and p.suffix.lower() in TEXT_EXT]
+    entries = [e for e in inventory["scan_entries"] if e["kind"] != "manual_text"] + inventory["manual_files"]
+    # Manual stack metadata and launcher owner are part of the stopped-stack evidence.
+    for rel in ("artifacts/lab-final-4774af5.json", "artifacts/lab-final-4774af5-owner.json"):
+        if not any(e["path"] == rel for e in entries):
+            entries.append(metadata(rel, "manual_stack_metadata", "completed-manual"))
+    inventory["scan_entries"] = [metadata(e["path"], e["kind"], e["group"]) for e in entries]
+    inventory["refreshed_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
+    inventory["status"] = "FULL_SAVED_TEXT_SCAN_RUNNING"
+    inventory["inventory"]["manual_text_files"] = len(inventory["manual_files"])
+    inventory["limits"] = ["Exact historical4774 scope; current source corrections do not alter this evidence.", "Manual network evidence is captured driver/DOM JSON, not a complete manual Playwright ZIP.", "Other local-mode browser/investigation ZIPs are outside these eight campaign-bound lab cases.", "Original files remain unchanged; binary pixels are hashed but not OCR-reviewed."]
+    (OUT / "final-trace-audit-inventory.json").write_text(json.dumps(inventory, indent=2) + "\n", encoding="utf-8")
+    records = []
+    for entry in inventory["scan_entries"]:
+        p = ROOT / entry["path"]
+        before = p.stat()
+        raw = p.read_bytes()
+        row = {**entry, "sha256": sha(raw)}
+        if entry["kind"] == "playwright_zip":
+            row["members"] = []
+            with zipfile.ZipFile(p) as z:
+                for member in z.infolist():
+                    data = z.read(member)
+                    suffix = Path(member.filename).suffix.lower()
+                    part = {"name": member.filename, "crc32": member.CRC, "bytes": len(data), "sha256": sha(data)}
+                    if suffix in BINARY_EXT:
+                        part["disposition"] = "known_binary_hashed_not_text_scanned"
+                    else:
+                        part.update(scan_text(data, entry["path"] + "!" + member.filename, suffix))
+                    row["members"].append(part)
+            row["disposition"] = "all_members_read_crc_verified_and_accounted"
+            print(json.dumps({"zip_complete": entry["path"], "members": len(row["members"]), "uncompressed_bytes": sum(m["bytes"] for m in row["members"])}), flush=True)
+        else:
+            row.update(scan_text(raw, entry["path"], p.suffix.lower()))
+        after = p.stat()
+        row["stable_during_read"] = (before.st_size, before.st_mtime_ns) == (after.st_size, after.st_mtime_ns)
+        records.append(row)
+    step_rows = list(steps.values())
+    result = {"completed_at": dt.datetime.now(dt.timezone.utc).isoformat(), "source_commit": SOURCE,
+              "status": "AUTOMATED_FULL_SCAN_COMPLETE_REVIEW_PENDING", "inputs": records,
+              "scan_method": "Every ZIP member fully read, CRC checked and SHA256 hashed; every nonbinary UTF-8/UTF-16 text fully regex/structured-JSON scanned without prefix/sample truncation. ZIPs processed sequentially, one member in memory at a time; no extraction.",
+              "candidates": list(findings.values()), "decode_failures": decode_failures, "json_parse_failures": json_failures,
+              "network_counts": dict(network_counts), "network_header_names": dict(header_names),
+              "truth_steps": step_rows, "truth_step_mismatches": [s for s in step_rows if not s["classification_matches"] or not s["protocol_matches"]],
+              "session_snapshots": list(sessions.values()), "changed_inputs": [r["path"] for r in records if not r["stable_during_read"]],
+              "limitations": inventory["limits"] + ["Heuristics cannot certify arbitrary secret encodings or unsaved traffic.", "This result is not an all-browser-pixel review or a claim that historical4774 presentation defects are corrected."]}
+    result["coverage"] = {"files": len(records), "input_bytes": sum(r["bytes"] for r in records), "zip_members": sum(len(r.get("members", [])) for r in records), "zip_uncompressed_bytes": sum(m["bytes"] for r in records for m in r.get("members", [])), "dispositions": dict(collections.Counter(m["disposition"] for r in records for m in r.get("members", [r]))), "unique_persisted_steps": len(step_rows), "unique_session_states": len(sessions)}
+    (OUT / "final-trace-audit-result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"complete": True, "coverage": result["coverage"], "candidate_classes": dict(collections.Counter(f["classification"] for f in findings.values())), "truth_mismatches": len(result["truth_step_mismatches"]), "decode_failures": len(decode_failures), "json_failures": len(json_failures), "changed_inputs": result["changed_inputs"]}), flush=True)
+
+
+if __name__ == "__main__":
+    main()

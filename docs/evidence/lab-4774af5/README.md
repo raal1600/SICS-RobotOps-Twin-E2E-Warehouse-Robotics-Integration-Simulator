@@ -1,0 +1,9 @@
+This archive preserves evidence for source `4774af56c656091a766c1f105b495c06e96e27ab`.
+
+Both local suites passed 799 tests and all 20 local gates passed. Manual happy/lost-ACK/duplicate semantics and both exact README CLI commands passed saved-evidence reviews. Historical duplicate/WMS brief and replay-caption defects leave presentation NOT PASS; corrected-source validation and three remote gates remain pending. Overall GOAL is NOT ACHIEVED.
+
+See [summary.json](summary.json), [inputs.json](inputs.json), [independent acceptance review](local-acceptance-review.json), and the reviews under [manual/](manual/). The canonical complete acceptance remains [20261005T224038](../acceptance/20261005T224038/), hashed in the index without redundant copies. The [correction plan](correction/scenario-label-fix-plan.md) preserves the historical defect boundary.
+
+The finalized [saved-text/truth audit](audit/final-trace-audit-summary.md) passes its explicit credential and execution-evidence scope while retaining presentation NOT PASS. Its [DOM detail](audit/final-trace-dom-review.json) independently confirms misleading duplicate/WMS briefs and replay captions. The [baseline publication review](publication-review/review.json) records root's review of all 64 combined PDF pages in eight contact sheets and three HTML screenshots. Corrected final-source publication still needs fresh validation.
+
+Copied raw files retain exact original bytes. `inputs.json` maps source paths to archived repo-relative paths and hashes. Empty logs remain skipped records. Detailed reviews retain original ignored-artifact references; use the index for archived equivalents. No database, trace ZIP, PDF or Blender render tree is copied. This archive is local evidence preparation, not publication or a global secret-free claim.

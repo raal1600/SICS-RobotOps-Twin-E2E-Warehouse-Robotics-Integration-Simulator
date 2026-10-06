@@ -1,0 +1,136 @@
+"""Bind saved manual facts and reconstructed DOM to the complete text scan."""
+import collections
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = Path(__file__).resolve().parent
+MANUAL = ROOT / "artifacts/final-manual-4774af5"
+
+
+def load(p):
+    return json.loads(p.read_text(encoding="utf-8-sig"))
+
+
+def digest(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def ref(p):
+    return {"path": p.relative_to(ROOT).as_posix(), "sha256": digest(p), "bytes": p.stat().st_size}
+
+
+def main():
+    audit = load(OUT / "final-trace-audit-result.json")
+    dom = load(OUT / "final-trace-dom-review.json")
+    source = audit["source_commit"]
+    manual_cases = []
+    for name, session_name, journal_name in [
+        ("happy", "happy-completed-session.json", "happy-after-duplicate-journals.json"),
+        ("lost", "lost-completed-session.json", "lost-after-reconcile-journals.json"),
+        ("duplicate", "duplicate-completed-session.json", "duplicate-completed-journals.json"),
+        ("cli-happy_path", "cli-happy_path-result.json", "cli-happy_path-journals.json"),
+        ("cli-lost_ack_after_effect", "cli-lost_ack_after_effect-result.json", "cli-lost_ack_after_effect-journals.json"),
+    ]:
+        obj = load(MANUAL / session_name)
+        session = obj.get("session", obj)
+        journals = load(MANUAL / journal_name)
+        rows = journals["selected_command"]
+        runtime = rows["runtime_journal"]
+        plc = rows["plc_commands"]
+        checks = {
+            "completed_final_stage": session["status"] == "COMPLETED" and session["current_stage"] == 22,
+            "lab_profile": session["profile"] == "lab",
+            "captured_source_4774": journals["source_commit_at_capture"] == source,
+            "one_original_runtime_row": len(runtime) == 1 and runtime[0]["command_id"] == session["command_id"],
+            "one_original_plc_row": len(plc) == 1 and plc[0]["command_id"] == session["command_id"],
+            "runtime_effect_exactly_one": len(runtime) == 1 and runtime[0]["receipt"]["effect_count"] == 1,
+            "plc_effect_exactly_one": len(plc) == 1 and plc[0]["result"]["effect_count"] == 1,
+            "runtime_plc_receipt_identical": len(runtime) == len(plc) == 1 and runtime[0]["receipt"] == plc[0]["result"],
+            "matching_original_payload_hash": len(runtime) == len(plc) == 1 and runtime[0]["payload_hash"] == plc[0]["payload_hash"] == runtime[0]["receipt"]["payload_hash"],
+            "every_stage_present": set(range(1, 23)).issubset({s["stage"] for s in session["steps"]}),
+        }
+        if name.startswith("cli-"):
+            exit_info = load(MANUAL / (name + "-exit.json"))
+            checks.update({"explicit_physical_consent_recorded": obj["explicit_physical_consent"] is True,
+                           "cli_exit_zero_same_source": exit_info["exit_code"] == 0 and exit_info["source"] == source,
+                           "cli_evidence_matches_durable_saved_receipt": obj["evidence"]["journal"] == runtime[0]["receipt"]})
+        manual_cases.append({"case": name, "session_id": session["session_id"], "command_id": session["command_id"], "fault": session["fault"], "status": session["status"], "revision": session["revision"], "checks": checks,
+                             "effect_count": runtime[0]["receipt"]["effect_count"], "inputs": [ref(MANUAL / session_name), ref(MANUAL / journal_name)],
+                             "scope": "Independent recomputation from saved session and durable-journal exports; no live DB, service or browser action."})
+    inspectors = []
+    for name in ("happy-completed-browser.json", "lost-unknown-browser.json", "duplicate-completed-browser.json"):
+        obj = load(MANUAL / name)
+        inspector = obj.get("inspector", obj.get("inspectors"))
+        step = inspector["selectedStep"]
+        truth = inspector["truth"]
+        labels = {tab["tab"] for tab in inspector["tabs"]}
+        checks = {
+            "six_actual_tabs_saved": labels == {"What", "Wire", "Code", "State", "Why", "Failure semantics"},
+            "before_after_ui_counts_and_identity_equal": inspector["before"] == inspector["after"],
+            "saved_helper_checks_all_true": all(v is True for v in inspector["checks"].values()),
+            "source_excerpt_matches_selected_step": inspector["source"] == step["source"],
+            "actual_lab_profile_explains_simulated_systems": all(x in truth["profile"] for x in ("Integration lab", "PostgreSQL", "real AMQP / OPC UA", "simulated systems")),
+            "synthetic_sensing_and_safety_boundaries_present": all(x in truth["boundaries"] for x in ("Synthetic observations", "camera images are not analyzed", "Not validated robot dynamics or safety-certified", "Not SICS AI proprietary software")),
+            "ack_boundaries_keep_effect_and_business_distinct": all(x in truth["acknowledgementBoundaries"] for x in ("HTTP 202", "publisher confirm", "consumer ACK", "OPC UA", "PLC accepted", "controller succeeded", "sensor verification", "WMS reconciliation", "ERP completion")),
+        }
+        inspectors.append({"input": ref(MANUAL / name), "selected_stage": step["stage"], "selected_step_id": step["step_id"], "checks": checks, "source": inspector["source"],
+                           "saved_helper_scope": "Existing helper records exact DOM/persisted-tab comparisons, payload close/reopen and old-step/current-map checks; no new interaction during this audit."})
+    known = []
+    dom_cases = []
+    for case in dom["cases"]:
+        last = case["last_snapshot"]["elements"]
+        state = last.get("motion-state", {}).get("text")
+        checks = {
+            "all_snapshots_decode": not case["errors"],
+            "final_profile_has_real_protocol_simulated_system_labels": "real AMQP / OPC UA" in last["execution-profile"]["text"] and "simulated systems" in last["execution-profile"]["text"],
+            "final_live_region_simulated_readonly": "SIMULATED ROBOT" in last["integration-live"]["text"] and "READ-ONLY REPLAY" in last["integration-live"]["text"],
+            "completed_copy_neutral": last["integration-live-state"]["text"] == "Execution session completed. Review the recorded controller result, verification and business reconciliation.",
+            "runtime_presentation_matches_recording_scope": state == ("Recorded 3D scenario" if case["runtime"] == "blender" else "Scenario events - stationary scene"),
+        }
+        dom_cases.append({"case": case["case"], "pass": case["acceptance_pass"], "trace": case["trace"], "checks": checks, "snapshot_count": case["snapshot_count"], "final_motion_state": state})
+        if case["known_unsupported_brief_snapshots"]:
+            known.append({"case": case["case"], "pass": case["acceptance_pass"], "trace": case["trace"], "unsupported_brief_snapshots": len(case["known_unsupported_brief_snapshots"]),
+                          "first_evidence": case["known_unsupported_brief_snapshots"][0], "brief": "Choose a supported scenario.", "watch": "No behavior is defined for this selection.",
+                          "replay_labels": case["unique_labels"]["motion-scenario"], "status": "HISTORICAL_PRESENTATION_NOT_PASS_REQUIRES_CORRECTED_SOURCE_REVERIFICATION"})
+    reviews = []
+    for name in ("happy-review.json", "lost-review.json", "duplicate-review.json"):
+        obj = load(MANUAL / name)
+        reviews.append({"input": ref(MANUAL / name), "verdict": obj["verdict"], "checks": len(obj["checks"]), "failed_checks": [k for k, v in obj["checks"].items() if v is not True], "issues": obj["issues"],
+                        "scope": "Referenced existing saved-evidence review; its broader historical checks are not represented as newly performed browser actions."})
+    failures = []
+    for group, items in (("manual", manual_cases), ("inspector", inspectors), ("dom", dom_cases)):
+        failures.extend({"group": group, "index": i, "check": k} for i, row in enumerate(items) for k, v in row["checks"].items() if v is not True)
+    diagnostics = load(MANUAL / "browser-diagnostics.json")
+    stopped = load(MANUAL / "stopped-processes.json")
+    audit["manual_truth_review"] = {"cases": manual_cases, "inspectors": inspectors, "existing_reviews": reviews, "failures": failures,
+                                     "browser_diagnostics": {"input": ref(MANUAL / "browser-diagnostics.json"), "saved_errors": diagnostics["errors"], "saved_console": diagnostics["console"]},
+                                     "stopped_processes": {"input": ref(MANUAL / "stopped-processes.json"), "stopped_count": len(stopped["stopped_ids"]), "scope": stopped["scope"], "claim": "Saved owner-validated stop record; this audit did not inspect live processes."}}
+    audit["dom_truth_review"] = {"input": ref(OUT / "final-trace-dom-review.json"), "cases": dom_cases, "total_saved_snapshots": sum(c["snapshot_count"] for c in dom["cases"]), "known_presentation_defects": known,
+                                  "additional_known_source_race": {"input": ref(MANUAL / "scenario-label-fix-plan.md"), "description": "Previous command protocol text is hidden at the next physical gate; source analysis identifies possible stale text exposure after consent before fresh GET. No observed visible stale-text screenshot is asserted."}}
+    audit["manual_binary_inputs"] = [{**ref(p), "disposition": "hash_only_no_OCR_or_new_visual_review"} for p in sorted(MANUAL.glob("*.png"))]
+    audit["credential_review"] = {"result": "NO_CREDENTIAL_CANDIDATES_DETECTED_IN_REVIEWED_SAVED_TEXT" if not audit["candidates"] else "CANDIDATES_REQUIRE_REVIEW", "candidate_count": len(audit["candidates"]),
+                                    "public_demo_credential_matches": sum(f["classification"] == "public_repository_demo_credential" for f in audit["candidates"]),
+                                    "header_scope": "All saved trace request/response headers traversed; no Authorization, Cookie or Set-Cookie header present. X-Test-Revision and WebSocket handshake keys are protocol controls, not private credentials.",
+                                    "boundary": "Heuristic complete-text review; no assertion about arbitrary encodings, binary pixels, unsaved traffic, external systems or unlisted artifacts."}
+    audit["semantic_status"] = "PASS_REVIEWED_SAVED_EVIDENCE" if not failures and not audit["truth_step_mismatches"] and not audit["decode_failures"] and not audit["json_parse_failures"] and not audit["changed_inputs"] else "REVIEW_REQUIRED"
+    audit["presentation_status"] = "NOT_PASS_HISTORICAL_4774_KNOWN_DEFECTS"
+    audit["status"] = "COMPLETE_SCOPED_AUDIT_WITH_HISTORICAL_PRESENTATION_FINDINGS"
+    audit["finalized_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
+    audit["audit_programs"] = [ref(OUT / n) for n in ("scan_saved_traces.py", "review_trace_dom.py", "finalize_saved_audit.py")]
+    audit["limitations"] += ["Nested JSON strings decoded up to eight layers; arbitrary deeper encoding is outside heuristic assurance.", "Reported source is historical4774; tracked fixes authored by other agents during this read-only review are not verified by this evidence."]
+    audit["limitations"] = list(dict.fromkeys(audit["limitations"]))
+    (OUT / "final-trace-audit-result.json").write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
+    inventory = load(OUT / "final-trace-audit-inventory.json")
+    inventory["status"] = "COMPLETE_SCOPED_AUDIT_WITH_HISTORICAL_PRESENTATION_FINDINGS"
+    inventory["completed_at"] = audit["finalized_at"]
+    inventory["result"] = ref(OUT / "final-trace-audit-result.json")
+    inventory["manual_binary_inputs"] = audit["manual_binary_inputs"]
+    (OUT / "final-trace-audit-inventory.json").write_text(json.dumps(inventory, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"semantic_status": audit["semantic_status"], "presentation_status": audit["presentation_status"], "failures": failures, "credential_candidates": len(audit["candidates"]), "known_presentation_cases": len(known), "manual_cases": len(manual_cases), "dom_snapshots": audit["dom_truth_review"]["total_saved_snapshots"], "result": ref(OUT / "final-trace-audit-result.json")}))
+
+
+if __name__ == "__main__":
+    main()

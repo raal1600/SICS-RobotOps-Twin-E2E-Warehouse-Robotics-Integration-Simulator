@@ -229,6 +229,13 @@ WMS outage scenario returns a real HTTP 503 on its first attempt; its durable fa
 record makes the next authorized retry succeed without invoking robot motion.
 Stage 20 records the HTTP response separately from PLC/controller/sensor evidence.
 
+The console's scenario summaries describe the configured injection; persisted
+stage and journal evidence shows what actually happened. Replay reads the original
+guided scenario through each job's saved session association, including transport
+and WMS faults that do not inject a robot-runtime fault. Live protocol responses
+are displayed only for the currently selected session and command. A pending or
+unavailable read cannot establish an execution outcome.
+
 These acknowledgements are intentionally distinct:
 
 `HTTP 202 != DB commit != publisher confirm != consumer ACK != OPC UA method

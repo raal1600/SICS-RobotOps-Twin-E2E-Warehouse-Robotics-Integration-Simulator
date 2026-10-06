@@ -173,6 +173,49 @@
       "title": "CellMode",
       "type": "string"
     },
+    "ExecutionScenario": {
+      "additionalProperties": false,
+      "description": "Recorded test configuration, not proof of an injection or physical outcome.",
+      "properties": {
+        "fault": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fault"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "pattern": "^1\\.0$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "source": {
+          "const": "GUIDED_SESSION",
+          "default": "GUIDED_SESSION",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "fault"
+      ],
+      "title": "ExecutionScenario",
+      "type": "object"
+    },
     "JobPlayback": {
       "additionalProperties": false,
       "properties": {
@@ -201,6 +244,17 @@
           },
           "title": "Events",
           "type": "array"
+        },
+        "execution_scenario": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionScenario"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "job_id": {
           "maxLength": 160,

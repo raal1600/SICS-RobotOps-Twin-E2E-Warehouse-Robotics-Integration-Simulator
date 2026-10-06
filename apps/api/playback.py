@@ -1,17 +1,21 @@
 """Presentation-only access to recorded Blender motion; never dispatches commands."""
 
+from pydantic import ValidationError
+
 from robotops.blender.adapter import BlenderRuntime
 from robotops.blender.visualization import (
     DeliveryExecution,
     DeliveryPlayback,
     DeliverySummary,
+    ExecutionScenario,
     JobPlayback,
     VisualCamera,
     VisualObject,
     VisualScene,
 )
-from robotops.domain.models import JobState, PresentationSnapshot, RobotCommand
+from robotops.domain.models import JobState, PickJob, PresentationSnapshot, RobotCommand
 from robotops.hkm_geometry import camera_views, scene_primitives
+from robotops.integration.models import ExecutionSession
 from robotops.scene_geometry import cell_meshes
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import NotFound
@@ -99,6 +103,30 @@ def visual_scene(workflow: Engine, job_id: str | None = None) -> VisualScene:
     )
 
 
+def execution_scenario(workflow: Engine, job: PickJob) -> ExecutionScenario | None:
+    """Read the immutable session selection through this job's saved authority link."""
+    with workflow.store.readonly_connect() as db:
+        marker = db.execute(
+            "SELECT value FROM meta WHERE key=?", ("guided:" + job.job_id,)
+        ).fetchone()
+        if marker is None:
+            return None
+        row = db.execute("SELECT body FROM execution_sessions WHERE id=?", (marker[0],)).fetchone()
+    if row is None:
+        return None
+    try:
+        session = ExecutionSession.model_validate_json(row[0])
+    except ValidationError:
+        return None
+    if (
+        session.session_id != marker[0]
+        or session.order_id != job.order_id
+        or job.line not in session.request.lines
+    ):
+        return None
+    return ExecutionScenario(session_id=session.session_id, fault=session.fault)
+
+
 def playback(workflow: Engine, job_id: str) -> JobPlayback:
     job = workflow.store.job(job_id)
     result = JobPlayback(
@@ -110,6 +138,7 @@ def playback(workflow: Engine, job_id: str) -> JobPlayback:
         scene=visual_scene(workflow, job_id),
         product_id=job.line.product_id,
         events=[event for event in workflow.store.timeline(job.order_id) if event.job_id == job_id],
+        execution_scenario=execution_scenario(workflow, job),
     )
     runtime = workflow.runtime
     if not isinstance(runtime, BlenderRuntime):

@@ -48,7 +48,20 @@ test('no effect and an uncertain result remain distinct even with a zero-effect 
 test('every selectable scenario has a short purpose and concrete thing to watch',()=>{
   for(const {value} of guide.choices('scenario')){
     const [purpose,watch]=guide.brief(value);assert.ok(purpose.length>20&&purpose.length<150);assert.ok(watch.length>20&&watch.length<150);
+    assert.doesNotMatch(purpose,/Choose a supported scenario/);assert.doesNotMatch(watch,/No behavior is defined/);
   }
+});
+test('all integration scenarios explain their actual boundary rather than an unsupported operation',()=>{
+  for(const [value,purpose,watch] of [
+    ['DUPLICATE_DELIVERY',/original command/,/only one physical effect/],
+    ['BROKER_TRANSIENT',/publication attempt/,/same command/],
+    ['EDGE_TRANSIENT',/inbox confirmation/,/consumer acceptance/],
+    ['OPC_UA_DISCONNECT',/before command acceptance/,/physical authorization/],
+    ['PLC_RESTART',/original command/,/must not authorize another pick/],
+    ['WMS_UNAVAILABLE',/outcome has been verified/,/business reconciliation only/],
+  ]){const brief=guide.brief(value);assert.match(brief[0],purpose);assert.match(brief[1],watch);}
+  assert.match(guide.brief('UNSUPPORTED_OPERATION')[0],/Choose a supported scenario/);
+  assert.match(guide.brief('UNSUPPORTED_OPERATION')[1],/No behavior is defined/);
 });
 test('manual inspection points to real checked-in engineering sources',()=>{
   for(const [path] of guide.inspect(evidence()).sources)assert.ok(fs.existsSync(path),path);

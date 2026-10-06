@@ -1,0 +1,302 @@
+{
+  "reviewed_at_utc": "2026-10-06T00:11:42.495547+00:00",
+  "verdict": "TWO_EXACT_README_CLI_RUNS_PASS_SAVED_EVIDENCE",
+  "source_commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+  "cases": [
+    {
+      "scenario": "happy_path",
+      "command": "uv run --locked python -m tools.integration_demo --scenario happy_path --authorize-robot",
+      "exit": {
+        "command": "uv run --locked python -m tools.integration_demo --scenario happy_path --authorize-robot",
+        "source": "4774af56c656091a766c1f105b495c06e96e27ab",
+        "started_at": "2026-10-06T00:04:40.6103067Z",
+        "ended_at": "2026-10-06T00:05:06.3149413Z",
+        "exit_code": 0
+      },
+      "stdout": {
+        "status": "COMPLETED",
+        "evidence": "runs\\integration-demos\\5eed5ba0-cdeb-557a-8014-a7b358ca154c.json"
+      },
+      "identity": {
+        "session_id": "5eed5ba0-cdeb-557a-8014-a7b358ca154c",
+        "execution_session_id": "5eed5ba0-cdeb-557a-8014-a7b358ca154c",
+        "correlation_id": "730b3676-0e5b-58e5-b61b-a888c77cea3b",
+        "order_id": "demo-97865fad70fa42389a54e43567ade7b8",
+        "job_id": "80905288-885f-59bf-b8db-637d4dd16763",
+        "command_id": "0d376b73-26bc-5de8-8a79-a98018d8c58a"
+      },
+      "status": "COMPLETED",
+      "revision": 44,
+      "current_stage": 22,
+      "trace_step_count": 22,
+      "stage16_record_count": 1,
+      "reconciliation_record_count": 0,
+      "selected_effect_count": 1,
+      "payload_hash": "05e4cce35bf7c749b8519d5bc6d43190983c084b49af5e6992725e00d54b4cc9",
+      "checks": {
+        "exact_frozen_readme_command": true,
+        "exit0_source4774": true,
+        "stdout_completed_original_session_path": true,
+        "stderr_empty": true,
+        "explicit_physical_consent": true,
+        "completed_original_session_command": true,
+        "job_evidence_original_ids": true,
+        "journal_session_snapshot_same_final_state": true,
+        "journal_input_binds_saved_result_hash": true,
+        "one_durable_runtime_effect": true,
+        "one_plc_command_result_sequence1": true,
+        "runtime_plc_and_cli_receipt_exactly_equal": true,
+        "all_journal_ids_hash_original": true,
+        "one_physical_stage16_record": true,
+        "all_step_original_identity_when_present": true,
+        "expected_ordered_completed_stages": true,
+        "queried_controller_result_original": true,
+        "wms_actual200_ack_no_physical_retry": true,
+        "erp_completed_with_wms_ack": true,
+        "happy_receipt_returned_without_reconciliation": true
+      },
+      "issues": [],
+      "journal_receipt": {
+        "schema_version": "2.0",
+        "run_id": "6d161f5f-7f91-44f8-b0d5-4ebdc7f4416d",
+        "correlation_id": "730b3676-0e5b-58e5-b61b-a888c77cea3b",
+        "causation_id": "0d376b73-26bc-5de8-8a79-a98018d8c58a",
+        "timestamp": "2026-10-06T00:04:58.536868Z",
+        "command_id": "0d376b73-26bc-5de8-8a79-a98018d8c58a",
+        "job_id": "80905288-885f-59bf-b8db-637d4dd16763",
+        "scene_epoch": "8ccce40d-c0f0-423d-b0a5-d0e2b635d1c9",
+        "status": "SUCCEEDED",
+        "reason": "BLENDER_PICK_APPLIED",
+        "effect_count": 1,
+        "payload_hash": "05e4cce35bf7c749b8519d5bc6d43190983c084b49af5e6992725e00d54b4cc9",
+        "journal_durable": true,
+        "active_tool_id": "EE_PINCH_NARROW",
+        "tool_change_performed": true,
+        "trajectory_id": "trajectory-56b38097a2db26d2de776b6dbf59377684f3329b560ef6462c1e76c333ffe7de",
+        "runtime_profile_version": "hkm_inspired_v1"
+      },
+      "reconciliation": null,
+      "wms": {
+        "command_id": "0d376b73-26bc-5de8-8a79-a98018d8c58a",
+        "job_id": "80905288-885f-59bf-b8db-637d4dd16763",
+        "physical_retry": false,
+        "verified_outcome": "COMPLETED",
+        "wire": {
+          "acknowledgement_id": "wms:0d376b73-26bc-5de8-8a79-a98018d8c58a",
+          "attempts": 1,
+          "classification": "REAL PROTOCOL",
+          "command_id": "0d376b73-26bc-5de8-8a79-a98018d8c58a",
+          "http_status": 200,
+          "job_id": "80905288-885f-59bf-b8db-637d4dd16763",
+          "payload_hash": "12cee1a43b7756617628e38416f096f7bcaa6b92a5d43c25601e67c9c3ab7064",
+          "physical_retry": false,
+          "protocol": "REST/JSON",
+          "schema_version": "1.0",
+          "system": "SIMULATED WMS",
+          "verified_outcome": "COMPLETED",
+          "wms_acknowledged": true
+        },
+        "wms_acknowledged": true
+      },
+      "erp": {
+        "order_id": "demo-97865fad70fa42389a54e43567ade7b8",
+        "business_status": "COMPLETED",
+        "wms_acknowledged": true,
+        "wms_acknowledgement_ids": [
+          "c23ce9b0-a220-5b22-a97f-d123fae21de2"
+        ]
+      }
+    },
+    {
+      "scenario": "lost_ack_after_effect",
+      "command": "uv run --locked python -m tools.integration_demo --scenario lost_ack_after_effect --authorize-robot",
+      "exit": {
+        "command": "uv run --locked python -m tools.integration_demo --scenario lost_ack_after_effect --authorize-robot",
+        "source": "4774af56c656091a766c1f105b495c06e96e27ab",
+        "started_at": "2026-10-06T00:05:06.3233255Z",
+        "ended_at": "2026-10-06T00:05:36.9056966Z",
+        "exit_code": 0
+      },
+      "stdout": {
+        "status": "COMPLETED",
+        "evidence": "runs\\integration-demos\\edd9d949-c4db-5d6b-bc90-dc6c04736218.json"
+      },
+      "identity": {
+        "session_id": "edd9d949-c4db-5d6b-bc90-dc6c04736218",
+        "execution_session_id": "edd9d949-c4db-5d6b-bc90-dc6c04736218",
+        "correlation_id": "3381631c-9de4-535f-a539-9e51394e493a",
+        "order_id": "demo-06e005146cef4b878ad5c9e853e27b2a",
+        "job_id": "fcbbc932-f2cd-5115-aaa1-720c16419861",
+        "command_id": "7aead772-3c20-5170-9edf-5d4413eff392"
+      },
+      "status": "COMPLETED",
+      "revision": 46,
+      "current_stage": 22,
+      "trace_step_count": 23,
+      "stage16_record_count": 1,
+      "reconciliation_record_count": 1,
+      "selected_effect_count": 1,
+      "payload_hash": "eb8cc4a9a4eb89dd530b70731d63b3ce482b92f1465222e0d0aa7ab533d11434",
+      "checks": {
+        "exact_frozen_readme_command": true,
+        "exit0_source4774": true,
+        "stdout_completed_original_session_path": true,
+        "stderr_empty": true,
+        "explicit_physical_consent": true,
+        "completed_original_session_command": true,
+        "job_evidence_original_ids": true,
+        "journal_session_snapshot_same_final_state": true,
+        "journal_input_binds_saved_result_hash": true,
+        "one_durable_runtime_effect": true,
+        "one_plc_command_result_sequence1": true,
+        "runtime_plc_and_cli_receipt_exactly_equal": true,
+        "all_journal_ids_hash_original": true,
+        "one_physical_stage16_record": true,
+        "all_step_original_identity_when_present": true,
+        "expected_ordered_completed_stages": true,
+        "queried_controller_result_original": true,
+        "wms_actual200_ack_no_physical_retry": true,
+        "erp_completed_with_wms_ack": true,
+        "lost_ack_unknown_historical_step_preserved": true,
+        "one_original_command_reconciliation": true,
+        "reconciliation_fresh_verification_success": true,
+        "context_confirms_no_physical_resend": true
+      },
+      "issues": [],
+      "journal_receipt": {
+        "schema_version": "2.0",
+        "run_id": "6d161f5f-7f91-44f8-b0d5-4ebdc7f4416d",
+        "correlation_id": "3381631c-9de4-535f-a539-9e51394e493a",
+        "causation_id": "7aead772-3c20-5170-9edf-5d4413eff392",
+        "timestamp": "2026-10-06T00:05:25.682576Z",
+        "command_id": "7aead772-3c20-5170-9edf-5d4413eff392",
+        "job_id": "fcbbc932-f2cd-5115-aaa1-720c16419861",
+        "scene_epoch": "8ccce40d-c0f0-423d-b0a5-d0e2b635d1c9",
+        "status": "SUCCEEDED",
+        "reason": "BLENDER_PICK_APPLIED",
+        "effect_count": 1,
+        "payload_hash": "eb8cc4a9a4eb89dd530b70731d63b3ce482b92f1465222e0d0aa7ab533d11434",
+        "journal_durable": true,
+        "active_tool_id": "EE_PINCH_WIDE",
+        "tool_change_performed": true,
+        "trajectory_id": "trajectory-2e998786c2494564d42708cf241cf09a020df405a2c58a95dc2ea4558e6f85ae",
+        "runtime_profile_version": "hkm_inspired_v1"
+      },
+      "reconciliation": {
+        "job_id": "fcbbc932-f2cd-5115-aaa1-720c16419861",
+        "command_id": "7aead772-3c20-5170-9edf-5d4413eff392",
+        "status": "COMPLETED",
+        "original_identity_queried": true,
+        "physical_resend": false
+      },
+      "wms": {
+        "command_id": "7aead772-3c20-5170-9edf-5d4413eff392",
+        "job_id": "fcbbc932-f2cd-5115-aaa1-720c16419861",
+        "physical_retry": false,
+        "verified_outcome": "COMPLETED",
+        "wire": {
+          "acknowledgement_id": "wms:7aead772-3c20-5170-9edf-5d4413eff392",
+          "attempts": 1,
+          "classification": "REAL PROTOCOL",
+          "command_id": "7aead772-3c20-5170-9edf-5d4413eff392",
+          "http_status": 200,
+          "job_id": "fcbbc932-f2cd-5115-aaa1-720c16419861",
+          "payload_hash": "4dc23df5d5915de340f075292f7458d93a79cc54f67ff1351029bd9cc9110634",
+          "physical_retry": false,
+          "protocol": "REST/JSON",
+          "schema_version": "1.0",
+          "system": "SIMULATED WMS",
+          "verified_outcome": "COMPLETED",
+          "wms_acknowledged": true
+        },
+        "wms_acknowledged": true
+      },
+      "erp": {
+        "order_id": "demo-06e005146cef4b878ad5c9e853e27b2a",
+        "business_status": "COMPLETED",
+        "wms_acknowledged": true,
+        "wms_acknowledgement_ids": [
+          "3c2e38da-3096-5e58-acf6-0b54988c97f1"
+        ]
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "path": "artifacts/final-manual-4774af5/cli-happy_path-exit.json",
+      "sha256": "593cd9e64112aed2c415275862cf58986217beb4b50ba55961b12205b4a6f50d",
+      "bytes": 301
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-happy_path-result.json",
+      "sha256": "0123f9300575ea10235a4ac703619584494a9b0fff1e6163d816b0ae3cbd0b98",
+      "bytes": 280434
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-happy_path-journals.json",
+      "sha256": "93267ae8497d0bea316404032138ec45e85383342bfb10166eceda86039a2850",
+      "bytes": 6000
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-happy_path.stdout.log",
+      "sha256": "6dbd4a1139df9b450d92d4a696541043fc6cbfb18abc71bef11056983966d7a0",
+      "bytes": 216
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-happy_path.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-lost_ack_after_effect-exit.json",
+      "sha256": "8342c4828e9291d3e67542c99b89c310a2b341074501be106dd6747b9be898b4",
+      "bytes": 312
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-lost_ack_after_effect-result.json",
+      "sha256": "b6565df83d66618083b609b49087845475f3fd4dd55818f9bf964e895fded65e",
+      "bytes": 363687
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-lost_ack_after_effect-journals.json",
+      "sha256": "b4e6fdafd648c4dd1c3a3c087b6dd2904181c554f1b9d2a82a5c0db6cc8f9e32",
+      "bytes": 6005
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-lost_ack_after_effect.stdout.log",
+      "sha256": "6bee5c87786f62ea5de39488170784424475073804765b4e56708928210eaae8",
+      "bytes": 216
+    },
+    {
+      "path": "artifacts/final-manual-4774af5/cli-lost_ack_after_effect.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "frozen_source_references": [
+    {
+      "commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+      "path": "README.md",
+      "sha256_of_git_blob": "3f31446509aa4fceba460693e2e05ce75dcfd2f4a8a6d5fbae30af067cffe2be",
+      "lines": [
+        87,
+        88
+      ]
+    },
+    {
+      "commit": "4774af56c656091a766c1f105b495c06e96e27ab",
+      "path": "tools/integration_demo.py",
+      "sha256_of_git_blob": "3dbef1a582e0a97a18c5825e8a5df2164c8aaa72c26914d4580899e8dc046252",
+      "facts": "Calls bounded session /authorize handlers with explicit consent; UNKNOWN_OUTCOME goes to same session /reconcile; returns persisted session/job evidence and checks original command/effect count."
+    }
+  ],
+  "method": "Read saved result/journal/exit/stdout/stderr files; compare full receipts and identity/state/stage fields, and exact exit command with README at frozen git commit. No runtime calls or database access.",
+  "limits": [
+    "One physical stage16 record and one durable effect are directly evidenced; there is no separate CLI HTTP request trace, so an exact network POST count is not independently asserted.",
+    "Lost-ACK CLI recovery is automatic within the explicitly consented README command; this is separate from the interactive manual Reconcile button proof.",
+    "The source labels in exit/journal records bind these runs to frozen4774; this review is not an independent attestation of every runtime process.",
+    "These passing CLI semantics do not clear the two UI caption defects or establish validation for a later corrected source.",
+    "No GOAL completion, CI, remote publication, Pages or Docker pass is claimed."
+  ],
+  "goal_status": "NOT_ACHIEVED"
+}

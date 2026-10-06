@@ -25,6 +25,14 @@ is the default scope: Replay and the scrubber span every product execution in
 the original execution order. **Selected product execution** replays just the
 chosen item in **Product execution details**. Six picks therefore appear as
 one delivery with six segments; each retains its own command and outcome.
+Guided replay also carries the saved session's scenario for each job. This is
+read-only test configuration, not proof that an injection occurred or that the
+pick succeeded. A transport or WMS fault may have no robot-runtime fault event;
+its caption still names the recorded scenario. Changing the next-order selector
+does not change historical labels. Mixed deliveries identify their different
+recorded scenarios. Missing legacy scenario metadata is explicit rather than
+being inferred as a happy path, and later observation-review faults do not
+replace the original execution selection.
 Earlier delivered products use their saved positions in later clips. Preparing
 a fresh scene preserves the earlier delivery; starting a new test retains that
 world's deliveries under Test history. Explicit **Delete selected test** or

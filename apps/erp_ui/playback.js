@@ -10,6 +10,17 @@ const scenarioNames = {
   CELL_FAULT: "Cell fault", BRAIN_INVALID_OUTPUT: "Invalid Brain output",
   BRAIN_TIMEOUT: "Brain timeout", ROBOT_COMMAND_FAILURE: "Robot command failure"
 };
+function recordedScenario(clip){
+  const label=fault=>{
+    const known=typeof SimulationGuide!=="undefined"&&SimulationGuide.choices("scenario").find(item=>item.value===fault);
+    return known?.label||scenarioNames[fault]||`Unrecognized recorded scenario (${fault})`;
+  };
+  const saved=clip.execution_scenario;
+  if(saved?.source==="GUIDED_SESSION")return saved.fault===null?"Happy path (no injected scenario)":label(saved.fault);
+  const events=clip.events||[],boundary=events.findIndex(event=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION","COMPLETED","FAILED"].includes(event.state_after));
+  const fault=events.slice(0,boundary<0?events.length:boundary).find(event=>event.event_type==="FAULT_INJECTED"&&(!event.job_id||event.job_id===clip.job_id));
+  return fault?label(fault.reason):"No execution scenario recorded";
+}
 function interpolateQuaternion(a,b,t){
   let dot=a.reduce((sum,v,i)=>sum+v*b[i],0);
   if(dot<0){b=b.map(v=>-v);dot=-dot;}
@@ -79,8 +90,8 @@ class MotionPlayer {
     const uncertain=clips.some(clip=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(clip.job_state));
     const completed=clips.filter(clip=>clip.job_state==="COMPLETED").length;
     this.byId("motion-outcome").textContent=delivery?(clips.length?`${completed}/${clips.length} completed${uncertain?" · uncertain outcome":""}`:"Ready for a new delivery"):"Job: "+data.job_state;
-    const fault=clips.flatMap(clip=>clip.events||[]).find(e=>e.event_type==="FAULT_INJECTED");
-    this.byId("motion-scenario").textContent=delivery&&!clips.length?"New delivery · ready for the selected scenario.":(delivery?"Delivery scenario: ":"Execution: ")+(scenarioNames[fault?.reason]||"Happy path");
+    const labels=[...new Set(clips.map(recordedScenario))];
+    this.byId("motion-scenario").textContent=delivery&&!clips.length?"New delivery · ready for the selected scenario.":(delivery?"Delivery scenario: ":"Execution: ")+(labels.length>1?`Mixed recorded scenarios: ${labels.join("; ")}`:labels[0]);
     this.byId("motion-outcome").classList.toggle("uncertain",uncertain);
     const provenance=data?.recording?"Original Blender poses":scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
     const missing=clips.filter(clip=>!clip.recording).length;

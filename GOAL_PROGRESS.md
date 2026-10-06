@@ -82,10 +82,51 @@ acceptance cleanup rule or test assertion was changed. The watcher is corrected;
 a new clean full two-pass campaign is required. [The retained record](docs/evidence/lab-dfb06bc/summary.json)
 keeps the successful suite distinct from the incomplete acceptance runner.
 
-Required next evidence: complete a clean full acceptance campaign, execute the
-final clean-lab browser/reload/duplicate/recovery
-loop and documented CLI demos, inspect logs and rendered publication, then update
-the final report and all requirement evidence. Exact-source CI, publication and
+The next clean campaign on `4774af5` completed successfully: **799 passed twice,
+zero failures, errors or skips**, with coverage **91.3835% / 91.4398%**. Both
+case sets match. All 20 local gates passed, including eight actual Blender demos,
+security, lint/type checks and publication generation. The three remote gates
+remain pending; this proves 163 of 169 MUSTs locally, with six depending on remote
+attestation. The optional model SHOULD remains separate. The original results are
+in [the complete campaign](docs/evidence/acceptance/20261005T224038/manifest.json).
+
+A fresh native Blender lab then completed the manual browser happy, lost-ACK and
+duplicate-delivery journeys, plus both exact README CLI commands. Saved evidence
+proves the physical gate precedes the effect, reload preserves the authoritative
+session, six inspectors are read-only, and duplicate authorization preserves the
+original result. Lost-ACK reconciliation retained the original runtime receipt and
+one effect; the PLC legitimately gained its first retained result. Duplicate
+publication increased inbox deliveries from one to two with the same command/hash
+and one effect; its broker redelivered flags were false. The selected manual
+browser diagnostics contained no errors. These are simulator results, not a
+guarantee of exactly-once physical execution in an industrial installation.
+
+Manual screenshot inspection also found two presentation defects that prevent
+completion: supported distributed scenarios had no short explanation, and their
+replay could incorrectly say Happy path when no robot-runtime fault was injected.
+The correction supplies persisted per-job scenario metadata for historical replay
+and complete scenario summaries. A related source-level race also needs command-
+bound live-response guards; the old protocol text at the captured physical gate
+was hidden, not a visible false claim. These changes require regression checks
+and a new source-bound acceptance campaign. The successful `4774af5` campaign and
+manual evidence remain historical proof of their exact source, not proof of the
+correction. See [the retained record](docs/evidence/lab-4774af5/summary.json).
+
+The bounded correction now passes **90 targeted Python tests**, with the final
+JavaScript wrapper rerunning the same five files as the **160-pass Node check**.
+It also passes **10 focused browser/real-protocol cases in 223.25 seconds**; the
+Blender happy case was deliberately deselected from that focused lane. The saved
+duplicate and WMS screenshots show correct historical captions even after changing
+the next-order selector. Full repository typing and the 169-MUST drift check pass.
+[Correction evidence](docs/evidence/scenario-label-correction/summary.json) records
+the exact code hashes and the distinction from full acceptance. The complete
+saved lab trace scan found no credential candidates in its listed scope, while
+preserving the historical caption findings. All 64 generated PDF pages were
+visually reviewed before the final status rebuild.
+
+Required next evidence: validate the
+corrected source, repeat the final manual checks, finish trace/publication review,
+then update the final report and all requirement evidence. Exact-source CI, publication and
 Pages verification remain mandatory. Remote publication requires explicit approval
 following the earlier automatic approval rejection; no remote action is inferred
 from local results. See [the complete checklist](docs/integration-lab-requirements.md).

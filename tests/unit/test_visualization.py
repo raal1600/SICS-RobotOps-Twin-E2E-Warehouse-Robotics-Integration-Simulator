@@ -118,6 +118,7 @@ def test_playback_controls_never_dispatch_and_preserve_partial_recording_limits(
             "tests/ui/dashboard.test.cjs",
             "tests/ui/workflow-guide.test.cjs",
             "tests/ui/investigation.test.cjs",
+            "tests/ui/integration-console.test.cjs",
         ],
         capture_output=True,
         text=True,

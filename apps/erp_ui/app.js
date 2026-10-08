@@ -1,5 +1,7 @@
 "use strict";
 const byId = id => document.getElementById(id);
+const workspaceView = typeof SimulationWorkspace !== "undefined" ? new SimulationWorkspace() : null;
+globalThis.robotWorkspace = workspaceView;
 const player = new MotionPlayer();
 let selectedJob = null, selectedDelivery = null, fixture = null, deliveries = [], busy = false, refreshing = false, pollingMotion = false;
 let orderSignature = "", productSignature = "", deliverySignature = "", nextMotionPoll = 0, cellMode = "READY", refreshVersion = 0;
@@ -14,17 +16,34 @@ let guideEvidence = null, guideJob = null, guidance = null;
 let cellProfiles = [], newTestRequest = null, deletionRequest = null, historyVersion = 0;
 let selectedEvidence = null, selectedEvents = [], knownOrders = [], inspection = null, inspectionVersion = 0, timelineSignature = "";
 let guidedPlaybackGate = false;
+let guidedReplayJob = null;
+let inspectionReturnFocus = null;
+let testDialogReturnFocus = null;
 const inspectionPanes = ["findings", "evidence", "manual"];
 const integration = new IntegrationConsole({
   request: (path, body) => api(path, body), path: path => testPath(path), readOnly: () => readOnly(),
+  investigate: async job => {
+    if(!job)return;
+    const testId=selectedTest;
+    try {
+      const evidence=await api(`/jobs/${encodeURIComponent(job)}/evidence`);
+      if(testId!==selectedTest)return;
+      await openInspection(evidence);
+      showInspectionPane("evidence");
+    } catch(error) { integration.error(error); }
+  },
   sessionChanged: session => {
+    byId("test-workflow-steps").hidden=!!session||!selectedTest||clearingTest();
     const gated = !!session && !session.context?.physical_authorized && session.status !== "COMPLETED";
-    if (guidedPlaybackGate && !gated && session?.job_id) {
+    if (session?.job_id && (guidedReplayJob !== session.job_id || guidedPlaybackGate && !gated)) {
       // Consent belongs to this job; never resume a previous delivery's motion.
       byId("replay-scope").value="product";
+      byId("orders").value=session.job_id;
       selectedJob=session.job_id;
       player.select(session.job_id);
+      nextMotionPoll=0;
     }
+    guidedReplayJob=session?.job_id || null;
     guidedPlaybackGate=gated;
     player.setExecutionGate?.(gated);
   },
@@ -39,9 +58,7 @@ const integration = new IntegrationConsole({
   physical: async (session, phase) => {
     byId("replay-scope").value="product";
     await refresh(session.job_id,fixture?.scene_epoch);nextMotionPoll=0;
-    if(phase==="before")byId("motion-panel").scrollIntoView({block:"start",behavior:"auto"});
     await refreshMotion(true);
-    if(phase==="after")integration.focus();
   }
 });
 function showInspectionPane(name) {
@@ -114,7 +131,7 @@ async function openInspection(evidence, events=null) {
   if(!same){showInspectionPane("findings");byId("timeline-panel").open=false;byId("evidence-details").open=false;byId("event-details").open=false;text("event-record","Select an event above.");}
   player.pause();
   byId("review-panel").open=true;text("inspection-error","");
-  if(!byId("investigation-dialog").open)byId("investigation-dialog").showModal();
+  if(!byId("investigation-dialog").open){inspectionReturnFocus=document.activeElement;byId("investigation-dialog").showModal();}
   renderInspection();
   const pane=inspectionPanes.find(name=>!byId(`pane-${name}`).hidden)||"findings";
   byId(pane==="findings"?"review-heading":`tab-${pane}`).focus({preventScroll:true});
@@ -129,6 +146,7 @@ const testPath = path => (selectedTest === "original" ? "" : `/simulation-tests/
 const sourceFor = product => fixture?.product_sources?.[product] || fixture?.source_id;
 const atSource = item => (item.location_id??item.location) === sourceFor(item.product_id);
 function testControls() {
+  workspaceView?.update(selectedTest,integration.session,integration.selected,integration.tab,integration.sourceMode==="current"?integration.sourceDocument:null);
   const current=testHistory.find(item=>item.test_id===selectedTest);
   byId("test-history").value=selectedTest||"";
   byId("new-test").disabled=busy||!testLifecycleAvailable;
@@ -140,14 +158,14 @@ function testControls() {
   byId("return-current").hidden=!activeTest||selectedTest===activeTest;byId("return-current").disabled=busy;
   byId("empty-workspace").hidden=!!selectedTest;
   byId("test-workspace").hidden=!selectedTest||clearingTest();
-  byId("test-workflow-steps").hidden=!selectedTest||clearingTest();
+  byId("test-workflow-steps").hidden=!selectedTest||clearingTest()||!!integration.session;
   text("test-status",!current
     ? (testHistory.length?"No test selected. Saved tests are available for review, or create a new test.":"No test data. Start a new test and choose a robot cell.")
     : `Test ${current.number} · ${current.cell_display_name} · `+(current.clearing
       ? "Clear is unfinished. Retry the confirmed clear, or reopen the app to finish restoring this test."
       : readOnly()
       ? "saved history, read-only. Return to the current test or start a new one."
-      : "current test. Start new test creates a separate world; previous results stay in history."));
+      : testLifecycleAvailable ? "current test. Start new test creates a separate world; previous results stay in history." : "current integration lab. Results remain in this lab's saved history."));
   if(selectedTest)byId("metrics-link").href=testPath("/metrics");
 }
 async function refreshHistory() {
@@ -160,7 +178,7 @@ async function refreshHistory() {
     byId("test-history").replaceChildren();
     byId("test-history").add(new Option("Select a test", ""));
     data.tests.slice().reverse().forEach(item=>byId("test-history").add(new Option(
-      `Test ${item.number} · ${item.cell_display_name} · ${item.active?"Current":"Saved"} · ${item.order_count} orders · ${[...new Set(item.outcomes)].join(", ")||"Ready"}`,item.test_id)));
+      `Test ${item.number} · ${item.cell_display_name} · ${item.active?"Current":"Saved"} · ${item.order_count} orders · Job states: ${[...new Set(item.outcomes)].join(", ")||"Ready"}`,item.test_id)));
     historySignature=signature;
   }
   if(selectedTest&&!testHistory.some(item=>item.test_id===selectedTest))await selectTest(null);
@@ -220,9 +238,9 @@ function fixtureControls() {
   const productName=fixture.products.find(item=>item.product_id===pending?.product_id)?.sku||pending?.product_id;
   const uncertain=pending?.state==="UNKNOWN_OUTCOME";
   const pendingGuided=integration.session&&!['COMPLETED','FAILED'].includes(integration.session.status);
-  byId("workflow-guide").hidden=!!pendingGuided&&!['UNKNOWN_OUTCOME','REQUIRES_INTERVENTION'].includes(integration.session.status);
-  byId("create").disabled=busy||readOnly()||!!pendingGuided||(!available&&anyAvailable)||(cellMode!=="READY"&&anyAvailable)||!!blocker;
-  byId("create").textContent=busy?"Operation in progress…":uncertain?"Next pick paused — reconcile first":pending?"Next pick paused — observe again":anyAvailable?"Create and run order":"Start new delivery and run order";
+  byId("workflow-guide").hidden=!!pendingGuided;
+  byId("create").disabled=busy||readOnly()||integration.startUnconfirmed||!!pendingGuided||(!available&&anyAvailable)||(cellMode!=="READY"&&anyAvailable)||!!blocker;
+  byId("create").textContent=busy?"Operation in progress…":integration.startUnconfirmed?"Request unconfirmed — reload to check":uncertain?"Next pick paused — reconcile first":pending?"Next pick paused — observe again":anyAvailable?"Create and run order":"Start new delivery and run order";
   byId("next-step").hidden=!pending;
   text("next-step-title",uncertain?`${productName}: outcome uncertain`:`${productName}: more evidence needed`);
   text("next-step-detail",uncertain
@@ -237,15 +255,15 @@ function fixtureControls() {
   byId("observation").disabled=busy;
   byId("fresh-scene").disabled=busy||readOnly()||!!blocker;
   byId("tool-showcase").hidden=!fixture.catalogue;
-  byId("tool-showcase").disabled=busy||readOnly()||!!pendingGuided||!!blocker||cellMode!=="READY";
+  byId("tool-showcase").disabled=busy||readOnly()||integration.startUnconfirmed||!!pendingGuided||!!blocker||cellMode!=="READY";
   byId("reset").disabled=busy||readOnly();byId("motion-import").disabled=busy||readOnly();
   text("inventory-status", blocker==="SCENE_RESET_IN_PROGRESS" ? "Preparing a fresh scene. Previous orders and recordings are being retained."
     : pending ? `Next pick blocked by ${productName} (${pending.state}). Open Investigate this pick to continue.`
     : blocker ? "An active job must finish before another pick can start."
     : readOnly() ? "Saved test: use the replay and evidence controls to review it."
-    : !anyAvailable ? "Delivery finished. Start new test for another combination, or start another delivery in this test. The full delivery replay stays saved."
+    : !anyAvailable ? testLifecycleAvailable ? "Delivery finished. Start new test for another combination, or start another delivery in this test. The full delivery replay stays saved." : "Delivery finished. Start another delivery in this lab. The full delivery replay stays saved."
     : cellMode!=="READY" ? "The cell is stopped or faulted. Reset logical cell state before running another order."
-    : "Choose a scenario and run products in this test. Start new test above for a fresh, independent combination.");
+    : testLifecycleAvailable ? "Choose a scenario and run products in this test. Start new test above for a fresh, independent combination." : "Choose a product and scenario to run the next pick in this integration lab.");
   renderGuidance();
 }
 function guideExecution() {
@@ -266,10 +284,15 @@ function renderGuidance() {
   const evidence=guideJob===execution?.job_id?guideEvidence:null;
   guidance=SimulationGuide.describe({ready:!!fixture,busy,archived:readOnly(),pending,state:execution?.state,
     cellMode,blocked:fixture?.scene_reset_blocked_reason,available:fixture?.inventory.filter(atSource).length,product,evidence});
+  if(!testLifecycleAvailable&&guidance.action==="configure")guidance.detail="Choose the next product and scenario, then run the next order in this integration lab.";
+  if(!testLifecycleAvailable&&guidance.action==="new-test")Object.assign(guidance,{action:"configure",label:"Set up next delivery",detail:"All products are at the destination. Replay this delivery, or start another delivery in this lab. Previous results stay saved."});
   text("guide-title",guidance.title);text("guide-detail",guidance.detail);text("guide-action",guidance.label);
   text("guide-label",guidance.tone==="attention"?"NEEDS YOUR ATTENTION":"NEXT STEP");
   byId("workflow-guide").setAttribute("data-tone",guidance.tone);
   byId("guide-action").disabled=guidance.action==="none";
+  // Keep the unresolved pick reachable even while reviewing another recording.
+  if(guidance.action==="review")byId("workflow-guide").hidden=false;
+  if(workspaceView&&integration.session?.status==="COMPLETED"&&guidance.action==="configure")byId("workflow-guide").hidden=true;
   for(let stage=0;stage<4;stage++){
     if(stage===guidance.stage)byId(`stage-${stage}`).setAttribute("aria-current","step");
     else byId(`stage-${stage}`).removeAttribute("aria-current");
@@ -483,9 +506,11 @@ async function refreshMotion(force=false) {
   if(!(full?selectedDelivery:selectedJob) || pollingMotion || !force && Date.now()<nextMotionPoll) return;
   pollingMotion=true;
   const version=viewVersion;
+  const replayKey=full?selectedDelivery:selectedJob;
   try {
     const data=await api(full?`/deliveries/${selectedDelivery}/playback`:`/jobs/${selectedJob}/playback`);
-    if(version!==viewVersion)return;
+    if(version!==viewVersion || full!==(byId("replay-scope").value==="delivery") || replayKey!==(full?selectedDelivery:selectedJob))return;
+    integration.replayEvidence(data);
     if(full)player.updateDelivery(data);else player.update(data);
     const clips=full?data.jobs:[data];
     nextMotionPoll=clips.some(clip=>["RECORDING","WAITING"].includes(clip.status))?Date.now()+250:Infinity;
@@ -547,7 +572,7 @@ byId("resolve-blocker").onclick=()=>action(async()=>{
 byId("reconcile").onclick=()=>action(async()=>{if(selectedJob)await reconcilePick(selectedJob);},"Collecting a fresh observation for the original pick…");
 byId("reset").onclick=()=>action(()=>api("/cell/reset",{}));
 byId("fresh-scene").onclick=()=>action(freshDelivery,"Preparing a new delivery; previous replays stay saved.");
-byId("scenario").onchange=()=>{fixtureControls();text("message","Scenario selected for the next order. Start new test for fresh products and an independent result.");};
+byId("scenario").onchange=()=>{fixtureControls();text("message",testLifecycleAvailable?"Scenario selected for the next order. Start new test for fresh products and an independent result.":"Scenario selected for the next order in this integration lab.");};
 function cellDescription(){
   const profile=cellProfiles.find(item=>item.cell_profile_id===byId("cell-profile").value);
   text("cell-profile-description",profile?`${profile.description} ${profile.product_count} product families · ${profile.tool_count} tools.`:"No robot cells are available.");
@@ -555,6 +580,7 @@ function cellDescription(){
 }
 byId("new-test").onclick=async()=>{
   if(busy)return;
+  testDialogReturnFocus=document.activeElement;
   try{
     const data=await request("/cell-profiles");
     cellProfiles=data.profiles.filter(item=>item.selectable);
@@ -589,6 +615,7 @@ async function manageTests(dialogId,errorId,operation){
     busy=false;managingTests=false;
     for(const id of ["create-test","cancel-new-test","confirm-delete-test","cancel-delete-test"])byId(id).disabled=false;
     fixtureControls();
+    if(!byId(dialogId).open)restoreTestDialogFocus();
   }
 }
 byId("create-test").onclick=()=>{
@@ -603,6 +630,7 @@ byId("create-test").onclick=()=>{
 };
 function confirmDeletion(all){
   if(busy)return;
+  testDialogReturnFocus=document.activeElement;
   const targets=all?testHistory:testHistory.filter(item=>item.test_id===selectedTest);
   if(!targets.length)return;
   deletionRequest={path:all?"/simulation-tests/delete-all":`/simulation-tests/${selectedTest}/delete`,
@@ -622,6 +650,7 @@ byId("clear-tests").onclick=()=>confirmDeletion(true);
 byId("clear-test").onclick=()=>{
   const current=testHistory.find(item=>item.test_id===selectedTest);
   if(busy||!current)return;
+  testDialogReturnFocus=document.activeElement;
   deletionRequest={path:`/simulation-tests/${selectedTest}/clear`,clearTestId:selectedTest,
     body:{request_id:crypto.randomUUID(),expected_revision:current.revision??1}};
   text("delete-test-title",`Clear Test ${current.number} and retry?`);
@@ -645,9 +674,16 @@ byId("confirm-delete-test").onclick=()=>{
     return result.cleanup_pending?"Test data removed from history. Some files are still in use; cleanup will retry when the app restarts.":"Test data deleted. Create a new test or review another saved test.";
   });
 };
+function restoreTestDialogFocus(){
+  if(!testDialogReturnFocus)return;
+  const target=[testDialogReturnFocus,byId("empty-new-test"),byId("new-test"),byId("test-history")]
+    .find(element=>element&&!element.disabled&&!element.hidden&&(!element.getClientRects||element.getClientRects().length));
+  target?.focus();testDialogReturnFocus=null;
+}
 for(const [dialog,cancel] of [["new-test-dialog","cancel-new-test"],["delete-test-dialog","cancel-delete-test"]]){
   byId(cancel).onclick=()=>{if(!busy)byId(dialog).close();};
   byId(dialog).addEventListener("cancel",event=>{if(busy)event.preventDefault();});
+  byId(dialog).addEventListener("close",()=>{if(!busy)restoreTestDialogFocus();});
 }
 byId("test-history").onchange=()=>{
   const identity=byId("test-history").value||null;
@@ -667,7 +703,7 @@ byId("guide-action").onclick=async()=>{
 byId("view-evidence").onclick=()=>{if(!inspection)return;showInspectionPane("evidence");byId("journal-details").open=true;byId("observation-details").open=true;byId("tab-evidence").focus();};
 byId("inspect-selected").onclick=()=>openInspection(selectedEvidence,selectedEvents);
 byId("return-simulation").onclick=()=>byId("investigation-dialog").close();
-byId("investigation-dialog").addEventListener("close",()=>{byId("inspect-selected").focus({preventScroll:true});});
+byId("investigation-dialog").addEventListener("close",()=>{(inspectionReturnFocus?.isConnected?inspectionReturnFocus:byId("inspect-selected")).focus({preventScroll:true});});
 for(const pane of inspectionPanes){
   byId(`tab-${pane}`).onclick=()=>showInspectionPane(pane);
   byId(`tab-${pane}`).addEventListener("keydown",event=>{
@@ -717,6 +753,27 @@ for(const kind of ["scenario","observation"]){
     detail.append(stage,meaning);row.append(name,detail);byId(`${kind}-comparisons`).append(row);
   });
 }
+async function restoreWorkspaceSelection(state) {
+  if(!workspaceView)return;
+  workspaceView.restoring=true;
+  try{
+    if(state.test&&state.test!==selectedTest&&testHistory.some(item=>item.test_id===state.test))await selectTest(state.test);
+    if(state.session&&state.session!==integration.session?.session_id&&Array.from(byId("integration-history").options).some(item=>item.value===state.session))await integration.selectSession(state.session);
+    const step=integration.session?.steps.find(item=>item.step_id===state.step);
+    if(step)integration.selectStep(step);
+    const tab=Array.from(byId("integration-tabs").children).find(item=>item.textContent===state.tab);
+    if(tab&&integration.session)tab.click();
+    if(state.tab==="Source"&&state.component&&integration.selected){
+      await integration.loadEngineering();
+      if(integration.engineeringDocument?.source_catalog?.some(item=>item.key===state.component))await integration.loadSourceFile(state.component);
+    }
+    workspaceView.show(state.view);
+  }finally{workspaceView.restoring=false;workspaceView.update(selectedTest,integration.session,integration.selected,integration.tab,integration.sourceMode==="current"?integration.sourceDocument:null);}
+}
+if(workspaceView)workspaceView.restore=state=>{
+  if(busy){workspaceView.save();return;}
+  restoreWorkspaceSelection(state).catch(appError);
+};
 (async()=>{try{
   const health=await request("/health");
   distributedProfile=health.capabilities?.distributed_protocols===true;
@@ -724,6 +781,7 @@ for(const kind of ["scenario","observation"]){
   testLifecycleAvailable=health.capabilities?.test_lifecycle!==false;
   if(!testLifecycleAvailable){byId("new-test").hidden=true;byId("clear-test").closest("details").hidden=true;}
   await refreshHistory();await selectTest(activeTest);
+  await restoreWorkspaceSelection(workspaceView?.requested||{});
   text("runtime",fixture?.runtime === "blender"?"Blender · CPU · synthetic world":"Deterministic headless world");
   setInterval(()=>{if(!managingTests)refreshHistory().then(()=>{if(!managingTests)return refresh();}).catch(appError);},1000);
   setInterval(()=>{if(!managingTests)refreshMotion();},250);

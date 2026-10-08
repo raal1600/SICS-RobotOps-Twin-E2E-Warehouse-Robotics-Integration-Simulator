@@ -1,0 +1,102 @@
+{
+  "checked_at_utc": "2026-10-07T19:09:42.936188+00:00",
+  "scope": "Focused local workbench validation, not full release or remote CI attestation",
+  "ui": {
+    "tests": 167,
+    "passed": 167,
+    "failed": 0
+  },
+  "backend_and_initial_contract": {
+    "tests": 84,
+    "passed": 83,
+    "failures": [
+      {
+        "class": "tests.contract.test_api",
+        "name": "test_openapi_is_current_and_schemas_validate"
+      }
+    ],
+    "integration_passed": 83
+  },
+  "contracts_after_regeneration": {
+    "tests": 68,
+    "passed": 68,
+    "failures": [],
+    "integration_passed": 0
+  },
+  "browser": {
+    "tests": 7,
+    "passed": 7,
+    "failures": [],
+    "integration_passed": 0,
+    "blender_deselected": 2
+  },
+  "distributed_browser_scenarios": [
+    {
+      "scenario": "happy",
+      "runtime": "blender",
+      "status": "COMPLETED",
+      "command_id": "39f761ad-d7fa-53df-9203-3f6799bf1ec6",
+      "journal_effect_count": 1,
+      "proof_boundaries_established": 10,
+      "browser_errors": 0,
+      "source_directory": "artifacts/lab-browser/20261007T183043204867/happy"
+    },
+    {
+      "scenario": "lost-ack",
+      "runtime": "synthetic",
+      "status": "COMPLETED",
+      "command_id": "7c364495-1ea0-54fc-b708-4ef0e3d567c4",
+      "journal_effect_count": 1,
+      "proof_boundaries_established": 10,
+      "browser_errors": 0,
+      "source_directory": "artifacts/lab-browser/20261007T183201239749/DROP_ACK_AFTER_EFFECT"
+    },
+    {
+      "scenario": "duplicate-delivery",
+      "runtime": "synthetic",
+      "status": "COMPLETED",
+      "command_id": "7c1f69ba-33fe-5405-86e2-4ede4e4ebcce",
+      "journal_effect_count": 1,
+      "proof_boundaries_established": 10,
+      "browser_errors": 0,
+      "source_directory": "artifacts/lab-browser/20261007T183304251453/DUPLICATE_DELIVERY"
+    },
+    {
+      "scenario": "wms-failure",
+      "runtime": "synthetic",
+      "status": "COMPLETED",
+      "command_id": "3b6341a5-9711-5112-911d-037fefd08d85",
+      "journal_effect_count": 1,
+      "proof_boundaries_established": 10,
+      "browser_errors": 0,
+      "source_directory": "artifacts/lab-browser/20261007T183359308064/WMS_UNAVAILABLE"
+    }
+  ],
+  "manual": {
+    "scenarios": [
+      "A successful order",
+      "B lost acknowledgement after effect",
+      "C WMS HTTP 503 and business-only retry"
+    ],
+    "all_completed": true,
+    "runtime": "blender",
+    "original_commands": [
+      "89dae376-6f2c-5164-919a-7c7817a538b5",
+      "426ebcae-977c-5b45-b601-4a850700a00d",
+      "32c07717-8200-585b-94f3-0b8827a05910"
+    ],
+    "effect_counts": [
+      1,
+      1,
+      1
+    ],
+    "physical_stage_requests": 3,
+    "wms_retry_stage": 20,
+    "browser_errors": 0,
+    "final_history_review_posts": 0,
+    "final_history_replay_identity_matches": true
+  },
+  "static_checks_passed": 6,
+  "curated_json_secret_scan_findings": [],
+  "attribution": "Distributed suite precedes final UI polish/history fix. Final UI regression and manual history review cover that fix. Raw initial stale-contract failure is retained; subsequent 68-case contract run is clean."
+}

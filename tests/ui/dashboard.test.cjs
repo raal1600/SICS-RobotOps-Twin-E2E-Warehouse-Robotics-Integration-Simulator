@@ -80,7 +80,7 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
     const scene=()=>({scene_epoch:id+'-scene-'+world.epoch,source:'CURRENT_WORLD_REFERENCE',objects:[]});
     const fixture=()=>({runtime:'headless',scene_epoch:scene().scene_epoch,source_id:catalogue?sources[inventory[0].product_id]:'source',destination_id:world.destination,
       robot_profile_version:catalogue?world.cell_profile_id:null,products:inventory.map(item=>({product_id:item.product_id,sku:catalogue?item.product_id.slice(8,-3):item.product_id})),catalogue,product_sources:sources,inventory,scene_reset_blocked_reason:world.blocked});
-    const pending=session=>({...session,pending_authorization:session.status==='WAITING_AUTHORIZATION'?{stage:session.current_stage,title:session.current_stage===17?'Controller result':`Stage ${session.current_stage}`,expected_revision:session.revision,label:'Continue',mandatory:[3,10,13,15].includes(session.current_stage)}:null});
+    const pending=session=>({...session,workbench:{status:session.status==='UNKNOWN_OUTCOME'?'Robot outcome not yet proven':session.status},pending_authorization:session.status==='WAITING_AUTHORIZATION'?{stage:session.current_stage,title:session.current_stage===17?'Controller result':`Stage ${session.current_stage}`,expected_revision:session.revision,label:'Continue',mandatory:[3,10,13,15].includes(session.current_stage)}:null});
     if(path==='/v1/wms/tasks'&&body){
       const session={session_id:'session-'+body.request_id,order_id:body.request.order_id,request:body.request,fault:body.fault,revision:0,current_stage:1,status:'WAITING_AUTHORIZATION',steps:[],context:{},created_at:'2026-10-03T14:00:00Z'};
       world.sessions.push(session);return reply(pending(session),202);
@@ -355,9 +355,9 @@ for(const fault of ['DROP_ACK_AFTER_EFFECT','DROP_ACK_BEFORE_EFFECT'])test(fault
   assertReconcile(posts.slice(start),null);await finishGuided(el);
   assert.equal(orders[0].status,fault==='DROP_ACK_BEFORE_EFFECT'?'FAILED':'COMPLETED');
   assert.match(el('integration-state').textContent,/^COMPLETED/);
-  assert.equal(el('integration-pending').hidden,true);
+  assert.equal(el('integration-pending').hidden,false);
   assert.equal(el('integration-advance').disabled,true);
-  assert.equal(el('integration-live-state').textContent,'Execution session completed. Review the recorded controller result, verification and business reconciliation.');
+  assert.match(el('integration-live-state').textContent,/do not establish sensor verification/);
   assert.equal(el('create').disabled,false);assert.equal(el('next-step').hidden,true);
   assert.equal(el('product').value,'product-blue');await runGuided(el);
   assert.equal(orders.length,2);assert.equal(orders[1].lines[0].product_id,'product-blue');
@@ -432,7 +432,7 @@ for(const execution of executions)for(const observation of observations)test(`in
   assert.match(el('test-status').textContent,/read-only/);assert.equal(el('create').disabled,true);
   assert.equal(el('reconcile').disabled,true);assert.equal(el('reset').disabled,true);assert.equal(el('fresh-scene').disabled,true);
   assert.equal(el('new-test').disabled,false);assert.equal(el('return-current').hidden,false);
-  assert.equal(app.player.data.jobs.length,1);
+  assert.equal(app.player.data.job_id,orders[0].job_ids[0]);
   const reads=posts.length;await runGuided(el);await el('reconcile').onclick();await el('reset').onclick();
   assert.equal(posts.length,reads);assert.equal(JSON.stringify({orders,inventory}),saved);
   await el('return-current').onclick();
@@ -443,9 +443,9 @@ test('unreconciled test can be archived without reconciliation, then reviewed un
   const {el,orders,posts}=await dashboard();
   el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
   assert.equal(el('integration-pending').hidden,false);
-  assert.match(el('integration-pending-title').textContent,/Outcome unproven/);
+  assert.match(el('integration-pending-title').textContent,/Robot outcome not yet proven/);
   assert.match(el('integration-pending-detail').textContent,/original command journal and fresh observation/);
-  assert.match(el('integration-pending-detail').textContent,/does not issue a new pick/);
+  assert.match(el('integration-pending-detail').textContent,/does not create or send a replacement robot command/);
   assert.equal(el('integration-advance').textContent,'Awaiting reconciliation');
   assert.equal(el('integration-advance').disabled,true);
   assert.match(el('integration-history').children.find(option=>option.value===el('integration-history').value).textContent,/UNKNOWN_OUTCOME/);
@@ -571,7 +571,7 @@ for(const fault of ['LOGICAL_ESTOP','CELL_FAULT'])test(fault+': guide resets the
 for(const fault of ['BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'])test(fault+': guide explains rejection and focuses configuration without dispatch',async()=>{
   const {el,posts}=await dashboard();el('scenario').value=fault;await runGuided(el);
   assert.match(el('integration-state').textContent,/^FAILED/);
-  assert.equal(el('integration-pending').hidden,true);
+  assert.equal(el('integration-pending').hidden,false);
   assert.equal(el('integration-advance').disabled,true);
   assert.match(el('guide-detail').textContent,/before a robot command was created/);
   const start=posts.length;await el('guide-action').onclick();
@@ -897,7 +897,7 @@ test('Create only persists a guided session; every boundary requires an explicit
   assert.equal(ui.posts.at(-1).body.stage,1);assert.equal(ui.posts.at(-1).body.expected_revision,0);
   await finishGuided(ui.el);
   assert.equal(ui.el('integration-error').textContent,'');
-  assert.equal(ui.el('integration-pending').hidden,true);
+  assert.equal(ui.el('integration-pending').hidden,false);
   const completed=JSON.stringify(ui.current().sessions[0]),posts=ui.posts.length;
   await ui.el('create').onclick();
   assert.equal(ui.posts.length,posts+1);assert.equal(ui.posts.at(-1).path,'/v1/wms/tasks');
@@ -905,4 +905,16 @@ test('Create only persists a guided session; every boundary requires an explicit
   assert.equal(ui.current().sessions[1].current_stage,1);
   assert.equal(ui.el('integration-pending').hidden,false);
   assert.equal(ui.el('integration-advance').disabled,false);
+});
+
+
+test('saved-session selection keeps its original job replay through background refresh',async()=>{
+  const ui=await dashboard();await runGuided(ui.el);const first=ui.current().sessions[0];
+  ui.el('product').value='product-blue';ui.el('product').onchange();await runGuided(ui.el);
+  assert.equal(ui.current().sessions.length,2);assert.notEqual(ui.current().sessions[1].job_id,first.job_id);
+  const posts=ui.posts.length;
+  await ui.el('integration-history').onchange({target:{value:first.session_id}});
+  await ui.refresh();await ui.motion();
+  assert.equal(ui.el('orders').value,first.job_id);assert.equal(ui.player.data.job_id,first.job_id);
+  assert.equal(ui.posts.length,posts);
 });

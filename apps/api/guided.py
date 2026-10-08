@@ -9,7 +9,15 @@ from pydantic import Field
 
 from robotops.domain.models import Contract, Fault
 from robotops.integration.engine import GuidedEngine
-from robotops.integration.models import AuthorizeStage, CreateSession, ExecutionSession
+from robotops.integration.inspection import code_catalog, inspect_step
+from robotops.integration.models import (
+    AuthorizeStage,
+    CreateSession,
+    ExecutionSession,
+    SourceReference,
+)
+from robotops.integration.source import current_source
+from robotops.integration.store import sanitize
 from robotops.workflow.engine import Engine
 from robotops.workflow.store import Conflict, NotFound, Store
 
@@ -41,6 +49,44 @@ def mount_guided_routes(app: FastAPI, store: Store | None, workflow: Engine | No
     @app.get("/integration/sessions/{session_id}", response_model=ExecutionSession)
     def session(session_id: str) -> ExecutionSession:
         return get_guided().get(session_id)
+
+    @app.get("/integration/sessions/{session_id}/export")
+    def export_session(session_id: str) -> dict[str, Any]:
+        saved = get_guided().get(session_id)
+        return dict(
+            sanitize(
+                {
+                    "format": "robotops-guided-run-v1",
+                    "scope": "Persisted session snapshot with stage records and evidence references. Referenced job records and motion files are not embedded.",
+                    "session": saved.model_dump(mode="json"),
+                }
+            )
+        )
+
+    @app.get("/integration/sessions/{session_id}/steps/{step_id}/source")
+    def step_source(session_id: str, step_id: str, component: str = "entry") -> dict[str, Any]:
+        saved = get_guided().get(session_id)
+        step = next((step for step in saved.steps if step.step_id == step_id), None)
+        if step is None:
+            raise NotFound(step_id)
+        item = next((item for item in code_catalog(saved, step) if item["key"] == component), None)
+        if item is None:
+            raise NotFound(component)
+        reference = (
+            step.source
+            if component == "entry"
+            else SourceReference(path=item["path"], symbol=item["symbol"], excerpt="")
+        )
+        return {**current_source(reference), "component": component, "role": item["role"]}
+
+    @app.get("/integration/sessions/{session_id}/steps/{step_id}/inspection")
+    def step_inspection(session_id: str, step_id: str) -> dict[str, Any]:
+        engine = get_guided()
+        saved = engine.get(session_id)
+        step = next((step for step in saved.steps if step.step_id == step_id), None)
+        if step is None:
+            raise NotFound(step_id)
+        return inspect_step(engine.workflow, saved, step)
 
     @app.get("/integration/sessions/{session_id}/live")
     def live_protocol_status(session_id: str) -> dict[str, Any]:

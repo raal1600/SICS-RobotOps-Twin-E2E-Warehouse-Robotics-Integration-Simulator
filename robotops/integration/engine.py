@@ -33,6 +33,7 @@ from robotops.integration.models import (
     ProtocolTrace,
     SourceReference,
 )
+from robotops.integration.presentation import ACTIONS, project
 from robotops.integration.store import IntegrationStore, sanitize
 from robotops.lab.transport import WMSResponseError
 from robotops.workflow.engine import Engine
@@ -263,15 +264,14 @@ class GuidedEngine:
             pending = PendingAuthorization(
                 stage=stage,
                 title=STAGES[stage - 1][0],
-                label="AUTHORIZE ROBOT EXECUTION"
-                if stage == 15
-                else "Authorize boundary"
-                if stage in GATES
-                else "Continue",
+                label="Retry WMS acknowledgement"
+                if stage == 20 and session.status == "RETRYABLE_FAILURE"
+                else ACTIONS[stage - 1],
                 expected_revision=session.revision,
                 mandatory=stage in GATES,
             )
-        return session.model_copy(update={"pending_authorization": pending})
+        presented = session.model_copy(update={"pending_authorization": pending})
+        return presented.model_copy(update={"workbench": project(presented)})
 
     def get(self, session_id: str) -> ExecutionSession:
         return self.present(self.store.get(session_id))

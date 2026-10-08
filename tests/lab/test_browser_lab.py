@@ -134,7 +134,7 @@ def prove_blender_playback(page, command_id, evidence):
         encoding="utf-8",
     )
     page.screenshot(path=str(evidence / "blender-motion.png"), full_page=True)
-    page.locator("#integration-return").click()
+    page.get_by_role("link", name="Inspect evidence", exact=True).click()
 
 
 @pytest.mark.parametrize(
@@ -270,6 +270,18 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                         continue
                     if current["status"] == "UNKNOWN_OUTCOME":
                         unknown_seen = True
+                        expect(page.locator("#integration-pending-title")).to_have_text(
+                            "Robot outcome not yet proven"
+                        )
+                        expect(page.locator("#integration-pending-detail")).to_contain_text(
+                            "Do not retry the pick"
+                        )
+                        expect(page.locator("#integration-command")).to_contain_text(
+                            current["command_id"]
+                        )
+                        expect(page.locator('[data-proof="verification"]')).to_have_attribute(
+                            "data-state", "unproven"
+                        )
                         expect(page.locator("#integration-reconcile")).to_be_visible()
                         expect(page.locator("#integration-advance")).to_be_disabled()
                         page.screenshot(path=str(evidence / "unknown-outcome.png"), full_page=True)
@@ -289,6 +301,23 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                             assert current["current_stage"] == 20
                             assert read_journal(stack, current["command_id"])[1] == 1
                             business_retry_seen = True
+                            expect(page.locator("#integration-pending-title")).to_have_text(
+                                "Business acknowledgement failed"
+                            )
+                            expect(page.locator("#integration-advance")).to_have_text(
+                                "Retry WMS acknowledgement"
+                            )
+                            expect(page.locator('[data-proof="verification"]')).to_have_attribute(
+                                "data-state", "established"
+                            )
+                            expect(page.locator('[data-proof="wms"]')).to_have_attribute(
+                                "data-state", "failed"
+                            )
+                            assert (
+                                current["steps"][-1]["output"]["http_response"]["status_code"]
+                                == 503
+                            )
+                            page.screenshot(path=str(evidence / "wms-failed.png"), full_page=True)
                     advance(page, stack.origin)
                 final = state(page, stack.origin)
                 assert final["status"] == "COMPLETED", final
@@ -299,6 +328,7 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                     "WMS_UNAVAILABLE": "WMS unavailable after verified pick",
                 }[scenario]
                 expect(page.locator("#motion-scenario")).to_contain_text(expected_scenario)
+                page.get_by_role("link", name="Run & watch", exact=True).click()
                 page.locator("#scenario").select_option("BRAIN_TIMEOUT")
                 expect(page.locator("#motion-scenario")).to_contain_text(expected_scenario)
                 saved_playback = page.request.get(
@@ -323,6 +353,9 @@ def test_full_lab_browser_authorization_recovery_and_business_completion(
                         duplicate.get("redelivered") is True
                     )
                 assert final["context"]["wms_ack"] is True
+                assert all(
+                    proof["state"] == "established" for proof in final["workbench"]["proofs"]
+                )
                 opc = next(step["output"] for step in final["steps"] if step["stage"] == 12)
                 assert opc["opcua_client_component"] == "edge-adapter"
                 assert opc["edge_process_id"] == stack.service_process_ids["edge"]

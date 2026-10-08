@@ -147,11 +147,17 @@ def create_app(
     @app.get("/ui/{script}", response_class=FileResponse)
     def playback_javascript(
         script: Literal[
-            "playback.js", "scene-view.js", "workflow-guide.js", "integration-console.js"
+            "playback.js",
+            "scene-view.js",
+            "workflow-guide.js",
+            "integration-console.js",
+            "workspace.js",
+            "workspace.css",
         ],
     ) -> FileResponse:
         return FileResponse(
-            Path(__file__).parents[1] / "erp_ui" / script, media_type="text/javascript"
+            Path(__file__).parents[1] / "erp_ui" / script,
+            media_type="text/css" if script.endswith(".css") else "text/javascript",
         )
 
     @app.get("/ui/vendor/{script}", response_class=FileResponse)

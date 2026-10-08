@@ -34,6 +34,10 @@ class MotionPlayer {
     this.byId=id=>document.getElementById(id);
     this.job=null;this.scene=null;this.preview=null;this.recording=null;this.data=null;this.delivery=null;
     this.cursor=0;this.track=[];this.playing=false;this.manualPause=false;this.executionGated=false;this.speed=1;this.last=null;
+    const motionPreference=globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
+    this.reducedMotion=!!motionPreference?.matches;
+    this.manualPause=this.reducedMotion;
+    motionPreference?.addEventListener("change",event=>{this.reducedMotion=event.matches;if(event.matches)this.pause();});
     this.byId("motion-play").onclick=()=>{
       if(this.executionGated)return;
       if(!this.playing&&this.atEnd())this.cursor=0;
@@ -60,13 +64,13 @@ class MotionPlayer {
     gated=!!gated;if(this.executionGated===gated)return;
     this.executionGated=gated;
     if(gated){this.playing=false;this.cursor=0;}
-    else this.playing=!!this.track.length&&!this.manualPause;
+    else this.playing=!!this.track.length&&!this.manualPause&&!this.reducedMotion;
     this.describeClips();this.controls();this.draw();
   }
   select(job){
     if(this.job===job)return;
     this.job=job;this.recording=null;this.scene=this.preview;this.data=null;this.delivery=null;this.track=[];
-    this.cursor=0;this.playing=false;this.manualPause=false;
+    this.cursor=0;this.playing=false;this.manualPause=this.reducedMotion;
     this.describeClips();this.controls();this.draw();
   }
   describeClips(){
@@ -137,7 +141,7 @@ class MotionPlayer {
       const start=this.track.findIndex(step=>step.clip.job_id===previousStep.clip.job_id);
       if(start>=0)this.cursor=start+oldClipOffset+fraction;
     }
-    if((first||this.track.length>oldLength&&wasEnd)&&!this.manualPause&&!this.executionGated)this.playing=true;
+    if((first||this.track.length>oldLength&&wasEnd)&&!this.manualPause&&!this.executionGated&&!this.reducedMotion)this.playing=true;
     if(!this.track.length||this.executionGated)this.playing=false;
     this.cursor=Math.min(this.cursor,this.limit());
     this.describeClips();this.controls();this.draw();

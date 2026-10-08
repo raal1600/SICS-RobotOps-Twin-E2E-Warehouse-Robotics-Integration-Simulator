@@ -979,6 +979,11 @@
             "format": "date-time",
             "title": "Updated At",
             "type": "string"
+          },
+          "workbench": {
+            "additionalProperties": true,
+            "title": "Workbench",
+            "type": "object"
           }
         },
         "required": [
@@ -4550,6 +4555,47 @@
         "summary": "Authorize"
       }
     },
+    "/integration/sessions/{session_id}/export": {
+      "get": {
+        "operationId": "export_session_integration_sessions__session_id__export_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Export Session Integration Sessions  Session Id  Export Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export Session"
+      }
+    },
     "/integration/sessions/{session_id}/live": {
       "get": {
         "operationId": "live_protocol_status_integration_sessions__session_id__live_get",
@@ -4638,6 +4684,116 @@
           }
         },
         "summary": "Reconcile"
+      }
+    },
+    "/integration/sessions/{session_id}/steps/{step_id}/inspection": {
+      "get": {
+        "operationId": "step_inspection_integration_sessions__session_id__steps__step_id__inspection_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step_id",
+            "required": true,
+            "schema": {
+              "title": "Step Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Step Inspection Integration Sessions  Session Id  Steps  Step Id  Inspection Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Step Inspection"
+      }
+    },
+    "/integration/sessions/{session_id}/steps/{step_id}/source": {
+      "get": {
+        "operationId": "step_source_integration_sessions__session_id__steps__step_id__source_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step_id",
+            "required": true,
+            "schema": {
+              "title": "Step Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "component",
+            "required": false,
+            "schema": {
+              "default": "entry",
+              "title": "Component",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Step Source Integration Sessions  Session Id  Steps  Step Id  Source Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Step Source"
       }
     },
     "/jobs/{job_id}": {
@@ -5399,7 +5555,9 @@
                 "playback.js",
                 "scene-view.js",
                 "workflow-guide.js",
-                "integration-console.js"
+                "integration-console.js",
+                "workspace.js",
+                "workspace.css"
               ],
               "title": "Script",
               "type": "string"

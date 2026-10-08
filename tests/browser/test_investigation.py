@@ -144,7 +144,7 @@ def continue_guided(page, prefix, identity):
             page.locator("#integration-advance").click()
         assert response.value.ok, response.value.text()
         if session["current_stage"] == 15:
-            expect(page.locator("#integration-pending-title")).to_have_text(
+            expect(page.locator("#integration-position")).to_contain_text(
                 "Controller result", timeout=180_000
             )
         page.wait_for_function("() => !busy && !integration.busy")
@@ -484,6 +484,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     expect(page.locator("#delete-test-title")).to_have_text("Clear Test 1 and retry?")
     screenshot(page, directory, "clear-same-test-confirmation")
     page.locator("#cancel-delete-test").click()
+    expect(page.locator("#clear-test")).to_be_focused()
     assert (
         registry.engine("original").store.job(uncertain["job_id"]).state.value == "UNKNOWN_OUTCOME"
     )
@@ -508,6 +509,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     assert clear_result["cleanup_pending"] is False
     expect(page.locator("#delete-test-dialog")).not_to_be_visible()
     expect(page.locator("#message")).to_contain_text("Test 1 cleared")
+    expect(page.locator("#clear-test")).to_be_focused()
     expect(page.locator("#test-history")).to_have_value("original")
     expect(page.locator("#create")).to_be_enabled()
     expect(page.locator("#scenario")).to_have_value("DROP_ACK_AFTER_EFFECT")
@@ -553,6 +555,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     assert delete_result["cleanup_pending"] is False
     expect(page.locator("#empty-workspace")).to_be_visible()
     expect(page.locator("#delete-test-dialog")).not_to_be_visible()
+    expect(page.locator("#empty-new-test")).to_be_focused()
     assert not (registry.data_dir / "workflow.db").exists()
     assert not (registry.data_dir / "runtime.db").exists()
     with registry.connect() as db:
@@ -573,6 +576,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     assert created_test["test_id"] == created.value.request.post_data_json["request_id"]
     expect(page.locator("#new-test-dialog")).not_to_be_visible()
     expect(page.locator("#message")).to_contain_text("Test 1 created")
+    expect(page.locator("#new-test")).to_be_focused()
     expect(page.locator("#create")).to_be_enabled()
     fresh = get(page, origin + "/simulation-tests")
     assert len(fresh["tests"]) == 1 and fresh["tests"][0]["number"] == 1

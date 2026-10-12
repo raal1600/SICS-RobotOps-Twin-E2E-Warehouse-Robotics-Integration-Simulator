@@ -6,6 +6,7 @@ use the checked-in API and runtime; navigation must not change durable evidence.
 
 import hashlib
 import json
+import os
 import re
 import socket
 import threading
@@ -47,19 +48,28 @@ def server(tmp_path, request, http_server):
 @pytest.fixture
 def browser_page(request):
     directory = (
-        Path("artifacts/investigation-browser")
+        Path(os.getenv("ROBOTOPS_BROWSER_ARTIFACT_ROOT", "artifacts/investigation-browser"))
         / datetime.now(UTC).strftime("%Y%m%dT%H%M%S%f")
         / request.node.name
     )
     directory.mkdir(parents=True)
-    ui_sources = [
-        *Path("apps/erp_ui").glob("*.js"),
-        Path("apps/erp_ui/index.html"),
-        Path("apps/erp_ui/theme.css"),
-        Path(__file__),
-    ]
+    verification_sources = sorted(
+        {
+            *Path("apps/erp_ui").glob("*.js"),
+            *Path("apps/erp_ui").glob("*.css"),
+            *Path("apps/api").glob("*.py"),
+            *Path("robotops").rglob("*.py"),
+            *Path("blender/scripts").glob("*.py"),
+            *Path("tests/browser").glob("*.py"),
+            Path("apps/erp_ui/index.html"),
+            Path("tools/calibration.py"),
+            Path("pyproject.toml"),
+            Path("uv.lock"),
+        }
+    )
     source_hashes = {
-        path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in ui_sources
+        path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in verification_sources
     }
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True, args=["--enable-unsafe-swiftshader"])
@@ -86,6 +96,10 @@ def browser_page(request):
         try:
             yield page, directory, errors, console_errors, requests
         finally:
+            source_hashes_at_end = {
+                path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in verification_sources
+            }
             page.screenshot(path=str(directory / "last-state.png"), full_page=True)
             (directory / "browser.json").write_text(
                 json.dumps(
@@ -94,6 +108,8 @@ def browser_page(request):
                         "console_errors": console_errors,
                         "requests": requests,
                         "source_sha256_at_start": source_hashes,
+                        "source_sha256_at_end": source_hashes_at_end,
+                        "source_unchanged_during_journey": source_hashes_at_end == source_hashes,
                     },
                     indent=2,
                 ),
@@ -105,6 +121,9 @@ def browser_page(request):
                 context.close()
             finally:
                 browser.close()
+            assert source_hashes_at_end == source_hashes, (
+                "Source changed during browser journey; evidence is not an exact-source pass"
+            )
 
 
 def get(page, url):
@@ -144,7 +163,7 @@ def continue_guided(page, prefix, identity):
             page.locator("#integration-advance").click()
         assert response.value.ok, response.value.text()
         if session["current_stage"] == 15:
-            expect(page.locator("#integration-pending-title")).to_have_text(
+            expect(page.locator("#integration-position")).to_contain_text(
                 "Controller result", timeout=180_000
             )
         page.wait_for_function("() => !busy && !integration.busy")
@@ -484,6 +503,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     expect(page.locator("#delete-test-title")).to_have_text("Clear Test 1 and retry?")
     screenshot(page, directory, "clear-same-test-confirmation")
     page.locator("#cancel-delete-test").click()
+    expect(page.locator("#clear-test")).to_be_focused()
     assert (
         registry.engine("original").store.job(uncertain["job_id"]).state.value == "UNKNOWN_OUTCOME"
     )
@@ -508,6 +528,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     assert clear_result["cleanup_pending"] is False
     expect(page.locator("#delete-test-dialog")).not_to_be_visible()
     expect(page.locator("#message")).to_contain_text("Test 1 cleared")
+    expect(page.locator("#clear-test")).to_be_focused()
     expect(page.locator("#test-history")).to_have_value("original")
     expect(page.locator("#create")).to_be_enabled()
     expect(page.locator("#scenario")).to_have_value("DROP_ACK_AFTER_EFFECT")
@@ -553,6 +574,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     assert delete_result["cleanup_pending"] is False
     expect(page.locator("#empty-workspace")).to_be_visible()
     expect(page.locator("#delete-test-dialog")).not_to_be_visible()
+    expect(page.locator("#empty-new-test")).to_be_focused()
     assert not (registry.data_dir / "workflow.db").exists()
     assert not (registry.data_dir / "runtime.db").exists()
     with registry.connect() as db:
@@ -573,6 +595,7 @@ def test_clear_retries_same_test_and_delete_starts_again_at_one(server, browser_
     assert created_test["test_id"] == created.value.request.post_data_json["request_id"]
     expect(page.locator("#new-test-dialog")).not_to_be_visible()
     expect(page.locator("#message")).to_contain_text("Test 1 created")
+    expect(page.locator("#new-test")).to_be_focused()
     expect(page.locator("#create")).to_be_enabled()
     fresh = get(page, origin + "/simulation-tests")
     assert len(fresh["tests"]) == 1 and fresh["tests"][0]["number"] == 1

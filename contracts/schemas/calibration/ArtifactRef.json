@@ -1,0 +1,44 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "media_type": {
+      "enum": [
+        "image/png",
+        "application/x-npy",
+        "application/json"
+      ],
+      "title": "Media Type",
+      "type": "string"
+    },
+    "path": {
+      "title": "Path",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Sha256",
+      "type": "string"
+    },
+    "shape": {
+      "default": [],
+      "items": {
+        "type": "integer"
+      },
+      "title": "Shape",
+      "type": "array"
+    }
+  },
+  "required": [
+    "path",
+    "sha256",
+    "media_type"
+  ],
+  "title": "ArtifactRef",
+  "type": "object"
+}

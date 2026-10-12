@@ -20,6 +20,13 @@ they are never skipped. The application/desktop runtime does not depend on
 Playwright or download a browser. Browser test servers bind only to loopback and
 use disposable data. See [investigation checks](investigation.md).
 
+Client accessibility regressions use pinned axe-core 4.14.0 from
+`tests/browser/package-lock.json`. Run `npm ci --ignore-scripts --no-audit --no-fund`
+inside `tests/browser` before running browser tests (also included in Make setup
+and Linux CI). This adds no application runtime dependency or second browser test
+framework. [Client rebuild verification](../client-rebuild/verification.md) records
+real-backend journeys separately from injected network failures.
+
 Ruff checks new Python formatting/lint; mypy strict checks all runtime and API
 modules. The pre-existing publication generator retains its separate build and
 link/PDF checks. Coverage must be at least 85% for the combined mandatory suite;

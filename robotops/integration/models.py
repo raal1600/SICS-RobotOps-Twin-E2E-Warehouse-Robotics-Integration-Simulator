@@ -106,3 +106,6 @@ class ExecutionSession(Contract):
     context: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=utc_now)
     updated_at: datetime = Field(default_factory=utc_now)
+    # Read-only projection, rebuilt from persisted steps by GuidedEngine.present.
+    # It never grants execution authority and requires no storage migration.
+    workbench: dict[str, Any] = Field(default_factory=dict)

@@ -1,0 +1,472 @@
+{
+  "$defs": {
+    "Calculation": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "const": "IN_PROCESS_PYTHON",
+          "default": "IN_PROCESS_PYTHON",
+          "title": "Classification",
+          "type": "string"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "formula": {
+          "title": "Formula",
+          "type": "string"
+        },
+        "function": {
+          "title": "Function",
+          "type": "string"
+        },
+        "inputs": {
+          "additionalProperties": true,
+          "title": "Inputs",
+          "type": "object"
+        },
+        "outputs": {
+          "additionalProperties": true,
+          "title": "Outputs",
+          "type": "object"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "function",
+        "formula",
+        "inputs",
+        "outputs",
+        "decision"
+      ],
+      "title": "Calculation",
+      "type": "object"
+    },
+    "ImageValidation": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "chain_residuals_px": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Chain Residuals Px",
+          "type": "array"
+        },
+        "chain_rms_px": {
+          "minimum": 0,
+          "title": "Chain Rms Px",
+          "type": "number"
+        },
+        "chain_rotation_deg": {
+          "minimum": 0,
+          "title": "Chain Rotation Deg",
+          "type": "number"
+        },
+        "chain_translation_mm": {
+          "minimum": 0,
+          "title": "Chain Translation Mm",
+          "type": "number"
+        },
+        "pnp_residuals_px": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Pnp Residuals Px",
+          "type": "array"
+        },
+        "pnp_rms_px": {
+          "minimum": 0,
+          "title": "Pnp Rms Px",
+          "type": "number"
+        },
+        "point_count": {
+          "exclusiveMinimum": 0,
+          "title": "Point Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capture_id",
+        "point_count",
+        "pnp_rms_px",
+        "chain_rms_px",
+        "chain_translation_mm",
+        "chain_rotation_deg",
+        "pnp_residuals_px",
+        "chain_residuals_px"
+      ],
+      "title": "ImageValidation",
+      "type": "object"
+    },
+    "MeasurementRejection": {
+      "additionalProperties": false,
+      "properties": {
+        "calculation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Calculation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capture_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "acquisition",
+            "board_pose",
+            "depth"
+          ],
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capture_id",
+        "reason",
+        "detail",
+        "stage"
+      ],
+      "title": "MeasurementRejection",
+      "type": "object"
+    },
+    "ReferenceValidation": {
+      "additionalProperties": false,
+      "properties": {
+        "error_mm": {
+          "minimum": 0,
+          "title": "Error Mm",
+          "type": "number"
+        },
+        "error_vector_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Error Vector M",
+          "type": "array"
+        },
+        "expected_base_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Expected Base M",
+          "type": "array"
+        },
+        "predicted_base_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Predicted Base M",
+          "type": "array"
+        },
+        "reference_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Reference Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference_id",
+        "expected_base_m",
+        "predicted_base_m",
+        "error_vector_m",
+        "error_mm"
+      ],
+      "title": "ReferenceValidation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "candidate_fingerprint": {
+      "title": "Candidate Fingerprint",
+      "type": "string"
+    },
+    "candidate_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "chain_rms_px": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Chain Rms Px"
+    },
+    "dataset_fingerprint": {
+      "title": "Dataset Fingerprint",
+      "type": "string"
+    },
+    "dataset_ids": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Dataset Ids",
+      "type": "array"
+    },
+    "failures": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Failures",
+      "type": "array"
+    },
+    "images": {
+      "items": {
+        "$ref": "#/$defs/ImageValidation"
+      },
+      "title": "Images",
+      "type": "array"
+    },
+    "limitations": {
+      "default": [
+        "Synthetic measurements and simulation-only limits; no real-cell accuracy claim.",
+        "Robot kinematics are inputs, not calibrated here; residual flex and robot/depth error remain.",
+        "A geometric point does not establish object recognition or a safe grasp."
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "limits_fingerprint": {
+      "title": "Limits Fingerprint",
+      "type": "string"
+    },
+    "minimum_p95_count": {
+      "minimum": 20,
+      "title": "Minimum P95 Count",
+      "type": "integer"
+    },
+    "passed": {
+      "title": "Passed",
+      "type": "boolean"
+    },
+    "pnp_rms_px": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Pnp Rms Px"
+    },
+    "point_count": {
+      "minimum": 0,
+      "title": "Point Count",
+      "type": "integer"
+    },
+    "quantile_method": {
+      "const": "linear",
+      "default": "linear",
+      "title": "Quantile Method",
+      "type": "string"
+    },
+    "reference_count": {
+      "minimum": 0,
+      "title": "Reference Count",
+      "type": "integer"
+    },
+    "reference_max_mm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reference Max Mm"
+    },
+    "reference_median_mm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reference Median Mm"
+    },
+    "reference_p95_mm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reference P95 Mm"
+    },
+    "reference_span_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Reference Span M",
+      "type": "array"
+    },
+    "references": {
+      "items": {
+        "$ref": "#/$defs/ReferenceValidation"
+      },
+      "title": "References",
+      "type": "array"
+    },
+    "rejected_measurements": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/MeasurementRejection"
+      },
+      "title": "Rejected Measurements",
+      "type": "array"
+    },
+    "report_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Report Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "report_id",
+    "candidate_id",
+    "candidate_fingerprint",
+    "limits_fingerprint",
+    "dataset_ids",
+    "dataset_fingerprint",
+    "passed",
+    "failures",
+    "images",
+    "references",
+    "point_count",
+    "pnp_rms_px",
+    "chain_rms_px",
+    "reference_count",
+    "reference_span_m",
+    "reference_median_mm",
+    "reference_max_mm",
+    "reference_p95_mm",
+    "minimum_p95_count"
+  ],
+  "title": "ValidationReport",
+  "type": "object"
+}

@@ -1,0 +1,376 @@
+{
+  "$defs": {
+    "Stream": {
+      "additionalProperties": false,
+      "properties": {
+        "coefficients": {
+          "default": [],
+          "items": {
+            "type": "number"
+          },
+          "title": "Coefficients",
+          "type": "array"
+        },
+        "crop_xy": {
+          "default": [
+            0,
+            0
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Crop Xy",
+          "type": "array"
+        },
+        "distortion_model": {
+          "default": "pinhole",
+          "enum": [
+            "pinhole",
+            "fisheye"
+          ],
+          "title": "Distortion Model",
+          "type": "string"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "maximum": 4096,
+          "title": "Height",
+          "type": "integer"
+        },
+        "k": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "K",
+          "type": "array"
+        },
+        "resize_xy": {
+          "default": [
+            1,
+            1
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Resize Xy",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "verification": {
+          "enum": [
+            "SIMULATION_ONLY_FACTORY_MODEL",
+            "MEASURED_BOARD_MODEL"
+          ],
+          "title": "Verification",
+          "type": "string"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "maximum": 4096,
+          "title": "Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "k",
+        "verification"
+      ],
+      "title": "Stream",
+      "type": "object"
+    },
+    "Transform": {
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Destination",
+          "type": "string"
+        },
+        "matrix": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Matrix",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "translation_unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Translation Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "destination",
+        "matrix"
+      ],
+      "title": "Transform",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "aligned_semantics": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Aligned Semantics"
+    },
+    "camera_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "configuration_revision": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Configuration Revision",
+      "type": "string"
+    },
+    "depth": {
+      "$ref": "#/$defs/Stream"
+    },
+    "depth_scale_m": {
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "title": "Depth Scale M",
+      "type": "number"
+    },
+    "depth_semantics": {
+      "enum": [
+        "optical_z",
+        "radial_range"
+      ],
+      "title": "Depth Semantics",
+      "type": "string"
+    },
+    "max_depth_m": {
+      "default": 4,
+      "exclusiveMinimum": 0,
+      "title": "Max Depth M",
+      "type": "number"
+    },
+    "min_depth_m": {
+      "default": 0.05,
+      "exclusiveMinimum": 0,
+      "title": "Min Depth M",
+      "type": "number"
+    },
+    "profile_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "registration": {
+      "default": "native",
+      "enum": [
+        "native",
+        "aligned_documented"
+      ],
+      "title": "Registration",
+      "type": "string"
+    },
+    "rgb": {
+      "$ref": "#/$defs/Stream"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "t_c_d": {
+      "$ref": "#/$defs/Transform"
+    }
+  },
+  "required": [
+    "camera_id",
+    "profile_id",
+    "configuration_revision",
+    "rgb",
+    "depth",
+    "depth_scale_m",
+    "depth_semantics",
+    "t_c_d"
+  ],
+  "title": "Camera",
+  "type": "object"
+}

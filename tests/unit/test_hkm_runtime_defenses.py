@@ -266,6 +266,7 @@ def test_fixed_runtime_noisy_contact_does_not_allow_waypoints_to_deviate_from_pl
 def test_runtime_manifest_covers_fixed_runtime_closure_and_canonical_data(monkeypatch):
     runtime = object.__new__(BlenderRuntime)
     runtime.executable = "fixture-blender"
+    runtime.settings = Settings.hkm()
     monkeypatch.setattr(
         "robotops.blender.adapter.subprocess.run",
         lambda *a, **kw: SimpleNamespace(stdout="Blender fixture\n"),
@@ -276,6 +277,7 @@ def test_runtime_manifest_covers_fixed_runtime_closure_and_canonical_data(monkey
         "blender/scripts/runtime.py",
         "blender/scripts/hkm_runtime.py",
         "blender/scripts/hkm_scene.py",
+        "blender/scripts/measured_presentation.py",
         "robotops/hkm_geometry.py",
         "robotops/scene_geometry.py",
         "robotops/presentation_io.py",

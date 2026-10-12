@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "limitation": {
+      "default": "Local sensitivity estimate; ignores systematic bias and does not prove physical accuracy",
+      "title": "Limitation",
+      "type": "string"
+    },
+    "method": {
+      "const": "linearized-pixel-Jacobian-1",
+      "default": "linearized-pixel-Jacobian-1",
+      "title": "Method",
+      "type": "string"
+    },
+    "pixel_sigma": {
+      "title": "Pixel Sigma",
+      "type": "number"
+    },
+    "rotation_sigma_deg": {
+      "title": "Rotation Sigma Deg",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sigma_multiplier": {
+      "default": 3,
+      "title": "Sigma Multiplier",
+      "type": "number"
+    },
+    "translation_sigma_mm": {
+      "title": "Translation Sigma Mm",
+      "type": "number"
+    }
+  },
+  "required": [
+    "pixel_sigma",
+    "translation_sigma_mm",
+    "rotation_sigma_deg"
+  ],
+  "title": "PoseConditioning",
+  "type": "object"
+}

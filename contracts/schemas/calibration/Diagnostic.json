@@ -1,0 +1,77 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "clues": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Clues",
+      "type": "array"
+    },
+    "conclusion": {
+      "title": "Conclusion",
+      "type": "string"
+    },
+    "diagnostic_scale": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Diagnostic Scale"
+    },
+    "next_measurements": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Next Measurements",
+      "type": "array"
+    },
+    "rigid_residual_rms_mm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rigid Residual Rms Mm"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "default": "Hypothesis comparison only; never changes X, depth scale, tool geometry or approval",
+      "title": "Scope",
+      "type": "string"
+    },
+    "similarity_residual_rms_mm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Similarity Residual Rms Mm"
+    }
+  },
+  "required": [
+    "conclusion",
+    "clues",
+    "next_measurements"
+  ],
+  "title": "Diagnostic",
+  "type": "object"
+}

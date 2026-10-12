@@ -1,0 +1,520 @@
+{
+  "$defs": {
+    "CellMode": {
+      "enum": [
+        "READY",
+        "BUSY",
+        "FAULTED",
+        "ESTOP_LOGICAL",
+        "RESETTING",
+        "OFFLINE"
+      ],
+      "title": "CellMode",
+      "type": "string"
+    },
+    "VisualCamera": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_version": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Calibration Version",
+          "type": "string"
+        },
+        "camera_model_version": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Camera Model Version",
+          "type": "string"
+        },
+        "frame_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Frame Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "role": {
+          "enum": [
+            "PRESENTATION",
+            "SYNTHETIC_SENSOR"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sensor_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sensor Id"
+        },
+        "target": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Target",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "position",
+        "target",
+        "role",
+        "frame_id",
+        "calibration_version",
+        "camera_model_version"
+      ],
+      "title": "VisualCamera",
+      "type": "object"
+    },
+    "VisualObject": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Color",
+          "type": "array"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "location_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location Id"
+        },
+        "material_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Material Role"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "opacity": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Opacity"
+        },
+        "parent_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Name"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "primitive": {
+          "anyOf": [
+            {
+              "enum": [
+                "box",
+                "cylinder"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primitive"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "minLength": 1,
+              "pattern": "^[\\w.:-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        },
+        "quaternion_xyzw": {
+          "anyOf": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quaternion Xyzw"
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scale"
+        },
+        "schema_version": {
+          "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0",
+            "3.0"
+          ],
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "semantic_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Semantic Tags"
+        },
+        "size": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Size",
+          "type": "array"
+        },
+        "tool_id": {
+          "anyOf": [
+            {
+              "enum": [
+                "EE_VAC_SINGLE",
+                "EE_VAC_ARRAY",
+                "EE_PINCH_NARROW",
+                "EE_PINCH_WIDE",
+                "EE_ADAPTIVE_SOFT",
+                "EE_SUPPORT_FORK"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool Id"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visible"
+        }
+      },
+      "required": [
+        "name",
+        "position",
+        "size",
+        "color"
+      ],
+      "title": "VisualObject",
+      "type": "object"
+    },
+    "VisualScene": {
+      "additionalProperties": false,
+      "properties": {
+        "cameras": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/VisualCamera"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cameras"
+        },
+        "cell_mode": {
+          "$ref": "#/$defs/CellMode"
+        },
+        "objects": {
+          "items": {
+            "$ref": "#/$defs/VisualObject"
+          },
+          "maxItems": 512,
+          "minItems": 1,
+          "title": "Objects",
+          "type": "array"
+        },
+        "robot_profile_version": {
+          "anyOf": [
+            {
+              "enum": [
+                "hkm_inspired_v1",
+                "synthetic_calibration_gantry_v1"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Robot Profile Version"
+        },
+        "scene_epoch": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[\\w.:-]+$",
+          "title": "Scene Epoch",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0",
+            "3.0"
+          ],
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "SAVED_START_SCENE",
+            "CURRENT_WORLD_REFERENCE"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scene_epoch",
+        "timestamp",
+        "cell_mode",
+        "objects"
+      ],
+      "title": "VisualScene",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "camera_id": {
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "capture_fingerprint": {
+      "title": "Capture Fingerprint",
+      "type": "string"
+    },
+    "capture_id": {
+      "title": "Capture Id",
+      "type": "string"
+    },
+    "scene": {
+      "$ref": "#/$defs/VisualScene"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "default": "SAVED_SYNTHETIC_PRESENTATION: reported flange/TCP with physical simulator camera/board layout. Instructor geometry only; not calibration/perception input. Robot-report noise can differ from the physical pose used to render pixels. This is not a new robot movement.",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "required": [
+    "capture_id",
+    "camera_id",
+    "capture_fingerprint",
+    "scene"
+  ],
+  "title": "CapturePresentation",
+  "type": "object"
+}

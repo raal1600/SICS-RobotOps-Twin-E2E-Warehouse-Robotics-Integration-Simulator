@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "attempt_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Attempt Id",
+      "type": "string"
+    },
+    "attempted_at_utc": {
+      "title": "Attempted At Utc",
+      "type": "string"
+    },
+    "code": {
+      "title": "Code",
+      "type": "string"
+    },
+    "command_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Command Id"
+    },
+    "detail": {
+      "title": "Detail",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "saved_capture_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Saved Capture Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "Failed observation attempt; no measured point or physical outcome inferred",
+      "default": "Failed observation attempt; no measured point or physical outcome inferred",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "required": [
+    "attempt_id",
+    "job_id",
+    "command_id",
+    "attempted_at_utc",
+    "code",
+    "detail",
+    "saved_capture_ids"
+  ],
+  "title": "ObservationFailure",
+  "type": "object"
+}

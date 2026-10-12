@@ -44,6 +44,9 @@ jobs:
           uv sync --locked --all-groups
       - name: Install pinned headless browser for investigation journeys
         run: uv run --locked python -m playwright install --with-deps chromium --only-shell
+      - name: Install pinned browser accessibility checks
+        working-directory: tests/browser
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install pinned CPU Blender runtime
         run: |
           sudo apt-get update -qq

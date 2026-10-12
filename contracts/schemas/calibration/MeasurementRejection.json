@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "Calculation": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "const": "IN_PROCESS_PYTHON",
+          "default": "IN_PROCESS_PYTHON",
+          "title": "Classification",
+          "type": "string"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "formula": {
+          "title": "Formula",
+          "type": "string"
+        },
+        "function": {
+          "title": "Function",
+          "type": "string"
+        },
+        "inputs": {
+          "additionalProperties": true,
+          "title": "Inputs",
+          "type": "object"
+        },
+        "outputs": {
+          "additionalProperties": true,
+          "title": "Outputs",
+          "type": "object"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "function",
+        "formula",
+        "inputs",
+        "outputs",
+        "decision"
+      ],
+      "title": "Calculation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "calculation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Calculation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "capture_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Capture Id",
+      "type": "string"
+    },
+    "detail": {
+      "title": "Detail",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "acquisition",
+        "board_pose",
+        "depth"
+      ],
+      "title": "Stage",
+      "type": "string"
+    }
+  },
+  "required": [
+    "capture_id",
+    "reason",
+    "detail",
+    "stage"
+  ],
+  "title": "MeasurementRejection",
+  "type": "object"
+}

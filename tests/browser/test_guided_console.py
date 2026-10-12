@@ -45,7 +45,7 @@ def advance(page, origin):
         button.click()
     assert response.value.ok, response.value.text()
     if state["current_stage"] == 15:
-        expect(page.locator("#integration-pending-title")).to_have_text(
+        expect(page.locator("#integration-position")).to_contain_text(
             "Controller result", timeout=180_000
         )
     else:
@@ -111,8 +111,17 @@ def test_guided_happy_reload_gate_trace_and_business_completion(server, browser_
     assert {step["stage"] for step in final["steps"]} == set(range(1, 23))
     assert final["context"]["wms_ack"] is True
     assert workflow.runtime.recorded_journal(command).effect_count == 1
-    page.get_by_role("tab", name="Code", exact=True).click()
-    expect(page.locator("#integration-inspector")).to_contain_text("robotops/integration/engine.py")
+    page.get_by_role("link", name="Inspect evidence", exact=True).click()
+    # Refresh preserves the inspected historical step. Explicitly follow the
+    # finished run before checking its final stage's source evidence.
+    page.locator("#integration-follow-mobile").click()
+    page.get_by_role("tab", name="Source", exact=True).click()
+    expect(page.locator("#integration-source-identity")).to_contain_text(
+        "robotops/integration/engine.py"
+    )
+    expect(page.locator("#integration-inspector")).to_have_text(
+        final["steps"][-1]["source"]["excerpt"]
+    )
     assert not errors
     assert not console_errors
     assert not any(item["method"] == "POST" and item["url"].endswith("/run") for item in requests)
@@ -147,7 +156,8 @@ def test_guided_retry_delivery_indicators_and_expandable_payload_are_persisted_a
             "Deliveries 2 · original command identity"
         )
     assert registry.engine("original").runtime.world().step == 0
-    page.get_by_role("tab", name="Wire", exact=True).click()
+    page.get_by_role("link", name="Inspect evidence", exact=True).click()
+    page.get_by_role("tab", name="Raw JSON", exact=True).click()
     original = page.locator("#integration-inspector").inner_text()
     posts = sum(item["method"] == "POST" for item in requests)
     page.locator("#integration-payload summary").click()
@@ -178,11 +188,15 @@ def test_guided_lost_ack_reconciles_original_command_without_second_effect(serve
     assert runtime.recorded_journal(command).effect_count == 1
     expect(page.locator("#integration-reconcile")).to_be_visible()
     expect(page.locator("#integration-advance")).to_be_disabled()
-    expect(page.locator("#integration-pending-title")).to_contain_text("Outcome unproven")
+    expect(page.locator("#integration-pending-title")).to_contain_text(
+        "Robot outcome not yet proven"
+    )
     expect(page.locator("#integration-pending-detail")).to_contain_text(
         "original command journal and fresh observation"
     )
-    expect(page.locator("#integration-pending-detail")).to_contain_text("does not issue a new pick")
+    expect(page.locator("#integration-pending-detail")).to_contain_text(
+        "does not create or send a replacement robot command"
+    )
     expect(page.locator("#integration-advance")).to_have_text("Awaiting reconciliation")
     expect(page.locator("#integration-history option:checked")).to_contain_text("UNKNOWN_OUTCOME")
     page.screenshot(path=str(directory / "unknown-outcome.png"), full_page=True)
@@ -190,7 +204,7 @@ def test_guided_lost_ack_reconciles_original_command_without_second_effect(serve
         page.locator("#integration-reconcile").click()
     assert response.value.ok, response.value.text()
     page.wait_for_function("() => !busy && !integration.busy")
-    expect(page.locator("#integration-pending-title")).to_have_text("WMS reconciliation")
+    expect(page.locator("#integration-position")).to_contain_text("WMS reconciliation")
     final = finish(page, origin)
     assert final["command_id"] == command
     assert runtime.recorded_journal(command).effect_count == 1

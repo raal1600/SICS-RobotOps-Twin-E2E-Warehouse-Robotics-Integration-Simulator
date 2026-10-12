@@ -1,0 +1,47 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "title": "Code",
+      "type": "string"
+    },
+    "investigate": {
+      "title": "Investigate",
+      "type": "string"
+    },
+    "limitation": {
+      "title": "Limitation",
+      "type": "string"
+    },
+    "metrics": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Metrics",
+      "type": "object"
+    },
+    "next_measurement": {
+      "title": "Next Measurement",
+      "type": "string"
+    },
+    "observation": {
+      "title": "Observation",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "code",
+    "observation",
+    "investigate",
+    "next_measurement",
+    "limitation"
+  ],
+  "title": "DiagnosticClue",
+  "type": "object"
+}

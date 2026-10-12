@@ -5,12 +5,20 @@ from typing import ClassVar, Literal, Self
 
 from pydantic import AwareDatetime, Field, model_validator
 
+from robotops.calibration.runtime_contracts import (
+    CalibratedObject,
+    CalibratedObservation,
+    CalibratedPlan,
+    CalibratedReceipt,
+    CalibrationMachine,
+)
+
 # Public imports remain stable for archived consumers and existing integrations.
 from robotops.domain.base import Contract as Contract
 from robotops.domain.base import Identifier as Identifier
+from robotops.domain.base import MeasuredVersionedContract, MeasuredVersionedRecord, V2Contract
 from robotops.domain.base import Pose as Pose
 from robotops.domain.base import Record as Record
-from robotops.domain.base import V2Contract, VersionedContract, VersionedRecord
 from robotops.domain.base import new_id as new_id
 from robotops.domain.base import stable_id as stable_id
 from robotops.domain.base import utc_now as utc_now
@@ -115,7 +123,9 @@ class WorldObject(Contract):
     attached: bool = False
 
 
-class WorldState(VersionedRecord):
+class WorldState(MeasuredVersionedRecord):
+    measured_fields: ClassVar[frozenset[str]] = frozenset({"calibration_machine"})
+    calibration_machine: CalibrationMachine | None = None
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {
             "robot_profile_version",
@@ -140,6 +150,18 @@ class WorldState(VersionedRecord):
 
     @model_validator(mode="after")
     def versioned_world(self) -> Self:
+        if self.schema_version == "3.0":
+            if self.calibration_machine is None or any(
+                getattr(self, name) is not None for name in self.extension_fields
+            ):
+                raise ValueError("MEASURED_WORLD_PROFILE_REQUIRED")
+            if len({obj.product.product_id for obj in self.objects}) != len(self.objects):
+                raise ValueError("DUPLICATE_WORLD_IDENTITY")
+            if any(
+                obj.location_id not in {loc.location_id for loc in self.locations}
+                for obj in self.objects
+            ):
+                raise ValueError("UNKNOWN_WORLD_LOCATION")
         if self.schema_version == "2.0":
             if any(getattr(self, name) is None for name in self.extension_fields):
                 raise ValueError("HKM_WORLD_METADATA_REQUIRED")
@@ -170,18 +192,33 @@ class WorldState(VersionedRecord):
         return self
 
 
-class ObservedObject(VersionedContract):
+class ObservedObject(MeasuredVersionedContract):
+    measured_fields: ClassVar[frozenset[str]] = frozenset({"calibrated_object"})
+    calibrated_object: CalibratedObject | None = None
     extension_fields: ClassVar[frozenset[str]] = frozenset({"sensor_id", "evidence_source"})
     product_id: Identifier
     location_id: Identifier
     pose: Pose
-    confidence: float = Field(ge=0, le=1, allow_inf_nan=False)
-    uncertainty_m: float = Field(default=0, ge=0, allow_inf_nan=False)
+    confidence: float | None = Field(ge=0, le=1, allow_inf_nan=False)
+    uncertainty_m: float | None = Field(default=0, ge=0, allow_inf_nan=False)
     sensor_id: Identifier | None = None
     evidence_source: Literal["SYNTHETIC_OBSERVATION_MODEL"] | None = None
 
     @model_validator(mode="after")
     def sensor_source(self) -> Self:
+        if self.schema_version != "3.0" and (self.confidence is None or self.uncertainty_m is None):
+            raise ValueError("LEGACY_OBSERVATION_REQUIRES_NUMERIC_QUALITY")
+        if self.schema_version == "3.0":
+            if (
+                self.calibrated_object is None
+                or self.sensor_id is not None
+                or self.evidence_source is not None
+            ):
+                raise ValueError("IMAGE_DERIVED_OBSERVATION_REQUIRED")
+            if self.calibrated_object.measurement_quality is not None and (
+                self.confidence is not None or self.uncertainty_m is not None
+            ):
+                raise ValueError("RULE_GATES_ARE_NOT_STATISTICAL_ESTIMATES")
         if self.schema_version == "2.0" and (
             self.sensor_id is None or self.evidence_source is None
         ):
@@ -206,7 +243,9 @@ class ObservedMachineState(V2Contract):
         return self
 
 
-class WorldObservation(VersionedRecord):
+class WorldObservation(MeasuredVersionedRecord):
+    measured_fields: ClassVar[frozenset[str]] = frozenset({"calibrated_observation"})
+    calibrated_observation: CalibratedObservation | None = None
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {
             "robot_profile_version",
@@ -232,6 +271,20 @@ class WorldObservation(VersionedRecord):
 
     @model_validator(mode="after")
     def observed_versions(self) -> Self:
+        if self.schema_version == "3.0":
+            if (
+                self.calibrated_observation is None
+                or self.model_version
+                not in {"measured-rgbd-observer-1", "measured-rgbd-observer-2"}
+                or any(getattr(self, name) is not None for name in self.extension_fields)
+                or any(obj.schema_version != "3.0" for obj in self.objects)
+            ):
+                raise ValueError("MEASURED_OBSERVATION_PROFILE_REQUIRED")
+            if self.model_version == "measured-rgbd-observer-2" and any(
+                obj.calibrated_object is None or obj.calibrated_object.measurement_quality is None
+                for obj in self.objects
+            ):
+                raise ValueError("MEASURED_OBSERVATION_QUALITY_RECORD_REQUIRED")
         if self.schema_version == "2.0":
             if any(getattr(self, name) is None for name in self.extension_fields):
                 raise ValueError("HKM_OBSERVATION_METADATA_REQUIRED")
@@ -258,7 +311,9 @@ class WorldObservation(VersionedRecord):
         return self
 
 
-class ActionPlan(VersionedRecord):
+class ActionPlan(MeasuredVersionedRecord):
+    measured_fields: ClassVar[frozenset[str]] = frozenset({"calibrated_plan"})
+    calibrated_plan: CalibratedPlan | None = None
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {
             "selected_tool_id",
@@ -283,9 +338,9 @@ class ActionPlan(VersionedRecord):
     scene_epoch: Identifier
     observation_id: Identifier
     cell_generation: int = Field(ge=0)
-    brain_version: Literal["deterministic-1", "structured-1", "deterministic-hkm-1"] = (
-        "deterministic-1"
-    )
+    brain_version: Literal[
+        "deterministic-1", "structured-1", "deterministic-hkm-1", "measured-geometric-1"
+    ] = "deterministic-1"
     selected_tool_id: ToolId | None = None
     grasp_pose: Pose | None = None
     trajectory: TrajectoryIntent | None = None
@@ -297,6 +352,15 @@ class ActionPlan(VersionedRecord):
 
     @model_validator(mode="after")
     def robotics_intent(self) -> Self:
+        if self.schema_version == "3.0":
+            if (
+                self.calibrated_plan is None
+                or self.brain_version != "measured-geometric-1"
+                or any(getattr(self, name) is not None for name in ActionPlan.extension_fields)
+            ):
+                raise ValueError("MEASURED_ACTION_PROFILE_REQUIRED")
+        elif self.brain_version == "measured-geometric-1":
+            raise ValueError("MEASURED_BRAIN_REQUIRES_VERSION_3")
         if self.schema_version == "2.0":
             if any(getattr(self, name) is None for name in ActionPlan.extension_fields):
                 raise ValueError("HKM_ACTION_METADATA_REQUIRED")
@@ -341,7 +405,9 @@ class CommandStatus(StrEnum):
     STATUS_UNKNOWN = "STATUS_UNKNOWN"
 
 
-class CommandReceipt(VersionedRecord):
+class CommandReceipt(MeasuredVersionedRecord):
+    measured_fields: ClassVar[frozenset[str]] = frozenset({"calibrated_receipt"})
+    calibrated_receipt: CalibratedReceipt | None = None
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {
             "active_tool_id",
@@ -365,6 +431,32 @@ class CommandReceipt(VersionedRecord):
 
     @model_validator(mode="after")
     def robotics_receipt(self) -> Self:
+        if self.schema_version == "3.0":
+            if self.calibrated_receipt is None or any(
+                getattr(self, name) is not None for name in self.extension_fields
+            ):
+                raise ValueError("MEASURED_RECEIPT_REQUIRED")
+            missed_transfer = self.calibrated_receipt.motion_without_transfer is not None
+            if missed_transfer and (
+                self.status != CommandStatus.FAILED
+                or self.reason != "GRASP_NOT_ESTABLISHED"
+                or self.effect_count != 0
+                or self.calibrated_receipt.executed_waypoint_count != 6
+            ):
+                raise ValueError("FAILED_TRANSFER_MOTION_RECEIPT_CONFLICT")
+            if (
+                (self.status == CommandStatus.SUCCEEDED and self.effect_count != 1)
+                or (
+                    self.status in {CommandStatus.FAILED, CommandStatus.REJECTED}
+                    and self.effect_count != 0
+                )
+                or (
+                    self.effect_count == 0
+                    and not missed_transfer
+                    and self.calibrated_receipt.executed_waypoint_count != 0
+                )
+            ):
+                raise ValueError("RECEIPT_EFFECT_STATUS_CONFLICT")
         if self.schema_version == "2.0":
             if (
                 self.tool_change_performed is None
@@ -402,6 +494,7 @@ class VerificationResult(Record):
 
 
 class Fault(StrEnum):
+    MISSED_PICK = "MISSED_PICK"
     DROP_ACK_AFTER_EFFECT = "DROP_ACK_AFTER_EFFECT"
     DROP_ACK_BEFORE_EFFECT = "DROP_ACK_BEFORE_EFFECT"
     ROBOT_COMMAND_FAILURE = "ROBOT_COMMAND_FAILURE"

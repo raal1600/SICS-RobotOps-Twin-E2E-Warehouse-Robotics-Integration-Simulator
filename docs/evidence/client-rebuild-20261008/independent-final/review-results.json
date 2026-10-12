@@ -1,0 +1,172 @@
+{
+  "review": "Independent agent heuristic review; not human research",
+  "date": "2026-10-08",
+  "baseUrl": "http://127.0.0.1:8000/",
+  "scope": "Read-only existing saved integration-lab runs; desktop, laptop, narrow; no execution or data mutations",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 1366,
+      "height": 768
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "checks": {
+    "fullSourceLoadingFocus": {
+      "status": "PASS",
+      "during": {
+        "tag": "BUTTON",
+        "id": "integration-source-full",
+        "disabled": false
+      },
+      "after": {
+        "tag": "BUTTON",
+        "id": "integration-source-full"
+      }
+    },
+    "sourceRefresh": {
+      "status": "PASS",
+      "before": {
+        "url": "http://127.0.0.1:8000/?test=original&session=a1ab4c15-8f60-527f-9e3f-61d8a4a6908b&step=e749d59f-09eb-55d8-b14a-3c7c00ac9158&tab=Source&component=plc#inspect",
+        "component": "plc",
+        "mode": "true",
+        "focus": {
+          "tag": "SELECT",
+          "id": "integration-source-select"
+        }
+      },
+      "after": {
+        "url": "http://127.0.0.1:8000/?test=original&session=a1ab4c15-8f60-527f-9e3f-61d8a4a6908b&step=e749d59f-09eb-55d8-b14a-3c7c00ac9158&tab=Source&component=plc#inspect",
+        "component": "plc",
+        "mode": "true",
+        "title": [
+          "RobotOps Twin",
+          "Journey finished — review the recorded outcomes",
+          "Inspect evidence",
+          "Persisted trace",
+          "Step 15 · READY FOR PHYSICAL EXECUTION"
+        ]
+      }
+    },
+    "visibleComponentLabel": {
+      "status": "PASS",
+      "name": "Choose component code"
+    },
+    "traceKeyboard": {
+      "status": "PASS",
+      "tabStops": 1,
+      "keys": [
+        "ArrowDown",
+        "ArrowUp",
+        "Home",
+        "End"
+      ],
+      "observed": "Focus and selected evidence follow the intended row"
+    },
+    "historicRecovery": {
+      "status": "PASS",
+      "text": "This attempt failed. A later attempt completed step 20; no retry is needed for this saved failure."
+    },
+    "uncertaintyResolution": {
+      "status": "PASS",
+      "observed": "Original command reconciled without replacement command; UNKNOWN_OUTCOME to COMPLETED; separate controller, observation, verification boundaries"
+    },
+    "dialog": {
+      "status": "PASS",
+      "testedFocusStates": [
+        {
+          "tag": "SUMMARY",
+          "inDialog": true
+        },
+        {
+          "tag": "BUTTON",
+          "inDialog": true
+        },
+        {
+          "tag": "SUMMARY",
+          "inDialog": true
+        },
+        {
+          "tag": "BUTTON",
+          "inDialog": true
+        },
+        {
+          "tag": "SUMMARY",
+          "inDialog": true
+        },
+        {
+          "tag": "BUTTON",
+          "inDialog": true
+        },
+        {
+          "tag": "SUMMARY",
+          "inDialog": true
+        },
+        {
+          "tag": "BUTTON",
+          "inDialog": true
+        },
+        {
+          "tag": "SUMMARY",
+          "inDialog": true
+        },
+        {
+          "tag": "BUTTON",
+          "inDialog": true
+        },
+        {
+          "tag": "SUMMARY",
+          "inDialog": true
+        },
+        {
+          "tag": "BUTTON",
+          "inDialog": true
+        }
+      ],
+      "escapeRestores": "Investigate this job · evidence & timeline"
+    },
+    "narrowOverflow": {
+      "status": "PASS",
+      "run": 0,
+      "inspect": 0,
+      "source": 0
+    },
+    "mainLabNextActionHints": {
+      "status": "PASS",
+      "observed": "Choose next product/scenario in this integration lab; no unavailable Start new test above instruction"
+    },
+    "topLabHistoryHints": {
+      "status": "PASS",
+      "observed": "Test 1 · HKM1800-inspired warehouse cell · current integration lab. Results remain in this lab's saved history.",
+      "evidence": "final-wording-confirmation.json"
+    }
+  },
+  "criticalOrHighFindings": [],
+  "lowFindings": [
+    "Baseline stage-number versus attempt-position distinction remains a minor trace-labeling ambiguity."
+  ],
+  "requests": {
+    "total": 1554,
+    "methods": [
+      "GET"
+    ],
+    "blockedMutations": [],
+    "failedRequests": [],
+    "pageErrors": []
+  },
+  "limits": {
+    "screenReader": false,
+    "humanStudy": false,
+    "automatedAxe": false,
+    "newExecution": false,
+    "backendIntegrityAssertions": false,
+    "zoom": false,
+    "notes": "Root task owns engineering, axe, execution, failure-state and backend verification. This review does not assert full WCAG conformance."
+  }
+}

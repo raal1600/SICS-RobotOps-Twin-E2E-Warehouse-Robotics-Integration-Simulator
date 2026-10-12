@@ -1,7 +1,8 @@
-param([ValidateSet('headless','blender')][string]$Runtime='headless',[string]$DataRoot)
+param([ValidateSet('headless','blender')][string]$Runtime='headless',[string]$DataRoot,[string]$Executable)
 $ErrorActionPreference='Stop'
 $repository=Split-Path -Parent $PSScriptRoot
-$executable=Join-Path $repository 'artifacts\desktop\RobotOps Twin\RobotOps Twin.exe'
+if (-not $Executable) { $Executable=Join-Path $repository 'artifacts\desktop\RobotOps Twin\RobotOps Twin.exe' }
+$executable=[IO.Path]::GetFullPath($Executable)
 $root=Join-Path $repository ('artifacts\desktop-smoke\'+[guid]::NewGuid().ToString('N')+' test data')
 if ($DataRoot) { $root=[IO.Path]::GetFullPath($DataRoot) }
 New-Item -ItemType Directory -Path $root -Force | Out-Null
@@ -35,7 +36,7 @@ function Start-OwnedApp {
     $held=$backend.Handle
     return @{ process=$process; backend=$backend; session=$session; origin=$ready.origin }
     } catch {
-        $diagnostic=Join-Path $env:LOCALAPPDATA 'RobotOpsTwin\launcher-error.log'
+        $diagnostic=Join-Path (Split-Path -Parent $executable) 'launcher-error.log'
         if (Test-Path -LiteralPath $diagnostic) { Write-Host (Get-Content -LiteralPath $diagnostic -Raw) }
         if (-not $process.HasExited) { $process.Kill(); $null=$process.WaitForExit(5000) }
         throw

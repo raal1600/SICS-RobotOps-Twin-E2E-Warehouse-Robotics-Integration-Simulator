@@ -1,0 +1,69 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "justification": {
+      "default": "Synthetic reference readout noise is 0.08 px per coordinate. Separate 0.5 px RMS and 1 px maximum gates reserve subpixel model error; these are not SICS or production tolerances.",
+      "title": "Justification",
+      "type": "string"
+    },
+    "limits_id": {
+      "const": "synthetic-optical-reference-budget-1",
+      "default": "synthetic-optical-reference-budget-1",
+      "title": "Limits Id",
+      "type": "string"
+    },
+    "max_error_px": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 1,
+      "title": "Max Error Px"
+    },
+    "max_rms_px": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 0.5,
+      "title": "Max Rms Px"
+    },
+    "min_image_fraction": {
+      "default": 0.35,
+      "exclusiveMaximum": 1,
+      "exclusiveMinimum": 0,
+      "title": "Min Image Fraction",
+      "type": "number"
+    },
+    "min_points_per_stream": {
+      "default": 30,
+      "minimum": 12,
+      "title": "Min Points Per Stream",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "SIMULATION_ONLY",
+      "default": "SIMULATION_ONLY",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "title": "OpticsLimits",
+  "type": "object"
+}

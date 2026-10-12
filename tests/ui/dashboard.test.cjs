@@ -80,7 +80,7 @@ async function dashboard({hkm=false,empty=false,profiles=null,beforeRun=null,aft
     const scene=()=>({scene_epoch:id+'-scene-'+world.epoch,source:'CURRENT_WORLD_REFERENCE',objects:[]});
     const fixture=()=>({runtime:'headless',scene_epoch:scene().scene_epoch,source_id:catalogue?sources[inventory[0].product_id]:'source',destination_id:world.destination,
       robot_profile_version:catalogue?world.cell_profile_id:null,products:inventory.map(item=>({product_id:item.product_id,sku:catalogue?item.product_id.slice(8,-3):item.product_id})),catalogue,product_sources:sources,inventory,scene_reset_blocked_reason:world.blocked});
-    const pending=session=>({...session,pending_authorization:session.status==='WAITING_AUTHORIZATION'?{stage:session.current_stage,title:session.current_stage===17?'Controller result':`Stage ${session.current_stage}`,expected_revision:session.revision,label:'Continue',mandatory:[3,10,13,15].includes(session.current_stage)}:null});
+    const pending=session=>({...session,workbench:{status:session.status==='UNKNOWN_OUTCOME'?'Robot outcome not yet proven':session.status},pending_authorization:session.status==='WAITING_AUTHORIZATION'?{stage:session.current_stage,title:session.current_stage===17?'Controller result':`Stage ${session.current_stage}`,expected_revision:session.revision,label:'Continue',mandatory:[3,10,13,15].includes(session.current_stage)}:null});
     if(path==='/v1/wms/tasks'&&body){
       const session={session_id:'session-'+body.request_id,order_id:body.request.order_id,request:body.request,fault:body.fault,revision:0,current_stage:1,status:'WAITING_AUTHORIZATION',steps:[],context:{},created_at:'2026-10-03T14:00:00Z'};
       world.sessions.push(session);return reply(pending(session),202);
@@ -355,9 +355,9 @@ for(const fault of ['DROP_ACK_AFTER_EFFECT','DROP_ACK_BEFORE_EFFECT'])test(fault
   assertReconcile(posts.slice(start),null);await finishGuided(el);
   assert.equal(orders[0].status,fault==='DROP_ACK_BEFORE_EFFECT'?'FAILED':'COMPLETED');
   assert.match(el('integration-state').textContent,/^COMPLETED/);
-  assert.equal(el('integration-pending').hidden,true);
+  assert.equal(el('integration-pending').hidden,false);
   assert.equal(el('integration-advance').disabled,true);
-  assert.equal(el('integration-live-state').textContent,'Execution session completed. Review the recorded controller result, verification and business reconciliation.');
+  assert.match(el('integration-live-state').textContent,/do not establish sensor verification/);
   assert.equal(el('create').disabled,false);assert.equal(el('next-step').hidden,true);
   assert.equal(el('product').value,'product-blue');await runGuided(el);
   assert.equal(orders.length,2);assert.equal(orders[1].lines[0].product_id,'product-blue');
@@ -432,7 +432,7 @@ for(const execution of executions)for(const observation of observations)test(`in
   assert.match(el('test-status').textContent,/read-only/);assert.equal(el('create').disabled,true);
   assert.equal(el('reconcile').disabled,true);assert.equal(el('reset').disabled,true);assert.equal(el('fresh-scene').disabled,true);
   assert.equal(el('new-test').disabled,false);assert.equal(el('return-current').hidden,false);
-  assert.equal(app.player.data.jobs.length,1);
+  assert.equal(app.player.data.job_id,orders[0].job_ids[0]);
   const reads=posts.length;await runGuided(el);await el('reconcile').onclick();await el('reset').onclick();
   assert.equal(posts.length,reads);assert.equal(JSON.stringify({orders,inventory}),saved);
   await el('return-current').onclick();
@@ -443,9 +443,9 @@ test('unreconciled test can be archived without reconciliation, then reviewed un
   const {el,orders,posts}=await dashboard();
   el('scenario').value='DROP_ACK_AFTER_EFFECT';await runGuided(el);
   assert.equal(el('integration-pending').hidden,false);
-  assert.match(el('integration-pending-title').textContent,/Outcome unproven/);
+  assert.match(el('integration-pending-title').textContent,/Robot outcome not yet proven/);
   assert.match(el('integration-pending-detail').textContent,/original command journal and fresh observation/);
-  assert.match(el('integration-pending-detail').textContent,/does not issue a new pick/);
+  assert.match(el('integration-pending-detail').textContent,/does not create or send a replacement robot command/);
   assert.equal(el('integration-advance').textContent,'Awaiting reconciliation');
   assert.equal(el('integration-advance').disabled,true);
   assert.match(el('integration-history').children.find(option=>option.value===el('integration-history').value).textContent,/UNKNOWN_OUTCOME/);
@@ -571,7 +571,7 @@ for(const fault of ['LOGICAL_ESTOP','CELL_FAULT'])test(fault+': guide resets the
 for(const fault of ['BRAIN_TIMEOUT','BRAIN_INVALID_OUTPUT'])test(fault+': guide explains rejection and focuses configuration without dispatch',async()=>{
   const {el,posts}=await dashboard();el('scenario').value=fault;await runGuided(el);
   assert.match(el('integration-state').textContent,/^FAILED/);
-  assert.equal(el('integration-pending').hidden,true);
+  assert.equal(el('integration-pending').hidden,false);
   assert.equal(el('integration-advance').disabled,true);
   assert.match(el('guide-detail').textContent,/before a robot command was created/);
   const start=posts.length;await el('guide-action').onclick();
@@ -593,20 +593,29 @@ test('depleted delivery and saved test both have an explicit next action with hi
 
 test('every selectable mode has a definition and comparison; browsing them cannot execute a test',async()=>{
   const {el,posts,refresh}=await dashboard();
-  for(const [kind,values] of [['scenario',[...executions.slice(0,-1),'DUPLICATE_DELIVERY','BROKER_TRANSIENT','EDGE_TRANSIENT','OPC_UA_DISCONNECT','PLC_RESTART','WMS_UNAVAILABLE',executions.at(-1)]],['observation',observations]]){
+  for(const [kind,values] of [['scenario',['MISSED_PICK',...executions.slice(0,-1),'DUPLICATE_DELIVERY','BROKER_TRANSIENT','EDGE_TRANSIENT','OPC_UA_DISCONNECT','PLC_RESTART','WMS_UNAVAILABLE',executions.at(-1)]],['observation',observations]]){
     const table=el(kind+'-comparisons');
     assert.equal(table.children.length,values.length);
     const meanings=[];
     for(const value of values){
       el(kind).value=value;await el(kind).onchange();
       const row=table.children[values.indexOf(value)];
+      if(value==='MISSED_PICK'){
+        // This fixture uses the legacy profile. Its comparison is educational,
+        // but an unsupported selection must reset without dispatching work.
+        const option=el(kind).options.find(item=>item.value===value);
+        assert.equal(option.disabled,true);assert.equal(option.hidden,true);
+        assert.equal(el(kind).value,'');
+        assert.match(row.children[1].children[1].textContent,/synthetic grip fails/);
+        continue;
+      }
       // The selected definition and the comparison row describe the same mode.
       assert.equal(el(kind+'-meaning').textContent,row.children[1].children[1].textContent);
       assert.equal(el(kind+'-phase').textContent,row.children[1].children[0].textContent);
       assert.ok(el(kind+'-difference').textContent.length>0);
       meanings.push(el(kind+'-meaning').textContent);
     }
-    assert.equal(new Set(meanings).size,values.length);
+    assert.equal(new Set(meanings).size,values.filter(value=>value!=='MISSED_PICK').length);
     el(kind+'-compare').open=true;await refresh();
     assert.equal(el(kind+'-compare').open,true);assert.equal(table.children.length,values.length);
   }
@@ -662,7 +671,10 @@ test('tool and uncertainty inspector reads persisted decision and observation wi
   const rows=ui.el('tool-candidates').children;
   assert.equal(rows.length,2);assert.equal(rows[1].children[1].textContent,'Rejected');
   const html=fs.readFileSync('apps/erp_ui/index.html','utf8');
-  for(const text of ['Simulation boundaries','Not Cognibotics CAD','Not validated robot dynamics','Not SICS AI proprietary software','camera images are not analyzed'])assert.ok(html.includes(text));
+  assert.ok(html.includes('Simulation boundaries'));
+  assert.ok(html.includes('not SICS AI proprietary software'));
+  assert.match(ui.el('simulation-profile-boundary').textContent,/Not Cognibotics CAD.*validated HKM1800 kinematics or robot dynamics/);
+  assert.match(ui.el('simulation-sensor-boundary').textContent,/camera images are not analyzed/);
 });
 
 
@@ -897,7 +909,7 @@ test('Create only persists a guided session; every boundary requires an explicit
   assert.equal(ui.posts.at(-1).body.stage,1);assert.equal(ui.posts.at(-1).body.expected_revision,0);
   await finishGuided(ui.el);
   assert.equal(ui.el('integration-error').textContent,'');
-  assert.equal(ui.el('integration-pending').hidden,true);
+  assert.equal(ui.el('integration-pending').hidden,false);
   const completed=JSON.stringify(ui.current().sessions[0]),posts=ui.posts.length;
   await ui.el('create').onclick();
   assert.equal(ui.posts.length,posts+1);assert.equal(ui.posts.at(-1).path,'/v1/wms/tasks');
@@ -905,4 +917,16 @@ test('Create only persists a guided session; every boundary requires an explicit
   assert.equal(ui.current().sessions[1].current_stage,1);
   assert.equal(ui.el('integration-pending').hidden,false);
   assert.equal(ui.el('integration-advance').disabled,false);
+});
+
+
+test('saved-session selection keeps its original job replay through background refresh',async()=>{
+  const ui=await dashboard();await runGuided(ui.el);const first=ui.current().sessions[0];
+  ui.el('product').value='product-blue';ui.el('product').onchange();await runGuided(ui.el);
+  assert.equal(ui.current().sessions.length,2);assert.notEqual(ui.current().sessions[1].job_id,first.job_id);
+  const posts=ui.posts.length;
+  await ui.el('integration-history').onchange({target:{value:first.session_id}});
+  await ui.refresh();await ui.motion();
+  assert.equal(ui.el('orders').value,first.job_id);assert.equal(ui.player.data.job_id,first.job_id);
+  assert.equal(ui.posts.length,posts);
 });

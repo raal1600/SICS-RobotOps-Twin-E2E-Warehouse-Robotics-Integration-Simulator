@@ -1,4 +1,5 @@
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -45,7 +46,11 @@ def test_real_blender_pick_and_lost_ack(tmp_path, order_request, fault):
     } <= set(response["object_names"])
     assert responses[0].with_name("capture.png").read_bytes().startswith(b"\x89PNG")
     assert responses[0].with_name("scene.blend").stat().st_size > 10000
-    evidence = Path("artifacts/blender") / ("lost-ack" if fault else "happy")
+    evidence = (
+        Path("artifacts/blender")
+        / datetime.now(UTC).strftime("%Y%m%dT%H%M%S%f")
+        / ("lost-ack" if fault else "happy")
+    )
     evidence.mkdir(parents=True, exist_ok=True)
     for name in ["response.json", "capture.png", "runtime.log", "scene.blend"]:
         (evidence / name).write_bytes(responses[0].with_name(name).read_bytes())

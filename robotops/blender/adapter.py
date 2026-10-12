@@ -110,6 +110,9 @@ class BlenderRuntime(SyntheticRuntime):
             raise CommunicationTimeout("BLENDER_PROCESS_FAILED:" + str(process.returncode))
 
     def _complete(self, command: RobotCommand, directory: Path) -> CommandReceipt | None:
+        if command.schema_version == "3.0":
+            # Measured Blender artifacts are never an execution checkpoint.
+            return None
         response_path = directory / "response.json"
         if not response_path.exists():
             return None
@@ -243,6 +246,8 @@ class BlenderRuntime(SyntheticRuntime):
 
     def journal(self, command_id: str) -> CommandReceipt | None:
         receipt = super().journal(command_id)
+        if self.settings.is_measured:
+            return receipt
         if receipt and receipt.status in {CommandStatus.RUNNING, CommandStatus.STATUS_UNKNOWN}:
             with self.db.connect() as db:
                 row = db.execute(
@@ -267,6 +272,25 @@ class BlenderRuntime(SyntheticRuntime):
 
     def apply(self, command: RobotCommand, fault: Fault | None = None) -> CommandReceipt:
         command = RobotCommand.model_validate_json(command.model_dump_json())
+        if self.settings.is_measured:
+            # Preserve the same approval/contact gate, atomic controller journal and
+            # unknown-ack behavior as headless execution. Blender only presents it.
+            receipt = super().apply(command, fault)
+            if receipt.status == CommandStatus.SUCCEEDED or (
+                receipt.calibrated_receipt
+                and receipt.calibrated_receipt.motion_without_transfer is not None
+            ):
+                from robotops.blender.measured import present
+
+                try:
+                    present(self, command)
+                except (ValueError, OSError, TimeoutError) as error:
+                    with self.db.transaction() as db:
+                        db.execute(
+                            "INSERT OR IGNORE INTO meta VALUES (?,?)",
+                            ("presentation_error:" + command.command_id, str(error)),
+                        )
+            return receipt
         with self.db.transaction() as db:
             world = self._world(db)
             existing = db.execute(
@@ -347,11 +371,24 @@ class BlenderRuntime(SyntheticRuntime):
 
     def reset(self, scene_epoch: str | None = None) -> WorldState:
         world = super().reset(scene_epoch=scene_epoch)
+        if self.settings.is_measured:
+            # Restocking is an independent physical operation; capture is optional
+            # presentation and cannot turn a committed restock into an unknown pick.
+            return world
         directory = self._exchange("reset", world)
         self._invoke(directory)
         return world
 
     def capture(self, path: Path) -> Path:
+        if self.settings.is_measured:
+            from robotops.blender.measured import present
+
+            directory = present(self)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.exists():
+                raise FileExistsError("CAPTURE_DESTINATION_EXISTS")
+            shutil.copyfile(directory / "capture.png", path)
+            return path
         directory = self._exchange("capture", self.world())
         self._invoke(directory)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -369,6 +406,7 @@ class BlenderRuntime(SyntheticRuntime):
             "blender/scripts/runtime.py",
             "blender/scripts/hkm_runtime.py",
             "blender/scripts/hkm_scene.py",
+            "blender/scripts/measured_presentation.py",
             "robotops/hkm_geometry.py",
             "robotops/scene_geometry.py",
             "robotops/presentation_io.py",
@@ -388,6 +426,13 @@ class BlenderRuntime(SyntheticRuntime):
             ).hexdigest(),
             "gpu_required": False,
             "cpu_qos": "high" if sys.platform == "win32" else "os_default",
+            **(
+                {
+                    "execution_authority": "Python synthetic controller; Blender presents committed reports"
+                }
+                if self.settings.is_measured
+                else {}
+            ),
         }
 
     def latest_artifact(self) -> Path | None:
@@ -419,7 +464,9 @@ class BlenderRuntime(SyntheticRuntime):
         path = self.command_artifact(command.command_id, "motion.json")
         if path is None:
             return None
-        if path.stat().st_size > (32_000_000 if command.schema_version == "2.0" else 2_000_000):
+        if path.stat().st_size > (
+            32_000_000 if command.schema_version in {"2.0", "3.0"} else 2_000_000
+        ):
             raise ValueError("RECORDING_TOO_LARGE")
         recording = MotionRecording.model_validate_json(path.read_bytes())
         if recording.schema_version != command.schema_version:

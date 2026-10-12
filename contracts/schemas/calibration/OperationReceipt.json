@@ -1,0 +1,846 @@
+{
+  "$defs": {
+    "Board": {
+      "additionalProperties": false,
+      "properties": {
+        "board_id": {
+          "default": "charuco-7x5",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Board Id",
+          "type": "string"
+        },
+        "corner_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Corner Ids",
+          "type": "array"
+        },
+        "corners_m": {
+          "items": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Corners M",
+          "type": "array"
+        },
+        "dictionary": {
+          "const": "DICT_4X4_100",
+          "default": "DICT_4X4_100",
+          "title": "Dictionary",
+          "type": "string"
+        },
+        "marker_length_m": {
+          "default": 0.0315,
+          "exclusiveMinimum": 0,
+          "title": "Marker Length M",
+          "type": "number"
+        },
+        "measured_dimensions_m": {
+          "default": [
+            0.315,
+            0.225
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Measured Dimensions M",
+          "type": "array"
+        },
+        "mounting_id": {
+          "default": "flange-mount-1",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Mounting Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "square_length_m": {
+          "default": 0.045,
+          "maximum": 0.2,
+          "minimum": 0.005,
+          "title": "Square Length M",
+          "type": "number"
+        },
+        "squares_x": {
+          "default": 7,
+          "maximum": 20,
+          "minimum": 3,
+          "title": "Squares X",
+          "type": "integer"
+        },
+        "squares_y": {
+          "default": 5,
+          "maximum": 20,
+          "minimum": 3,
+          "title": "Squares Y",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "corner_ids",
+        "corners_m"
+      ],
+      "title": "Board",
+      "type": "object"
+    },
+    "Camera": {
+      "additionalProperties": false,
+      "properties": {
+        "aligned_semantics": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aligned Semantics"
+        },
+        "camera_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Camera Id",
+          "type": "string"
+        },
+        "configuration_revision": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Configuration Revision",
+          "type": "string"
+        },
+        "depth": {
+          "$ref": "#/$defs/Stream"
+        },
+        "depth_scale_m": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Depth Scale M",
+          "type": "number"
+        },
+        "depth_semantics": {
+          "enum": [
+            "optical_z",
+            "radial_range"
+          ],
+          "title": "Depth Semantics",
+          "type": "string"
+        },
+        "max_depth_m": {
+          "default": 4,
+          "exclusiveMinimum": 0,
+          "title": "Max Depth M",
+          "type": "number"
+        },
+        "min_depth_m": {
+          "default": 0.05,
+          "exclusiveMinimum": 0,
+          "title": "Min Depth M",
+          "type": "number"
+        },
+        "profile_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "registration": {
+          "default": "native",
+          "enum": [
+            "native",
+            "aligned_documented"
+          ],
+          "title": "Registration",
+          "type": "string"
+        },
+        "rgb": {
+          "$ref": "#/$defs/Stream"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "t_c_d": {
+          "$ref": "#/$defs/Transform"
+        }
+      },
+      "required": [
+        "camera_id",
+        "profile_id",
+        "configuration_revision",
+        "rgb",
+        "depth",
+        "depth_scale_m",
+        "depth_semantics",
+        "t_c_d"
+      ],
+      "title": "Camera",
+      "type": "object"
+    },
+    "CameraState": {
+      "additionalProperties": false,
+      "properties": {
+        "active_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Active Artifact Id"
+        },
+        "active_validity": {
+          "default": "UNVERIFIED",
+          "enum": [
+            "UNVERIFIED",
+            "VERIFIED",
+            "SUSPECT_INVALID"
+          ],
+          "title": "Active Validity",
+          "type": "string"
+        },
+        "blocking_reasons": {
+          "default": [
+            "APPROVED_CALIBRATION_REQUIRED"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Blocking Reasons",
+          "type": "array"
+        },
+        "board": {
+          "$ref": "#/$defs/Board"
+        },
+        "camera": {
+          "$ref": "#/$defs/Camera"
+        },
+        "camera_model_report_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Camera Model Report Id"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "limits": {
+          "$ref": "#/$defs/Limits"
+        },
+        "report_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Report Id"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "workflow_state": {
+          "default": "UNVERIFIED",
+          "enum": [
+            "UNVERIFIED",
+            "NEW_MEASUREMENTS",
+            "CANDIDATE",
+            "INDEPENDENT_VALIDATION",
+            "APPROVED",
+            "REJECTED",
+            "INVESTIGATION"
+          ],
+          "title": "Workflow State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "camera",
+        "board",
+        "limits",
+        "revision"
+      ],
+      "title": "CameraState",
+      "type": "object"
+    },
+    "Limits": {
+      "additionalProperties": false,
+      "properties": {
+        "ambiguity_gap_px": {
+          "default": 0.08,
+          "exclusiveMinimum": 0,
+          "title": "Ambiguity Gap Px",
+          "type": "number"
+        },
+        "justification": {
+          "default": "10 mm synthetic contact capture radius; reserve 5 mm for depth/robot/tool and require at most 5 mm independent point error. Pixel and angular limits are separate quality gates, not production or SICS requirements.",
+          "title": "Justification",
+          "type": "string"
+        },
+        "limits_id": {
+          "default": "synthetic-grasp-budget-1",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Limits Id",
+          "type": "string"
+        },
+        "max_chain_rms_px": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 2.0,
+          "title": "Max Chain Rms Px"
+        },
+        "max_chain_rotation_deg": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1,
+          "title": "Max Chain Rotation Deg"
+        },
+        "max_chain_translation_mm": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 6,
+          "title": "Max Chain Translation Mm"
+        },
+        "max_correspondence_error_px": {
+          "default": 1.5,
+          "exclusiveMinimum": 0,
+          "title": "Max Correspondence Error Px",
+          "type": "number"
+        },
+        "max_depth_surface_spread_m": {
+          "default": 0.015,
+          "exclusiveMinimum": 0,
+          "title": "Max Depth Surface Spread M",
+          "type": "number"
+        },
+        "max_pnp_rms_px": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1.5,
+          "title": "Max Pnp Rms Px"
+        },
+        "max_reference_error_mm": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 5,
+          "title": "Max Reference Error Mm"
+        },
+        "max_timestamp_skew_s": {
+          "default": 0.02,
+          "exclusiveMinimum": 0,
+          "title": "Max Timestamp Skew S",
+          "type": "number"
+        },
+        "min_corners": {
+          "default": 8,
+          "minimum": 4,
+          "title": "Min Corners",
+          "type": "integer"
+        },
+        "min_image_coverage": {
+          "default": 0.08,
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Min Image Coverage",
+          "type": "number"
+        },
+        "min_rotation_singular_rad": {
+          "default": 0.15,
+          "exclusiveMinimum": 0,
+          "title": "Min Rotation Singular Rad",
+          "type": "number"
+        },
+        "min_samples": {
+          "default": 10,
+          "minimum": 3,
+          "title": "Min Samples",
+          "type": "integer"
+        },
+        "min_translation_span_m": {
+          "default": [
+            0.12,
+            0.12,
+            0.12
+          ],
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Min Translation Span M",
+          "type": "array"
+        },
+        "minimum_p95_count": {
+          "default": 20,
+          "minimum": 20,
+          "title": "Minimum P95 Count",
+          "type": "integer"
+        },
+        "outlier_threshold_px": {
+          "default": 2.5,
+          "exclusiveMinimum": 0,
+          "title": "Outlier Threshold Px",
+          "type": "number"
+        },
+        "quantile_method": {
+          "const": "linear",
+          "default": "linear",
+          "title": "Quantile Method",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "scope": {
+          "const": "SIMULATION_ONLY",
+          "default": "SIMULATION_ONLY",
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "title": "Limits",
+      "type": "object"
+    },
+    "Stream": {
+      "additionalProperties": false,
+      "properties": {
+        "coefficients": {
+          "default": [],
+          "items": {
+            "type": "number"
+          },
+          "title": "Coefficients",
+          "type": "array"
+        },
+        "crop_xy": {
+          "default": [
+            0,
+            0
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Crop Xy",
+          "type": "array"
+        },
+        "distortion_model": {
+          "default": "pinhole",
+          "enum": [
+            "pinhole",
+            "fisheye"
+          ],
+          "title": "Distortion Model",
+          "type": "string"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "maximum": 4096,
+          "title": "Height",
+          "type": "integer"
+        },
+        "k": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "K",
+          "type": "array"
+        },
+        "resize_xy": {
+          "default": [
+            1,
+            1
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Resize Xy",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "verification": {
+          "enum": [
+            "SIMULATION_ONLY_FACTORY_MODEL",
+            "MEASURED_BOARD_MODEL"
+          ],
+          "title": "Verification",
+          "type": "string"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "maximum": 4096,
+          "title": "Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "k",
+        "verification"
+      ],
+      "title": "Stream",
+      "type": "object"
+    },
+    "Transform": {
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Destination",
+          "type": "string"
+        },
+        "matrix": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Matrix",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "translation_unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Translation Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "destination",
+        "matrix"
+      ],
+      "title": "Transform",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "camera_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "classification": {
+      "const": "IN_PROCESS_PYTHON",
+      "default": "IN_PROCESS_PYTHON",
+      "title": "Classification",
+      "type": "string"
+    },
+    "operation": {
+      "title": "Operation",
+      "type": "string"
+    },
+    "record_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Record Ids",
+      "type": "array"
+    },
+    "request_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/CameraState"
+    },
+    "timestamp_utc": {
+      "title": "Timestamp Utc",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "operation",
+    "request_id",
+    "camera_id",
+    "state",
+    "record_ids",
+    "timestamp_utc"
+  ],
+  "title": "OperationReceipt",
+  "type": "object"
+}

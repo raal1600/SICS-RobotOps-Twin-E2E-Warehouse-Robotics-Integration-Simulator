@@ -5,14 +5,14 @@ from typing import ClassVar, Literal, Self
 
 from pydantic import AwareDatetime, Field, FiniteFloat, model_validator
 
-from robotops.domain.base import V2Contract, VersionedContract
+from robotops.domain.base import MeasuredVersionedContract, V2Contract
 from robotops.domain.models import AuditEvent, CellMode, Contract, Identifier, JobState
 from robotops.robotics.models import ToolId
 
 Vector3 = tuple[FiniteFloat, FiniteFloat, FiniteFloat]
 
 
-class VisualObject(VersionedContract):
+class VisualObject(MeasuredVersionedContract):
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {
             "primitive",
@@ -48,7 +48,7 @@ class VisualObject(VersionedContract):
     def geometric_shape(self) -> Self:
         if any(value <= 0 for value in self.size):
             raise ValueError("INVALID_VISUAL_DIMENSIONS")
-        if self.schema_version == "2.0":
+        if self.schema_version in {"2.0", "3.0"}:
             if self.primitive is None or self.quaternion_xyzw is None or self.scale is None:
                 raise ValueError("ARTICULATED_GEOMETRY_REQUIRED")
             if not isclose(sum(v * v for v in self.quaternion_xyzw), 1, abs_tol=1e-6):
@@ -73,7 +73,7 @@ class VisualTransform(V2Contract):
         return self
 
 
-class VisualFrame(VersionedContract):
+class VisualFrame(MeasuredVersionedContract):
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {
             "transforms",
@@ -115,12 +115,14 @@ class VisualFrame(VersionedContract):
     positions: dict[str, Vector3]
     transforms: dict[str, VisualTransform] | None = None
     sim_time_s: float | None = Field(default=None, ge=0)
-    active_tool_id: ToolId | None = None
+    active_tool_id: ToolId | Literal["synthetic-vacuum-1"] | None = None
     rack_tool_ids: tuple[ToolId, ...] | None = None
     attached_product_id: Identifier | None = None
 
     @model_validator(mode="after")
     def versioned_frame(self) -> Self:
+        if self.schema_version == "2.0" and self.active_tool_id == "synthetic-vacuum-1":
+            raise ValueError("MEASURED_TOOL_REQUIRES_VERSION_3")
         if self.schema_version == "1.0":
             if self.frame > 100 or self.phase not in {
                 "APPROACH",
@@ -142,7 +144,7 @@ class VisualFrame(VersionedContract):
         return self
 
 
-class MotionRecording(VersionedContract):
+class MotionRecording(MeasuredVersionedContract):
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {
             "robot_profile_version",
@@ -152,7 +154,11 @@ class MotionRecording(VersionedContract):
             "simulated_duration_s",
         }
     )
-    source: Literal["BLENDER_EVALUATED_SCENE"] = "BLENDER_EVALUATED_SCENE"
+    source: Literal[
+        "BLENDER_EVALUATED_SCENE",
+        "SYNTHETIC_CONTROLLER_REPORTS",
+        "BLENDER_EVALUATED_CONTROLLER_REPLAY",
+    ] = "BLENDER_EVALUATED_SCENE"
     command_id: Identifier
     job_id: Identifier
     scene_epoch: Identifier
@@ -164,14 +170,32 @@ class MotionRecording(VersionedContract):
     complete: bool
     objects: list[VisualObject] = Field(min_length=1, max_length=512)
     frames: list[VisualFrame] = Field(min_length=1, max_length=720)
-    robot_profile_version: Literal["hkm_inspired_v1"] | None = None
-    kinematics_version: Literal["HKM_INSPIRED_VISUAL_KINEMATICS_V1"] | None = None
+    robot_profile_version: Literal["hkm_inspired_v1", "synthetic_calibration_gantry_v1"] | None = (
+        None
+    )
+    kinematics_version: (
+        Literal["HKM_INSPIRED_VISUAL_KINEMATICS_V1", "IDEAL_GANTRY_GIMBAL_V1"] | None
+    ) = None
     calibration_version: Identifier | None = None
     frame_tree_version: Identifier | None = None
     simulated_duration_s: float | None = Field(default=None, gt=0, le=30)
 
     @model_validator(mode="after")
     def valid_frames(self) -> Self:
+        if self.schema_version != "3.0" and (
+            self.source != "BLENDER_EVALUATED_SCENE"
+            or self.robot_profile_version == "synthetic_calibration_gantry_v1"
+            or self.kinematics_version == "IDEAL_GANTRY_GIMBAL_V1"
+        ):
+            raise ValueError("MEASURED_RECORDING_REQUIRES_VERSION_3")
+        if self.schema_version == "3.0" and (
+            self.source
+            not in {"SYNTHETIC_CONTROLLER_REPORTS", "BLENDER_EVALUATED_CONTROLLER_REPLAY"}
+            or self.robot_profile_version != "synthetic_calibration_gantry_v1"
+            or self.kinematics_version != "IDEAL_GANTRY_GIMBAL_V1"
+            or self.frame_id != "b"
+        ):
+            raise ValueError("MEASURED_RECORDING_PROFILE_MISMATCH")
         names = {item.name for item in self.objects}
         if len(names) != len(self.objects):
             raise ValueError("DUPLICATE_VISUAL_OBJECT")
@@ -197,6 +221,7 @@ class MotionRecording(VersionedContract):
                 or self.frame_tree_version != "hkm-frame-tree-1"
             ):
                 raise ValueError("RECORDING_SPATIAL_METADATA_MISMATCH")
+        if self.schema_version in {"2.0", "3.0"}:
             times = [frame.sim_time_s for frame in self.frames if frame.sim_time_s is not None]
             if (
                 len(times) != len(self.frames)
@@ -212,14 +237,16 @@ class MotionRecording(VersionedContract):
         return self
 
 
-class VisualScene(VersionedContract):
+class VisualScene(MeasuredVersionedContract):
     extension_fields: ClassVar[frozenset[str]] = frozenset({"robot_profile_version", "cameras"})
     source: Literal["SAVED_START_SCENE", "CURRENT_WORLD_REFERENCE"]
     scene_epoch: Identifier
     timestamp: AwareDatetime
     cell_mode: CellMode
     objects: list[VisualObject] = Field(min_length=1, max_length=512)
-    robot_profile_version: Literal["hkm_inspired_v1"] | None = None
+    robot_profile_version: Literal["hkm_inspired_v1", "synthetic_calibration_gantry_v1"] | None = (
+        None
+    )
     cameras: list["VisualCamera"] | None = None
 
     @model_validator(mode="after")
@@ -231,7 +258,17 @@ class VisualScene(VersionedContract):
         if self.schema_version == "1.0":
             if len(self.objects) > 100:
                 raise ValueError("INVALID_LEGACY_SCENE_BOUNDS")
-        elif self.robot_profile_version is None or self.cameras is None or len(self.cameras) != 3:
+        elif self.schema_version == "3.0":
+            if (
+                self.robot_profile_version != "synthetic_calibration_gantry_v1"
+                or self.cameras is None
+            ):
+                raise ValueError("CALIBRATION_SCENE_METADATA_REQUIRED")
+        elif (
+            self.robot_profile_version != "hkm_inspired_v1"
+            or self.cameras is None
+            or len(self.cameras) != 3
+        ):
             raise ValueError("HKM_SCENE_CAMERAS_REQUIRED")
         return self
 

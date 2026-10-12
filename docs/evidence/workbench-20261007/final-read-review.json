@@ -1,0 +1,169 @@
+{
+  "checkedAt": "2026-10-07T19:05:13.074Z",
+  "health": {
+    "status": "ok",
+    "process_id": 25852,
+    "profile": "lab",
+    "database": "PostgreSQL",
+    "scope": "independent synthetic simulator; real AMQP and OPC UA",
+    "runtime": "blender",
+    "capabilities": {
+      "test_lifecycle": false,
+      "guided_execution": true,
+      "distributed_protocols": true
+    }
+  },
+  "ui": {
+    "sessionId": "3686df7c-817c-59c2-8f89-132c7eea58fa",
+    "commandId": "89dae376-6f2c-5164-919a-7c7817a538b5",
+    "selectedJob": "15d54193-91bb-542e-8bfa-bc188610222e",
+    "playerJob": "15d54193-91bb-542e-8bfa-bc188610222e",
+    "recordingCommand": "89dae376-6f2c-5164-919a-7c7817a538b5",
+    "status": "COMPLETED",
+    "proofs": [
+      {
+        "key": "intent",
+        "label": "Business intent",
+        "state": "established",
+        "fact": "Business demand saved.",
+        "does_not_prove": "Durable workflow intake or robot work.",
+        "step_id": "3e61710b-25e3-5917-b116-ce7be7969231",
+        "field": "output.demand_id",
+        "evidence_ids": [
+          "aeda6ec4-99be-563e-860a-173ebad20790",
+          "60c208a9-a358-5b14-9606-47d777124cb6"
+        ],
+        "classification": "SIMULATED SYSTEM"
+      },
+      {
+        "key": "durable",
+        "label": "Durable workflow",
+        "state": "established",
+        "fact": "Order and jobs committed.",
+        "does_not_prove": "Broker publication or robot execution.",
+        "step_id": "8f4ff968-b049-5b08-98c6-8429bc4d4ca4",
+        "field": "output.transaction_committed",
+        "evidence_ids": [
+          "1415ff22-4d51-590a-95c8-2cc6ffc04ebc"
+        ],
+        "classification": "REAL CODE"
+      },
+      {
+        "key": "broker",
+        "label": "Broker publication",
+        "state": "established",
+        "fact": "Broker publisher confirmation recorded.",
+        "does_not_prove": "Consumer processing or controller acceptance.",
+        "step_id": "0cb43c50-143b-5c3a-9217-e36fd225f8e5",
+        "field": "output.publisher_confirm",
+        "evidence_ids": [
+          "89dae376-6f2c-5164-919a-7c7817a538b5",
+          "4345d533-e0b6-570e-822d-47ef100184cc"
+        ],
+        "classification": "REAL PROTOCOL"
+      },
+      {
+        "key": "edge",
+        "label": "Edge processing",
+        "state": "established",
+        "fact": "Durable edge inbox recorded; acknowledgement details remain in Protocol.",
+        "does_not_prove": "Controller acceptance or execution.",
+        "step_id": "051d7220-ea2b-5aed-9d31-555e03d07ae0",
+        "field": "output",
+        "evidence_ids": [
+          "89dae376-6f2c-5164-919a-7c7817a538b5",
+          "0c9407b9-0fe4-524c-98d3-26e5e7a22169"
+        ],
+        "classification": "REAL PROTOCOL"
+      },
+      {
+        "key": "controller",
+        "label": "Controller acceptance",
+        "state": "established",
+        "fact": "Original command accepted; no execution implied.",
+        "does_not_prove": "Execution, observation or verification.",
+        "step_id": "2464f761-0b98-5e43-98da-66494d419889",
+        "field": "output",
+        "evidence_ids": [
+          "89dae376-6f2c-5164-919a-7c7817a538b5",
+          "86f5c7e2-f23b-56ea-9fb8-4a97b220abe3"
+        ],
+        "classification": "REAL PROTOCOL"
+      },
+      {
+        "key": "execution",
+        "label": "Execution result",
+        "state": "established",
+        "fact": "Controller result: SUCCEEDED",
+        "does_not_prove": "Sensor verification or business acknowledgement.",
+        "step_id": "110eed34-03d6-5ea8-95f9-2673dbca28b0",
+        "field": "output.receipt",
+        "evidence_ids": [
+          "89dae376-6f2c-5164-919a-7c7817a538b5",
+          "721598cc-d03b-52ba-a95b-b717289ade0f"
+        ],
+        "classification": "REAL PROTOCOL"
+      },
+      {
+        "key": "observation",
+        "label": "Post-action observation",
+        "state": "established",
+        "fact": "Observation captured; see Verification for its assessment.",
+        "does_not_prove": "Freshness, confidence or success until assessed by verification.",
+        "step_id": "6271f8de-f8fc-5de4-9325-b35c1f9e852c",
+        "field": "output",
+        "evidence_ids": [
+          "df2817b3-0959-4af8-aa2d-484a1a2dfbcd",
+          "e3dd1024-f589-5efa-954a-34277648c290"
+        ],
+        "classification": "SYNTHETIC SENSOR"
+      },
+      {
+        "key": "verification",
+        "label": "Verification",
+        "state": "established",
+        "fact": "VERIFIED_SUCCESS: JOURNAL_AND_FRESH_DESTINATION_AGREE",
+        "does_not_prove": "WMS acknowledgement or ERP completion.",
+        "step_id": "c676223f-f580-5f7e-9367-fc7148db7428",
+        "field": "output",
+        "evidence_ids": [
+          "df2817b3-0959-4af8-aa2d-484a1a2dfbcd",
+          "255094fb-bca4-44eb-ac31-cdf6926b66e0",
+          "89dae376-6f2c-5164-919a-7c7817a538b5",
+          "4968e6b7-4e83-5256-813c-926992644773"
+        ],
+        "classification": "REAL CODE"
+      },
+      {
+        "key": "wms",
+        "label": "WMS acknowledgement",
+        "state": "established",
+        "fact": "WMS acknowledged the verified outcome: COMPLETED",
+        "does_not_prove": "ERP completion or that a failed physical result succeeded.",
+        "step_id": "0b9c797c-f5ab-5d53-972a-c7c7d5348449",
+        "field": "output.wms_acknowledged",
+        "evidence_ids": [
+          "89dae376-6f2c-5164-919a-7c7817a538b5",
+          "a8adb5c4-10e2-5d6a-b17b-fd4187ec0416"
+        ],
+        "classification": "REAL PROTOCOL"
+      },
+      {
+        "key": "erp",
+        "label": "ERP completion",
+        "state": "established",
+        "fact": "ERP business result: COMPLETED",
+        "does_not_prove": "Production hardware validation or certified safety.",
+        "step_id": "00007c61-ed25-502a-b54c-09c4985fda94",
+        "field": "output.business_status",
+        "evidence_ids": [
+          "2a780dc7-8713-5148-9f25-e9333706b843"
+        ],
+        "classification": "SIMULATED SYSTEM"
+      }
+    ],
+    "replayLabel": "RECORDED · Complete Blender motion for command 89dae376-6f2c-5164-919a-7c7817a538b5. Replay does not prove verification."
+  },
+  "posts": [],
+  "errors": []
+}

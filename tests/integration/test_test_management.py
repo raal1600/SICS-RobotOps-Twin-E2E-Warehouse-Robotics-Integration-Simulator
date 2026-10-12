@@ -89,7 +89,8 @@ def test_cell_selection_is_explicit_persisted_and_legacy_history_is_unchanged(tm
     profiles = client.get("/cell-profiles").json()
     assert profiles["default_cell_profile_id"] == "hkm_inspired_v1"
     assert [p["cell_profile_id"] for p in profiles["profiles"] if p["selectable"]] == [
-        "hkm_inspired_v1"
+        "hkm_inspired_v1",
+        "synthetic_calibration_gantry_v1",
     ]
     assert (
         client.get("/simulation-tests").json()["tests"][0]["cell_profile_id"]

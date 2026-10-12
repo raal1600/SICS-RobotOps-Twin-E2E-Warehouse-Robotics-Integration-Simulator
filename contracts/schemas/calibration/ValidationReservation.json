@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "candidate_fingerprint": {
+      "title": "Candidate Fingerprint",
+      "type": "string"
+    },
+    "candidate_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "dataset_ids": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Dataset Ids",
+      "type": "array"
+    },
+    "reservation_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Reservation Id",
+      "type": "string"
+    },
+    "reserved_at_utc": {
+      "title": "Reserved At Utc",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "reservation_id",
+    "candidate_id",
+    "candidate_fingerprint",
+    "dataset_ids",
+    "reserved_at_utc"
+  ],
+  "title": "ValidationReservation",
+  "type": "object"
+}

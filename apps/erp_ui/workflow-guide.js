@@ -3,6 +3,12 @@
    never from the scene, replay frames or an expected scenario outcome. */
 const SimulationGuide = (() => {
   const scenarios = {
+    MISSED_PICK: {
+      label: "Missed pick · measured cell", phase: "Physical execution · contact without transfer",
+      meaning: "The approved measured target passes the usual interlocks. The synthetic grip fails to retain the object, while the controller reports its actual motion and fresh images observe the object still at source.",
+      difference: "A failed transfer is a symptom. Inspect the original command and measurements; it does not prove that the camera transform is wrong.",
+      expected: "Expected: FAILED transfer, no automatic second pick, and an investigation that leaves the cause unresolved and X unchanged."
+    },
     "": {
       label: "Happy path", phase: "Whole pick · no injected fault",
       meaning: "The baseline test: the planner supplies a valid plan, the controller moves the product and replies, and a fresh observation checks the result.",
@@ -139,6 +145,9 @@ const SimulationGuide = (() => {
     difference: "Choose an option from the selector.", expected: "No expected result is defined for this selection."
   };
   const reasons = {
+    MEASUREMENT_QUALITY_EVIDENCE_REQUIRED: "This historical measurement lacks the current image/depth check record. Acquire fresh evidence; do not infer confidence from its old fixed fields.",
+    MEASUREMENT_QUALITY_FAILED: "The measured image, depth or camera-agreement checks did not pass. Inspect those measurements before continuing.",
+    RULE_GATES_ARE_NOT_STATISTICAL_ESTIMATES: "Rule-based checks cannot supply a statistical confidence or uncertainty estimate. Inspect the observation contract.",
     CONTRADICTORY_OBSERVATION: "The observation gives conflicting locations for the product.",
     LOW_CONFIDENCE: "The observation is not confident enough to decide where the product is.",
     STALE_OR_FUTURE_OBSERVATION: "The observation time is outside the allowed freshness window.",
@@ -198,6 +207,18 @@ const SimulationGuide = (() => {
       : "Planning or validation stopped this order before a robot command was created. Open Investigate this pick for the rejection evidence, then choose the next scenario or repeat this test.", "configure", "Choose next scenario");
     return result(0, "neutral", "Ready for your first pick", "Choose a product and execution scenario below. Run the order, watch the cell, then follow the next step shown here.", "configure", "Choose product & scenario");
   }
+  function qualityLabel(object){
+    if(object?.schema_version==="3.0"||object?.calibrated_object){
+      const checks=object?.calibrated_object?.measurement_quality;
+      return checks?`Measured checks ${checks.passed?"passed":"failed"}; confidence and point uncertainty not estimated`:"Historical measured quality fields; statistical confidence not established";
+    }
+    return Number.isFinite(object?.confidence)?`${Math.round(object.confidence*100)}% confidence`:"Confidence unavailable";
+  }
+  function qualitySummary(objects=[]){
+    if(!objects.length)return "No product evidence";
+    if(objects.some(object=>object.calibrated_object||object.schema_version==="3.0"))return [...new Set(objects.map(qualityLabel))].join("; ");
+    return objects.every(object=>Number.isFinite(object.confidence))?`${Math.round(Math.min(...objects.map(object=>object.confidence))*100)}% confidence`:"Confidence unavailable";
+  }
   function inspect(evidence, events = []) {
     const job = evidence?.job, command = evidence?.command, journal = evidence?.journal;
     const related = job ? events.filter(event => event.job_id === job.job_id ||
@@ -228,7 +249,7 @@ const SimulationGuide = (() => {
     const productId = command?.product_id || job?.line?.product_id;
     const objects = assessed?.objects?.filter(item => item.product_id === productId) || [];
     const observation = !assessed ? "No assessed sensor report is available. A planning capture is not a post-pick check."
-      : `Product detections: ${objects.length ? objects.map(item => `${item.location_id} (${Math.round(item.confidence * 100)}% confidence)`).join("; ") : "none"}. Model ${assessed.model_version}; calibration ${assessed.calibration_version}.`;
+      : `Product detections: ${objects.length ? objects.map(item => `${item.location_id} (${qualityLabel(item)})`).join("; ") : "none"}. Model ${assessed.model_version}; calibration ${assessed.calibration_version}.`;
     const boundary = related.findIndex(event => ["UNKNOWN_OUTCOME", "REQUIRES_INTERVENTION", "COMPLETED", "FAILED"].includes(event.state_after));
     const initialFault = related.slice(0, boundary < 0 ? related.length : boundary).find(event => event.job_id === job?.job_id && event.event_type === "FAULT_INJECTED")?.reason || null;
     return {symptom, finding, limit, hypothesis, observation, assessed, latest, related, initialFault, summary,
@@ -243,6 +264,7 @@ const SimulationGuide = (() => {
       ]};
   }
   const brief = value => ({
+    MISSED_PICK: ["The measured-cell controller moves through the approved path, but the object is not retained.", "Fresh images confirm no transfer. Investigate the original pick without changing X or automatically repeating it."],
     "": ["Normal pick: move the product, receive the reply and check its new position.", "The product reaches the output tote and the job becomes COMPLETED."],
     DROP_ACK_AFTER_EFFECT: ["The product moves, but the robot's completion reply is deliberately lost.", "Movement can finish while the workflow still says UNKNOWN_OUTCOME."],
     DROP_ACK_BEFORE_EFFECT: ["The pick never starts, and the controller's reply is deliberately lost.", "The product stays still, but the workflow still needs evidence to know that."],
@@ -260,7 +282,7 @@ const SimulationGuide = (() => {
     PLC_RESTART: ["Restart the virtual controller after execution, then query the original command.", "A changed boot must retain the original result and must not authorize another pick."],
     WMS_UNAVAILABLE: ["The first WMS acknowledgement fails after the robot outcome has been verified.", "Retry business reconciliation only; the robot effect and original command remain unchanged."]
   }[value] || ["Choose a supported scenario.", "No behavior is defined for this selection."]);
-  return {describe, evidenceSummary, explain, inspect, brief,
+  return {describe, evidenceSummary, explain, inspect, brief,qualityLabel,qualitySummary,
     choices: kind => Object.entries(catalog(kind)).map(([value, info]) => ({value, ...info})),
     scenario: value => explain("scenario", value).expected,
     observation: value => explain("observation", value).expected};

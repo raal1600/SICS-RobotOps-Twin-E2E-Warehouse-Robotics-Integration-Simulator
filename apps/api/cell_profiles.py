@@ -38,17 +38,30 @@ LEGACY = CellProfile(
     product_count=3,
     tool_count=1,
 )
+CALIBRATION = CellProfile(
+    cell_profile_id="synthetic_calibration_gantry_v1",
+    display_name="Measured calibration cell",
+    description=(
+        "Synthetic gantry with a rotating tool mount, two RGB-D cameras and a removable ChArUco board. "
+        "Measure, validate and explicitly approve calibration before a pick. Not HKM kinematics."
+    ),
+    selectable=True,
+    product_count=1,
+    tool_count=1,
+)
 
 
 def cell_profiles() -> CellProfiles:
-    return CellProfiles(profiles=(HKM, LEGACY))
+    return CellProfiles(profiles=(HKM, CALIBRATION, LEGACY))
 
 
 def profile_for(settings: Settings) -> CellProfile:
-    return HKM if settings.is_hkm else LEGACY
+    return CALIBRATION if settings.is_measured else HKM if settings.is_hkm else LEGACY
 
 
 def profile_settings(profile_id: str, *, visual_frame_seconds: float) -> Settings:
+    if profile_id == CALIBRATION.cell_profile_id:
+        return Settings.calibration(visual_frame_seconds=visual_frame_seconds)
     if profile_id != HKM.cell_profile_id:
         raise Conflict("CELL_PROFILE_NOT_AVAILABLE")
     return Settings.hkm(visual_frame_seconds=visual_frame_seconds)

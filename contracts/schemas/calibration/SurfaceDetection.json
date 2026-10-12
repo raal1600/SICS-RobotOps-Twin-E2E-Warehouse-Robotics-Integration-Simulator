@@ -1,0 +1,112 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "properties": {
+        "media_type": {
+          "enum": [
+            "image/png",
+            "application/x-npy",
+            "application/json"
+          ],
+          "title": "Media Type",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "shape": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Shape",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "media_type"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "camera_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "capture_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Capture Id",
+      "type": "string"
+    },
+    "mask": {
+      "$ref": "#/$defs/ArtifactRef"
+    },
+    "method": {
+      "enum": [
+        "reference_center",
+        "red_cube_top"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "default": "Rule-based detection of one declared synthetic color patch; not a recognition probability or complete grasp pose",
+      "title": "Scope",
+      "type": "string"
+    },
+    "selected_pixel_count": {
+      "exclusiveMinimum": 0,
+      "title": "Selected Pixel Count",
+      "type": "integer"
+    },
+    "selected_rgb_pixel": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Selected Rgb Pixel",
+      "type": "array"
+    }
+  },
+  "required": [
+    "capture_id",
+    "camera_id",
+    "method",
+    "selected_rgb_pixel",
+    "mask",
+    "selected_pixel_count"
+  ],
+  "title": "SurfaceDetection",
+  "type": "object"
+}

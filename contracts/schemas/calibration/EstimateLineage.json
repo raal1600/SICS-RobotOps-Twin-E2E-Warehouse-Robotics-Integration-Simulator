@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "artifact_fingerprint": {
+      "title": "Artifact Fingerprint",
+      "type": "string"
+    },
+    "artifact_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "candidate_fingerprint": {
+      "title": "Candidate Fingerprint",
+      "type": "string"
+    },
+    "created_at_utc": {
+      "title": "Created At Utc",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "UNCHANGED_ESTIMATE_NEW_VALIDATION_REQUIRED",
+      "default": "UNCHANGED_ESTIMATE_NEW_VALIDATION_REQUIRED",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_id",
+    "artifact_fingerprint",
+    "candidate_fingerprint",
+    "created_at_utc"
+  ],
+  "title": "EstimateLineage",
+  "type": "object"
+}

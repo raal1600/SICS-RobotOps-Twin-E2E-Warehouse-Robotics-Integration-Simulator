@@ -415,7 +415,10 @@
         "kinematics_version": {
           "anyOf": [
             {
-              "const": "HKM_INSPIRED_VISUAL_KINEMATICS_V1",
+              "enum": [
+                "HKM_INSPIRED_VISUAL_KINEMATICS_V1",
+                "IDEAL_GANTRY_GIMBAL_V1"
+              ],
               "type": "string"
             },
             {
@@ -444,7 +447,10 @@
         "robot_profile_version": {
           "anyOf": [
             {
-              "const": "hkm_inspired_v1",
+              "enum": [
+                "hkm_inspired_v1",
+                "synthetic_calibration_gantry_v1"
+              ],
               "type": "string"
             },
             {
@@ -465,7 +471,8 @@
           "default": "1.0",
           "enum": [
             "1.0",
-            "2.0"
+            "2.0",
+            "3.0"
           ],
           "title": "Schema Version",
           "type": "string"
@@ -485,8 +492,12 @@
           "title": "Simulated Duration S"
         },
         "source": {
-          "const": "BLENDER_EVALUATED_SCENE",
           "default": "BLENDER_EVALUATED_SCENE",
+          "enum": [
+            "BLENDER_EVALUATED_SCENE",
+            "SYNTHETIC_CONTROLLER_REPORTS",
+            "BLENDER_EVALUATED_CONTROLLER_REPLAY"
+          ],
           "title": "Source",
           "type": "string"
         },
@@ -638,6 +649,10 @@
               "type": "string"
             },
             {
+              "const": "synthetic-vacuum-1",
+              "type": "string"
+            },
+            {
               "type": "null"
             }
           ],
@@ -744,7 +759,8 @@
           "default": "1.0",
           "enum": [
             "1.0",
-            "2.0"
+            "2.0",
+            "3.0"
           ],
           "title": "Schema Version",
           "type": "string"
@@ -982,7 +998,8 @@
           "default": "1.0",
           "enum": [
             "1.0",
-            "2.0"
+            "2.0",
+            "3.0"
           ],
           "title": "Schema Version",
           "type": "string"
@@ -1094,7 +1111,10 @@
         "robot_profile_version": {
           "anyOf": [
             {
-              "const": "hkm_inspired_v1",
+              "enum": [
+                "hkm_inspired_v1",
+                "synthetic_calibration_gantry_v1"
+              ],
               "type": "string"
             },
             {
@@ -1115,7 +1135,8 @@
           "default": "1.0",
           "enum": [
             "1.0",
-            "2.0"
+            "2.0",
+            "3.0"
           ],
           "title": "Schema Version",
           "type": "string"

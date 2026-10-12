@@ -1,0 +1,87 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "capture_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Capture Id",
+      "type": "string"
+    },
+    "chain_residuals_px": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Chain Residuals Px",
+      "type": "array"
+    },
+    "chain_rms_px": {
+      "minimum": 0,
+      "title": "Chain Rms Px",
+      "type": "number"
+    },
+    "chain_rotation_deg": {
+      "minimum": 0,
+      "title": "Chain Rotation Deg",
+      "type": "number"
+    },
+    "chain_translation_mm": {
+      "minimum": 0,
+      "title": "Chain Translation Mm",
+      "type": "number"
+    },
+    "pnp_residuals_px": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Pnp Residuals Px",
+      "type": "array"
+    },
+    "pnp_rms_px": {
+      "minimum": 0,
+      "title": "Pnp Rms Px",
+      "type": "number"
+    },
+    "point_count": {
+      "exclusiveMinimum": 0,
+      "title": "Point Count",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "capture_id",
+    "point_count",
+    "pnp_rms_px",
+    "chain_rms_px",
+    "chain_translation_mm",
+    "chain_rotation_deg",
+    "pnp_residuals_px",
+    "chain_residuals_px"
+  ],
+  "title": "ImageValidation",
+  "type": "object"
+}

@@ -1,5 +1,171 @@
 {
   "$defs": {
+    "ArtifactBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_fingerprint": {
+          "title": "Artifact Fingerprint",
+          "type": "string"
+        },
+        "artifact_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "camera_configuration_fingerprint": {
+          "title": "Camera Configuration Fingerprint",
+          "type": "string"
+        },
+        "camera_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Camera Id",
+          "type": "string"
+        },
+        "capture_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "camera_id",
+        "artifact_id",
+        "artifact_fingerprint",
+        "camera_configuration_fingerprint",
+        "capture_id"
+      ],
+      "title": "ArtifactBinding",
+      "type": "object"
+    },
+    "CalibratedReceipt": {
+      "additionalProperties": false,
+      "properties": {
+        "binding": {
+          "$ref": "#/$defs/ArtifactBinding"
+        },
+        "executed_waypoint_count": {
+          "minimum": 0,
+          "title": "Executed Waypoint Count",
+          "type": "integer"
+        },
+        "final_machine": {
+          "$ref": "#/$defs/CalibrationMachine"
+        },
+        "motion_without_transfer": {
+          "anyOf": [
+            {
+              "const": "GRASP_NOT_ESTABLISHED",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Motion Without Transfer"
+        },
+        "profile": {
+          "const": "synthetic_calibration_gantry_v1",
+          "default": "synthetic_calibration_gantry_v1",
+          "title": "Profile",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tool_fingerprint": {
+          "title": "Tool Fingerprint",
+          "type": "string"
+        }
+      },
+      "required": [
+        "binding",
+        "tool_fingerprint",
+        "executed_waypoint_count",
+        "final_machine"
+      ],
+      "title": "CalibratedReceipt",
+      "type": "object"
+    },
+    "CalibrationMachine": {
+      "additionalProperties": false,
+      "properties": {
+        "board_mounted": {
+          "title": "Board Mounted",
+          "type": "boolean"
+        },
+        "command_mode": {
+          "default": "flange",
+          "enum": [
+            "tcp",
+            "flange"
+          ],
+          "title": "Command Mode",
+          "type": "string"
+        },
+        "flange": {
+          "$ref": "#/$defs/Transform"
+        },
+        "motion_phase": {
+          "default": "IDLE",
+          "title": "Motion Phase",
+          "type": "string"
+        },
+        "profile": {
+          "const": "synthetic_calibration_gantry_v1",
+          "default": "synthetic_calibration_gantry_v1",
+          "title": "Profile",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "settled": {
+          "default": true,
+          "title": "Settled",
+          "type": "boolean"
+        },
+        "tcp": {
+          "$ref": "#/$defs/Transform"
+        },
+        "tool": {
+          "$ref": "#/$defs/Tool"
+        },
+        "tool_verification_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool Verification Id"
+        }
+      },
+      "required": [
+        "flange",
+        "tcp",
+        "tool",
+        "board_mounted"
+      ],
+      "title": "CalibrationMachine",
+      "type": "object"
+    },
     "CommandStatus": {
       "enum": [
         "CREATED",
@@ -13,6 +179,182 @@
       ],
       "title": "CommandStatus",
       "type": "string"
+    },
+    "Tool": {
+      "additionalProperties": false,
+      "properties": {
+        "configuration_revision": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Configuration Revision",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "t_f_tcp": {
+          "$ref": "#/$defs/Transform"
+        },
+        "tool_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "verification_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verification Id"
+        }
+      },
+      "required": [
+        "tool_id",
+        "configuration_revision",
+        "t_f_tcp"
+      ],
+      "title": "Tool",
+      "type": "object"
+    },
+    "Transform": {
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Destination",
+          "type": "string"
+        },
+        "matrix": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Matrix",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "translation_unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Translation Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "destination",
+        "matrix"
+      ],
+      "title": "Transform",
+      "type": "object"
     }
   },
   "additionalProperties": false,
@@ -36,6 +378,17 @@
       ],
       "default": null,
       "title": "Active Tool Id"
+    },
+    "calibrated_receipt": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CalibratedReceipt"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "causation_id": {
       "maxLength": 160,
@@ -115,7 +468,8 @@
       "default": "1.0",
       "enum": [
         "1.0",
-        "2.0"
+        "2.0",
+        "3.0"
       ],
       "title": "Schema Version",
       "type": "string"

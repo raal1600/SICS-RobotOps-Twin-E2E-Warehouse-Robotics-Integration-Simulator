@@ -8,6 +8,7 @@ import threading
 from collections.abc import Iterator
 from contextlib import closing, contextmanager
 from pathlib import Path
+from typing import Literal
 from uuid import UUID
 
 from pydantic import AwareDatetime, Field, field_validator
@@ -26,6 +27,8 @@ from robotops.workflow.store import Conflict, NotFound, Store
 class StartTestRequest(Contract):
     request_id: UUID
     cell_profile_id: Identifier = "hkm_inspired_v1"
+    seed: int | None = Field(default=None, ge=0, le=2147483647)
+    command_mode: Literal["tcp", "flange"] | None = None
 
 
 class DeleteTestRequest(Contract):
@@ -389,9 +392,24 @@ class TestRegistry:
             number += 1
         return number
 
-    def start(self, request_id: UUID, cell_profile_id: str = "hkm_inspired_v1") -> SimulationTest:
+    def start(
+        self,
+        request_id: UUID,
+        cell_profile_id: str = "hkm_inspired_v1",
+        seed: int | None = None,
+        command_mode: Literal["tcp", "flange"] | None = None,
+    ) -> SimulationTest:
         test_id = str(request_id)
-        payload = json.dumps(["start", cell_profile_id])
+        if seed is not None and cell_profile_id != "synthetic_calibration_gantry_v1":
+            raise Conflict("SEED_REQUIRES_MEASURED_PROFILE")
+        if command_mode is not None and cell_profile_id != "synthetic_calibration_gantry_v1":
+            raise Conflict("COMMAND_MODE_REQUIRES_MEASURED_PROFILE")
+        # Preserve request digests for existing callers that supplied no mode.
+        payload = json.dumps(
+            ["start", cell_profile_id]
+            + ([seed] if seed is not None else [])
+            + ([{"command_mode": command_mode}] if command_mode is not None else [])
+        )
         with self.access():
             with self.exclusive() as db:
                 known = self._request(db, request_id, payload)
@@ -414,7 +432,17 @@ class TestRegistry:
                     active = self.current(db)
                     if active and self.engine(active).store.test_operation_in_progress():
                         raise Conflict("TEST_OPERATION_IN_PROGRESS")
-                    fresh = self.make_engine(test_id, cell_profile_id)
+                    fresh = self.make_engine(
+                        test_id,
+                        cell_profile_id,
+                        Settings.calibration(
+                            seed=29 if seed is None else seed,
+                            calibration_command_mode=command_mode,
+                            visual_frame_seconds=self.settings.visual_frame_seconds,
+                        )
+                        if seed is not None or command_mode is not None
+                        else None,
+                    )
                     if profile_for(fresh.settings).cell_profile_id != cell_profile_id:
                         raise Conflict("CELL_PROFILE_STATE_MISMATCH")
                     db.execute(
@@ -764,7 +792,14 @@ class TestScopeMiddleware:
                         self.children[identity] = cached
                     target = cached[1]
                 read_only = identity != self.registry.active_id()
-                scope = {**scope, "state": {**scope.get("state", {}), "test_read_only": read_only}}
+                scope = {
+                    **scope,
+                    "state": {
+                        **scope.get("state", {}),
+                        "test_read_only": read_only,
+                        "external_request_path": path,
+                    },
+                }
                 if scope["method"] not in {"GET", "HEAD", "OPTIONS"}:
                     revision_header = dict(scope["headers"]).get(b"x-test-revision")
                     try:

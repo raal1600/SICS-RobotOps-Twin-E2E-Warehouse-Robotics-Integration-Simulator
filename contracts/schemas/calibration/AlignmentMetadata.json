@@ -1,0 +1,62 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "algorithm": {
+      "const": "native-z-buffer-with-index-map-1",
+      "default": "native-z-buffer-with-index-map-1",
+      "title": "Algorithm",
+      "type": "string"
+    },
+    "aligned_sha256": {
+      "title": "Aligned Sha256",
+      "type": "string"
+    },
+    "camera_configuration_fingerprint": {
+      "title": "Camera Configuration Fingerprint",
+      "type": "string"
+    },
+    "capture_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Capture Id",
+      "type": "string"
+    },
+    "hole_policy": {
+      "const": "NaN; never filled or used as a target",
+      "default": "NaN; never filled or used as a target",
+      "title": "Hole Policy",
+      "type": "string"
+    },
+    "native_index_map_sha256": {
+      "title": "Native Index Map Sha256",
+      "type": "string"
+    },
+    "native_sha256": {
+      "title": "Native Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "value_semantics": {
+      "enum": [
+        "native_optical_z",
+        "native_radial_range"
+      ],
+      "title": "Value Semantics",
+      "type": "string"
+    }
+  },
+  "required": [
+    "capture_id",
+    "camera_configuration_fingerprint",
+    "value_semantics",
+    "native_sha256",
+    "aligned_sha256",
+    "native_index_map_sha256"
+  ],
+  "title": "AlignmentMetadata",
+  "type": "object"
+}

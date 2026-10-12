@@ -2,8 +2,19 @@
 
 import json
 import sqlite3
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
+import numpy as np
+
+from robotops.calibration.contracts import CalibrationArtifact
+from robotops.calibration.errors import CalibrationError
+from robotops.calibration.geometry import Array
+from robotops.calibration.lifecycle import CalibrationStore, CameraState
+from robotops.calibration.optics import CameraModelReport
+from robotops.cell import calibration_execution
+from robotops.cell.calibration_motion import controller_frames
 from robotops.cell.hkm_execution import final_machine, receipt_metadata, validate_execution
 from robotops.config import Settings
 from robotops.domain.models import (
@@ -12,6 +23,7 @@ from robotops.domain.models import (
     CommandReceipt,
     CommandStatus,
     Fault,
+    Pose,
     RobotCommand,
     RobotEvent,
     WorldObject,
@@ -88,7 +100,15 @@ class SyntheticRuntime:
                 for row in db.execute("SELECT receipt FROM controller_journal")
             ):
                 raise Conflict("SCENE_RESET_BLOCKED_UNCERTAIN_COMMAND")
+            # Restocking objects does not reinstall a removed board or change the
+            # reported physical tool/gantry. Calibration remains tied to that cell.
+            previous_machine = (
+                self._world(db).calibration_machine if self.settings.is_measured else None
+            )
             world = self._reset(db, epoch)
+            if previous_machine is not None:
+                world = world.model_copy(update={"calibration_machine": previous_machine})
+                self._write_world(db, world)
             self.db._record(db, epoch, world)
             event = RobotEvent(
                 **metadata(world),
@@ -114,7 +134,14 @@ class SyntheticRuntime:
         cell = CellState(**common)
         source = self.settings.locations[0]
         extensions = {}
-        if self.settings.is_hkm:
+        if self.settings.is_measured:
+            extensions = dict(
+                schema_version="3.0",
+                calibration_machine=calibration_execution.initial_machine(
+                    self.settings.calibration_command_mode or "flange"
+                ),
+            )
+        elif self.settings.is_hkm:
             catalogue = load_catalogue()
             tools = initial_tool_state()
             extensions = dict(
@@ -274,8 +301,17 @@ class SyntheticRuntime:
                 validate_execution(world, command)
             except (ValueError, StopIteration) as exc:
                 return str(exc) or "RUNTIME_PRECONDITION_FAILED"
+        elif world.schema_version == "3.0":
+            try:
+                if command.target_pose != locations[command.destination_id].pose:
+                    return "TARGET_POSE_MISMATCH"
+                calibration_execution.validate_execution(world, command)
+            except (ValueError, StopIteration) as exc:
+                return str(exc) or "RUNTIME_PRECONDITION_FAILED"
         elif command.target_pose != locations[command.destination_id].pose:
             return "TARGET_POSE_MISMATCH"
+        if fault == Fault.MISSED_PICK and command.schema_version != "3.0":
+            return "MISSED_PICK_REQUIRES_MEASURED_CELL"
         if fault == Fault.DROP_ACK_BEFORE_EFFECT:
             return "PROVEN_NOT_STARTED"
         elif fault == Fault.ROBOT_COMMAND_FAILURE:
@@ -283,15 +319,70 @@ class SyntheticRuntime:
         return None
 
     def _motion_events(
-        self, db: sqlite3.Connection, command: RobotCommand, world: WorldState
-    ) -> None:
+        self,
+        db: sqlite3.Connection,
+        command: RobotCommand,
+        world: WorldState,
+        physical_tool: Array | None = None,
+        *,
+        grip_established: bool = True,
+    ) -> Pose | None:
+        if command.calibrated_plan is not None:
+            if world.calibration_machine is None or physical_tool is None:
+                raise CalibrationError("MEASURED_MACHINE_REQUIRED")
+            result = None
+            last_phase = None
+            for frame in controller_frames(
+                world, command, physical_tool, grip_established=grip_established
+            ):
+                result = frame.object_pose
+                reported_world = world.model_copy(
+                    update={
+                        "calibration_machine": frame.machine,
+                        "objects": tuple(
+                            obj.model_copy(
+                                update={"pose": frame.object_pose, "attached": frame.attached}
+                            )
+                            if obj.product.product_id == command.product_id
+                            else obj
+                            for obj in world.objects
+                        ),
+                    }
+                )
+                self._write_world(db, reported_world)
+                db.execute(
+                    "INSERT INTO calibration_machine_reports(capture_id,body) VALUES (?,?)",
+                    (
+                        f"command:{command.command_id}:{frame.index}",
+                        frame.machine.model_dump_json(),
+                    ),
+                )
+                db.execute(
+                    "INSERT INTO calibration_motion_frames VALUES (?,?,?)",
+                    (command.command_id, frame.index, frame.model_dump_json()),
+                )
+                if frame.machine.motion_phase != last_phase:
+                    self._event(
+                        db,
+                        command,
+                        reported_world,
+                        frame.machine.motion_phase,
+                        f"SYNTHETIC_GANTRY_REPORTED;SIM_TIME_S={frame.sim_time_s:.9f}",
+                    )
+                last_phase = frame.machine.motion_phase
+            return result
         if command.trajectory is None:
-            return
+            return None
         for point in command.trajectory.waypoints:
             self._event(db, command, world, point.phase, f"SIM_TIME_S={point.sim_time_s:.9f}")
+        return None
 
     def _execute(
-        self, db: sqlite3.Connection, command: RobotCommand, fault: Fault | None
+        self,
+        db: sqlite3.Connection,
+        command: RobotCommand,
+        fault: Fault | None,
+        gate_rejection: str | None = None,
     ) -> CommandReceipt:
         world = self._world(db)
         original_world = world
@@ -312,6 +403,7 @@ class SyntheticRuntime:
         reason = "PICK_APPLIED"
         status = CommandStatus.SUCCEEDED
         count = 0
+        missed_transfer = False
         if fault in {Fault.CELL_FAULT, Fault.LOGICAL_ESTOP}:
             mode = CellMode.FAULTED if fault == Fault.CELL_FAULT else CellMode.ESTOP_LOGICAL
             world = world.model_copy(
@@ -325,7 +417,18 @@ class SyntheticRuntime:
                     )
                 }
             )
-        reason = self.rejection_reason(world, command, fault) or "PICK_APPLIED"
+        reason = gate_rejection or self.rejection_reason(world, command, fault) or "PICK_APPLIED"
+        physical_tool = None
+        if reason == "PICK_APPLIED" and command.schema_version == "3.0":
+            row = db.execute("SELECT value FROM meta WHERE key='synthetic_sensor_truth'").fetchone()
+            if row is None:
+                reason = "SYNTHETIC_PHYSICAL_TOOL_UNKNOWN"
+            else:
+                try:
+                    physical_tool = np.asarray(json.loads(row[0])["tool"], dtype=np.float64)
+                    calibration_execution.validate_execution(world, command, physical_tool)
+                except (ValueError, KeyError) as error:
+                    reason = str(error)
         if reason == "SIMULATED_COMMAND_FAILURE":
             status = CommandStatus.FAILED
         if reason != "PICK_APPLIED":
@@ -334,13 +437,22 @@ class SyntheticRuntime:
         else:
             self._event(db, command, world, "COMMAND_ACCEPTED", "PRECONDITIONS_PASSED")
             self._event(db, command, world, "COMMAND_RUNNING", "SIMULATED_PICK")
-            self._motion_events(db, command, world)
-            moved = objects[command.product_id].model_copy(
-                update={
-                    "location_id": command.destination_id,
-                    "pose": command.target_pose,
-                    "attached": False,
-                }
+            missed_transfer = fault == Fault.MISSED_PICK
+            measured_final_pose = self._motion_events(
+                db, command, world, physical_tool, grip_established=not missed_transfer
+            )
+            moved = (
+                objects[command.product_id]
+                if missed_transfer
+                else objects[command.product_id].model_copy(
+                    update={
+                        "location_id": command.destination_id,
+                        "pose": measured_final_pose
+                        if measured_final_pose is not None
+                        else command.target_pose,
+                        "attached": False,
+                    }
+                )
             )
             world = world.model_copy(
                 update={
@@ -355,12 +467,33 @@ class SyntheticRuntime:
             if command.schema_version == "2.0":
                 robot, tools = final_machine(original_world, command)
                 world = world.model_copy(update={"robot_state": robot, "tool_state": tools})
-            self._event(db, command, world, "PICK_EFFECT", "ATTACH_TRANSFER_DETACH")
-            count = 1
+            elif command.schema_version == "3.0":
+                world = world.model_copy(
+                    update={
+                        "calibration_machine": calibration_execution.final_machine(
+                            original_world, command
+                        )
+                    }
+                )
+            if missed_transfer:
+                status, reason = CommandStatus.FAILED, "GRASP_NOT_ESTABLISHED"
+                self._event(db, command, world, "PICK_ATTEMPT_NO_TRANSFER", reason)
+            else:
+                self._event(db, command, world, "PICK_EFFECT", "ATTACH_TRANSFER_DETACH")
+                count = 1
         self._write_world(db, world)
         receipt = CommandReceipt(
             **metadata(command, command.command_id),
-            **receipt_metadata(original_world, command, effect=count == 1),
+            **(
+                calibration_execution.receipt_metadata(
+                    original_world,
+                    command,
+                    effect=count == 1,
+                    motion_without_transfer=missed_transfer,
+                )
+                if command.schema_version == "3.0"
+                else receipt_metadata(original_world, command, effect=count == 1)
+            ),
             command_id=command.command_id,
             job_id=command.job_id,
             scene_epoch=command.scene_epoch,
@@ -379,11 +512,106 @@ class SyntheticRuntime:
     def apply(self, command: RobotCommand, fault: Fault | None = None) -> CommandReceipt:
         # Parse even Python callers: no model_construct/model_copy bypass at the boundary.
         command = RobotCommand.model_validate_json(command.model_dump_json())
-        with self.db.transaction() as db:
-            receipt = self._execute(db, command, fault)
+        with self.calibration_gate(command) as rejection, self.db.transaction() as db:
+            receipt = self._execute(db, command, fault, gate_rejection=rejection)
         if fault in {Fault.DROP_ACK_AFTER_EFFECT, Fault.DROP_ACK_BEFORE_EFFECT}:
             raise CommunicationTimeout("ACKNOWLEDGEMENT_LOST")
         return receipt
+
+    def bind_calibration_store(self, path: Path) -> None:
+        """Application composition binds a same-run store; not an HTTP file-path input."""
+        if path.resolve().parent != self.db.path.resolve().parent:
+            raise CalibrationError("CALIBRATION_STORE_MUST_BELONG_TO_SAME_RUN")
+        with self.db.transaction() as db:
+            prior = db.execute(
+                "SELECT value FROM meta WHERE key='calibration_workflow_name'"
+            ).fetchone()
+            if prior and prior[0] != path.name:
+                raise CalibrationError("CALIBRATION_STORE_BINDING_IMMUTABLE")
+            db.execute(
+                "INSERT OR IGNORE INTO meta VALUES ('calibration_workflow_name',?)", (path.name,)
+            )
+
+    @contextmanager
+    def calibration_gate(self, command: RobotCommand) -> Iterator[str | None]:
+        """Pin applicable approval across the physical transaction; never reinterpret a command.
+
+        An existing command always reconciles its original journal, even if calibration
+        subsequently changed. A new physical effect requires the exact bound artifact.
+        """
+        if command.schema_version != "3.0" or self.recorded_journal(command.command_id) is not None:
+            yield None
+            return
+        with self.db.readonly_connect() as db:
+            row = db.execute(
+                "SELECT value FROM meta WHERE key='calibration_workflow_name'"
+            ).fetchone()
+        if row is None or Path(row[0]).name != row[0]:
+            yield "CALIBRATION_STORE_NOT_BOUND"
+            return
+        path = self.db.path.with_name(row[0])
+        if not path.is_file():
+            yield "CALIBRATION_STORE_UNAVAILABLE"
+            return
+        workflow = Store(path)
+        with workflow.transaction() as authority:
+            reason = None
+            intent = command.calibrated_plan
+            if intent is None:
+                reason = "MEASURED_COMMAND_REQUIRED"
+            else:
+                try:
+                    recorded = authority.execute(
+                        "SELECT body FROM records WHERE kind='RobotCommand' AND id=?",
+                        (command.command_id,),
+                    ).fetchone()
+                    if recorded is None or RobotCommand.model_validate_json(recorded[0]) != command:
+                        raise CalibrationError("COMMAND_NOT_BOUND_TO_SAVED_AUTHORITY")
+                    for binding in (intent.observed_object.binding, *intent.supporting_bindings):
+                        row = authority.execute(
+                            "SELECT body FROM calibration_cameras WHERE id=?", (binding.camera_id,)
+                        ).fetchone()
+                        if row is None:
+                            raise CalibrationError("APPROVED_CALIBRATION_REQUIRED")
+                        state = CameraState.model_validate_json(row[0])
+                        if state.active_validity != "VERIFIED":
+                            raise CalibrationError("ACTIVE_CALIBRATION_SUSPECT")
+                        if state.active_artifact_id != binding.artifact_id:
+                            raise CalibrationError("PREPARED_COMMAND_CALIBRATION_CHANGED")
+                        if state.camera_model_report_id is None:
+                            raise CalibrationError("CAMERA_MODEL_VERIFICATION_REQUIRED")
+                        optical = CalibrationStore._record(
+                            authority,
+                            "camera-model-report",
+                            state.camera_model_report_id,
+                            CameraModelReport,
+                        )
+                        if (
+                            not optical.passed
+                            or optical.camera_configuration_fingerprint
+                            != state.camera.fingerprint()
+                        ):
+                            raise CalibrationError("CAMERA_MODEL_NOT_VERIFIED")
+                        artifact = CalibrationStore._record(
+                            authority, "artifact", binding.artifact_id, CalibrationArtifact
+                        )
+                        if (
+                            artifact.camera_model_report_id != optical.report_id
+                            or artifact.camera_model_report_fingerprint != optical.fingerprint()
+                        ):
+                            raise CalibrationError("APPROVED_OPTICAL_REPORT_BINDING_CHANGED")
+                        if (
+                            artifact.fingerprint() != binding.artifact_fingerprint
+                            or state.camera.fingerprint()
+                            != binding.camera_configuration_fingerprint
+                            or artifact.candidate.camera.fingerprint() != state.camera.fingerprint()
+                            or artifact.candidate.limits_fingerprint != state.limits.fingerprint()
+                            or artifact.candidate.board.fingerprint() != state.board.fingerprint()
+                        ):
+                            raise CalibrationError("COMMAND_CALIBRATION_CONFIGURATION_MISMATCH")
+                except (CalibrationError, ValueError, LookupError) as error:
+                    reason = str(error)
+            yield reason
 
     def capture(self, path: Path) -> Path:
         # Headless diagnostic artifact; never presented as a Blender screenshot.

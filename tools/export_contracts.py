@@ -7,6 +7,7 @@ from pathlib import Path
 from apps.api.app import create_app
 from apps.api.test_sessions import TEST_SCHEMAS
 from robotops.blender.visualization import VISUAL_SCHEMAS
+from robotops.calibration.schemas import CALIBRATION_SCHEMAS
 from robotops.domain.models import SCHEMAS
 from robotops.integration.models import (
     AuthorizationDecision,
@@ -45,6 +46,13 @@ def export() -> None:
         *integration_schemas,
     ):
         (directory / f"{schema.__name__}.json").write_text(
+            json.dumps(schema.model_json_schema(), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    calibration_directory = directory / "calibration"
+    calibration_directory.mkdir(exist_ok=True)
+    for schema in CALIBRATION_SCHEMAS:
+        (calibration_directory / f"{schema.__name__}.json").write_text(
             json.dumps(schema.model_json_schema(), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )

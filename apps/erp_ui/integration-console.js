@@ -540,6 +540,7 @@ class IntegrationConsole {
     const unproven = ["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(session.status);
     const businessFailure = stage === 20 && session.status === "RETRYABLE_FAILURE";
     const ended = ["COMPLETED","FAILED"].includes(session.status);
+    this.el("integration-pending").classList.toggle("finished", ended);
     const failures=steps.filter(step=>step.status==="FAILED");
     const summary=this.el("integration-attempt-summary");
     summary.hidden=!failures.length;

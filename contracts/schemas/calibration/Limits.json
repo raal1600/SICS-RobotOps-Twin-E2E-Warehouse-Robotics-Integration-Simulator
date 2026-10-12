@@ -1,0 +1,184 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "ambiguity_gap_px": {
+      "default": 0.08,
+      "exclusiveMinimum": 0,
+      "title": "Ambiguity Gap Px",
+      "type": "number"
+    },
+    "justification": {
+      "default": "10 mm synthetic contact capture radius; reserve 5 mm for depth/robot/tool and require at most 5 mm independent point error. Pixel and angular limits are separate quality gates, not production or SICS requirements.",
+      "title": "Justification",
+      "type": "string"
+    },
+    "limits_id": {
+      "default": "synthetic-grasp-budget-1",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Limits Id",
+      "type": "string"
+    },
+    "max_chain_rms_px": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 2.0,
+      "title": "Max Chain Rms Px"
+    },
+    "max_chain_rotation_deg": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 1,
+      "title": "Max Chain Rotation Deg"
+    },
+    "max_chain_translation_mm": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 6,
+      "title": "Max Chain Translation Mm"
+    },
+    "max_correspondence_error_px": {
+      "default": 1.5,
+      "exclusiveMinimum": 0,
+      "title": "Max Correspondence Error Px",
+      "type": "number"
+    },
+    "max_depth_surface_spread_m": {
+      "default": 0.015,
+      "exclusiveMinimum": 0,
+      "title": "Max Depth Surface Spread M",
+      "type": "number"
+    },
+    "max_pnp_rms_px": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 1.5,
+      "title": "Max Pnp Rms Px"
+    },
+    "max_reference_error_mm": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 5,
+      "title": "Max Reference Error Mm"
+    },
+    "max_timestamp_skew_s": {
+      "default": 0.02,
+      "exclusiveMinimum": 0,
+      "title": "Max Timestamp Skew S",
+      "type": "number"
+    },
+    "min_corners": {
+      "default": 8,
+      "minimum": 4,
+      "title": "Min Corners",
+      "type": "integer"
+    },
+    "min_image_coverage": {
+      "default": 0.08,
+      "exclusiveMaximum": 1,
+      "exclusiveMinimum": 0,
+      "title": "Min Image Coverage",
+      "type": "number"
+    },
+    "min_rotation_singular_rad": {
+      "default": 0.15,
+      "exclusiveMinimum": 0,
+      "title": "Min Rotation Singular Rad",
+      "type": "number"
+    },
+    "min_samples": {
+      "default": 10,
+      "minimum": 3,
+      "title": "Min Samples",
+      "type": "integer"
+    },
+    "min_translation_span_m": {
+      "default": [
+        0.12,
+        0.12,
+        0.12
+      ],
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Min Translation Span M",
+      "type": "array"
+    },
+    "minimum_p95_count": {
+      "default": 20,
+      "minimum": 20,
+      "title": "Minimum P95 Count",
+      "type": "integer"
+    },
+    "outlier_threshold_px": {
+      "default": 2.5,
+      "exclusiveMinimum": 0,
+      "title": "Outlier Threshold Px",
+      "type": "number"
+    },
+    "quantile_method": {
+      "const": "linear",
+      "default": "linear",
+      "title": "Quantile Method",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "SIMULATION_ONLY",
+      "default": "SIMULATION_ONLY",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "title": "Limits",
+  "type": "object"
+}

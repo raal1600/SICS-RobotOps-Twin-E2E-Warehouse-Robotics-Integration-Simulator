@@ -5,10 +5,12 @@ or OPC UA wire operation unless the configured LabBridge actually performs one.
 """
 
 import ast
+import inspect
 from pathlib import Path
 from time import monotonic
 from typing import Any
 
+from robotops.calibration.runtime_contracts import ObservationFailure
 from robotops.cell.runtime import SyntheticRuntime
 from robotops.domain.models import (
     ActionPlan,
@@ -279,6 +281,8 @@ class GuidedEngine:
     def create(self, request: CreateSession) -> ExecutionSession:
         if request.fault is not None and request.fault not in FAULTS:
             raise Conflict("UNKNOWN_FAILURE_SCENARIO")
+        if request.fault == Fault.MISSED_PICK and not self.workflow.settings.is_measured:
+            raise Conflict("MISSED_PICK_REQUIRES_MEASURED_CELL")
         session = self.store.create(request)
         return self.present(session)
 
@@ -645,6 +649,10 @@ class GuidedEngine:
                 verification = results[-1]
             elif job.state == JobState.UNKNOWN_OUTCOME:
                 verification = self.workflow.verifier.verify(command, observation, receipt)
+                if self.workflow.calibration is not None:
+                    self.workflow.calibration.record_pick_outcome(
+                        command, receipt, observation, verification
+                    )
                 ws.save(verification.verification_id, verification)
             else:
                 claim = self._claim(session)
@@ -736,9 +744,31 @@ class GuidedEngine:
             physical_started = session.job_id is not None and self.workflow.store.job(
                 session.job_id
             ).state in {JobState.EXECUTING, JobState.VERIFYING, JobState.UNKNOWN_OUTCOME}
-            status = "UNKNOWN_OUTCOME" if stage == 16 and physical_started else "RETRYABLE_FAILURE"
+            status = "UNKNOWN_OUTCOME" if stage >= 16 and physical_started else "RETRYABLE_FAILURE"
+            if (
+                status == "UNKNOWN_OUTCOME"
+                and session.job_id is not None
+                and self.workflow.calibration is not None
+            ):
+                # Measured-cell post-action acquisition can fail after the effect.
+                # Preserve the legacy/lab dispatch journal's existing reconciliation state.
+                unresolved = self.workflow.store.job(session.job_id)
+                if unresolved.state in {JobState.EXECUTING, JobState.VERIFYING}:
+                    claim = self._claim(session)
+                    try:
+                        self.workflow.store.transition(
+                            session.job_id,
+                            JobState.UNKNOWN_OUTCOME,
+                            "POST_DISPATCH_EVIDENCE_UNAVAILABLE:" + str(exc),
+                            claim=claim,
+                        )
+                    finally:
+                        self.workflow.store.release(claim)
             step_status = "FAILED"
-            result = {"error": str(exc), "retry_permitted": stage != 16}
+            result = {
+                "error": str(exc),
+                "retry_permitted": stage != 16 and status != "UNKNOWN_OUTCOME",
+            }
             if isinstance(exc, WMSResponseError):
                 result.update(
                     {
@@ -1075,6 +1105,7 @@ class GuidedEngine:
         if self.workflow.store.job(session.job_id).state == JobState.READY_TO_EXECUTE:
             return self._recover_unstarted_dispatch(session)
         started = monotonic()
+        attempt_started_at = utc_now().isoformat()
         before = self.workflow.store.job(session.job_id).state.value
         job = self.workflow.reconcile(session.job_id, fault)
         if self.lab and job.command_id:
@@ -1089,7 +1120,35 @@ class GuidedEngine:
             "original_identity_queried": True,
             "physical_resend": False,
         }
-        evidence = self.workflow.evidence(job.job_id).reconciliations[-1]
+        observation_failure = None
+        if self.workflow.calibration is not None and job.state not in {
+            JobState.COMPLETED,
+            JobState.FAILED,
+        }:
+            with self.workflow.store.readonly_connect() as db:
+                row = db.execute(
+                    "SELECT body FROM calibration_records WHERE kind='observation-failure' ORDER BY rowid DESC LIMIT 1"
+                ).fetchone()
+            if row:
+                failure = ObservationFailure.model_validate_json(row[0])
+                if failure.job_id == job.job_id and failure.attempted_at_utc >= attempt_started_at:
+                    observation_failure = failure
+        evidence = (
+            None if observation_failure else self.workflow.evidence(job.job_id).reconciliations[-1]
+        )
+        output = (
+            observation_failure.model_dump(mode="json")
+            if observation_failure
+            else evidence.model_dump(mode="json")
+            if evidence
+            else {}
+        )
+        source_lines = inspect.getsource(Engine._reconcile).splitlines()
+        source_start = next(
+            index
+            for index, line in enumerate(source_lines)
+            if "receipt = self.gateway.query(command)" in line
+        )
         step = ExecutionStep(
             step_id=stable_id(session_id, f"reconciliation:{session.revision}"),
             session_id=session_id,
@@ -1102,8 +1161,12 @@ class GuidedEngine:
             sequence=len(session.steps) + 1,
             revision=session.revision,
             title="Original command reconciliation",
-            summary=evidence.verification.reason,
-            status="COMPLETED",
+            summary=observation_failure.code
+            if observation_failure
+            else evidence.verification.reason
+            if evidence
+            else "EVIDENCE_UNAVAILABLE",
+            status="FAILED" if observation_failure else "COMPLETED",
             component="reconciliation",
             protocol="controller + sensor",
             classification="REAL CODE",
@@ -1111,20 +1174,26 @@ class GuidedEngine:
                 "command_id": job.command_id,
                 "observation_fault": fault.value if fault else None,
             },
-            output=sanitize(evidence.model_dump(mode="json")),
+            output=sanitize(output),
             state_before=before,
             state_after=job.state.value,
-            persistence_effect="Original journal, fresh observation and verification evidence committed.",
+            persistence_effect="Original journal queried; failed observation attempt saved; outcome remains unresolved."
+            if observation_failure
+            else "Original journal, fresh observation and verification evidence committed.",
             wire=context["reconciliation"],
             source=SourceReference(
                 path="robotops/workflow/engine.py",
                 symbol="Engine._reconcile",
-                excerpt="receipt = self.gateway.query(command)\nobservation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)\nresult = self.verifier.verify(command, observation, receipt)",
+                excerpt="\n".join(source_lines[source_start : source_start + 6]),
             ),
             invariant="Reconciliation queries original command identity; it has no send operation.",
             failure_semantics="Inconclusive evidence pauses for intervention; no physical retry.",
             duration_ms=(monotonic() - started) * 1000,
-            evidence_ids=(evidence.evidence_id,),
+            evidence_ids=(observation_failure.attempt_id,)
+            if observation_failure
+            else (evidence.evidence_id,)
+            if evidence
+            else (),
             authorization_required=True,
         )
         self.workflow.store.save(step.step_id, step)

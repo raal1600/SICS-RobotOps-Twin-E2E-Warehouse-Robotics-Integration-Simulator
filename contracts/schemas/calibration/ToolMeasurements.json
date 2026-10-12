@@ -1,0 +1,309 @@
+{
+  "$defs": {
+    "Tool": {
+      "additionalProperties": false,
+      "properties": {
+        "configuration_revision": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Configuration Revision",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "t_f_tcp": {
+          "$ref": "#/$defs/Transform"
+        },
+        "tool_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "verification_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verification Id"
+        }
+      },
+      "required": [
+        "tool_id",
+        "configuration_revision",
+        "t_f_tcp"
+      ],
+      "title": "Tool",
+      "type": "object"
+    },
+    "ToolProbe": {
+      "additionalProperties": false,
+      "properties": {
+        "measured_flange_point_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Measured Flange Point M",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tcp_reference_point_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Tcp Reference Point M",
+          "type": "array"
+        }
+      },
+      "required": [
+        "tcp_reference_point_m",
+        "measured_flange_point_m"
+      ],
+      "title": "ToolProbe",
+      "type": "object"
+    },
+    "Transform": {
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Destination",
+          "type": "string"
+        },
+        "matrix": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Matrix",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "translation_unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Translation Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "destination",
+        "matrix"
+      ],
+      "title": "Transform",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Independent fixture observations, retained before any tool can be enabled.",
+  "properties": {
+    "captured_at_utc": {
+      "title": "Captured At Utc",
+      "type": "string"
+    },
+    "cell_generation": {
+      "minimum": 0,
+      "title": "Cell Generation",
+      "type": "integer"
+    },
+    "machine_fingerprint": {
+      "title": "Machine Fingerprint",
+      "type": "string"
+    },
+    "max_orientation_deg": {
+      "default": 0.25,
+      "exclusiveMinimum": 0,
+      "title": "Max Orientation Deg",
+      "type": "number"
+    },
+    "max_translation_mm": {
+      "default": 1,
+      "exclusiveMinimum": 0,
+      "title": "Max Translation Mm",
+      "type": "number"
+    },
+    "measurement_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Measurement Id",
+      "type": "string"
+    },
+    "pivot_flange_poses": {
+      "items": {
+        "$ref": "#/$defs/Transform"
+      },
+      "title": "Pivot Flange Poses",
+      "type": "array"
+    },
+    "probes": {
+      "items": {
+        "$ref": "#/$defs/ToolProbe"
+      },
+      "title": "Probes",
+      "type": "array"
+    },
+    "scene_epoch": {
+      "title": "Scene Epoch",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "default": "SIMULATION_ONLY: independent synthetic pivot fixture and indexed axis probes; not executed robot calibration motion",
+      "title": "Scope",
+      "type": "string"
+    },
+    "tool": {
+      "$ref": "#/$defs/Tool"
+    }
+  },
+  "required": [
+    "measurement_id",
+    "tool",
+    "pivot_flange_poses",
+    "probes",
+    "machine_fingerprint",
+    "scene_epoch",
+    "cell_generation",
+    "captured_at_utc"
+  ],
+  "title": "ToolMeasurements",
+  "type": "object"
+}

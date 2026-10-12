@@ -34,6 +34,7 @@ class SimulationWorkspace {
     const robotNotesTitle = document.createElement("summary");
     robotNotesTitle.textContent = "Replay evidence and limits";
     robotNotes.append(robotNotesTitle);
+    this.robotNotes=robotNotes;
     for (const child of Array.from(robot.children)) if (child.tagName === "P") robotNotes.append(child);
     this.el("motion-panel").append(robotNotes);
     const phases = document.createElement("details");
@@ -87,13 +88,19 @@ class SimulationWorkspace {
   update(test, session, selected, tab, source) {
     this.test = test;
     this.session = session;
+    // Active controller feedback stays beside the live scene. Completed-run
+    // protocol belongs with saved replay evidence, below the current action.
+    const live=this.el("integration-live"),finished=["COMPLETED","FAILED"].includes(session?.status);
+    if(finished){if(live.parentElement!==this.robotNotes)this.robotNotes.append(live);}
+    else if(live.parentElement!==this.el("motion-panel"))this.el("motion-panel").prepend(live);
     this.step = selected?.step_id;
     this.tab = tab;
     this.component = tab === "Source" && source?.key === `${session?.session_id}/${selected?.step_id}` ? source.component || "entry" : null;
-    this.el("evidence-empty").hidden = !!session;
+    this.el("evidence-empty").hidden = !!session || !!this.calibrationAvailable;
     this.el("evidence-empty").textContent = this.restoring ? "Loading saved runs…" : "No saved run yet. Start a guided run in Run & watch to record each step, then inspect its evidence here.";
     for (const child of this.el("evidence-workspace").children) {
-      if (child.tagName !== "H2" && child.id !== "evidence-empty") child.hidden = !session;
+      if (child.id === "calibration-evidence") child.hidden = !this.calibrationAvailable;
+      else if (child.tagName !== "H2" && child.id !== "evidence-empty") child.hidden = !session;
     }
     this.el("integration-history").closest(".integration-session-picker").hidden = !session;
     this.save();

@@ -1,0 +1,48 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "const": "IN_PROCESS_PYTHON",
+      "default": "IN_PROCESS_PYTHON",
+      "title": "Classification",
+      "type": "string"
+    },
+    "decision": {
+      "title": "Decision",
+      "type": "string"
+    },
+    "formula": {
+      "title": "Formula",
+      "type": "string"
+    },
+    "function": {
+      "title": "Function",
+      "type": "string"
+    },
+    "inputs": {
+      "additionalProperties": true,
+      "title": "Inputs",
+      "type": "object"
+    },
+    "outputs": {
+      "additionalProperties": true,
+      "title": "Outputs",
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "function",
+    "formula",
+    "inputs",
+    "outputs",
+    "decision"
+  ],
+  "title": "Calculation",
+  "type": "object"
+}

@@ -1,18 +1,22 @@
 from typing import Any, ClassVar, Literal, Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from robotops.domain.models import Contract, Identifier, InventoryLocation, Pose, Product
 from robotops.robotics.catalogue import fixture_target_pose, load_catalogue, product_spec
 
 
 class Settings(Contract):
-    schema_version: Literal["1.0", "2.0"] = "1.0"
+    schema_version: Literal["1.0", "2.0", "3.0"] = "1.0"
     extension_fields: ClassVar[frozenset[str]] = frozenset(
         {"robot_profile_version", "product_sources"}
     )
-    robot_profile_version: Literal["hkm_inspired_v1"] | None = None
+    robot_profile_version: Literal["hkm_inspired_v1", "synthetic_calibration_gantry_v1"] | None = (
+        None
+    )
     product_sources: dict[str, str] | None = None
+    measured_fields: ClassVar[frozenset[str]] = frozenset({"calibration_command_mode"})
+    calibration_command_mode: Literal["tcp", "flange"] | None = None
     seed: int = 7
     pose_noise_m: float = Field(default=0, ge=0, allow_inf_nan=False)
     pose_tolerance_m: float = Field(default=0.005, ge=0, allow_inf_nan=False)
@@ -41,6 +45,53 @@ class Settings(Contract):
     @property
     def is_hkm(self) -> bool:
         return self.robot_profile_version == "hkm_inspired_v1"
+
+    @model_serializer(mode="wrap")
+    def preserve_settings_wire_shape(  # type: ignore[no-untyped-def]
+        self, handler: SerializerFunctionWrapHandler
+    ):
+        data: dict[str, Any] = super().preserve_original_wire_shape(handler)
+        if self.calibration_command_mode is None:
+            data.pop("calibration_command_mode", None)
+        return data
+
+    @property
+    def is_measured(self) -> bool:
+        return self.robot_profile_version == "synthetic_calibration_gantry_v1"
+
+    @classmethod
+    def calibration(cls, **overrides: Any) -> Self:
+        """Ideal 6DOF synthetic gantry/gimbal; distinct from the unchanged HKM profile."""
+        values = dict(
+            schema_version="3.0",
+            robot_profile_version="synthetic_calibration_gantry_v1",
+            seed=29,
+            frame_id="b",
+            calibration_version="synthetic-gantry-geometry-1",
+            workspace_min=(-0.45, -0.45, 0.15),
+            workspace_max=(0.45, 0.45, 1.15),
+            products=(Product(product_id="calibration-red-cube", sku="CAL-RED"),),
+            locations=(
+                InventoryLocation(
+                    location_id="source",
+                    pose=Pose(
+                        position=(-0.16, 0, 0.35),
+                        frame_id="b",
+                        calibration_version="synthetic-gantry-geometry-1",
+                    ),
+                ),
+                InventoryLocation(
+                    location_id="destination",
+                    pose=Pose(
+                        position=(0.20, 0, 0.35),
+                        frame_id="b",
+                        calibration_version="synthetic-gantry-geometry-1",
+                    ),
+                ),
+            ),
+            product_sources={"calibration-red-cube": "source"},
+        )
+        return cls.model_validate({**values, **overrides})
 
     @classmethod
     def hkm(cls, **overrides: Any) -> Self:
@@ -89,6 +140,28 @@ class Settings(Contract):
 
     @model_validator(mode="after")
     def supported_profile(self) -> Self:
+        if self.schema_version == "3.0":
+            if (
+                not self.is_measured
+                or self.frame_id != "b"
+                or self.calibration_version != "synthetic-gantry-geometry-1"
+                or self.product_sources is None
+            ):
+                raise ValueError("MEASURED_GANTRY_SETTINGS_REQUIRED")
+            if len(self.products) != 1 or self.products[0].sku != "CAL-RED":
+                raise ValueError("MEASURED_FIXTURE_PRODUCT_REQUIRED")
+            if self.product_sources != {self.products[0].product_id: "source"}:
+                raise ValueError("PRODUCT_SOURCE_MAP_MISMATCH")
+            if tuple(loc.location_id for loc in self.locations) != ("source", "destination"):
+                raise ValueError("MEASURED_FIXTURE_LOCATIONS_REQUIRED")
+            if any(
+                loc.pose.frame_id != self.frame_id
+                or loc.pose.calibration_version != self.calibration_version
+                for loc in self.locations
+            ):
+                raise ValueError("MEASURED_FIXTURE_FRAME_MISMATCH")
+        elif self.is_measured:
+            raise ValueError("MEASURED_PROFILE_REQUIRES_VERSION_3")
         if self.schema_version == "2.0":
             if not self.is_hkm or self.product_sources is None:
                 raise ValueError("HKM_SETTINGS_REQUIRED")

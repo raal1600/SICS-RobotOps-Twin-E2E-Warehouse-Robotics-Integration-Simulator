@@ -1,0 +1,155 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "camera_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "crop_xy": {
+      "default": [
+        0,
+        0
+      ],
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "integer"
+        }
+      ],
+      "title": "Crop Xy",
+      "type": "array"
+    },
+    "fixture_id": {
+      "const": "synthetic-camera-local-survey-1",
+      "default": "synthetic-camera-local-survey-1",
+      "title": "Fixture Id",
+      "type": "string"
+    },
+    "height": {
+      "exclusiveMinimum": 0,
+      "title": "Height",
+      "type": "integer"
+    },
+    "measured_pixels_px": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Measured Pixels Px",
+      "type": "array"
+    },
+    "measurement_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Measurement Id",
+      "type": "string"
+    },
+    "optical_frame": {
+      "enum": [
+        "c",
+        "d"
+      ],
+      "title": "Optical Frame",
+      "type": "string"
+    },
+    "optical_points_m": {
+      "items": {
+        "maxItems": 3,
+        "minItems": 3,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Optical Points M",
+      "type": "array"
+    },
+    "profile_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "provenance": {
+      "const": "SYNTHETIC_FACTORY_REFERENCE_FIXTURE",
+      "default": "SYNTHETIC_FACTORY_REFERENCE_FIXTURE",
+      "title": "Provenance",
+      "type": "string"
+    },
+    "resize_xy": {
+      "default": [
+        1,
+        1
+      ],
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Resize Xy",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "default": "Synthetic camera-local metrology observations, not working-cell RGB-D captures or real hardware certification",
+      "title": "Scope",
+      "type": "string"
+    },
+    "stream": {
+      "enum": [
+        "rgb",
+        "depth"
+      ],
+      "title": "Stream",
+      "type": "string"
+    },
+    "width": {
+      "exclusiveMinimum": 0,
+      "title": "Width",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "measurement_id",
+    "camera_id",
+    "profile_id",
+    "stream",
+    "optical_frame",
+    "width",
+    "height",
+    "optical_points_m",
+    "measured_pixels_px"
+  ],
+  "title": "OpticalReference",
+  "type": "object"
+}

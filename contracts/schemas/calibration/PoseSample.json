@@ -1,0 +1,363 @@
+{
+  "$defs": {
+    "PoseConditioning": {
+      "additionalProperties": false,
+      "properties": {
+        "limitation": {
+          "default": "Local sensitivity estimate; ignores systematic bias and does not prove physical accuracy",
+          "title": "Limitation",
+          "type": "string"
+        },
+        "method": {
+          "const": "linearized-pixel-Jacobian-1",
+          "default": "linearized-pixel-Jacobian-1",
+          "title": "Method",
+          "type": "string"
+        },
+        "pixel_sigma": {
+          "title": "Pixel Sigma",
+          "type": "number"
+        },
+        "rotation_sigma_deg": {
+          "title": "Rotation Sigma Deg",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sigma_multiplier": {
+          "default": 3,
+          "title": "Sigma Multiplier",
+          "type": "number"
+        },
+        "translation_sigma_mm": {
+          "title": "Translation Sigma Mm",
+          "type": "number"
+        }
+      },
+      "required": [
+        "pixel_sigma",
+        "translation_sigma_mm",
+        "rotation_sigma_deg"
+      ],
+      "title": "PoseConditioning",
+      "type": "object"
+    },
+    "Transform": {
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Destination",
+          "type": "string"
+        },
+        "matrix": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Matrix",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "translation_unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Translation Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "destination",
+        "matrix"
+      ],
+      "title": "Transform",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "board_fingerprint": {
+      "title": "Board Fingerprint",
+      "type": "string"
+    },
+    "camera_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "candidate_rms_px": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Candidate Rms Px",
+      "type": "array"
+    },
+    "capture_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Capture Id",
+      "type": "string"
+    },
+    "conditioning": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PoseConditioning"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "configuration_fingerprint": {
+      "title": "Configuration Fingerprint",
+      "type": "string"
+    },
+    "corner_ids": {
+      "items": {
+        "type": "integer"
+      },
+      "title": "Corner Ids",
+      "type": "array"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "excluded_corner_ids": {
+      "default": [],
+      "items": {
+        "type": "integer"
+      },
+      "title": "Excluded Corner Ids",
+      "type": "array"
+    },
+    "excluded_image_points_px": {
+      "anyOf": [
+        {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Excluded Image Points Px"
+    },
+    "image_points_px": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Image Points Px",
+      "type": "array"
+    },
+    "object_points_m": {
+      "items": {
+        "maxItems": 3,
+        "minItems": 3,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Object Points M",
+      "type": "array"
+    },
+    "partition": {
+      "enum": [
+        "fit",
+        "validation",
+        "routine"
+      ],
+      "title": "Partition",
+      "type": "string"
+    },
+    "pnp_rms_px": {
+      "title": "Pnp Rms Px",
+      "type": "number"
+    },
+    "residuals_px": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Residuals Px",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "t_b_f": {
+      "$ref": "#/$defs/Transform"
+    },
+    "t_c_t": {
+      "$ref": "#/$defs/Transform"
+    }
+  },
+  "required": [
+    "capture_id",
+    "dataset_id",
+    "camera_id",
+    "configuration_fingerprint",
+    "board_fingerprint",
+    "t_b_f",
+    "t_c_t",
+    "corner_ids",
+    "object_points_m",
+    "image_points_px",
+    "residuals_px",
+    "pnp_rms_px",
+    "candidate_rms_px",
+    "partition"
+  ],
+  "title": "PoseSample",
+  "type": "object"
+}

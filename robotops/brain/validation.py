@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from robotops.brain.deterministic import observed_obstacles
+from robotops.calibration.lifecycle import CalibrationStore
 from robotops.config import Settings
 from robotops.domain.models import (
     ActionPlan,
@@ -18,8 +19,11 @@ from robotops.robotics.trajectory import plan_trajectory, validate_trajectory
 
 
 class ActionValidator:
-    def __init__(self, settings: Settings | None = None):
+    def __init__(
+        self, settings: Settings | None = None, calibration_store: CalibrationStore | None = None
+    ):
         self.settings = settings or Settings()
+        self.calibration_store = calibration_store
 
     def validate(
         self,
@@ -90,7 +94,21 @@ class ActionValidator:
             )
         ):
             raise ValueError("WORKSPACE_BOUNDS")
-        if self.settings.is_hkm:
+        if self.settings.is_measured:
+            if (
+                self.calibration_store is None
+                or plan.schema_version != "3.0"
+                or observation.schema_version != "3.0"
+            ):
+                raise ValueError("MEASURED_PROFILE_VALIDATOR_REQUIRED")
+            from robotops.brain.calibrated import CalibratedBrain
+
+            expected_measured = CalibratedBrain(self.settings, self.calibration_store).plan(
+                job, observation, destination
+            )
+            if plan.calibrated_plan != expected_measured.calibrated_plan:
+                raise ValueError("MEASURED_TARGET_CALCULATION_MISMATCH")
+        elif self.settings.is_hkm:
             self._validate_hkm(plan, observation, now or utc_now())
         elif plan.schema_version != "1.0":
             raise ValueError("LEGACY_PROFILE_REQUIRES_VERSION_1")

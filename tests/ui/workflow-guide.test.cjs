@@ -3,6 +3,17 @@ const assert=require('node:assert/strict');
 const guide=require('../../apps/erp_ui/workflow-guide.js');
 const base={ready:true,busy:false,archived:false,pending:null,state:null,cellMode:'READY',blocked:null,available:3,product:'RED',evidence:null};
 
+test('measured rule gates never present an invented statistical confidence',()=>{
+  const measured={schema_version:'3.0',confidence:null,calibrated_object:{measurement_quality:{passed:true}}};
+  assert.match(guide.qualityLabel(measured),/Measured checks passed/);
+  assert.match(guide.qualitySummary([measured]),/confidence and point uncertainty not estimated/);
+  const historical={schema_version:'3.0',confidence:.99,calibrated_object:{}};
+  assert.match(guide.qualityLabel(historical),/Historical measured quality/);
+  assert.doesNotMatch(guide.qualityLabel(historical),/99%/);
+  assert.equal(guide.qualitySummary([{confidence:.99}]),'99% confidence');
+  assert.equal(guide.qualitySummary([{confidence:null}]),'Confidence unavailable');
+});
+
 test('only persisted verification may describe success; scene and planning observation cannot',()=>{
   const evidence={command:{command_id:'c'},journal:{status:'SUCCEEDED',effect_count:1},
     observations:[{observation_id:'planning',captured_at:'before effect',objects:[{location_id:'destination'}]}],verifications:[]};

@@ -53,6 +53,7 @@ const integration = new IntegrationConsole({
     if(session.job_id&&(stage===4||stage===8||stage>=16||session.status==="FAILED")){
       await refresh(session.job_id,fixture?.scene_epoch);await refreshMotion(true);
     }
+    if(calibration?.overview?.supported && ["COMPLETED","FAILED"].includes(session.status))await calibration.load();
     fixtureControls();
   },
   physical: async (session, phase) => {
@@ -61,6 +62,13 @@ const integration = new IntegrationConsole({
     await refreshMotion(true);
   }
 });
+const calibration = typeof CalibrationConsole !== "undefined" && workspaceView ? new CalibrationConsole({
+  request: (path, body) => api(path, body), path: path => testPath(path), readOnly: () => readOnly(),
+  workspace: workspaceView, activity: active => {busy=active;fixtureControls();},
+  changed: () => {fixtureControls();refreshMotion(true);}, run: () => byId("create").click(),
+  overlay: objects => player.inspectionOverlay(objects),
+  geometry: evidence => player.inspectionEvidence(evidence)
+}) : null;
 function showInspectionPane(name) {
   for(const pane of inspectionPanes){
     byId(`pane-${pane}`).hidden=pane!==name;
@@ -188,6 +196,7 @@ async function refreshHistory() {
 }
 async function selectTest(identity) {
   integration.clear();
+  calibration?.clear(identity);
   ++viewVersion;++refreshVersion;refreshing=false;
   ++inspectionVersion;inspection=null;selectedEvidence=null;selectedEvents=[];knownOrders=[];
   byId("inspect-selected").disabled=true;text("selected-result","Loading the selected test…");
@@ -202,6 +211,7 @@ async function selectTest(identity) {
   player.select(null);testControls();fixtureControls();
   await refresh();await refreshMotion(true);
   if(selectedTest)await integration.load();
+  if(selectedTest)await calibration?.load(selectedTest);
 }
 function pendingExecution() {
   const executions=deliveries.flatMap(group=>group.executions);
@@ -218,6 +228,8 @@ function fixtureControls() {
     renderGuidance();return;
   }
   const products=fixture.products.map(item=>({...item,location:fixture.inventory.find(obj=>obj.product_id===item.product_id)?.location_id}));
+  const missedPickOption=Array.from(byId("scenario").options).find(option=>option.value==="MISSED_PICK");
+  if(missedPickOption){const supported=fixture.robot_profile_version==="synthetic_calibration_gantry_v1";missedPickOption.disabled=!supported;missedPickOption.hidden=!supported;if(!supported&&byId("scenario").value==="MISSED_PICK")byId("scenario").value="";}
   const anyAvailable=products.some(atSource);
   const signature=JSON.stringify(products);
   if(signature!==productSignature){
@@ -265,6 +277,26 @@ function fixtureControls() {
     : cellMode!=="READY" ? "The cell is stopped or faulted. Reset logical cell state before running another order."
     : testLifecycleAvailable ? "Choose a scenario and run products in this test. Start new test above for a fresh, independent combination." : "Choose a product and scenario to run the next pick in this integration lab.");
   renderGuidance();
+  const measuredCell=fixture.robot_profile_version==="synthetic_calibration_gantry_v1";
+  text("cell-summary",`Controller: ${cellMode} · ${measuredCell?"calibration checked separately":"logical cell state"}`);
+  text("simulation-profile-boundary",measuredCell
+    ? "Ideal synthetic gantry with an orientable flange, removable board and two fixed RGB-D sensors. It is not an HKM1800 kinematic model or validated robot dynamics."
+    : fixture.robot_profile_version==="hkm_inspired_v1"
+    ? "HKM1800-inspired visualization built from original procedural geometry. Not Cognibotics CAD or validated HKM1800 kinematics or robot dynamics."
+    : "Legacy synthetic Cartesian cell. Its simplified motion model is not validated industrial robot kinematics or dynamics.");
+  text("simulation-sensor-boundary",measuredCell
+    ? "Python generates synthetic RGB and native depth arrays. OpenCV detects the printed ChArUco board; Python estimates calibration and reconstructs runtime points from the acquired images and depth. Product identification assumes the known colored cube; this is not general object recognition or real-cell accuracy evidence."
+    : "Synthetic observations come from a deterministic observation model; camera images are not analyzed by computer vision.");
+  if(fixture.robot_profile_version==="synthetic_calibration_gantry_v1"){
+    player.setCalibrationStatus?.({label:calibration?.canRun()?"Calibration checks complete":"Calibration check required",
+      detail:calibration?.step()?.detail||"Load the saved calibration state before continuing."});
+    byId("workflow-guide").hidden=true;
+    byId("test-workflow-steps").hidden=true;
+    if(!calibration?.canRun())byId("create").disabled=true;
+    byId("setup-panel").hidden=!calibration?.canRun()&&!integration.session;
+    byId("create").hidden=true;
+  }else {player.setCalibrationStatus?.(null);byId("setup-panel").hidden=false;byId("create").hidden=false;}
+  calibration?.render();
 }
 function guideExecution() {
   if(readOnly())return deliveries.flatMap(group=>group.executions).find(item=>item.job_id===selectedJob);
@@ -361,7 +393,9 @@ async function requestData(path, body, revision) {
       TEST_DELETED:"This test was already deleted. Cancel and create a new test.",
       TEST_STORAGE_UNSAFE_PATH:"The test storage path cannot be safely deleted. Data was kept; inspect the server log."
     };
-    throw new Error(explanations[data.reason]||data.reason||JSON.stringify(data.detail));
+    const error = new Error(explanations[data.reason]||data.reason||JSON.stringify(data.detail));
+    error.status=response.status;error.reason=data.reason;error.detail=data.detail;
+    throw error;
   }
   return data;
 }
@@ -404,7 +438,7 @@ function roboticsEvidence(evidence){
   const name=id=>fixture?.catalogue?.tools.find(item=>item.tool_id===id)?.display_name||id;
   text("status-product",product?`${product.sku} / ${product.product_id}`:"No order selected");
   text("status-tool",tool?name(tool):"Not observed yet");
-  text("status-observation",observation?`${observed.length?Math.round(Math.min(...observed.map(item=>item.confidence))*100)+"% confidence":"No product evidence"} / ${assessment?.reason||"Unassessed capture; not a verified result"} / ${observation.model_version}`:assessment?"Assessed observation not available":"Not captured");
+  text("status-observation",observation?`${SimulationGuide.qualitySummary(observed)} / ${assessment?.reason||"Unassessed capture; not a verified result"} / ${observation.model_version}`:assessment?"Assessed observation not available":"Not captured");
   text("status-calibration",observation?.calibration_version||"Not observed");
   text("business-identity",evidence?`Order ${evidence.job.order_id} / Job ${evidence.job.job_id}`:"");
   text("status-job",evidence?`${evidence.job.state} / ${evidence.job.job_id}`:"No job selected");
@@ -434,7 +468,6 @@ async function refresh(preferred, preferredDelivery) {
     knownOrders=orders;
     deliveries=groups;
     fixture=currentFixture;cellMode=cell.mode;fixtureControls();
-    text("cell-summary",`Cell: ${cell.mode}`);
     const wantedDelivery=preferredDelivery||byId("delivery").value||fixture.scene_epoch;
     selectedDelivery=groups.find(group=>group.delivery_id===wantedDelivery)?.delivery_id||fixture.scene_epoch;
     const group=groups.find(item=>item.delivery_id===selectedDelivery);
@@ -575,6 +608,7 @@ byId("fresh-scene").onclick=()=>action(freshDelivery,"Preparing a new delivery; 
 byId("scenario").onchange=()=>{fixtureControls();text("message",testLifecycleAvailable?"Scenario selected for the next order. Start new test for fresh products and an independent result.":"Scenario selected for the next order in this integration lab.");};
 function cellDescription(){
   const profile=cellProfiles.find(item=>item.cell_profile_id===byId("cell-profile").value);
+  if(byId("calibration-seed-control"))byId("calibration-seed-control").hidden=profile?.cell_profile_id!=="synthetic_calibration_gantry_v1";
   text("cell-profile-description",profile?`${profile.description} ${profile.product_count} product families · ${profile.tool_count} tools.`:"No robot cells are available.");
   byId("create-test").disabled=busy||!profile;
 }
@@ -588,6 +622,7 @@ byId("new-test").onclick=async()=>{
     cellProfiles.forEach(item=>byId("cell-profile").add(new Option(item.display_name,item.cell_profile_id)));
     byId("cell-profile").value=cellProfiles.find(item=>item.cell_profile_id===data.default_cell_profile_id)?.cell_profile_id||cellProfiles[0]?.cell_profile_id||"";
     newTestRequest={request_id:crypto.randomUUID()};
+    for(const id of ["calibration-seed","calibration-command-mode"])byId(id).disabled=false;
     byId("cell-profile").disabled=false;text("new-test-error","");cellDescription();
     byId("new-test-dialog").showModal();
   }catch(error){appError(error);}
@@ -621,11 +656,17 @@ async function manageTests(dialogId,errorId,operation){
 byId("create-test").onclick=()=>{
   if(!newTestRequest||!byId("new-test-dialog").open||!cellProfiles.some(item=>item.cell_profile_id===byId("cell-profile").value))return;
   newTestRequest.cell_profile_id??=byId("cell-profile").value;
+  if(newTestRequest.cell_profile_id==="synthetic_calibration_gantry_v1"){
+    if(!byId("calibration-seed").reportValidity())return;
+    newTestRequest.seed??=Number(byId("calibration-seed").value);
+    newTestRequest.command_mode??=byId("calibration-command-mode").value;
+    for(const id of ["calibration-seed","calibration-command-mode"])byId(id).disabled=true;
+  }
   byId("cell-profile").disabled=true;
   return manageTests("new-test-dialog","new-test-error",async()=>{
     const created=await request("/simulation-tests",newTestRequest);
     await refreshHistory();await selectTest(created.test_id);
-    return `Test ${created.number} created · ${created.cell_display_name}. Choose a scenario and run an order.`;
+    return `Test ${created.number} created · ${created.cell_display_name}. `+(created.cell_profile_id==="synthetic_calibration_gantry_v1"?"Configure and measure each camera before running a pick.":"Choose a scenario and run an order.");
   });
 };
 function confirmDeletion(all){
@@ -745,7 +786,7 @@ byId("visual").onload=()=>{byId("visual-panel").hidden=false;};
 byId("visual").onerror=()=>{byId("visual-panel").hidden=true;};
 for(const kind of ["scenario","observation"]){
   SimulationGuide.choices(kind).forEach(info=>{
-    if(kind==="scenario"&&["DUPLICATE_DELIVERY","BROKER_TRANSIENT","EDGE_TRANSIENT","OPC_UA_DISCONNECT","PLC_RESTART","WMS_UNAVAILABLE"].includes(info.value))byId("scenario").add(new Option(info.label,info.value));
+    if(kind==="scenario"&&["MISSED_PICK","DUPLICATE_DELIVERY","BROKER_TRANSIENT","EDGE_TRANSIENT","OPC_UA_DISCONNECT","PLC_RESTART","WMS_UNAVAILABLE"].includes(info.value))byId("scenario").add(new Option(info.label,info.value));
     const row=document.createElement("tr"),name=document.createElement("th"),detail=document.createElement("td");
     name.scope="row";name.textContent=info.label;
     const stage=document.createElement("strong"),meaning=document.createElement("p");

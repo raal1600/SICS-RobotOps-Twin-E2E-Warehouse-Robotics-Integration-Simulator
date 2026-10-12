@@ -1,0 +1,52 @@
+{
+  "recorded_at": "2026-10-12T23:04:55.493802+00:00",
+  "branch": "feat/measured-calibration",
+  "fresh_checks": {
+    "pytest": {
+      "passed": 575,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "366 unit + 208 contract + one real-browser seed37 calibration/approval/pick/inspection/fault/recovery journey",
+      "seconds": 173.32,
+      "command": "python -m pytest tests/unit tests/contract \"tests/browser/test_calibration_console.py::test_calibration_images_approval_guided_pick_and_readonly_inspection[37]\" -q --basetemp=<unused-directory> --junitxml=<new-results.xml>"
+    },
+    "node": {
+      "passed": 199,
+      "failed": 0,
+      "command": "node --test tests/ui/*.test.cjs (expand file paths explicitly in Windows PowerShell)"
+    },
+    "lint_format": "PASS: python -m tools.dev lint",
+    "typing": "PASS: python -m mypy robotops apps/api tools/calibration.py",
+    "security": {
+      "passed": true,
+      "bandit_exit": 1,
+      "static_findings": 5,
+      "all_static_findings_previously_reviewed": true,
+      "pip_audit_exit": 0,
+      "npm_audit_exit": 0,
+      "vendor_integrity": true,
+      "lock_sha256": "111c6538f0d83b9d2becc5458162bb9bd8ea7c5f3f405d4f6686dabe042c4686"
+    },
+    "git_diff_check": "PASS using repository line-ending settings",
+    "browser_render_review": "Approved desktop screenshot opened and inspected; automated test covers the real backend and axe assertions.",
+    "publication_screening": {
+      "scope": "Changed and untracked publishable files; pattern screening is not proof of absence of every possible secret.",
+      "files_checked": 221,
+      "findings": []
+    }
+  },
+  "historical_evidence": {
+    "full_campaign_date": "2026-10-09",
+    "passed": 1080,
+    "coverage_percent": 91.18,
+    "not_rerun_as_a_full_campaign_for_this_publish": true,
+    "source_comparison": "417/420 historical file bytes match. Only the three documented desktop portability files differ.",
+    "relocation_desktop_checks": "Eight actual native/Blender checks passed during relocation; saved record and source hashes retained."
+  },
+  "limits": [
+    "GitHub Actions results are separate from these local results.",
+    "This upload does not merge main or deploy GitHub Pages.",
+    "Full raw captures, recordings, traces and worlds remain local; selected compact evidence is committed.",
+    "No new human usability, screen-reader or real-hardware validation was performed."
+  ]
+}

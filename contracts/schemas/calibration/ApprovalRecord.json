@@ -1,0 +1,43 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Actor",
+      "type": "string"
+    },
+    "candidate_fingerprint": {
+      "title": "Candidate Fingerprint",
+      "type": "string"
+    },
+    "report_fingerprint": {
+      "title": "Report Fingerprint",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "SIMULATED_OPERATOR_APPROVAL",
+      "default": "SIMULATED_OPERATOR_APPROVAL",
+      "title": "Scope",
+      "type": "string"
+    },
+    "timestamp_utc": {
+      "title": "Timestamp Utc",
+      "type": "string"
+    }
+  },
+  "required": [
+    "actor",
+    "timestamp_utc",
+    "candidate_fingerprint",
+    "report_fingerprint"
+  ],
+  "title": "ApprovalRecord",
+  "type": "object"
+}

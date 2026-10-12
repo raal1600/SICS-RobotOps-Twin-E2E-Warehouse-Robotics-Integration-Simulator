@@ -1,0 +1,51 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "measured_flange_point_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Measured Flange Point M",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "tcp_reference_point_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Tcp Reference Point M",
+      "type": "array"
+    }
+  },
+  "required": [
+    "tcp_reference_point_m",
+    "measured_flange_point_m"
+  ],
+  "title": "ToolProbe",
+  "type": "object"
+}

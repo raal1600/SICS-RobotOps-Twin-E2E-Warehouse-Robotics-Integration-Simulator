@@ -61,7 +61,8 @@ class Verifier:
                     and receipt.effect_count == 1
                     and obj.location_id == command.destination_id
                     and dist(obj.pose.position, command.target_pose.position)
-                    <= self.settings.pose_tolerance_m + obj.uncertainty_m
+                    # An unestimated measured-point uncertainty never widens the tolerance.
+                    <= self.settings.pose_tolerance_m + (obj.uncertainty_m or 0)
                 ):
                     verdict = Verdict.VERIFIED_SUCCESS
                     reason = "JOURNAL_AND_FRESH_DESTINATION_AGREE"

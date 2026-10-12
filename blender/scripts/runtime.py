@@ -139,6 +139,11 @@ def record_motion(directory, command, pacing=0):
 def main():
     directory = Path(sys.argv[sys.argv.index("--") + 1]).resolve()
     request = json.loads((directory / "request.json").read_text(encoding="utf-8"))
+    if request.get("schema_version") == "3.0":
+        from blender.scripts.measured_presentation import run
+
+        run(directory, record_existing="--record-existing" in sys.argv)
+        return
     if request.get("schema_version") == "2.0":
         from blender.scripts.hkm_runtime import run
 

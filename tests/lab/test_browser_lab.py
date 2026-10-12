@@ -50,6 +50,9 @@ def advance(page, origin):
 
 def assert_waiting_without_playback(page):
     page.wait_for_function("() => player.executionGated === true")
+    # A reloaded page fetches its static scene asynchronously. Wait for that initial
+    # layout before checking that two animation frames cause no physical motion.
+    page.wait_for_function("() => player.pose().objects.length > 0")
     for identity in (
         "motion-play",
         "motion-replay",

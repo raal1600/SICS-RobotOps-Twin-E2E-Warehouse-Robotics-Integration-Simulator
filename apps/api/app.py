@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 
+from apps.api.calibration import mount_calibration_routes
 from apps.api.cell_profiles import CellProfiles, cell_profiles
 from apps.api.guided import mount_guided_routes
 from apps.api.playback import deliveries, delivery_playback, playback, visual_scene
@@ -87,7 +88,9 @@ def create_app(
 
         @app.post("/simulation-tests", response_model=SimulationTest, status_code=201)
         def start_test(request: StartTestRequest) -> SimulationTest:
-            return registry.start(request.request_id, request.cell_profile_id)
+            return registry.start(
+                request.request_id, request.cell_profile_id, request.seed, request.command_mode
+            )
 
         @app.get("/cell-profiles", response_model=CellProfiles)
         def available_cells() -> CellProfiles:
@@ -151,6 +154,7 @@ def create_app(
             "scene-view.js",
             "workflow-guide.js",
             "integration-console.js",
+            "calibration-console.js",
             "workspace.js",
             "workspace.css",
         ],
@@ -174,6 +178,7 @@ def create_app(
 
 def mount_world_routes(app: FastAPI, store: Store | None, workflow: Engine | None) -> None:
     mount_guided_routes(app, store, workflow)
+    mount_calibration_routes(app, workflow)
 
     def get_store() -> Store:
         if store is None:

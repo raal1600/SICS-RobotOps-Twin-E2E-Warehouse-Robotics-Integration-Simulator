@@ -46,6 +46,7 @@ class Contract(BaseModel):
         default="1.0", pattern=r"^1\.0$", json_schema_extra={"const": "1.0"}
     )
     extension_fields: ClassVar[frozenset[str]] = frozenset()
+    measured_fields: ClassVar[frozenset[str]] = frozenset()
 
     @model_validator(mode="after")
     def legacy_has_no_extensions(self) -> Self:
@@ -53,6 +54,10 @@ class Contract(BaseModel):
         return self
 
     def _check_extensions(self) -> None:
+        if self.schema_version != "3.0" and any(
+            getattr(self, name) is not None for name in self.measured_fields
+        ):
+            raise ValueError("MEASURED_FIELDS_REQUIRE_VERSION_3")
         if self.schema_version == "1.0" and any(
             getattr(self, name) is not None for name in self.extension_fields
         ):
@@ -71,6 +76,9 @@ class Contract(BaseModel):
         data: dict[str, Any] = handler(self)
         if self.schema_version == "1.0":
             for name in self.extension_fields:
+                data.pop(name, None)
+        if self.schema_version != "3.0":
+            for name in self.measured_fields:
                 data.pop(name, None)
         return data
 
@@ -97,6 +105,14 @@ class Record(Contract):
 
 class VersionedRecord(Record):
     schema_version: Literal["1.0", "2.0"] = "1.0"
+
+
+class MeasuredVersionedContract(Contract):
+    schema_version: Literal["1.0", "2.0", "3.0"] = "1.0"
+
+
+class MeasuredVersionedRecord(Record):
+    schema_version: Literal["1.0", "2.0", "3.0"] = "1.0"
 
 
 class Pose(Contract):

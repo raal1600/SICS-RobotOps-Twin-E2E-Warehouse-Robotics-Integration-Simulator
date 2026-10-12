@@ -23,6 +23,30 @@ label, .muted { font-size: .875rem; }
 input { color: var(--text); }
 input::placeholder { color: var(--muted); opacity: 1; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+#calibration-console { padding: var(--space-2); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+#calibration-console h2 { margin-block: 0 var(--space-1); }
+#calibration-console p { max-width: 65ch; }
+#calibration-state, #calibration-next { font-size: .875rem; margin-block: .5rem; }
+#calibration-feedback:empty, #calibration-error:empty { margin: 0; }
+#calibration-action { width: 100%; }
+#calibration-error { color: #ffc4b9; }
+#calibration-images { margin-block: var(--space-2); }
+.calibration-images { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--space-2); }
+.calibration-images figure { margin: 0; min-width: 0; }
+.calibration-images img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; background: #0b1118; }
+#calibration-pixel-form input, #calibration-actor, #calibration-seed { font: inherit; color: var(--text); background: #0d1620; border: 1px solid #415367; border-radius: 7px; padding: 10px 12px; min-height: 44px; width: 100%; }
+.calibration-images figcaption { font-size: .875rem; }
+#calibration-evidence { border-block-end: 1px solid var(--line); padding-block-end: var(--space-3); margin-block-end: var(--space-3); min-width: 0; }
+#calibration-evidence pre { max-height: 32rem; overflow: auto; font-size: .875rem; position: relative; }
+#calibration-evidence select { max-width: 100%; }
+#calibration-source-content { white-space: pre; }
+#calibration-source-content .related-source-line { background: #183b3a; display: block; }
+#calibration-source-content span { display: block; white-space: pre; }
+.source-modes { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.source-modes button[aria-pressed="true"] { color: var(--text); background: #244742; border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.watch-for { border-left: 0; padding-left: 0; }
+#calibration-state, #calibration-evidence-context, #calibration-record-identity { overflow-wrap: anywhere; }
+@media (max-width: 600px) { .calibration-images { grid-template-columns: minmax(0,1fr); } }
 ::selection { color: #08241d; background: var(--accent); }
 .skip-link { position: absolute; inset-block-start: -80px; inset-inline-start: 16px; z-index: 30; padding: 12px; background: var(--accent); color: #08241d; }
 .skip-link:focus { inset-block-start: 8px; }
@@ -36,6 +60,16 @@ input::placeholder { color: var(--muted); opacity: 1; }
 .test-toolbar .manage-data { margin: 0; }
 .test-toolbar .integration-session-picker { flex-basis: 100%; display: flex; gap: var(--space-2); margin: 0; }
 .test-toolbar .integration-session-picker label { min-width: 120px; }
+@media (min-width: 1100px) {
+  .test-toolbar { gap: .5rem .75rem; padding-block: 8px; }
+  .test-toolbar .test-picker { flex: 1 1 280px; }
+  .test-toolbar .integration-session-picker { flex: 1 1 280px; display: block; order: 1; margin: 0; }
+  .test-toolbar .integration-session-picker label { margin-bottom: 7px; }
+  .test-toolbar .integration-session-picker select { width: 100%; }
+  .test-toolbar #integration-stream { display: block; font-size: .75rem; line-height: 1.25; }
+  .test-toolbar > button, .test-toolbar .manage-data { order: 2; }
+  .test-toolbar #test-status { order: 3; }
+}
 .workspace-navigation { display: flex; gap: var(--space-3); border-bottom: 1px solid var(--line); margin-bottom: var(--space-2); }
 .workspace-navigation a { padding: 12px 4px; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; font-weight: 650; }
 .workspace-navigation a[aria-current] { color: var(--accent); border-color: var(--accent); }
@@ -61,6 +95,9 @@ input::placeholder { color: var(--muted); opacity: 1; }
 }
 .integration-pending p { font-size: .875rem; }
 .integration-pending h3 { margin: 0 0 .25rem; font-size: 1rem; }
+.integration-pending.finished { padding-block: .5rem; }
+.integration-pending.finished #integration-position { display: none; }
+.integration-pending.finished #integration-pending-detail { margin-block: .25rem 0; }
 .integration-pending small, #integration-execution-run, #integration-command,
 #integration-current-inspection, #integration-follow { display: none; }
 .integration-actions:has(>button:not([hidden]):not(:disabled)) { align-content: center; }

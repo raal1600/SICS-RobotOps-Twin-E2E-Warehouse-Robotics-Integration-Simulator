@@ -593,20 +593,29 @@ test('depleted delivery and saved test both have an explicit next action with hi
 
 test('every selectable mode has a definition and comparison; browsing them cannot execute a test',async()=>{
   const {el,posts,refresh}=await dashboard();
-  for(const [kind,values] of [['scenario',[...executions.slice(0,-1),'DUPLICATE_DELIVERY','BROKER_TRANSIENT','EDGE_TRANSIENT','OPC_UA_DISCONNECT','PLC_RESTART','WMS_UNAVAILABLE',executions.at(-1)]],['observation',observations]]){
+  for(const [kind,values] of [['scenario',['MISSED_PICK',...executions.slice(0,-1),'DUPLICATE_DELIVERY','BROKER_TRANSIENT','EDGE_TRANSIENT','OPC_UA_DISCONNECT','PLC_RESTART','WMS_UNAVAILABLE',executions.at(-1)]],['observation',observations]]){
     const table=el(kind+'-comparisons');
     assert.equal(table.children.length,values.length);
     const meanings=[];
     for(const value of values){
       el(kind).value=value;await el(kind).onchange();
       const row=table.children[values.indexOf(value)];
+      if(value==='MISSED_PICK'){
+        // This fixture uses the legacy profile. Its comparison is educational,
+        // but an unsupported selection must reset without dispatching work.
+        const option=el(kind).options.find(item=>item.value===value);
+        assert.equal(option.disabled,true);assert.equal(option.hidden,true);
+        assert.equal(el(kind).value,'');
+        assert.match(row.children[1].children[1].textContent,/synthetic grip fails/);
+        continue;
+      }
       // The selected definition and the comparison row describe the same mode.
       assert.equal(el(kind+'-meaning').textContent,row.children[1].children[1].textContent);
       assert.equal(el(kind+'-phase').textContent,row.children[1].children[0].textContent);
       assert.ok(el(kind+'-difference').textContent.length>0);
       meanings.push(el(kind+'-meaning').textContent);
     }
-    assert.equal(new Set(meanings).size,values.length);
+    assert.equal(new Set(meanings).size,values.filter(value=>value!=='MISSED_PICK').length);
     el(kind+'-compare').open=true;await refresh();
     assert.equal(el(kind+'-compare').open,true);assert.equal(table.children.length,values.length);
   }
@@ -662,7 +671,10 @@ test('tool and uncertainty inspector reads persisted decision and observation wi
   const rows=ui.el('tool-candidates').children;
   assert.equal(rows.length,2);assert.equal(rows[1].children[1].textContent,'Rejected');
   const html=fs.readFileSync('apps/erp_ui/index.html','utf8');
-  for(const text of ['Simulation boundaries','Not Cognibotics CAD','Not validated robot dynamics','Not SICS AI proprietary software','camera images are not analyzed'])assert.ok(html.includes(text));
+  assert.ok(html.includes('Simulation boundaries'));
+  assert.ok(html.includes('not SICS AI proprietary software'));
+  assert.match(ui.el('simulation-profile-boundary').textContent,/Not Cognibotics CAD.*validated HKM1800 kinematics or robot dynamics/);
+  assert.match(ui.el('simulation-sensor-boundary').textContent,/camera images are not analyzed/);
 });
 
 

@@ -9,6 +9,22 @@
       "title": "Cell Profile Id",
       "type": "string"
     },
+    "command_mode": {
+      "anyOf": [
+        {
+          "enum": [
+            "tcp",
+            "flange"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Command Mode"
+    },
     "request_id": {
       "format": "uuid",
       "title": "Request Id",
@@ -20,6 +36,20 @@
       "pattern": "^1\\.0$",
       "title": "Schema Version",
       "type": "string"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
     }
   },
   "required": [

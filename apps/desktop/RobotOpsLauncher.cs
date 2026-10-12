@@ -19,11 +19,12 @@ using Microsoft.Web.WebView2.WinForms;
 internal static class Launcher {
     [STAThread] static int Main(string[] args) {
         Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
+        string data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RobotOpsTwin");
         try {
             var json = new JavaScriptSerializer();
             string folder = AppDomain.CurrentDomain.BaseDirectory;
             var config = json.Deserialize<Dictionary<string,string>>(File.ReadAllText(Path.Combine(folder, "launcher.json")));
-            string data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RobotOpsTwin");
+            if (config.ContainsKey("data_root")) data=Path.GetFullPath(config["data_root"]);
             string runtime = "blender";
             for (int i=0; i<args.Length; i+=2) {
                 if (i+1 == args.Length) throw new ArgumentException("Missing launcher argument.");
@@ -37,13 +38,13 @@ internal static class Launcher {
             using (var mutex = new Mutex(true, "Local\\RobotOpsTwin-" + key, out first))
             using (var activate = new EventWaitHandle(false, EventResetMode.AutoReset, "Local\\RobotOpsTwinActivate-" + key)) {
                 if (!first) { activate.Set(); return 0; }
-                string profile=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"RobotOpsTwin","WebView2",key.Substring(0,32));
+                string profile=Path.Combine(data,"WebView2",key.Substring(0,32));
                 Application.Run(new Desktop(config, data, runtime, activate, profile));
             }
             return 0;
         } catch (Exception error) {
             try {
-                string logs=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"RobotOpsTwin");
+                string logs=AppDomain.CurrentDomain.BaseDirectory;
                 Directory.CreateDirectory(logs);
                 File.WriteAllText(Path.Combine(logs,"launcher-error.log"),error.ToString());
             } catch { }

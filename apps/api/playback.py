@@ -13,6 +13,7 @@ from robotops.blender.visualization import (
     VisualObject,
     VisualScene,
 )
+from robotops.cell.runtime import SyntheticRuntime
 from robotops.domain.models import JobState, PickJob, PresentationSnapshot, RobotCommand
 from robotops.hkm_geometry import camera_views, scene_primitives
 from robotops.integration.models import ExecutionSession
@@ -79,6 +80,31 @@ def visual_scene(workflow: Engine, job_id: str | None = None) -> VisualScene:
         except NotFound:
             pass  # Legacy history must not be represented as a historical snapshot.
     world = snapshot.world if snapshot else workflow.runtime.world()
+    if world.schema_version == "3.0":
+        if job_id:
+            try:
+                return workflow.store.load(VisualScene, job_id)
+            except NotFound:
+                # Early measured prototypes saved world objects but not physical
+                # sensor placement. Do not relabel today's camera as historical.
+                world = workflow.runtime.world()
+                snapshot = None
+        from robotops.cell.calibration_sensor import ControllerSensor
+
+        sensor = workflow.calibration.sensor if workflow.calibration else None
+        if not isinstance(sensor, ControllerSensor):
+            raise NotFound("CALIBRATION_SCENE_PROVIDER_UNAVAILABLE")
+        physical_scene = sensor.presentation_snapshot(world)
+        return VisualScene(
+            schema_version="3.0",
+            robot_profile_version="synthetic_calibration_gantry_v1",
+            source="SAVED_START_SCENE" if snapshot else "CURRENT_WORLD_REFERENCE",
+            scene_epoch=world.scene_epoch,
+            timestamp=snapshot.timestamp if snapshot else world.timestamp,
+            cell_mode=world.cell.mode,
+            objects=physical_scene.objects,
+            cameras=physical_scene.cameras,
+        )
     hkm = world.schema_version == "2.0"
     return VisualScene(
         **(
@@ -141,6 +167,37 @@ def playback(workflow: Engine, job_id: str) -> JobPlayback:
         execution_scenario=execution_scenario(workflow, job),
     )
     runtime = workflow.runtime
+    if (
+        workflow.settings.is_measured
+        and isinstance(runtime, SyntheticRuntime)
+        and job.command_id is not None
+    ):
+        from robotops.calibration.replay import controller_recording
+
+        command = workflow.store.load(RobotCommand, job.command_id)
+        recording = controller_recording(workflow.store, runtime, command)
+        presentation_reason = (
+            "Committed synthetic controller samples; replay cannot authorize work."
+        )
+        if isinstance(runtime, BlenderRuntime):
+            try:
+                evaluated = runtime.motion(command)
+                if evaluated is not None:
+                    recording = evaluated
+                    presentation_reason = "Blender evaluated the committed controller samples. Python controller receipts establish execution; replay is read-only."
+                else:
+                    presentation_reason += " Blender presentation is unavailable; controller evidence remains available."
+            except (ValueError, OSError, KeyError):
+                presentation_reason += " Blender presentation failed its integrity check; controller evidence remains available."
+        return result.model_copy(
+            update={
+                "recording": recording,
+                "status": "RECORDED" if recording and recording.complete else "UNAVAILABLE",
+                "reason": presentation_reason
+                if recording
+                else "No saved controller samples and scene geometry for this command. No motion is inferred.",
+            }
+        )
     if not isinstance(runtime, BlenderRuntime):
         return result.model_copy(update={"reason": "Headless runtime has no Blender recording."})
     if job.command_id is None:

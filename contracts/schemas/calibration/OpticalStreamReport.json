@@ -1,0 +1,94 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "failures": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Failures",
+      "type": "array"
+    },
+    "image_fraction": {
+      "title": "Image Fraction",
+      "type": "number"
+    },
+    "maximum_px": {
+      "title": "Maximum Px",
+      "type": "number"
+    },
+    "measurement_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Measurement Id",
+      "type": "string"
+    },
+    "point_count": {
+      "title": "Point Count",
+      "type": "integer"
+    },
+    "predicted_pixels_px": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Predicted Pixels Px",
+      "type": "array"
+    },
+    "residuals_px": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Residuals Px",
+      "type": "array"
+    },
+    "rms_px": {
+      "title": "Rms Px",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stream": {
+      "enum": [
+        "rgb",
+        "depth"
+      ],
+      "title": "Stream",
+      "type": "string"
+    }
+  },
+  "required": [
+    "measurement_id",
+    "stream",
+    "point_count",
+    "rms_px",
+    "maximum_px",
+    "image_fraction",
+    "predicted_pixels_px",
+    "residuals_px",
+    "failures"
+  ],
+  "title": "OpticalStreamReport",
+  "type": "object"
+}

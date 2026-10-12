@@ -18,16 +18,17 @@ class SoftwareSceneView {
       else{this.yaw-=dx*0.008;this.pitch=Math.max(0.15,Math.min(1.45,this.pitch+dy*0.008));}
       drag=[e.clientX,e.clientY,drag[2]];
     };
-    canvas.addEventListener("wheel",e=>{e.preventDefault();this.distance=Math.max(2,Math.min(9,this.distance*Math.exp(e.deltaY*0.001)));},{passive:false});
+    canvas.addEventListener("wheel",e=>{e.preventDefault();this.zoom(Math.exp(e.deltaY*0.001));},{passive:false});
   }
-  reset(){this.yaw=-1.05;this.pitch=0.58;this.distance=5;this.pan=[0,0];this.target=[0,0,0.5];this.fov=42;}
+  reset(){this.yaw=-1.05;this.pitch=0.58;this.distance=5;this.minimumDistance=2;this.pan=[0,0];this.target=[0,0,0.5];this.fov=42;}
   viewpoint(camera,fov=42){
     const delta=camera.position.map((v,i)=>v-camera.target[i]);
     this.yaw=Math.atan2(delta[1],delta[0]);this.pitch=Math.atan2(delta[2],Math.hypot(delta[0],delta[1]));
     this.distance=Math.hypot(...delta);this.target=[...camera.target];this.pan=[0,0];this.fov=fov;
+    this.minimumDistance=camera.camera_model_version==="evidence-framing-v1"?0.15:2;
   }
   rotate(){this.yaw+=Math.PI/6;}
-  zoom(factor){this.distance=Math.max(2,Math.min(9,this.distance*factor));}
+  zoom(factor){this.distance=Math.max(this.minimumDistance,Math.min(9,this.distance*factor));}
   render(objects,positions,product,transforms={}) {
     const key=JSON.stringify([objects,positions,transforms,product,this.yaw,this.pitch,this.distance,this.pan,this.target,this.fov]);
     if(key===this.lastRender)return;
@@ -124,6 +125,7 @@ class SceneView {
   reset(){
     this.following=false;
     this.fallback.reset();
+    if(this.controls)this.controls.minDistance=2;
     if(this.cameras?.length){this.viewpoint("OperatorOverview");return;}
     if(this.controls){this.camera.fov=42;this.camera.updateProjectionMatrix();this.camera.position.set(2.4,-3.3,2.5);this.controls.target.set(0,0,0.6);this.controls.update();}
   }
@@ -142,6 +144,7 @@ class SceneView {
     if(this.controls){
       this.camera.fov=fov;this.camera.updateProjectionMatrix();
       this.camera.position.set(...chosen.position);this.controls.target.set(...chosen.target);
+      this.controls.minDistance=this.fallback.minimumDistance;
       this.controls.maxPolarAngle=Math.PI*0.499;this.controls.update();this.dirty=true;
     }
   }
@@ -151,15 +154,15 @@ class SceneView {
   }
   zoom(factor){
     this.fallback.zoom(factor);
-    if(this.renderer){const offset=this.camera.position.clone().sub(this.controls.target);offset.setLength(Math.max(2,Math.min(9,offset.length()*factor)));this.camera.position.copy(this.controls.target).add(offset);this.controls.update();}
+    if(this.renderer){const offset=this.camera.position.clone().sub(this.controls.target);offset.setLength(Math.max(this.fallback.minimumDistance,Math.min(9,offset.length()*factor)));this.camera.position.copy(this.controls.target).add(offset);this.controls.update();}
   }
-  label(text,color){
+  label(text,color,height=0.13){
     const T=this.T,canvas=document.createElement("canvas");canvas.height=64;
     const c=canvas.getContext("2d");c.font="bold 30px system-ui";canvas.width=Math.ceil(c.measureText(text).width)+36;
     c.fillStyle="#112630df";c.fillRect(0,0,canvas.width,64);
     c.fillStyle=color;c.font="bold 30px system-ui";c.textAlign="center";c.fillText(text,canvas.width/2,43);
     const sprite=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(canvas),depthTest:false,transparent:true}));
-    sprite.scale.set(canvas.width/64*0.13,0.13,1);sprite.renderOrder=10;this.scene.add(sprite);return sprite;
+    sprite.scale.set(canvas.width/64*height,height,1);sprite.renderOrder=10;this.scene.add(sprite);return sprite;
   }
   render(objects,positions,product,transforms={}){
     if(this.following){
@@ -184,7 +187,7 @@ class SceneView {
         mesh.add(new T.LineSegments(new T.EdgesGeometry(mesh.geometry),new T.LineBasicMaterial({color:selected?0xffdc83:0x23414a})));
         this.meshes.set(o.name,mesh);this.scene.add(mesh);
         const text=o.label||(o.name==="SourceTote"?"SOURCE":o.name==="DestinationTote"?"DESTINATION":selected?product:null);
-        if(text)this.labels.push({name:o.name,product:selected,sprite:this.label(text,selected?"#ffdc83":"#d2e8ed")});
+        if(text)this.labels.push({name:o.name,product:selected,measured:o.schema_version==="3.0",sprite:this.label(text,selected?"#ffdc83":"#d2e8ed",o.schema_version==="3.0"?0.045:0.13)});
       }
     }
     const poseKey=JSON.stringify([positions,transforms]);
@@ -196,7 +199,7 @@ class SceneView {
       mesh.scale.set(...(t.scale||o.scale||[1,1,1]));
       mesh.visible=(t.visible??o.visible)!==false;
     }
-    for(const label of this.labels){label.sprite.visible=this.meshes.get(label.name).visible;label.sprite.position.copy(this.meshes.get(label.name).position);label.sprite.position.z+=label.product?0.23:0.03;if(!label.product)label.sprite.position.y-=0.51;}
+    for(const label of this.labels){label.sprite.visible=this.meshes.get(label.name).visible;label.sprite.position.copy(this.meshes.get(label.name).position);label.sprite.position.z+=label.measured?0.09:label.product?0.23:0.03;if(!label.product&&!label.measured)label.sprite.position.y-=0.51;}
     const w=this.canvas.clientWidth||1000,h=w*0.6;
     if(this.width!==w){this.width=w;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.dirty=true;}
     this.controls.update();

@@ -3,6 +3,7 @@ import json
 import math
 import shutil
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -250,7 +251,11 @@ def assert_recording(engine, command, before):
 def test_hkm_real_blender_six_tool_showcase_articulates_attaches_and_releases(tmp_path):
     engine = make_engine(tmp_path)
     catalogue = load_catalogue()
-    evidence = Path("artifacts/hkm-blender/tool-showcase")
+    evidence = (
+        Path("artifacts/hkm-blender")
+        / datetime.now(UTC).strftime("%Y%m%dT%H%M%S%f")
+        / "tool-showcase"
+    )
     evidence.mkdir(parents=True, exist_ok=True)
     summaries = []
     for index, product in enumerate(catalogue.products):

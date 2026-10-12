@@ -6,6 +6,7 @@ use the checked-in API and runtime; navigation must not change durable evidence.
 
 import hashlib
 import json
+import os
 import re
 import socket
 import threading
@@ -47,19 +48,28 @@ def server(tmp_path, request, http_server):
 @pytest.fixture
 def browser_page(request):
     directory = (
-        Path("artifacts/investigation-browser")
+        Path(os.getenv("ROBOTOPS_BROWSER_ARTIFACT_ROOT", "artifacts/investigation-browser"))
         / datetime.now(UTC).strftime("%Y%m%dT%H%M%S%f")
         / request.node.name
     )
     directory.mkdir(parents=True)
-    ui_sources = [
-        *Path("apps/erp_ui").glob("*.js"),
-        Path("apps/erp_ui/index.html"),
-        Path("apps/erp_ui/theme.css"),
-        Path(__file__),
-    ]
+    verification_sources = sorted(
+        {
+            *Path("apps/erp_ui").glob("*.js"),
+            *Path("apps/erp_ui").glob("*.css"),
+            *Path("apps/api").glob("*.py"),
+            *Path("robotops").rglob("*.py"),
+            *Path("blender/scripts").glob("*.py"),
+            *Path("tests/browser").glob("*.py"),
+            Path("apps/erp_ui/index.html"),
+            Path("tools/calibration.py"),
+            Path("pyproject.toml"),
+            Path("uv.lock"),
+        }
+    )
     source_hashes = {
-        path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in ui_sources
+        path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in verification_sources
     }
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True, args=["--enable-unsafe-swiftshader"])
@@ -86,6 +96,10 @@ def browser_page(request):
         try:
             yield page, directory, errors, console_errors, requests
         finally:
+            source_hashes_at_end = {
+                path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in verification_sources
+            }
             page.screenshot(path=str(directory / "last-state.png"), full_page=True)
             (directory / "browser.json").write_text(
                 json.dumps(
@@ -94,6 +108,8 @@ def browser_page(request):
                         "console_errors": console_errors,
                         "requests": requests,
                         "source_sha256_at_start": source_hashes,
+                        "source_sha256_at_end": source_hashes_at_end,
+                        "source_unchanged_during_journey": source_hashes_at_end == source_hashes,
                     },
                     indent=2,
                 ),
@@ -105,6 +121,9 @@ def browser_page(request):
                 context.close()
             finally:
                 browser.close()
+            assert source_hashes_at_end == source_hashes, (
+                "Source changed during browser journey; evidence is not an exact-source pass"
+            )
 
 
 def get(page, url):

@@ -1,6 +1,154 @@
 {
   "components": {
     "schemas": {
+      "AcquireRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "repeated_poses": {
+            "default": false,
+            "title": "Repeated Poses",
+            "type": "boolean"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "scenario": {
+            "default": "varied",
+            "enum": [
+              "varied",
+              "repeated",
+              "single_axis",
+              "near_frontal",
+              "timestamp_skew",
+              "unsettled"
+            ],
+            "title": "Scenario",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "settled": {
+            "default": true,
+            "title": "Settled",
+            "type": "boolean"
+          },
+          "timestamp_skew_s": {
+            "default": 0,
+            "title": "Timestamp Skew S",
+            "type": "number"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "dataset_id"
+        ],
+        "title": "AcquireRequest",
+        "type": "object"
+      },
+      "ApprovalRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "candidate_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "report_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Report Id",
+            "type": "string"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "candidate_id",
+          "report_id",
+          "actor"
+        ],
+        "title": "ApprovalRequest",
+        "type": "object"
+      },
+      "ArtifactBinding": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_fingerprint": {
+            "title": "Artifact Fingerprint",
+            "type": "string"
+          },
+          "artifact_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "camera_configuration_fingerprint": {
+            "title": "Camera Configuration Fingerprint",
+            "type": "string"
+          },
+          "camera_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Camera Id",
+            "type": "string"
+          },
+          "capture_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Capture Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "camera_id",
+          "artifact_id",
+          "artifact_fingerprint",
+          "camera_configuration_fingerprint",
+          "capture_id"
+        ],
+        "title": "ArtifactBinding",
+        "type": "object"
+      },
       "AuditEvent": {
         "additionalProperties": false,
         "properties": {
@@ -197,6 +345,711 @@
           "stage"
         ],
         "title": "AuthorizeStage",
+        "type": "object"
+      },
+      "Board": {
+        "additionalProperties": false,
+        "properties": {
+          "board_id": {
+            "default": "charuco-7x5",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Board Id",
+            "type": "string"
+          },
+          "corner_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Corner Ids",
+            "type": "array"
+          },
+          "corners_m": {
+            "items": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Corners M",
+            "type": "array"
+          },
+          "dictionary": {
+            "const": "DICT_4X4_100",
+            "default": "DICT_4X4_100",
+            "title": "Dictionary",
+            "type": "string"
+          },
+          "marker_length_m": {
+            "default": 0.0315,
+            "exclusiveMinimum": 0.0,
+            "title": "Marker Length M",
+            "type": "number"
+          },
+          "measured_dimensions_m": {
+            "default": [
+              0.315,
+              0.225
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Measured Dimensions M",
+            "type": "array"
+          },
+          "mounting_id": {
+            "default": "flange-mount-1",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Mounting Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "square_length_m": {
+            "default": 0.045,
+            "maximum": 0.2,
+            "minimum": 0.005,
+            "title": "Square Length M",
+            "type": "number"
+          },
+          "squares_x": {
+            "default": 7,
+            "maximum": 20.0,
+            "minimum": 3.0,
+            "title": "Squares X",
+            "type": "integer"
+          },
+          "squares_y": {
+            "default": 5,
+            "maximum": 20.0,
+            "minimum": 3.0,
+            "title": "Squares Y",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "corner_ids",
+          "corners_m"
+        ],
+        "title": "Board",
+        "type": "object"
+      },
+      "Calculation": {
+        "additionalProperties": false,
+        "properties": {
+          "classification": {
+            "const": "IN_PROCESS_PYTHON",
+            "default": "IN_PROCESS_PYTHON",
+            "title": "Classification",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "formula": {
+            "title": "Formula",
+            "type": "string"
+          },
+          "function": {
+            "title": "Function",
+            "type": "string"
+          },
+          "inputs": {
+            "additionalProperties": true,
+            "title": "Inputs",
+            "type": "object"
+          },
+          "outputs": {
+            "additionalProperties": true,
+            "title": "Outputs",
+            "type": "object"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "function",
+          "formula",
+          "inputs",
+          "outputs",
+          "decision"
+        ],
+        "title": "Calculation",
+        "type": "object"
+      },
+      "CalibratedObject": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "$ref": "#/components/schemas/ArtifactBinding"
+          },
+          "geometry_assumption": {
+            "default": "Known rigid cube, visible top patch; orientation supplied separately by the fixture",
+            "title": "Geometry Assumption",
+            "type": "string"
+          },
+          "measurement_quality": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MeasurementQuality"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "perception_method": {
+            "const": "DECLARED_SYNTHETIC_COLOR_PATCH",
+            "default": "DECLARED_SYNTHETIC_COLOR_PATCH",
+            "title": "Perception Method",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "surface_point": {
+            "$ref": "#/components/schemas/PointMeasurement"
+          }
+        },
+        "required": [
+          "binding",
+          "surface_point"
+        ],
+        "title": "CalibratedObject",
+        "type": "object"
+      },
+      "CalibratedObservation": {
+        "additionalProperties": false,
+        "properties": {
+          "bindings": {
+            "items": {
+              "$ref": "#/components/schemas/ArtifactBinding"
+            },
+            "title": "Bindings",
+            "type": "array"
+          },
+          "limitations": {
+            "default": [
+              "Synthetic RGB-D sensor arrays; known color-coded rigid objects only.",
+              "Object orientation and grasp geometry come from the declared fixture, not depth alone."
+            ],
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "machine": {
+            "$ref": "#/components/schemas/CalibrationMachine"
+          },
+          "profile": {
+            "const": "synthetic_calibration_gantry_v1",
+            "default": "synthetic_calibration_gantry_v1",
+            "title": "Profile",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "machine",
+          "bindings"
+        ],
+        "title": "CalibratedObservation",
+        "type": "object"
+      },
+      "CalibratedPlan": {
+        "additionalProperties": false,
+        "properties": {
+          "contact_radius_m": {
+            "default": 0.01,
+            "exclusiveMinimum": 0.0,
+            "maximum": 0.01,
+            "title": "Contact Radius M",
+            "type": "number"
+          },
+          "grasp": {
+            "$ref": "#/components/schemas/GraspSpecification"
+          },
+          "observed_object": {
+            "$ref": "#/components/schemas/CalibratedObject"
+          },
+          "profile": {
+            "const": "synthetic_calibration_gantry_v1",
+            "default": "synthetic_calibration_gantry_v1",
+            "title": "Profile",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "supporting_bindings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ArtifactBinding"
+            },
+            "title": "Supporting Bindings",
+            "type": "array"
+          },
+          "target": {
+            "$ref": "#/components/schemas/TargetPose"
+          },
+          "tool_verification_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Tool Verification Id",
+            "type": "string"
+          },
+          "waypoints": {
+            "items": {
+              "$ref": "#/components/schemas/MachineWaypoint"
+            },
+            "title": "Waypoints",
+            "type": "array"
+          }
+        },
+        "required": [
+          "observed_object",
+          "grasp",
+          "target",
+          "tool_verification_id",
+          "waypoints"
+        ],
+        "title": "CalibratedPlan",
+        "type": "object"
+      },
+      "CalibratedReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "$ref": "#/components/schemas/ArtifactBinding"
+          },
+          "executed_waypoint_count": {
+            "minimum": 0.0,
+            "title": "Executed Waypoint Count",
+            "type": "integer"
+          },
+          "final_machine": {
+            "$ref": "#/components/schemas/CalibrationMachine"
+          },
+          "motion_without_transfer": {
+            "anyOf": [
+              {
+                "const": "GRASP_NOT_ESTABLISHED",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motion Without Transfer"
+          },
+          "profile": {
+            "const": "synthetic_calibration_gantry_v1",
+            "default": "synthetic_calibration_gantry_v1",
+            "title": "Profile",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "tool_fingerprint": {
+            "title": "Tool Fingerprint",
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "tool_fingerprint",
+          "executed_waypoint_count",
+          "final_machine"
+        ],
+        "title": "CalibratedReceipt",
+        "type": "object"
+      },
+      "CalibrationMachine": {
+        "additionalProperties": false,
+        "properties": {
+          "board_mounted": {
+            "title": "Board Mounted",
+            "type": "boolean"
+          },
+          "command_mode": {
+            "default": "flange",
+            "enum": [
+              "tcp",
+              "flange"
+            ],
+            "title": "Command Mode",
+            "type": "string"
+          },
+          "flange": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "motion_phase": {
+            "default": "IDLE",
+            "title": "Motion Phase",
+            "type": "string"
+          },
+          "profile": {
+            "const": "synthetic_calibration_gantry_v1",
+            "default": "synthetic_calibration_gantry_v1",
+            "title": "Profile",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "settled": {
+            "default": true,
+            "title": "Settled",
+            "type": "boolean"
+          },
+          "tcp": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "tool": {
+            "$ref": "#/components/schemas/Tool"
+          },
+          "tool_verification_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Verification Id"
+          }
+        },
+        "required": [
+          "flange",
+          "tcp",
+          "tool",
+          "board_mounted"
+        ],
+        "title": "CalibrationMachine",
+        "type": "object"
+      },
+      "Camera": {
+        "additionalProperties": false,
+        "properties": {
+          "aligned_semantics": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aligned Semantics"
+          },
+          "camera_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Camera Id",
+            "type": "string"
+          },
+          "configuration_revision": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Configuration Revision",
+            "type": "string"
+          },
+          "depth": {
+            "$ref": "#/components/schemas/Stream"
+          },
+          "depth_scale_m": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Depth Scale M",
+            "type": "number"
+          },
+          "depth_semantics": {
+            "enum": [
+              "optical_z",
+              "radial_range"
+            ],
+            "title": "Depth Semantics",
+            "type": "string"
+          },
+          "max_depth_m": {
+            "default": 4,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Depth M",
+            "type": "number"
+          },
+          "min_depth_m": {
+            "default": 0.05,
+            "exclusiveMinimum": 0.0,
+            "title": "Min Depth M",
+            "type": "number"
+          },
+          "profile_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Profile Id",
+            "type": "string"
+          },
+          "registration": {
+            "default": "native",
+            "enum": [
+              "native",
+              "aligned_documented"
+            ],
+            "title": "Registration",
+            "type": "string"
+          },
+          "rgb": {
+            "$ref": "#/components/schemas/Stream"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "t_c_d": {
+            "$ref": "#/components/schemas/Transform"
+          }
+        },
+        "required": [
+          "camera_id",
+          "profile_id",
+          "configuration_revision",
+          "rgb",
+          "depth",
+          "depth_scale_m",
+          "depth_semantics",
+          "t_c_d"
+        ],
+        "title": "Camera",
+        "type": "object"
+      },
+      "CameraMovementRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "rotation_rad": {
+            "default": [
+              0,
+              0.025,
+              0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Rotation Rad",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "translation_m": {
+            "default": [
+              0.04,
+              0,
+              0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Translation M",
+            "type": "array"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision"
+        ],
+        "title": "CameraMovementRequest",
+        "type": "object"
+      },
+      "CameraState": {
+        "additionalProperties": false,
+        "properties": {
+          "active_artifact_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Artifact Id"
+          },
+          "active_validity": {
+            "default": "UNVERIFIED",
+            "enum": [
+              "UNVERIFIED",
+              "VERIFIED",
+              "SUSPECT_INVALID"
+            ],
+            "title": "Active Validity",
+            "type": "string"
+          },
+          "blocking_reasons": {
+            "default": [
+              "APPROVED_CALIBRATION_REQUIRED"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "title": "Blocking Reasons",
+            "type": "array"
+          },
+          "board": {
+            "$ref": "#/components/schemas/Board"
+          },
+          "camera": {
+            "$ref": "#/components/schemas/Camera"
+          },
+          "camera_model_report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Camera Model Report Id"
+          },
+          "candidate_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Id"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits"
+          },
+          "report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Id"
+          },
+          "revision": {
+            "minimum": 1.0,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "workflow_state": {
+            "default": "UNVERIFIED",
+            "enum": [
+              "UNVERIFIED",
+              "NEW_MEASUREMENTS",
+              "CANDIDATE",
+              "INDEPENDENT_VALIDATION",
+              "APPROVED",
+              "REJECTED",
+              "INVESTIGATION"
+            ],
+            "title": "Workflow State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "camera",
+          "board",
+          "limits",
+          "revision"
+        ],
+        "title": "CameraState",
         "type": "object"
       },
       "CellMode": {
@@ -442,6 +1295,16 @@
             ],
             "title": "Active Tool Id"
           },
+          "calibrated_receipt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalibratedReceipt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "causation_id": {
             "maxLength": 160,
             "minLength": 1,
@@ -519,7 +1382,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -778,6 +1642,158 @@
           "current"
         ],
         "title": "DeliverySummary",
+        "type": "object"
+      },
+      "DepthDisplay": {
+        "additionalProperties": false,
+        "properties": {
+          "colors": {
+            "default": "Turbo: dark blue to red; values outside the display range are clipped; magenta is nonfinite or nonpositive",
+            "title": "Colors",
+            "type": "string"
+          },
+          "high_raw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "High Raw"
+          },
+          "invalid_pixels": {
+            "title": "Invalid Pixels",
+            "type": "integer"
+          },
+          "low_raw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Low Raw"
+          },
+          "quantile_method": {
+            "const": "linear",
+            "default": "linear",
+            "title": "Quantile Method",
+            "type": "string"
+          },
+          "quantiles": {
+            "default": [
+              0.01,
+              0.99
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Quantiles",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "scope": {
+            "default": "Display only; raw sensor units, not calibrated distances or a validity decision",
+            "title": "Scope",
+            "type": "string"
+          },
+          "valid_pixels": {
+            "title": "Valid Pixels",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "low_raw",
+          "high_raw",
+          "valid_pixels",
+          "invalid_pixels"
+        ],
+        "title": "DepthDisplay",
+        "type": "object"
+      },
+      "EvidenceGeometry": {
+        "additionalProperties": false,
+        "properties": {
+          "frame": {
+            "const": "b",
+            "default": "b",
+            "title": "Frame",
+            "type": "string"
+          },
+          "numbers": {
+            "additionalProperties": true,
+            "title": "Numbers",
+            "type": "object"
+          },
+          "objects": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/VisualObject"
+            },
+            "title": "Objects",
+            "type": "array"
+          },
+          "scene": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualScene"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "unit": {
+            "const": "m",
+            "default": "m",
+            "title": "Unit",
+            "type": "string"
+          },
+          "viewing_cameras": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/VisualCamera"
+            },
+            "title": "Viewing Cameras",
+            "type": "array"
+          }
+        },
+        "required": [
+          "title",
+          "scope",
+          "numbers"
+        ],
+        "title": "EvidenceGeometry",
         "type": "object"
       },
       "ExecutionRequest": {
@@ -1176,6 +2192,7 @@
       },
       "Fault": {
         "enum": [
+          "MISSED_PICK",
           "DROP_ACK_AFTER_EFFECT",
           "DROP_ACK_BEFORE_EFFECT",
           "ROBOT_COMMAND_FAILURE",
@@ -1192,6 +2209,240 @@
         "title": "Fault",
         "type": "string"
       },
+      "FaultRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "depth_scale",
+              "range_as_z",
+              "depth_registration",
+              "depth_zero",
+              "depth_nonfinite",
+              "depth_mixed",
+              "depth_occluded",
+              "units_1000",
+              "rgb_crop",
+              "sensor_noise",
+              "rgb_corner_warp",
+              "tool_translation",
+              "tool_rotation",
+              "restore_sensor",
+              "restore_tool",
+              "model_focal",
+              "model_profile",
+              "model_crop",
+              "model_resize",
+              "model_distortion",
+              "restore_model",
+              "board_remount",
+              "board_dimensions",
+              "restore_board_dimensions",
+              "board_marker_ids",
+              "restore_board_print",
+              "missing_reference_limit",
+              "restore_limits"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "kind"
+        ],
+        "title": "FaultRequest",
+        "type": "object"
+      },
+      "FitRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "dataset_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "dataset_id",
+          "candidate_id"
+        ],
+        "title": "FitRequest",
+        "type": "object"
+      },
+      "GraspSpecification": {
+        "additionalProperties": false,
+        "properties": {
+          "approach_direction_b": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Approach Direction B",
+            "type": "array"
+          },
+          "approach_distance_m": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 0.5,
+            "title": "Approach Distance M",
+            "type": "number"
+          },
+          "approach_source": {
+            "minLength": 1,
+            "title": "Approach Source",
+            "type": "string"
+          },
+          "contact_offset_b_m": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Contact Offset B M",
+            "type": "array"
+          },
+          "contact_source": {
+            "minLength": 1,
+            "title": "Contact Source",
+            "type": "string"
+          },
+          "orientation_b_tcp": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              }
+            ],
+            "title": "Orientation B Tcp",
+            "type": "array"
+          },
+          "orientation_source": {
+            "minLength": 1,
+            "title": "Orientation Source",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "orientation_b_tcp",
+          "contact_offset_b_m",
+          "approach_direction_b",
+          "approach_distance_m",
+          "orientation_source",
+          "contact_source",
+          "approach_source"
+        ],
+        "title": "GraspSpecification",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1203,6 +2454,85 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "InvalidationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "reason"
+        ],
+        "title": "InvalidationRequest",
+        "type": "object"
+      },
+      "InvestigationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "identity": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Identity",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "validation",
+              "routine-check",
+              "acquisition-report",
+              "tool-verification",
+              "rejection",
+              "runtime-point-error",
+              "pick-outcome"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "kind",
+          "identity"
+        ],
+        "title": "InvestigationRequest",
         "type": "object"
       },
       "JobEvidence": {
@@ -1392,6 +2722,364 @@
         "title": "JobState",
         "type": "string"
       },
+      "Limits": {
+        "additionalProperties": false,
+        "properties": {
+          "ambiguity_gap_px": {
+            "default": 0.08,
+            "exclusiveMinimum": 0.0,
+            "title": "Ambiguity Gap Px",
+            "type": "number"
+          },
+          "justification": {
+            "default": "10 mm synthetic contact capture radius; reserve 5 mm for depth/robot/tool and require at most 5 mm independent point error. Pixel and angular limits are separate quality gates, not production or SICS requirements.",
+            "title": "Justification",
+            "type": "string"
+          },
+          "limits_id": {
+            "default": "synthetic-grasp-budget-1",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Limits Id",
+            "type": "string"
+          },
+          "max_chain_rms_px": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 2.0,
+            "title": "Max Chain Rms Px"
+          },
+          "max_chain_rotation_deg": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 1,
+            "title": "Max Chain Rotation Deg"
+          },
+          "max_chain_translation_mm": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 6,
+            "title": "Max Chain Translation Mm"
+          },
+          "max_correspondence_error_px": {
+            "default": 1.5,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Correspondence Error Px",
+            "type": "number"
+          },
+          "max_depth_surface_spread_m": {
+            "default": 0.015,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Depth Surface Spread M",
+            "type": "number"
+          },
+          "max_pnp_rms_px": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 1.5,
+            "title": "Max Pnp Rms Px"
+          },
+          "max_reference_error_mm": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 5,
+            "title": "Max Reference Error Mm"
+          },
+          "max_timestamp_skew_s": {
+            "default": 0.02,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Timestamp Skew S",
+            "type": "number"
+          },
+          "min_corners": {
+            "default": 8,
+            "minimum": 4.0,
+            "title": "Min Corners",
+            "type": "integer"
+          },
+          "min_image_coverage": {
+            "default": 0.08,
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Min Image Coverage",
+            "type": "number"
+          },
+          "min_rotation_singular_rad": {
+            "default": 0.15,
+            "exclusiveMinimum": 0.0,
+            "title": "Min Rotation Singular Rad",
+            "type": "number"
+          },
+          "min_samples": {
+            "default": 10,
+            "minimum": 3.0,
+            "title": "Min Samples",
+            "type": "integer"
+          },
+          "min_translation_span_m": {
+            "default": [
+              0.12,
+              0.12,
+              0.12
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Min Translation Span M",
+            "type": "array"
+          },
+          "minimum_p95_count": {
+            "default": 20,
+            "minimum": 20.0,
+            "title": "Minimum P95 Count",
+            "type": "integer"
+          },
+          "outlier_threshold_px": {
+            "default": 2.5,
+            "exclusiveMinimum": 0.0,
+            "title": "Outlier Threshold Px",
+            "type": "number"
+          },
+          "quantile_method": {
+            "const": "linear",
+            "default": "linear",
+            "title": "Quantile Method",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "scope": {
+            "const": "SIMULATION_ONLY",
+            "default": "SIMULATION_ONLY",
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "title": "Limits",
+        "type": "object"
+      },
+      "MachineWaypoint": {
+        "additionalProperties": false,
+        "properties": {
+          "attached": {
+            "title": "Attached",
+            "type": "boolean"
+          },
+          "flange": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "phase": {
+            "enum": [
+              "PRE_GRASP",
+              "GRASP",
+              "LIFT",
+              "TRANSFER",
+              "PLACE",
+              "RETRACT"
+            ],
+            "title": "Phase",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sim_time_s": {
+            "minimum": 0.0,
+            "title": "Sim Time S",
+            "type": "number"
+          },
+          "tcp": {
+            "$ref": "#/components/schemas/Transform"
+          }
+        },
+        "required": [
+          "phase",
+          "sim_time_s",
+          "flange",
+          "tcp",
+          "attached"
+        ],
+        "title": "MachineWaypoint",
+        "type": "object"
+      },
+      "MeasurementQuality": {
+        "additionalProperties": false,
+        "properties": {
+          "agreement_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Agreement Id",
+            "type": "string"
+          },
+          "artifact_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "camera_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Camera Id",
+            "type": "string"
+          },
+          "capture_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Capture Id",
+            "type": "string"
+          },
+          "confidence_estimate": {
+            "const": "NOT_ESTIMATED",
+            "default": "NOT_ESTIMATED",
+            "title": "Confidence Estimate",
+            "type": "string"
+          },
+          "correspondence_error_px": {
+            "minimum": 0.0,
+            "title": "Correspondence Error Px",
+            "type": "number"
+          },
+          "correspondence_limit_px": {
+            "exclusiveMinimum": 0.0,
+            "title": "Correspondence Limit Px",
+            "type": "number"
+          },
+          "failures": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "overlap_difference_mm": {
+            "minimum": 0.0,
+            "title": "Overlap Difference Mm",
+            "type": "number"
+          },
+          "overlap_limit_mm": {
+            "exclusiveMinimum": 0.0,
+            "title": "Overlap Limit Mm",
+            "type": "number"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "point_fingerprint": {
+            "title": "Point Fingerprint",
+            "type": "string"
+          },
+          "point_uncertainty_estimate": {
+            "const": "NOT_ESTIMATED",
+            "default": "NOT_ESTIMATED",
+            "title": "Point Uncertainty Estimate",
+            "type": "string"
+          },
+          "quality_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Quality Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "scope": {
+            "default": "Measured gate results for this synthetic color-coded object, not a statistical probability or point uncertainty bound. Holdout error and acceptance limits are not fresh-point accuracy guarantees.",
+            "title": "Scope",
+            "type": "string"
+          },
+          "selected_pixel_count": {
+            "exclusiveMinimum": 0.0,
+            "title": "Selected Pixel Count",
+            "type": "integer"
+          },
+          "surface_mask_sha256": {
+            "title": "Surface Mask Sha256",
+            "type": "string"
+          },
+          "validation_limit_mm": {
+            "exclusiveMinimum": 0.0,
+            "title": "Validation Limit Mm",
+            "type": "number"
+          },
+          "validation_reference_max_mm": {
+            "minimum": 0.0,
+            "title": "Validation Reference Max Mm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "quality_id",
+          "camera_id",
+          "capture_id",
+          "artifact_id",
+          "point_fingerprint",
+          "surface_mask_sha256",
+          "selected_pixel_count",
+          "agreement_id",
+          "correspondence_error_px",
+          "correspondence_limit_px",
+          "overlap_difference_mm",
+          "overlap_limit_mm",
+          "validation_reference_max_mm",
+          "validation_limit_mm",
+          "passed",
+          "failures"
+        ],
+        "title": "MeasurementQuality",
+        "type": "object"
+      },
       "MotionRecording": {
         "additionalProperties": false,
         "properties": {
@@ -1466,7 +3154,10 @@
           "kinematics_version": {
             "anyOf": [
               {
-                "const": "HKM_INSPIRED_VISUAL_KINEMATICS_V1",
+                "enum": [
+                  "HKM_INSPIRED_VISUAL_KINEMATICS_V1",
+                  "IDEAL_GANTRY_GIMBAL_V1"
+                ],
                 "type": "string"
               },
               {
@@ -1494,7 +3185,10 @@
           "robot_profile_version": {
             "anyOf": [
               {
-                "const": "hkm_inspired_v1",
+                "enum": [
+                  "hkm_inspired_v1",
+                  "synthetic_calibration_gantry_v1"
+                ],
                 "type": "string"
               },
               {
@@ -1514,7 +3208,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -1533,8 +3228,12 @@
             "title": "Simulated Duration S"
           },
           "source": {
-            "const": "BLENDER_EVALUATED_SCENE",
             "default": "BLENDER_EVALUATED_SCENE",
+            "enum": [
+              "BLENDER_EVALUATED_SCENE",
+              "SYNTHETIC_CONTROLLER_REPORTS",
+              "BLENDER_EVALUATED_CONTROLLER_REPLAY"
+            ],
             "title": "Source",
             "type": "string"
           },
@@ -1563,6 +3262,33 @@
           "frames"
         ],
         "title": "MotionRecording",
+        "type": "object"
+      },
+      "Mutation": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision"
+        ],
+        "title": "Mutation",
         "type": "object"
       },
       "ObservedMachineState": {
@@ -1609,11 +3335,28 @@
       "ObservedObject": {
         "additionalProperties": false,
         "properties": {
+          "calibrated_object": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalibratedObject"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "confidence": {
-            "maximum": 1.0,
-            "minimum": 0.0,
-            "title": "Confidence",
-            "type": "number"
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
           },
           "evidence_source": {
             "anyOf": [
@@ -1648,7 +3391,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -1668,10 +3412,17 @@
             "title": "Sensor Id"
           },
           "uncertainty_m": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "default": 0,
-            "minimum": 0.0,
-            "title": "Uncertainty M",
-            "type": "number"
+            "title": "Uncertainty M"
           }
         },
         "required": [
@@ -1681,6 +3432,66 @@
           "confidence"
         ],
         "title": "ObservedObject",
+        "type": "object"
+      },
+      "OperationReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "camera_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Camera Id",
+            "type": "string"
+          },
+          "classification": {
+            "const": "IN_PROCESS_PYTHON",
+            "default": "IN_PROCESS_PYTHON",
+            "title": "Classification",
+            "type": "string"
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          },
+          "record_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Record Ids",
+            "type": "array"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CameraState"
+          },
+          "timestamp_utc": {
+            "title": "Timestamp Utc",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "operation",
+          "request_id",
+          "camera_id",
+          "state",
+          "record_ids",
+          "timestamp_utc"
+        ],
+        "title": "OperationReceipt",
         "type": "object"
       },
       "Order": {
@@ -1993,6 +3804,106 @@
         "title": "PickJob",
         "type": "object"
       },
+      "PointMeasurement": {
+        "additionalProperties": false,
+        "properties": {
+          "calculation": {
+            "$ref": "#/components/schemas/Calculation"
+          },
+          "camera_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Camera Id",
+            "type": "string"
+          },
+          "configuration_fingerprint": {
+            "title": "Configuration Fingerprint",
+            "type": "string"
+          },
+          "frame": {
+            "const": "b",
+            "default": "b",
+            "title": "Frame",
+            "type": "string"
+          },
+          "native_depth_pixel": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Native Depth Pixel",
+            "type": "array"
+          },
+          "point": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Point",
+            "type": "array"
+          },
+          "raw_depth_value": {
+            "title": "Raw Depth Value",
+            "type": "number"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "selected_rgb_pixel": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Selected Rgb Pixel",
+            "type": "array"
+          },
+          "transform_fingerprint": {
+            "title": "Transform Fingerprint",
+            "type": "string"
+          },
+          "unit": {
+            "const": "m",
+            "default": "m",
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "point",
+          "camera_id",
+          "configuration_fingerprint",
+          "transform_fingerprint",
+          "selected_rgb_pixel",
+          "native_depth_pixel",
+          "raw_depth_value",
+          "calculation"
+        ],
+        "title": "PointMeasurement",
+        "type": "object"
+      },
       "Pose": {
         "additionalProperties": false,
         "properties": {
@@ -2199,6 +4110,45 @@
         "title": "ReconciliationEvidence",
         "type": "object"
       },
+      "ReuseRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "candidate_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "artifact_id",
+          "candidate_id"
+        ],
+        "title": "ReuseRequest",
+        "type": "object"
+      },
       "RobotCommand": {
         "additionalProperties": false,
         "properties": {
@@ -2214,10 +4164,21 @@
             "enum": [
               "deterministic-1",
               "structured-1",
-              "deterministic-hkm-1"
+              "deterministic-hkm-1",
+              "measured-geometric-1"
             ],
             "title": "Brain Version",
             "type": "string"
+          },
+          "calibrated_plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalibratedPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "causation_id": {
             "maxLength": 160,
@@ -2376,7 +4337,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -2639,6 +4601,21 @@
             "title": "Cell Profile Id",
             "type": "string"
           },
+          "command_mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "tcp",
+                  "flange"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Command Mode"
+          },
           "request_id": {
             "format": "uuid",
             "title": "Request Id",
@@ -2650,12 +4627,227 @@
             "pattern": "^1\\.0$",
             "title": "Schema Version",
             "type": "string"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "maximum": 2147483647.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed"
           }
         },
         "required": [
           "request_id"
         ],
         "title": "StartTestRequest",
+        "type": "object"
+      },
+      "Stream": {
+        "additionalProperties": false,
+        "properties": {
+          "coefficients": {
+            "default": [],
+            "items": {
+              "type": "number"
+            },
+            "title": "Coefficients",
+            "type": "array"
+          },
+          "crop_xy": {
+            "default": [
+              0,
+              0
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Crop Xy",
+            "type": "array"
+          },
+          "distortion_model": {
+            "default": "pinhole",
+            "enum": [
+              "pinhole",
+              "fisheye"
+            ],
+            "title": "Distortion Model",
+            "type": "string"
+          },
+          "height": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 4096.0,
+            "title": "Height",
+            "type": "integer"
+          },
+          "k": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              }
+            ],
+            "title": "K",
+            "type": "array"
+          },
+          "resize_xy": {
+            "default": [
+              1,
+              1
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Resize Xy",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "verification": {
+            "enum": [
+              "SIMULATION_ONLY_FACTORY_MODEL",
+              "MEASURED_BOARD_MODEL"
+            ],
+            "title": "Verification",
+            "type": "string"
+          },
+          "width": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 4096.0,
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "width",
+          "height",
+          "k",
+          "verification"
+        ],
+        "title": "Stream",
+        "type": "object"
+      },
+      "TargetPose": {
+        "additionalProperties": false,
+        "properties": {
+          "approach_tcp": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "calculation": {
+            "$ref": "#/components/schemas/Calculation"
+          },
+          "command_target": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "configured_tool_id": {
+            "title": "Configured Tool Id",
+            "type": "string"
+          },
+          "flange_target": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "mode": {
+            "enum": [
+              "tcp",
+              "flange"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "tcp_target": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "tool_fingerprint": {
+            "title": "Tool Fingerprint",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "configured_tool_id",
+          "tool_fingerprint",
+          "tcp_target",
+          "flange_target",
+          "command_target",
+          "approach_tcp",
+          "calculation"
+        ],
+        "title": "TargetPose",
         "type": "object"
       },
       "TestClearing": {
@@ -2767,6 +4959,49 @@
           "tests"
         ],
         "title": "TestHistory",
+        "type": "object"
+      },
+      "Tool": {
+        "additionalProperties": false,
+        "properties": {
+          "configuration_revision": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Configuration Revision",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "t_f_tcp": {
+            "$ref": "#/components/schemas/Transform"
+          },
+          "tool_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Tool Id",
+            "type": "string"
+          },
+          "verification_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Id"
+          }
+        },
+        "required": [
+          "tool_id",
+          "configuration_revision",
+          "t_f_tcp"
+        ],
+        "title": "Tool",
         "type": "object"
       },
       "ToolCandidate": {
@@ -3196,6 +5431,138 @@
         "title": "TrajectoryWaypoint",
         "type": "object"
       },
+      "Transform": {
+        "additionalProperties": false,
+        "properties": {
+          "destination": {
+            "enum": [
+              "b",
+              "f",
+              "t",
+              "c",
+              "d",
+              "tcp"
+            ],
+            "title": "Destination",
+            "type": "string"
+          },
+          "matrix": {
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "maxItems": 4,
+                "minItems": 4,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 4,
+                "minItems": 4,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 4,
+                "minItems": 4,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 4,
+                "minItems": 4,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              }
+            ],
+            "title": "Matrix",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "b",
+              "f",
+              "t",
+              "c",
+              "d",
+              "tcp"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "translation_unit": {
+            "const": "m",
+            "default": "m",
+            "title": "Translation Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "destination",
+          "matrix"
+        ],
+        "title": "Transform",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -3234,6 +5601,45 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "ValidationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "dataset_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "expected_revision": {
+            "minimum": 0.0,
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "calibration-1.0",
+            "default": "calibration-1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_revision",
+          "dataset_id",
+          "candidate_id"
+        ],
+        "title": "ValidationRequest",
         "type": "object"
       },
       "Verdict": {
@@ -3452,6 +5858,10 @@
                 "type": "string"
               },
               {
+                "const": "synthetic-vacuum-1",
+                "type": "string"
+              },
+              {
                 "type": "null"
               }
             ],
@@ -3555,7 +5965,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -3782,7 +6193,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -3890,7 +6302,10 @@
           "robot_profile_version": {
             "anyOf": [
               {
-                "const": "hkm_inspired_v1",
+                "enum": [
+                  "hkm_inspired_v1",
+                  "synthetic_calibration_gantry_v1"
+                ],
                 "type": "string"
               },
               {
@@ -3910,7 +6325,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -4023,6 +6439,16 @@
       "WorldObservation": {
         "additionalProperties": false,
         "properties": {
+          "calibrated_observation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalibratedObservation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "calibration_version": {
             "default": "cal-1",
             "maxLength": 160,
@@ -4139,7 +6565,8 @@
             "default": "1.0",
             "enum": [
               "1.0",
-              "2.0"
+              "2.0",
+              "3.0"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -4214,6 +6641,1193 @@
           }
         },
         "summary": "Artifact"
+      }
+    },
+    "/calibration": {
+      "get": {
+        "operationId": "overview_calibration_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Overview Calibration Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Overview"
+      }
+    },
+    "/calibration/cameras/{camera_id}/acquisitions": {
+      "post": {
+        "operationId": "acquire_calibration_cameras__camera_id__acquisitions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcquireRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Acquire"
+      }
+    },
+    "/calibration/cameras/{camera_id}/approvals": {
+      "post": {
+        "operationId": "approve_calibration_cameras__camera_id__approvals_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve"
+      }
+    },
+    "/calibration/cameras/{camera_id}/begin-measurements": {
+      "post": {
+        "operationId": "begin_measurements_calibration_cameras__camera_id__begin_measurements_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Mutation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Begin Measurements"
+      }
+    },
+    "/calibration/cameras/{camera_id}/candidates": {
+      "post": {
+        "operationId": "fit_calibration_cameras__camera_id__candidates_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fit"
+      }
+    },
+    "/calibration/cameras/{camera_id}/configure": {
+      "post": {
+        "operationId": "configure_calibration_cameras__camera_id__configure_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Mutation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Configure"
+      }
+    },
+    "/calibration/cameras/{camera_id}/faults": {
+      "post": {
+        "operationId": "fault_calibration_cameras__camera_id__faults_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FaultRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fault"
+      }
+    },
+    "/calibration/cameras/{camera_id}/invalidation": {
+      "post": {
+        "operationId": "invalidate_calibration_cameras__camera_id__invalidation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvalidationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Invalidate"
+      }
+    },
+    "/calibration/cameras/{camera_id}/investigate": {
+      "post": {
+        "operationId": "investigate_calibration_cameras__camera_id__investigate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvestigationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Investigate"
+      }
+    },
+    "/calibration/cameras/{camera_id}/move-camera": {
+      "post": {
+        "operationId": "move_camera_calibration_cameras__camera_id__move_camera_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CameraMovementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Move Camera"
+      }
+    },
+    "/calibration/cameras/{camera_id}/reuse-estimate": {
+      "post": {
+        "operationId": "reuse_estimate_calibration_cameras__camera_id__reuse_estimate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReuseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reuse Estimate"
+      }
+    },
+    "/calibration/cameras/{camera_id}/routine-check": {
+      "post": {
+        "operationId": "routine_check_calibration_cameras__camera_id__routine_check_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Mutation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Routine Check"
+      }
+    },
+    "/calibration/cameras/{camera_id}/tool-check": {
+      "post": {
+        "operationId": "tool_check_calibration_cameras__camera_id__tool_check_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Mutation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Tool Check"
+      }
+    },
+    "/calibration/cameras/{camera_id}/validations": {
+      "post": {
+        "operationId": "validate_calibration_cameras__camera_id__validations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationReceipt"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Validate"
+      }
+    },
+    "/calibration/capture-plan": {
+      "get": {
+        "operationId": "capture_plan_calibration_capture_plan_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Capture Plan Calibration Capture Plan Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Capture Plan"
+      }
+    },
+    "/calibration/captures/{capture_id}/depth-display": {
+      "get": {
+        "operationId": "capture_depth_display_calibration_captures__capture_id__depth_display_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepthDisplay"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Capture Depth Display"
+      }
+    },
+    "/calibration/captures/{capture_id}/{view}": {
+      "get": {
+        "operationId": "capture_image_calibration_captures__capture_id___view__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "view",
+            "required": true,
+            "schema": {
+              "enum": [
+                "rgb",
+                "depth",
+                "corners",
+                "raw-depth"
+              ],
+              "title": "View",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Capture Image"
+      }
+    },
+    "/calibration/export": {
+      "get": {
+        "operationId": "export_calibration_export_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Export"
+      }
+    },
+    "/calibration/geometry": {
+      "get": {
+        "operationId": "geometry_calibration_geometry_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "title": "Camera Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "required": true,
+            "schema": {
+              "enum": [
+                "capture",
+                "poses",
+                "record"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "capture_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capture Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "record_kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "sample",
+                    "validation",
+                    "routine-check",
+                    "runtime-target"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Record Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "record_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Record Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceGeometry"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Geometry"
+      }
+    },
+    "/calibration/inspect-pixel": {
+      "get": {
+        "operationId": "point_inspection_calibration_inspect_pixel_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "title": "Capture Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "artifact_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "title": "Artifact Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "u",
+            "required": true,
+            "schema": {
+              "maximum": 4096,
+              "minimum": 0,
+              "title": "U",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "v",
+            "required": true,
+            "schema": {
+              "maximum": 4096,
+              "minimum": 0,
+              "title": "V",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "native",
+              "enum": [
+                "native",
+                "aligned"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Point Inspection Calibration Inspect Pixel Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Point Inspection"
+      }
+    },
+    "/calibration/operations/{camera_id}/{request_id}": {
+      "get": {
+        "operationId": "operation_calibration_operations__camera_id___request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "camera_id",
+            "required": true,
+            "schema": {
+              "title": "Camera Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Operation Calibration Operations  Camera Id   Request Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Operation"
+      }
+    },
+    "/calibration/records": {
+      "get": {
+        "operationId": "record_index_calibration_records_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Record Index Calibration Records Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Record Index"
+      }
+    },
+    "/calibration/records/{kind}/{identity}": {
+      "get": {
+        "operationId": "record_calibration_records__kind___identity__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "investigation",
+                "pick-outcome",
+                "capture-plan",
+                "acquisition-report",
+                "simulation-fault",
+                "optical-reference",
+                "camera-model-report",
+                "capture",
+                "sample",
+                "candidate",
+                "validation",
+                "artifact",
+                "reference",
+                "reference-batch",
+                "surface-detection",
+                "measurement-quality",
+                "runtime-acquisition",
+                "rejection",
+                "runtime-point",
+                "runtime-point-error",
+                "runtime-target",
+                "observation-failure",
+                "tool-measurements",
+                "tool-verification",
+                "validation-reservation",
+                "calculation-trace",
+                "http-trace",
+                "camera-agreement",
+                "routine-check"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "identity",
+            "required": true,
+            "schema": {
+              "title": "Identity",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Calibration Records  Kind   Identity  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record"
+      }
+    },
+    "/calibration/source": {
+      "get": {
+        "operationId": "source_calibration_source_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "title": "Path",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "title": "Symbol",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Source Calibration Source Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Source"
       }
     },
     "/cell": {
@@ -5556,6 +9170,7 @@
                 "scene-view.js",
                 "workflow-guide.js",
                 "integration-console.js",
+                "calibration-console.js",
                 "workspace.js",
                 "workspace.css"
               ],

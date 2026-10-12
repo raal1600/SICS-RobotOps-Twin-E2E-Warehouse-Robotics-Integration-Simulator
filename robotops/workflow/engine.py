@@ -8,6 +8,9 @@ from pydantic import ValidationError
 
 from robotops.brain.deterministic import DeterministicBrain
 from robotops.brain.validation import ActionValidator
+from robotops.calibration.errors import CalibrationError
+from robotops.calibration.runtime_contracts import ObservationFailure
+from robotops.calibration.service import CalibrationService
 from robotops.config import Settings
 from robotops.domain.models import (
     ActionPlan,
@@ -25,9 +28,11 @@ from robotops.domain.models import (
     WorldObservation,
     new_id,
     stable_id,
+    utc_now,
 )
 from robotops.domain.ports import Brain, Observer, Runtime
 from robotops.faults.injection import OBSERVATION_FAULTS, RUNTIME_FAULTS
+from robotops.observation.calibrated import CalibratedObserver
 from robotops.observation.model import ObservationModel
 from robotops.robot_gateway.gateway import RobotGateway
 from robotops.verification.verifier import Verifier
@@ -47,14 +52,64 @@ class Engine:
         self.store = store
         self.runtime = runtime
         self.settings: Settings = settings or getattr(runtime, "settings", None) or Settings()
-        self.brain = brain or DeterministicBrain(self.settings)
+        self.brain: Brain = brain or DeterministicBrain(self.settings)
         self.observer = observer or ObservationModel(self.settings)
         self.validator = ActionValidator(self.settings)
+        self.calibration: CalibrationService | None = None
+        self.measured_observer: CalibratedObserver | None = None
+        if self.settings.is_measured:
+            from robotops.brain.calibrated import CalibratedBrain
+            from robotops.calibration.artifacts import SensorArtifacts
+            from robotops.cell.calibration_sensor import ControllerSensor
+            from robotops.cell.runtime import SyntheticRuntime
+
+            if not isinstance(runtime, SyntheticRuntime) or observer is not None:
+                raise ValueError("MEASURED_CELL_SENSOR_ADAPTER_REQUIRED")
+            sensor = ControllerSensor(
+                runtime, SensorArtifacts(store.path.parent / "calibration" / "images")
+            )
+            self.calibration = CalibrationService(store, self.settings.seed, sensor)
+            runtime.bind_calibration_store(store.path)
+            self.measured_observer = CalibratedObserver(
+                self.settings, sensor, self.calibration.store, self.calibration.artifacts
+            )
+            self.brain = brain or CalibratedBrain(self.settings, self.calibration.store)
+            self.validator = ActionValidator(self.settings, self.calibration.store)
         self.verifier = Verifier(self.settings)
         self.gateway = RobotGateway(runtime, store)
 
     def _observe(self, job: PickJob, fault: Fault | None = None) -> WorldObservation:
-        observation = self.observer.observe(self.runtime.world(), fault)
+        attempt = new_id()
+        try:
+            observation = (
+                self.measured_observer.fresh(fault, identity=attempt)
+                if self.measured_observer is not None
+                else self.observer.observe(self.runtime.world(), fault)
+            )
+        except CalibrationError as error:
+            if self.calibration is not None:
+                with self.store.transaction() as db:
+                    captured = tuple(
+                        row[0]
+                        for row in db.execute(
+                            "SELECT id FROM calibration_records WHERE kind='capture' AND id LIKE ?",
+                            (attempt + "-%",),
+                        )
+                    )
+                    failure = ObservationFailure(
+                        attempt_id=attempt,
+                        job_id=job.job_id,
+                        command_id=job.command_id,
+                        attempted_at_utc=utc_now().isoformat(),
+                        code=error.code,
+                        detail=error.detail,
+                        saved_capture_ids=captured,
+                    )
+                    self.calibration.store._put(db, "observation-failure", attempt, failure)
+                self.store.emit(
+                    job, "observation", "OBSERVATION_REJECTED", str(error), evidence_ids=(attempt,)
+                )
+            raise
         # Correlate sensor evidence to the request without changing its capture data.
         observation = observation.model_copy(
             update={
@@ -88,12 +143,18 @@ class Engine:
         try:
             self.store.load(PresentationSnapshot, job.job_id)
         except NotFound:
+            world = self.runtime.world()
             self.store.save(
                 job.job_id,
-                PresentationSnapshot(
-                    **metadata(job), job_id=job.job_id, world=self.runtime.world()
-                ),
+                PresentationSnapshot(**metadata(job), job_id=job.job_id, world=world),
             )
+            if self.calibration is not None:
+                from robotops.cell.calibration_sensor import ControllerSensor
+
+                if isinstance(self.calibration.sensor, ControllerSensor):
+                    self.store.save(
+                        job.job_id, self.calibration.sensor.presentation_snapshot(world)
+                    )
         if job.state == JobState.RECEIVED:
             return self.store.transition(
                 job.job_id, JobState.VALIDATED, "ORDER_SCHEMA_VALID", claim=claim
@@ -208,6 +269,8 @@ class Engine:
         claim: Claim,
     ) -> VerificationResult:
         result = self.verifier.verify(command, observation, receipt)
+        if self.calibration is not None:
+            self.calibration.record_pick_outcome(command, receipt, observation, result)
         if result.verdict == Verdict.INCONCLUSIVE:
             self.store.save(result.verification_id, result)
             if job.state != JobState.UNKNOWN_OUTCOME:
@@ -262,7 +325,15 @@ class Engine:
                 if receipt is None:
                     return self.store.job(job_id)
                 job = self.stage_result(self.store.job(job_id), claim)
-                observation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)
+                try:
+                    observation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)
+                except CalibrationError as error:
+                    return self.store.transition(
+                        job_id,
+                        JobState.UNKNOWN_OUTCOME,
+                        "POST_ACTION_OBSERVATION_UNAVAILABLE:" + str(error),
+                        claim=claim,
+                    )
                 if job.command_id is None:
                     raise Conflict("MISSING_DURABLE_COMMAND")
                 command = self.store.load(RobotCommand, job.command_id)
@@ -302,8 +373,16 @@ class Engine:
         command = self.store.load(RobotCommand, job.command_id)
         # Query first, then a fresh observation. Never dispatch here.
         receipt = self.gateway.query(command)
-        observation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)
+        try:
+            observation = self._observe(job, fault if fault in OBSERVATION_FAULTS else None)
+        except CalibrationError:
+            # Receipt was queried and the failed observation is persisted. There is
+            # insufficient evidence for a terminal outcome; keep the original job
+            # and command. Explicit reobservation may continue after sensor recovery.
+            return self.store.job(job.job_id)
         result = self.verifier.verify(command, observation, receipt)
+        if self.calibration is not None:
+            self.calibration.record_pick_outcome(command, receipt, observation, result)
         evidence = ReconciliationEvidence(
             **metadata(job, observation.observation_id),
             evidence_id=new_id(),

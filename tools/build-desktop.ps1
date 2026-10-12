@@ -1,7 +1,8 @@
-param([switch]$Install, [switch]$RestoreDependencies)
+param([switch]$Install, [switch]$RestoreDependencies, [string]$OutputDirectory, [string]$DataRoot)
 $ErrorActionPreference = 'Stop'
 $repository = Split-Path -Parent $PSScriptRoot
 $output = Join-Path $repository 'artifacts\desktop\RobotOps Twin'
+if ($OutputDirectory) { $output = [IO.Path]::GetFullPath($OutputDirectory) }
 $dependencyRoot = Join-Path $repository 'artifacts\desktop\dependencies'
 $archive = Join-Path $dependencyRoot 'webview2-1.0.3800.47.zip'
 $sdk = Join-Path $dependencyRoot 'webview2-1.0.3800.47'
@@ -24,7 +25,9 @@ $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 $source = Join-Path $repository 'apps\desktop'
 & $compiler /nologo /target:winexe /platform:x64 /optimize+ /warnaserror+ /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll ('/reference:'+(Join-Path $output 'Microsoft.Web.WebView2.Core.dll')) ('/reference:'+(Join-Path $output 'Microsoft.Web.WebView2.WinForms.dll')) ('/win32manifest:'+(Join-Path $source 'app.manifest')) ('/out:'+(Join-Path $output 'RobotOps Twin.exe')) (Join-Path $source 'OwnedProcess.cs') (Join-Path $source 'RobotOpsLauncher.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Desktop compilation failed.' }
-@{ repository=$repository; python=$python } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'launcher.json') -Encoding UTF8
+$launcher = @{ repository=$repository; python=$python }
+if ($DataRoot) { $launcher.data_root = [IO.Path]::GetFullPath($DataRoot) }
+$launcher | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'launcher.json') -Encoding UTF8
 @'
 <?xml version="1.0" encoding="utf-8"?>
 <configuration><startup><supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" /></startup><runtime><AppContextSwitchOverrides value="Switch.System.IO.UseLegacyPathHandling=false;Switch.System.IO.BlockLongPaths=false" /></runtime></configuration>

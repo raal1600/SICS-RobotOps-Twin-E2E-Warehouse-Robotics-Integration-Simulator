@@ -52,6 +52,13 @@ routine approval. No new authentication or external service is introduced.
 
 ## Operating documentation
 
+The **Measured calibration cell** adds a local synthetic gantry/gimbal, two RGB-D
+sensors and image-based geometric calibration. It uses Python measurements and an
+explicit configure -> measure -> estimate -> independently validate -> approve
+lifecycle before the same guided order workflow. Camera approval is separate from
+tool verification and physical execution authorization. See [calibration scope and
+acceptance](docs/calibration/PLAN.md) for current implementation limits and evidence.
+
 See [engineering inspection](docs/implementation/engineering-inspector.md),
 [evidence workbench](docs/implementation/evidence-workbench.md), and
 [investigation](docs/implementation/investigation.md) for the domain contracts.

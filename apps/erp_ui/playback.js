@@ -39,7 +39,7 @@ class MotionPlayer {
     this.manualPause=this.reducedMotion;
     motionPreference?.addEventListener("change",event=>{this.reducedMotion=event.matches;if(event.matches)this.pause();});
     this.byId("motion-play").onclick=()=>{
-      if(this.executionGated)return;
+      if(this.executionGated||this.evidence)return;
       if(!this.playing&&this.atEnd())this.cursor=0;
       this.playing=!this.playing;this.manualPause=!this.playing;this.controls();
     };
@@ -59,6 +59,12 @@ class MotionPlayer {
     requestAnimationFrame(time=>this.tick(time));this.controls();
   }
   previewScene(scene){this.preview=scene;if(!this.job)this.scene=scene;if(!this.job||this.executionGated){this.controls();this.draw();}}
+  inspectionOverlay(objects=[]){this.overlay=objects;this.pause();this.draw();}
+  inspectionEvidence(evidence){this.evidence=evidence;this.pause();this.describeClips();this.draw();}
+  setCalibrationStatus(status){
+    if(JSON.stringify(status)===JSON.stringify(this.calibrationStatus))return;
+    this.calibrationStatus=status;this.describeClips();this.draw();
+  }
   pause(){this.playing=false;this.manualPause=true;this.controls();}
   setExecutionGate(gated){
     gated=!!gated;if(this.executionGated===gated)return;
@@ -75,6 +81,13 @@ class MotionPlayer {
   }
   describeClips(){
     const {data,delivery,scene}=this,clips=delivery?.jobs||(data?[data]:[]);
+    if(this.evidence){
+      this.byId("motion-outcome").textContent="Read-only evidence";
+      this.byId("motion-outcome").classList.toggle("uncertain",false);
+      this.byId("motion-scenario").textContent=this.evidence.title;
+      this.byId("motion-detail").textContent=this.evidence.scope;
+      this.byId("motion-import").hidden=true;return;
+    }
     if(this.executionGated){
       this.byId("motion-outcome").textContent="Robot execution not authorized";
       this.byId("motion-outcome").classList.toggle("uncertain",false);
@@ -84,20 +97,20 @@ class MotionPlayer {
       return;
     }
     if(!data&&!delivery){
-      this.byId("motion-outcome").textContent="Current cell";
+      this.byId("motion-outcome").textContent=this.calibrationStatus?.label||"Current cell";
       this.byId("motion-outcome").classList.toggle("uncertain",false);
-      this.byId("motion-scenario").textContent="Choose an execution scenario on the left.";
+      this.byId("motion-scenario").textContent=this.calibrationStatus?.detail||"Choose an execution scenario on the left.";
       this.byId("motion-detail").textContent="Current scene. Saved orders retain their original replay.";
       this.byId("motion-import").hidden=true;
       return;
     }
     const uncertain=clips.some(clip=>["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(clip.job_state));
     const completed=clips.filter(clip=>clip.job_state==="COMPLETED").length;
-    this.byId("motion-outcome").textContent=delivery?(clips.length?`${completed}/${clips.length} completed${uncertain?" · uncertain outcome":""}`:"Ready for a new delivery"):"Job: "+data.job_state;
+    this.byId("motion-outcome").textContent=delivery?(clips.length?`Saved delivery: ${completed}/${clips.length} completed${uncertain?" · uncertain outcome":""}`:this.calibrationStatus?.label||"Ready for a new delivery"):"Recorded job: "+data.job_state;
     const labels=[...new Set(clips.map(recordedScenario))];
-    this.byId("motion-scenario").textContent=delivery&&!clips.length?"New delivery · ready for the selected scenario.":(delivery?"Delivery scenario: ":"Execution: ")+(labels.length>1?`Mixed recorded scenarios: ${labels.join("; ")}`:labels[0]);
+    this.byId("motion-scenario").textContent=delivery&&!clips.length?(this.calibrationStatus?.detail||"New delivery · ready for the selected scenario."):(delivery?"Delivery scenario: ":"Execution: ")+(labels.length>1?`Mixed recorded scenarios: ${labels.join("; ")}`:labels[0]);
     this.byId("motion-outcome").classList.toggle("uncertain",uncertain);
-    const provenance=data?.recording?"Original Blender poses":scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
+    const provenance=data?.recording?(data.recording.source==="SYNTHETIC_CONTROLLER_REPORTS"?"Saved controller samples":data.recording.source==="BLENDER_EVALUATED_CONTROLLER_REPLAY"?"Blender view of controller samples":"Original Blender poses"):scene.source==="SAVED_START_SCENE"?"Saved starting scene":"Current cell reference - historical starting scene unavailable";
     const missing=clips.filter(clip=>!clip.recording).length;
     this.byId("motion-detail").textContent=delivery
       ? (clips.length?`${delivery.reason}${missing?` ${missing} executions have no motion recording; their events and scene provenance remain explicit.`:""}`:"Create an order to start this delivery. Previous deliveries remain available above.")
@@ -142,16 +155,16 @@ class MotionPlayer {
       if(start>=0)this.cursor=start+oldClipOffset+fraction;
     }
     if((first||this.track.length>oldLength&&wasEnd)&&!this.manualPause&&!this.executionGated&&!this.reducedMotion)this.playing=true;
-    if(!this.track.length||this.executionGated)this.playing=false;
+    if(!this.track.length||this.executionGated||this.evidence)this.playing=false;
     this.cursor=Math.min(this.cursor,this.limit());
     this.describeClips();this.controls();this.draw();
   }
   limit(){return Math.max(0,this.track.length-1);}
   atEnd(){return this.cursor>=this.limit();}
   controls(){
-    for(const id of ["motion-play","motion-replay","motion-scrub","motion-speed","motion-step-back","motion-step-forward"])this.byId(id).disabled=this.executionGated||!this.track.length;
+    for(const id of ["motion-play","motion-replay","motion-scrub","motion-speed","motion-step-back","motion-step-forward"])this.byId(id).disabled=!!this.evidence||this.executionGated||!this.track.length;
     for(const id of ["motion-rotate","motion-home","motion-zoom-in","motion-zoom-out"])this.byId(id).disabled=!this.scene&&!this.recording;
-    this.byId("motion-state").textContent=this.executionGated?"Physical execution not authorized":this.delivery
+    this.byId("motion-state").textContent=this.evidence?"Saved geometry · inspection only":this.executionGated?"Physical execution not authorized":this.delivery
       ?(this.delivery.jobs.length?"Full delivery replay · "+this.delivery.jobs.length+" product executions":"3D cell ready")
       :this.data?this.data.recording
         ?({RECORDING:"Live Blender motion",RECORDED:"Recorded 3D scenario",PARTIAL:"Partial motion - outcome uncertain"}[this.data.status]||this.data.status)
@@ -162,7 +175,7 @@ class MotionPlayer {
   }
   tick(time){
     const delta=this.last===null?0:Math.min((time-this.last)/1000,0.1);this.last=time;
-    if(!this.executionGated&&this.playing&&this.track.length){
+    if(!this.evidence&&!this.executionGated&&this.playing&&this.track.length){
       this.cursor=Math.min(this.cursor+delta*24*this.speed,this.limit());
       if(this.atEnd()&&!['WAITING','RECORDING'].includes(this.track.at(-1)?.clip.status))this.playing=false;
       this.controls();
@@ -177,10 +190,11 @@ class MotionPlayer {
     requestAnimationFrame(next=>this.tick(next));
   }
   pose(){
+    if(this.evidence)return {objects:[...(this.evidence.scene?.objects||[]),...(this.evidence.objects||[])],positions:{},transforms:{},phase:this.evidence.title,event:null,data:null};
     if(this.executionGated)return {objects:(this.preview||this.scene)?.objects||[],positions:{},transforms:{},phase:"Physical execution not authorized",event:null,data:null};
     const step=this.track[Math.floor(this.cursor)],data=step?.clip||this.data,rec=data?.recording;
     const objects=rec?.objects||data?.scene?.objects||this.scene?.objects||[];
-    let positions={},transforms={},phase="Cell ready",event=null;
+    let positions={},transforms={},phase=this.calibrationStatus?`Robot idle · ${this.calibrationStatus.label}`:"Cell ready",event=null;
     if(step?.kind==="motion"){
       const frame=rec.frames[step.frame],next=rec.frames[Math.min(step.frame+1,rec.frames.length-1)],fraction=this.cursor-Math.floor(this.cursor);
       for(const obj of objects){const a=frame.positions[obj.name]||obj.position,b=next.positions[obj.name]||a;positions[obj.name]=a.map((v,i)=>v+(b[i]-v)*fraction);}
@@ -195,7 +209,7 @@ class MotionPlayer {
           };
         }
       }
-      phase=`${frame.phase} - Blender frame ${step.frame+1}/${rec.total_frames||100} - ${(frame.sim_time_s??step.frame/(rec.fps||24)).toFixed(1)} s simulated`;
+      phase=`${frame.phase} - ${rec.source==="SYNTHETIC_CONTROLLER_REPORTS"?"Controller sample":"Blender frame"} ${step.frame+1}/${rec.total_frames||100} - ${(frame.sim_time_s??step.frame/(rec.fps||24)).toFixed(1)} s simulated`;
     }else if(step){
       event=step.event;phase=event.state_after||event.event_type;
       if(step.afterMotion&&rec){positions=rec.frames.at(-1).positions;transforms=rec.frames.at(-1).transforms||{};}
@@ -205,8 +219,8 @@ class MotionPlayer {
   }
   draw(){
     const {objects,positions,transforms,phase,event,data}=this.pose();
-    this.view.configure?.((this.executionGated?this.preview||this.scene:data?.scene||this.scene)?.cameras);
-    this.view.render(objects,positions,data?.product_id,transforms);
+    this.view.configure?.(this.evidence?(this.evidence.viewing_cameras?.length?this.evidence.viewing_cameras:this.evidence.scene?.cameras):(this.executionGated?this.preview||this.scene:data?.scene||this.scene)?.cameras);
+    this.view.render([...objects,...(this.overlay||[])],positions,data?.product_id,transforms);
     let message=this.job?"Waiting for persisted execution events":"Environment ready. Create and run an order to begin.";
     let tone="normal";
     if(event){
@@ -223,7 +237,7 @@ class MotionPlayer {
       if(["UNKNOWN_OUTCOME","REQUIRES_INTERVENTION"].includes(event.state_after))tone="uncertain";
       if(event.state_after==="FAILED"||/ESTOP|CELL_FAULT/.test(event.reason))tone="blocked";
       if(event.state_after==="COMPLETED")tone="success";
-    }else if(data?.recording&&this.track.length)message="Machine and product follow evaluated Blender poses.";
+    }else if(data?.recording&&this.track.length)message=data.recording.source==="SYNTHETIC_CONTROLLER_REPORTS"?"Machine and product follow committed controller reports. Replay is read-only.":data.recording.source==="BLENDER_EVALUATED_CONTROLLER_REPLAY"?"Blender presents the committed Python controller samples. Replay does not execute a pick.":"Machine and product follow evaluated Blender poses.";
     if(data&&!data.recording){
       const dispatched=(data.events||[]).some(e=>e.state_after==="EXECUTING");
       const rejected=(data.events||[]).some(e=>["COMMAND_REJECTED","COMMAND_FAILED"].includes(e.event_type));
@@ -231,13 +245,14 @@ class MotionPlayer {
       if(data.scene.source==="CURRENT_WORLD_REFERENCE")message+=" Current cell reference; historical starting scene unavailable.";
     }
     if(this.executionGated)message="Static scene view. Physical execution is not authorized; playback is disabled.";
+    if(this.evidence)message="Static evidence in robot-base coordinates. No new movement or approval.";
     const banner=this.byId("motion-event");
     if(banner.textContent!==message)banner.textContent=message;
     if(banner.dataset.tone!==tone)banner.dataset.tone=tone;
     if(this.byId("motion-phase").textContent!==phase)this.byId("motion-phase").textContent=phase;
-    const step=this.executionGated?null:this.track[Math.floor(this.cursor)];
+    const step=this.executionGated||this.evidence?null:this.track[Math.floor(this.cursor)];
     const frame=step?.kind==="motion"?data.recording.frames[step.frame]:step?.afterMotion?data?.recording?.frames.at(-1):null;
-    this.byId("motion-tool").textContent=frame?.schema_version==="2.0"?`Replay tool: ${frame.active_tool_id||"empty flange"} · ${frame.rack_tool_ids?.length??0} tools in rack`:"";
+    this.byId("motion-tool").textContent=frame?.schema_version==="3.0"?`Replay tool: ${frame.active_tool_id} · reported flange and TCP`:frame?.schema_version==="2.0"?`Replay tool: ${frame.active_tool_id||"empty flange"} · ${frame.rack_tool_ids?.length??0} tools in rack`:"";
     const description=`3D warehouse cell. ${phase}. ${message}`;
     if(this.view.canvas.getAttribute("aria-label")!==description)this.view.canvas.setAttribute("aria-label",description);
   }

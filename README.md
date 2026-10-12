@@ -3,7 +3,27 @@
 A deterministic warehouse robotics integration simulator with a durable workflow,
 a synthetic Blender world, observations, verification and conservative recovery.
 
-**Current delivery status:** Integration Lab is verified at audited source 76e6abe: two clean 831-case Linux suites, all 169 MUST criteria, Windows native checks and exact-source publication/Pages verification. Five fresh Blender/manual scenarios remain attributed to unchanged runtime source 9e83fe7. This evidence/status revision requires its own exact-SHA CI, Windows and deployed-build attestation under ADR 0002. **DONE at audited C**.
+The **Measured calibration cell** adds: synthetic RGB/depth
+images -> actual ChArUco detection/PnP -> inactive estimate -> independent validation
+-> explicit simulated approval -> measured target -> verified order execution.
+[Calibration acceptance](docs/calibration/ACCEPTANCE_REPORT.md) records all SC01-SC20
+results at the tested worktree source: 1080 Python tests, 199 Node tests and 91.18%
+coverage. Those figures describe the October 9 acceptance campaign. The current
+GitHub review branch is `feat/measured-calibration`;
+[publication checks and relocation notes](docs/calibration/VERIFICATION.md#github-review-handoff-2026-10-13)
+separate fresh checks from that historical evidence. `main` and the public site
+remain separately versioned.
+[Swedish presenter walkthrough](docs/calibration/PRESENTER.md) ·
+[Contracts and frames](docs/calibration/CONTRACTS.md) ·
+[Requirement traceability](docs/calibration/TRACEABILITY.md) ·
+[Simulation limits](docs/calibration/LIMITATIONS.md).
+
+Choose **Start new test -> Measured calibration cell** in the existing client.
+The separate ideal orientable gantry keeps the original HKM upright-tool guard intact.
+The two cameras have independent approved artifacts; depth, tools and grasp choices
+remain separate checks. No hardware, paid model service or reinforcement learning is used.
+
+**Historical Integration Lab delivery status:** Integration Lab is verified at audited source 76e6abe: two clean 831-case Linux suites, all 169 MUST criteria, Windows native checks and exact-source publication/Pages verification. Five fresh Blender/manual scenarios remain attributed to unchanged runtime source 9e83fe7. This evidence/status revision requires its own exact-SHA CI, Windows and deployed-build attestation under ADR 0002. **DONE at audited C**.
 
 [Acceptance evidence](ACCEPTANCE_REPORT.md) · [Progress](GOAL_PROGRESS.md) ·
 [Plan](PROJECT_PLAN.md) · [Success criteria](SUCCESS_CRITERIA.md) ·
@@ -29,8 +49,8 @@ synthetic mechanics and conservative geometric checks.
 
 Fresh API/desktop data uses this six-SKU profile. **Start new test** opens
 **New simulation test**: choose **Robot cell**, then **Create test**. The
-HKM-inspired cell is the only selectable cell today; the registry supports future
-additions. Saved legacy tests retain their original Cartesian scene, command
+selector offers the HKM-inspired cell and the measured calibration cell described above.
+Saved legacy tests retain their original Cartesian scene, command
 hashes and evidence, and are labelled by their saved cell.
 [Actual Blender evidence](docs/evidence/hkm-blender-local/result.json) covers the
 six-tool showcase, attachment/release, uncertainty, restart and read-only replay.

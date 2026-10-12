@@ -1,0 +1,213 @@
+{
+  "$defs": {
+    "Transform": {
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Destination",
+          "type": "string"
+        },
+        "matrix": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Matrix",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "b",
+            "f",
+            "t",
+            "c",
+            "d",
+            "tcp"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "translation_unit": {
+          "const": "m",
+          "default": "m",
+          "title": "Translation Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "destination",
+        "matrix"
+      ],
+      "title": "Transform",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "board_fingerprint": {
+      "title": "Board Fingerprint",
+      "type": "string"
+    },
+    "camera_fingerprint": {
+      "title": "Camera Fingerprint",
+      "type": "string"
+    },
+    "camera_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "flange_poses": {
+      "items": {
+        "$ref": "#/$defs/Transform"
+      },
+      "title": "Flange Poses",
+      "type": "array"
+    },
+    "plan_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "scenario": {
+      "enum": [
+        "varied",
+        "repeated",
+        "single_axis",
+        "near_frontal",
+        "timestamp_skew",
+        "unsettled"
+      ],
+      "title": "Scenario",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "default": "Planned synthetic flange inputs; not executed poses or calibration evidence until captured",
+      "title": "Scope",
+      "type": "string"
+    },
+    "settled": {
+      "title": "Settled",
+      "type": "boolean"
+    },
+    "timestamp_skew_s": {
+      "title": "Timestamp Skew S",
+      "type": "number"
+    }
+  },
+  "required": [
+    "plan_id",
+    "dataset_id",
+    "camera_id",
+    "camera_fingerprint",
+    "board_fingerprint",
+    "scenario",
+    "flange_poses",
+    "settled",
+    "timestamp_skew_s"
+  ],
+  "title": "CapturePlan",
+  "type": "object"
+}

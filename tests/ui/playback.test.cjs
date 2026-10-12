@@ -19,6 +19,38 @@ function clip(count, complete=false, job='j1') {
   return {job_id:job, job_state:'UNKNOWN_OUTCOME', status:complete?'RECORDED':'RECORDING',
     scene:{source:'SAVED_START_SCENE',objects:[]},events:[],recording:{complete,objects:[],frames:Array.from({length:count},(_,i)=>({frame:i+1,phase:'TRANSFER',positions:{}})),product_id:'red'},can_import:false};
 }
+test('idle measured cell describes calibration gates without rewriting saved outcomes',()=>{
+  const {player:p,el}=setup();
+  p.setCalibrationStatus({label:'Calibration check required',detail:'Verify the optical model.'});
+  assert.equal(el('motion-outcome').textContent,'Calibration check required');
+  assert.equal(el('motion-scenario').textContent,'Verify the optical model.');
+  assert.match(p.pose().phase,/Robot idle/);
+  p.select('j1');p.update(clip(12));
+  assert.equal(el('motion-outcome').textContent,'Recorded job: UNKNOWN_OUTCOME');
+  p.setCalibrationStatus({label:'Calibration checks complete',detail:'Run a guided pick.'});
+  assert.equal(el('motion-outcome').textContent,'Recorded job: UNKNOWN_OUTCOME');
+  p.select(null);p.setCalibrationStatus(null);
+  assert.equal(el('motion-outcome').textContent,'Current cell');
+});
+
+test('saved capture inspection pins its recorded geometry and pauses command replay',()=>{
+  const {player:p,el}=setup();p.select('j1');p.update(clip(12));
+  const geometry={title:'Selected capture',scope:'Instructor presentation; read-only',scene:{objects:[{name:'saved-flange',position:[1,2,3]}],cameras:[]},numbers:{}};
+  p.inspectionEvidence(geometry);
+  assert.equal(p.playing,false);assert.equal(el('motion-play').disabled,true);
+  assert.equal(p.pose().objects[0].name,'saved-flange');
+  assert.equal(el('motion-outcome').textContent,'Read-only evidence');
+  const cursor=p.cursor;p.tick(100);p.tick(200);assert.equal(p.cursor,cursor);
+  p.inspectionEvidence(null);
+  assert.equal(el('motion-outcome').textContent,'Recorded job: UNKNOWN_OUTCOME');
+  assert.equal(el('motion-play').disabled,false);assert.equal(p.cursor,cursor);
+});
+
+test('historical coordinate overlays never borrow current physical cell geometry',()=>{
+  const {player:p}=setup();p.previewScene({objects:[{name:'moved-camera'}]});
+  p.inspectionEvidence({title:'Reference errors',scope:'Saved coordinates',objects:[{name:'reference'}]});
+  assert.deepEqual(Array.from(p.pose().objects,object=>object.name),['reference']);
+});
 test('live playback waits at last received pose; pause survives incoming frames',()=>{
   const {player:p,el}=setup();p.select('j1');p.update(clip(12));
   for(let i=0;i<50;i++)p.tick(i*100);
@@ -33,7 +65,7 @@ test('replay rewinds only the view; source outcome stays unknown',()=>{
   assert.equal(p.cursor,99);assert.equal(p.playing,false);
   el('motion-replay').onclick();assert.equal(p.cursor,0);assert.equal(p.playing,true);
   el('motion-speed').onchange({target:{value:'0.5'}});assert.equal(p.speed,0.5);
-  assert.equal(el('motion-outcome').textContent,'Job: UNKNOWN_OUTCOME');
+  assert.equal(el('motion-outcome').textContent,'Recorded job: UNKNOWN_OUTCOME');
 });
 test('switching orders rejects late data and unavailable evidence clears motion',()=>{
   const {player:p,el}=setup();p.select('j1');p.update(clip(12));p.select('j2');p.update(clip(100,true));
@@ -99,7 +131,7 @@ function deliveryClips(){
 test('full delivery plays all three original clips with cumulative product positions and read-only replay',()=>{
   const {player:p,el}=setup(),jobs=deliveryClips();p.select('delivery:scene');
   p.updateDelivery({delivery_id:'scene',scene:jobs[0].scene,jobs,reason:'Original clips'});
-  assert.equal(p.track.length,372);assert.equal(el('motion-outcome').textContent,'3/3 completed');
+  assert.equal(p.track.length,372);assert.equal(el('motion-outcome').textContent,'Saved delivery: 3/3 completed');
   for(let i=0;i<3;i++){
     p.cursor=i*124+12;let pose=p.pose();
     assert.equal(pose.data.product_id,['red','blue','green'][i]);
@@ -219,7 +251,7 @@ test('guided gate replaces historical robot poses with the static current cell w
   assert.equal(JSON.stringify(data),before);
   p.setExecutionGate(false);assert.equal(p.playing,true);assert.equal(el('motion-replay').disabled,false);
   assert.equal(el('motion-state').textContent,'Recorded 3D scenario');
-  assert.equal(el('motion-outcome').textContent,'Job: UNKNOWN_OUTCOME');
+  assert.equal(el('motion-outcome').textContent,'Recorded job: UNKNOWN_OUTCOME');
   assert.match(el('motion-detail').textContent,/Original Blender poses/);
   el('motion-replay').onclick();p.tick(200);assert.ok(p.cursor>0);assert.ok(p.pose().positions.Robot[0]>0);
 });
@@ -257,7 +289,7 @@ test('recorded baseline, missing scenario and unknown scenario are distinct from
   p.update(data);assert.match(el('motion-scenario').textContent,/No execution scenario recorded/);
   data.execution_scenario={source:'GUIDED_SESSION',session_id:'saved',fault:null};
   p.update(data);assert.match(el('motion-scenario').textContent,/Happy path \(no injected scenario\)/);
-  assert.equal(el('motion-outcome').textContent,'Job: UNKNOWN_OUTCOME');
+  assert.equal(el('motion-outcome').textContent,'Recorded job: UNKNOWN_OUTCOME');
   data.execution_scenario.fault='UNSUPPORTED_SAVED_FAULT';p.update(data);
   assert.match(el('motion-scenario').textContent,/Unrecognized recorded scenario \(UNSUPPORTED_SAVED_FAULT\)/);
   assert.doesNotMatch(el('motion-scenario').textContent,/Happy path/);
@@ -317,4 +349,16 @@ test('software projection uses vertical field of view and redraws when only fram
   assert.ok(narrow[1]<0,'the old narrow overhead frame crops the cell floor');
   assert.ok(wide[1]>0&&wide[1]<canvas.height,'the wider frame includes the floor');
   assert.deepEqual(camera,{position:[0,0,2.6],target:[0,0,.18]});
+});
+
+test('saved numerical evidence has close framing without changing its points or physical camera',()=>{
+  const {SoftwareSceneView}=realSceneTypes(),{canvas}=softwareCanvas();
+  const view=new SoftwareSceneView(canvas);
+  const camera={position:[.2,-.3,.8],target:[.1,.1,.4],camera_model_version:'evidence-framing-v1'};
+  const before=JSON.stringify(camera);
+  view.viewpoint(camera);
+  const distance=view.distance;view.zoom(.9);
+  assert.ok(Math.abs(view.distance-distance*.9)<1e-10,'zoom remains continuous below the whole-cell distance');
+  assert.equal(JSON.stringify(camera),before);
+  view.reset();assert.equal(view.minimumDistance,2);
 });

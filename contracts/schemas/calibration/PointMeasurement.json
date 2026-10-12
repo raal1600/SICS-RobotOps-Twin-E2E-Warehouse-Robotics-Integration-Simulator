@@ -1,0 +1,150 @@
+{
+  "$defs": {
+    "Calculation": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "const": "IN_PROCESS_PYTHON",
+          "default": "IN_PROCESS_PYTHON",
+          "title": "Classification",
+          "type": "string"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "formula": {
+          "title": "Formula",
+          "type": "string"
+        },
+        "function": {
+          "title": "Function",
+          "type": "string"
+        },
+        "inputs": {
+          "additionalProperties": true,
+          "title": "Inputs",
+          "type": "object"
+        },
+        "outputs": {
+          "additionalProperties": true,
+          "title": "Outputs",
+          "type": "object"
+        },
+        "schema_version": {
+          "const": "calibration-1.0",
+          "default": "calibration-1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "function",
+        "formula",
+        "inputs",
+        "outputs",
+        "decision"
+      ],
+      "title": "Calculation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "calculation": {
+      "$ref": "#/$defs/Calculation"
+    },
+    "camera_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "title": "Camera Id",
+      "type": "string"
+    },
+    "configuration_fingerprint": {
+      "title": "Configuration Fingerprint",
+      "type": "string"
+    },
+    "frame": {
+      "const": "b",
+      "default": "b",
+      "title": "Frame",
+      "type": "string"
+    },
+    "native_depth_pixel": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "integer"
+        }
+      ],
+      "title": "Native Depth Pixel",
+      "type": "array"
+    },
+    "point": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Point",
+      "type": "array"
+    },
+    "raw_depth_value": {
+      "title": "Raw Depth Value",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "selected_rgb_pixel": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Selected Rgb Pixel",
+      "type": "array"
+    },
+    "transform_fingerprint": {
+      "title": "Transform Fingerprint",
+      "type": "string"
+    },
+    "unit": {
+      "const": "m",
+      "default": "m",
+      "title": "Unit",
+      "type": "string"
+    }
+  },
+  "required": [
+    "point",
+    "camera_id",
+    "configuration_fingerprint",
+    "transform_fingerprint",
+    "selected_rgb_pixel",
+    "native_depth_pixel",
+    "raw_depth_value",
+    "calculation"
+  ],
+  "title": "PointMeasurement",
+  "type": "object"
+}

@@ -39,6 +39,14 @@ dialog. Dynamic replacement must not drop focus or reset an investigation.
 
 ## Responsive and state requirements
 
+For the measured cell, keep the next calibration action beside the robot view, with
+camera-specific state and actual image previews. Detailed equations, source, HTTP
+records and raw arrays belong in Inspect evidence. Use the same two source modes;
+highlight related functions without claiming an executed-line trace. Swedish presenter
+explanations are optional disclosures. The client renders backend decisions and never
+solves calibration or decides approval. A known mount change blocks affected targets;
+routine checks and new candidates cannot silently restore approval.
+
 At narrow widths, stack setup and robot; stack trace and inspector. Allow code/table
 scrolling within labelled regions. Never hide essential evidence to fit the viewport.
 No sticky element may cover a focused control. Respect reduced motion; replay has

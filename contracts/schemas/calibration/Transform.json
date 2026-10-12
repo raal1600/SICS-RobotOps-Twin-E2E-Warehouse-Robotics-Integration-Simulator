@@ -1,0 +1,132 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "destination": {
+      "enum": [
+        "b",
+        "f",
+        "t",
+        "c",
+        "d",
+        "tcp"
+      ],
+      "title": "Destination",
+      "type": "string"
+    },
+    "matrix": {
+      "maxItems": 4,
+      "minItems": 4,
+      "prefixItems": [
+        {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        }
+      ],
+      "title": "Matrix",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "calibration-1.0",
+      "default": "calibration-1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "b",
+        "f",
+        "t",
+        "c",
+        "d",
+        "tcp"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "translation_unit": {
+      "const": "m",
+      "default": "m",
+      "title": "Translation Unit",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source",
+    "destination",
+    "matrix"
+  ],
+  "title": "Transform",
+  "type": "object"
+}
